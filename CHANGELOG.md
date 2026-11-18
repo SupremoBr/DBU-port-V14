@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.0.11-v14.4] — DBU Automation integrada
+
+- Incluye DBU Automation DEV 1.9.22 en el sistema: HUD, paneles, ataques/defensas, auras, transformaciones, equipos y demás recursos del módulo. Foundry v13 sigue soportado.
+- Usa el socket del sistema, configuraciones propias y hooks de chat adaptados a v13. Conserva la API global para macros existentes.
+- No carga la copia integrada si DBU Automation/DEV o dbu-auto-start están activos; incluye opción de desactivación y controles contra inicialización duplicada.
+- Migración inicial de preferencias y flags anteriores sin sobrescribir datos actuales ni eliminar los originales; evita resucitar flags eliminadas después de la migración.
+- Ver README de la integración para límites de validación y uso de un mundo de prueba. No incluye migración de reglas a DBU 0.9.3.
+
+
 ## [1.0.11-v14.3] — ficha modular
 
 - Clase principal reducida de 17.613 a 663 líneas; lógica distribuida en 22 módulos de dominio y eventos.

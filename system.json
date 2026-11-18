@@ -2,7 +2,7 @@
   "id": "DBU-MRR-OLD",
   "title": "Dragon Universe RPG - Old System",
   "description": "Automatización para Foundry VTT del juego de rol Dragon Universe (versión antigua), creado por el equipo de https://dbu-rpg.com/. Implementación con permiso de los autores; mecánicas d10, Tiers of Power, Ki y transformaciones. Proyecto sin ánimo de lucro, gratuito, hecho por fans para fans.",
-  "version": "1.0.11-v14.3",
+  "version": "1.0.11-v14.4",
   "compatibility": {
     "minimum": "12",
     "verified": "13",
@@ -13,19 +13,32 @@
       "name": "MRR / ArdillaTactica",
       "discord": "ardillatactica",
       "url": "https://github.com/ArdillaTactica"
+    },
+    {
+      "name": "DBU Automation",
+      "url": "https://github.com/SupremoBr/dbu-automation-releases"
     }
   ],
   "esmodules": [
-    "dbu-old.mjs"
+    "dbu-old.mjs",
+    "module/automation/entry.mjs"
   ],
   "styles": [
-    "styles/dbu-old.css"
+    "styles/dbu-old.css",
+    "module/automation/styles/dbu-automation.css",
+    "module/automation/styles/dbu-hud-v2.css",
+    "module/automation/styles/dbu-action-windows.css"
   ],
   "languages": [
     {
       "lang": "es",
       "name": "Español",
       "path": "lang/es.json"
+    },
+    {
+      "lang": "pt-BR",
+      "name": "Português (Brasil) — DBU Automation",
+      "path": "module/automation/lang/pt-BR.json"
     }
   ],
   "documentTypes": {
@@ -100,10 +113,11 @@
   },
   "url": "https://github.com/SupremoBr/DBU-port-V14",
   "manifest": "https://raw.githubusercontent.com/SupremoBr/DBU-port-V14/main/system.json",
-  "download": "https://github.com/SupremoBr/DBU-port-V14/archive/refs/tags/v1.0.11-v14.3.zip",
+  "download": "https://github.com/SupremoBr/DBU-port-V14/archive/refs/tags/v1.0.11-v14.4.zip",
   "readme": "https://github.com/SupremoBr/DBU-port-V14/blob/main/README.md",
   "changelog": "https://github.com/SupremoBr/DBU-port-V14/blob/main/CHANGELOG.md",
   "bugs": "https://github.com/SupremoBr/DBU-port-V14/issues",
   "license": "MIT",
-  "media": []
+  "media": [],
+  "socket": true
 }
