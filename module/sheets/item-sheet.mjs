@@ -1,3 +1,4 @@
+import { ItemSheet, TextEditor } from "../helpers/foundry-compat.mjs";
 /**
  * Item sheet for all DBU-OLD item types.
  * Uses a dynamic template based on item type.

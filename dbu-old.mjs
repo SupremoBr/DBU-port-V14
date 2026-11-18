@@ -1,3 +1,4 @@
+import { onRenderChatMessage, registerSystemSheets } from "./module/helpers/foundry-compat.mjs";
 /**
  * DBU-OLD — Dragon Ball Universe RPG System for Foundry VTT
  * Main entry point.
@@ -59,7 +60,7 @@ import { JACKET_MODULES_CATALOG } from "./module/data/jacket-modules-catalog.mjs
  * Init Hook — runs once when the system is first initialized.
  * Registers document classes, sheets, templates, and helpers.
  */
-Hooks.once("init", () => {
+Hooks.once("init", async () => {
   console.log("DBU-OLD | Initializing Dragon Ball Universe RPG system");
 
   // Namespace for system-level references
@@ -125,29 +126,10 @@ Hooks.once("init", () => {
     equipment: DBUEquipmentData
   };
 
-  // Register actor sheets
-  Actors.unregisterSheet("core", ActorSheet);
-  Actors.registerSheet("DBU-MRR-OLD", DBUCharacterSheet, {
-    types: ["character"],
-    makeDefault: true,
-    label: "DBU.SheetLabel.Character"
-  });
-
-  Actors.registerSheet("DBU-MRR-OLD", DBUBattleJacketSheet, {
-    types: ["battleJacket"],
-    makeDefault: true,
-    label: "DBU.SheetLabel.BattleJacket"
-  });
-
-  // Register item sheets
-  Items.unregisterSheet("core", ItemSheet);
-  Items.registerSheet("DBU-MRR-OLD", DBUItemSheet, {
-    makeDefault: true,
-    label: "DBU.SheetLabel.Item"
-  });
+  registerSystemSheets(DBUCharacterSheet, DBUBattleJacketSheet, DBUItemSheet);
 
   // Preload Handlebars templates
-  preloadHandlebarsTemplates();
+  await preloadHandlebarsTemplates();
 
   // Register custom Handlebars helpers
   registerHandlebarsHelpers();
@@ -182,7 +164,7 @@ function _dbuQueuePayment(actorId, work) {
   return next;
 }
 
-Hooks.on("renderChatMessage", (message, html, data) => {
+onRenderChatMessage((message, html, data) => {
   const $html = html instanceof HTMLElement ? $(html) : html;
 
   // ---- Hidden attack roll: Reveal button ----

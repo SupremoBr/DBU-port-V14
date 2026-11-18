@@ -1,3 +1,4 @@
+import { ActorSheet, Dialog } from "../helpers/foundry-compat.mjs";
 import { initiateDuel, initiateClash } from "../helpers/duel.mjs";
 
 /**

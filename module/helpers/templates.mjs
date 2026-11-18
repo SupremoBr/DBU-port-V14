@@ -1,3 +1,4 @@
+import { loadSystemTemplates } from "./foundry-compat.mjs";
 /**
  * Preload Handlebars templates used by the DBU-OLD system.
  * @returns {Promise}
@@ -31,5 +32,5 @@ export async function preloadHandlebarsTemplates() {
     "systems/DBU-MRR-OLD/templates/actor/parts/tab-battlejacket.hbs"
   ];
 
-  return loadTemplates(templatePaths);
+  return loadSystemTemplates(templatePaths);
 }

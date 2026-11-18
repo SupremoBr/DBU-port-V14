@@ -1,3 +1,4 @@
+import { Dialog, onRenderChatMessage } from "./foundry-compat.mjs";
 /**
  * Duel Maneuver — interactive two-player chat flow (actions-combat.txt:507-544).
  *
@@ -1312,9 +1313,9 @@ function onClashActorUpdate(actor, changes) {
 }
 
 export function registerDuelHooks() {
-  Hooks.on("renderChatMessage", onRenderDuelMessage);
-  Hooks.on("renderChatMessage", onRenderUnitedAttack);
-  Hooks.on("renderChatMessage", onRenderClashMessage);
+  onRenderChatMessage(onRenderDuelMessage);
+  onRenderChatMessage(onRenderUnitedAttack);
+  onRenderChatMessage(onRenderClashMessage);
   Hooks.on("updateActor", onDuelActorUpdate);
   Hooks.on("updateActor", onClashActorUpdate);
 }

@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.11-v14.1] — adaptación de este fork
+
+- Manifest y descarga apuntan a SupremoBr/DBU-port-V14; el ZIP está fijado al tag de esta versión.
+- APIs con namespace y alternativas para v12, registro moderno de fichas y hook HTML del chat para v13+.
+- Se espera la carga de templates. Se incluyen seis pruebas de compatibilidad.
+- v14 permitida para pruebas; versión verificada se mantiene en v13. Créditos y licencia originales preservados.
+
 ## [1.0.10] - 2026-08-14
 
 - Mejoras en los catálogos de efectos de maestría (`mastery-effects`),

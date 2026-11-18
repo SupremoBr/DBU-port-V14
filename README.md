@@ -11,12 +11,16 @@ Power, Ki y transformaciones) y no distribuye textos, ilustraciones ni
 contenido escaneado de los manuales — para eso, visita
 [dbu-rpg.com](https://dbu-rpg.com/) y apoya a los creadores.
 
+## Adaptación de compatibilidad v14
+
+Este fork conserva la autoría original MRR / ArdillaTactica. Versión local `1.0.11-v14.1`, con ajustes de API y chat para probar en Foundry v14. `verified` permanece en v13: falta validación funcional en v14. Consulte [COMPATIBILITY-V14.md](COMPATIBILITY-V14.md).
+
 ## Instalación
 
 En Foundry VTT → **Game Systems → Install System → Manifest URL**, pega:
 
 ```
-https://github.com/ArdillaTactica/dbu-mrr-old/releases/latest/download/system.json
+https://raw.githubusercontent.com/SupremoBr/DBU-port-V14/main/system.json
 ```
 
 ## Características

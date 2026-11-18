@@ -1,3 +1,4 @@
+import { ActorSheet, Dialog } from "../helpers/foundry-compat.mjs";
 /**
  * ActorSheet for the "battleJacket" actor type.
  */
