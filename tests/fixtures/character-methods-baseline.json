@@ -1,0 +1,2954 @@
+{
+  "baseline": "56b984a",
+  "methods": {
+    "_updateObject": {
+      "hash": "dd62143dd920712e9004745794d241b0360b737d083d0fe2c87a351c801835eb",
+      "length": 2,
+      "async": true
+    },
+    "_normalizeTransformationRows": {
+      "hash": "b3990046802b616cab6467f109ebbe7c76a7d8648de3368cd4097f2d44446814",
+      "length": 1,
+      "async": false
+    },
+    "getData": {
+      "hash": "3526627ce6f3856e36b3595385220fd7a5d1b02ef6180adca6e0a1f3feb13981",
+      "length": 0,
+      "async": true
+    },
+    "_prepareProgressionData": {
+      "hash": "6cf2b995786a1a995689e856ad51c39298cb301a546f86f4cdc3789198e6f1eb",
+      "length": 2,
+      "async": false
+    },
+    "_tpLimitByBaseTier": {
+      "hash": "5f34547969caa92186c6f9edab128b7b206b7ded1cc57e10b84ae36dffdc2232",
+      "length": 1,
+      "async": false
+    },
+    "_prepareTechniquesData": {
+      "hash": "17ada8954086af70c1b8a9345e7f44290840c1cbcda347381dee3831835d5b4b",
+      "length": 2,
+      "async": false
+    },
+    "_techMagicalFlavor": {
+      "hash": "72986b04c47c5c6704e65e42dec7e7e9acabf0db1ce20ba3cf2d3bfd43919efc",
+      "length": 1,
+      "async": false
+    },
+    "_calcTechKP": {
+      "hash": "5af3763a522ad282703a3342121cef69c8d427f537049a5dbd8a221e128a8685",
+      "length": 1,
+      "async": false
+    },
+    "_calcTechTPCost": {
+      "hash": "2fd792e0ac1472275e861678f6ec634068c8f9c2cc4a40610f059033c5ee099c",
+      "length": 1,
+      "async": false
+    },
+    "_calcTechStrike": {
+      "hash": "06ab9c03615bc27cdfa4c3b05034697622c20c0be61879199a5a23a3bbd8802b",
+      "length": 3,
+      "async": false
+    },
+    "_calcTechWound": {
+      "hash": "e308a52e83f36bdb9b183a9b5664da04a72ca64bd60e99d890f907d08136fb91",
+      "length": 3,
+      "async": false
+    },
+    "_getConditionStacks": {
+      "hash": "964b9ca13b969c730f79d0bfca19af3bed37678dad10750f0ed2c0f0f9b18e1b",
+      "length": 2,
+      "async": false
+    },
+    "_diceCategoryFormula": {
+      "hash": "9c8c2ad6bf1d959a98903ecab77b5f487dcea9af7d83f5fb8baccb196941ce7f",
+      "length": 1,
+      "async": false
+    },
+    "_critExtraFormula": {
+      "hash": "3b5a1d306d6f1cdfa541f13233685397bb6797d4452f65c3a49fef4f07ecfa44",
+      "length": 1,
+      "async": false
+    },
+    "_scaleDiceByTier": {
+      "hash": "9b15cdf90f5508ac7b034199a8439691196abdbceb5f7ae4b384176488f7fcc1",
+      "length": 2,
+      "async": false
+    },
+    "_ragingWoundDice": {
+      "hash": "bac7b04bde8fb1066dbaca1b96ce31b7c25012205a32979da04caa2f37aaea02",
+      "length": 2,
+      "async": false
+    },
+    "_surgingWoundDice": {
+      "hash": "47d65c780ce47c5a488c06ded31c2fc7b8c78bdf7ac3141f03f8fd08b1e124b0",
+      "length": 2,
+      "async": false
+    },
+    "_calcCombatCTs": {
+      "hash": "fe857a20cc6e3184b4731d1e06bab94895d75d9be7f496f9a66bc3b79c59ef38",
+      "length": 1,
+      "async": false
+    },
+    "_calcTechCT": {
+      "hash": "65cef488dfce543add4d94fd082c5fe707a1b54663f9502bea45947dcafaf814",
+      "length": 2,
+      "async": false
+    },
+    "_prepareAurasData": {
+      "hash": "c61e2ab0ad83510081db3549ef83e3a05024627a42f6d8344a5c0ea708c859fa",
+      "length": 2,
+      "async": false
+    },
+    "_getActiveAuraEffects": {
+      "hash": "cb967686e82200032645c3c5c1f73f2fed9b0dc37b0903188a419ccb89ecc6a7",
+      "length": 1,
+      "async": false
+    },
+    "_preparePlayerMinionData": {
+      "hash": "399aaf904d431a0d6831b36fb607a91725ab6560638fe5b3a93b95107169f61d",
+      "length": 2,
+      "async": false
+    },
+    "_calcAuraKPCharge": {
+      "hash": "39cac982e4c1d2d0fa356d92825af735bccd8b35b3989b1dabcdf48ef4ed1ca4",
+      "length": 2,
+      "async": false
+    },
+    "_calcAuraEfficiency": {
+      "hash": "76546a126b25387472afe85f76ea242504f04d3ae3ab56cf4126236ba3d4d27a",
+      "length": 2,
+      "async": false
+    },
+    "_calcAuraTPCost": {
+      "hash": "bd3a846f591679801dbfcb477a9354877e521bc86270dd2e68f43aa47ba1ab65",
+      "length": 1,
+      "async": false
+    },
+    "_calcAurasTotalTP": {
+      "hash": "5c4218d0a2b832058249982ed12d13e1c356845a3f163b894787070291df1f81",
+      "length": 1,
+      "async": false
+    },
+    "_prepareTransformationsData": {
+      "hash": "0b3a6da20b8c6d0426eddbc870570f6fd7e4666893f285c6d945f40fd311779d",
+      "length": 2,
+      "async": false
+    },
+    "_resolveUAKpCost": {
+      "hash": "4da4eb46cb4c6c81cb0e93b76117338588c05f7cf8bf09ffb8465c6f1bb1009a",
+      "length": 3,
+      "async": false
+    },
+    "_prepareUniqueData": {
+      "hash": "ed0d0862a877913a5f5345079432c901289c19456b59e593e72ab828dfa6a217",
+      "length": 2,
+      "async": false
+    },
+    "_prepareShapeshiftConfig": {
+      "hash": "a701542fc8e4add86b1f581f2fd5445d5c4c635536cc92cd8318b89d574d0fcb",
+      "length": 2,
+      "async": false
+    },
+    "_shapeshiftCosts": {
+      "hash": "5f3800f208813c397b9ae3cda890ba314062f5d64bd0c66cdd5c8866f9516f45",
+      "length": 1,
+      "async": false
+    },
+    "_onShapeshiftField": {
+      "hash": "d27950bcd78819e6ca1e91198ffe5c3887780631c1646e92bef1a91fca8812e0",
+      "length": 1,
+      "async": true
+    },
+    "_onShapeshiftEffect": {
+      "hash": "c917bfd14f66a3af5272a5e9e65fc5cdf96a10e906357f03e539b4a3ee3fa0b0",
+      "length": 1,
+      "async": true
+    },
+    "_onShapeshiftToggle": {
+      "hash": "f16cc02db923132c147293f6ab9d5663f2981e6e8463efc75cba143a03593613",
+      "length": 1,
+      "async": true
+    },
+    "_shapeshiftDurationLabel": {
+      "hash": "08f2820d556f29133df15a15ac4e06e25d445a5b6e9dc7d3a76ce989e6b1f1f7",
+      "length": 1,
+      "async": false
+    },
+    "_prepareBasesData": {
+      "hash": "1aa50536b5293488dde2646f8545c5b568cbeb5a63d68e2d00741484ff168fe5",
+      "length": 2,
+      "async": false
+    },
+    "_onAddBase": {
+      "hash": "6d4f1a3647f586869583757b6133e62822a79d68fc745afccc761ac659be8477",
+      "length": 1,
+      "async": true
+    },
+    "_onDeleteBase": {
+      "hash": "6e87f6f45f00ce826b2a4ca214139ba3626e1eb97aefb6d6ba31417123641d9a",
+      "length": 1,
+      "async": true
+    },
+    "_onBaseField": {
+      "hash": "7c3060c4810aac5a7264d8efb7fc53dd2b0354455ae7be91654e7794c89803f5",
+      "length": 1,
+      "async": true
+    },
+    "_onBaseAddQuality": {
+      "hash": "86e15ece07ea3e1a6c5013b76f2d37eb7769ec592f539cb4df1a3a06d7d7cfe7",
+      "length": 1,
+      "async": true
+    },
+    "_onBaseDeleteQuality": {
+      "hash": "e5cb7d1817cafde24a632c8cf9ef01a515498200a384f16324457d4937ca1198",
+      "length": 1,
+      "async": true
+    },
+    "_onBaseQualityField": {
+      "hash": "1d89f5fcd13bb6e10a0d250e8ce4c5169f6a4e1ece9e5f66ec7909a92a2ebf5d",
+      "length": 1,
+      "async": true
+    },
+    "_onBaseRepair": {
+      "hash": "746cc1dabc9cbff7d65bf9dfc295ba889a52a2a8d98a5c8f28792495bbffff0c",
+      "length": 1,
+      "async": true
+    },
+    "_onUnifyAttrAlloc": {
+      "hash": "96281bae54bc919713de7191e61fa61716413b850a9bc2df384d698b23acde56",
+      "length": 1,
+      "async": true
+    },
+    "_onUnifyUnlink": {
+      "hash": "a2393eac40af52f7d03074f699e6f01a59825ce14a992e5220e8f35a8d765cea",
+      "length": 1,
+      "async": true
+    },
+    "_onUnifyGrantMP": {
+      "hash": "d0ef88b56e9a701be3e65742d686b3354fada5eefdf8428314ea7812e7ef5ac2",
+      "length": 1,
+      "async": true
+    },
+    "_calcUniqueTPCost": {
+      "hash": "f5b4ba7a9f3c76c6a62b526379efbbfc5bb011ab36eaacd7d59b6230b0745c24",
+      "length": 2,
+      "async": false
+    },
+    "_calcAdvancementTP": {
+      "hash": "cefd9cbf7206112c6704d7f856211a3174f4f5432f1f6c4b2d9a6df73b2e4c34",
+      "length": 2,
+      "async": false
+    },
+    "_calcUniqueTotalTP": {
+      "hash": "77aed4446b829cc3a89c981ce65bedb0623969d57d70369ae1b8fe719149c895",
+      "length": 1,
+      "async": false
+    },
+    "_prepareAttackRefData": {
+      "hash": "89a3fcc378f5d72b1e0236f0297e33d53a27477fa663eafc312b38a9c5849c47",
+      "length": 2,
+      "async": false
+    },
+    "_resolveExtraDice": {
+      "hash": "49fedc480071c6fdf0676894e505a0a70a194ba5df7bdcca8f256e2ba01ea58d",
+      "length": 2,
+      "async": false
+    },
+    "_extraDicePool": {
+      "hash": "1a1c59ef19f1f99735cd5be01f07372d8de02dcc48059d8b207de9585f794652",
+      "length": 2,
+      "async": false
+    },
+    "_applyTopCount": {
+      "hash": "a99f80dd85734ea21ff61a8e937c07ac44986a8de3f6aecd9f5dc9e2b179495c",
+      "length": 3,
+      "async": false
+    },
+    "_buildFormula": {
+      "hash": "7eb79f160d54769714f4f3f65aba23a8c52601f38a42f9d8b75068782df53395",
+      "length": 3,
+      "async": false
+    },
+    "_prepareCombatRollsData": {
+      "hash": "44b9b7f1e86f2852937c54fc9d748a685d943f427828e9e18a001464455f4c28",
+      "length": 2,
+      "async": false
+    },
+    "_prepareActiveEffects": {
+      "hash": "1fe9e52a76e09d8dc56ce88bc297c2427c78cfab96d76db6d267d585a020488c",
+      "length": 2,
+      "async": false
+    },
+    "_prepareCombatData": {
+      "hash": "0d9ef838c77a8a873e804dc48b0865c0129730a5abf3ec4375ca86f32129d3d8",
+      "length": 2,
+      "async": false
+    },
+    "_prepareFusionData": {
+      "hash": "90a362f26626f6c73eca74a9bef323a326206b9c3f3efe2f35b8fdc29e8ef330",
+      "length": 2,
+      "async": false
+    },
+    "_tierFromLevel": {
+      "hash": "c991a5c0cb688a99dd00af1c723288c3a20a0d61f821aff401eb1fa44c2e50c3",
+      "length": 1,
+      "async": false
+    },
+    "_getCombatResources": {
+      "hash": "403b1a6d140352c5d2d318ff801bcfb28bc8ffbd0170e2af3f28ff82b5727d6f",
+      "length": 1,
+      "async": false
+    },
+    "_getCombatConditions": {
+      "hash": "8a72d60abeea04ffe8e0bc6173ea3e1422b7468635d504864a9071c2b0b49e96",
+      "length": 1,
+      "async": false
+    },
+    "_meetsRacialRequirement": {
+      "hash": "2e3ddeb6afbe45bb6efbda8c67594c04e9009e1ba8f705417597904e2afb71e5",
+      "length": 2,
+      "async": false
+    },
+    "_raceMatchesLabel": {
+      "hash": "ba8aa99f42366527256baca583b5838ab495030fa3496f5846acf71f195352bb",
+      "length": 2,
+      "async": false
+    },
+    "_getSubspeciesLabel": {
+      "hash": "adcc444564b8cf0054211c05d7ba4eadd967216ed5e9498bb094055d700af721",
+      "length": 1,
+      "async": false
+    },
+    "_prepareRacialBonusData": {
+      "hash": "0fb33d60ab412dca7035be513aa1e4a45f69d4d8916449faf07142380cc41e77",
+      "length": 2,
+      "async": false
+    },
+    "_prepareManifestedPowerData": {
+      "hash": "cac70b31ecbe60cfd58219613a6fd13c11bae5a35eed1b8406e5ed1c467d5fe8",
+      "length": 2,
+      "async": false
+    },
+    "_prepareTalentBonusData": {
+      "hash": "9bd3fc47dc4224285ab11f381c33daf6aa6302820772548b848c56b6a5514d7a",
+      "length": 2,
+      "async": false
+    },
+    "_prepareEnhancementPowerData": {
+      "hash": "50cb34af62f69be4c4e380aeae5230904baa3d8c7c089a3228ac9b43a78b5265",
+      "length": 2,
+      "async": false
+    },
+    "_prepareAlternateFormData": {
+      "hash": "31dbf6d4937a2e2bf5eb45d8d68c862b7e3dba2e2a2bf10eef69c9ef5b190467",
+      "length": 2,
+      "async": false
+    },
+    "_prepareLegendaryFormData": {
+      "hash": "4bc9172e76c52ffdb22d50f369586297064a46d723439e64d64462978d7a5c31",
+      "length": 2,
+      "async": false
+    },
+    "_decorateTriggeredEffects": {
+      "hash": "9ca298861226f9cf37b36790c939df64f8dd9859adf0d17920e998d3dc5309fd",
+      "length": 3,
+      "async": false
+    },
+    "_resolveTrackedEffectResource": {
+      "hash": "ea83b4168ec4bcd51e4f57581eda2441993ef58b0737913ace4816cf6369ec60",
+      "length": 2,
+      "async": false
+    },
+    "_onBBIncrement": {
+      "hash": "9aa204f31057f46782360277bad11388b4befc7e4cd1a755869feaa198d0ce36",
+      "length": 1,
+      "async": true
+    },
+    "_onBBDecrement": {
+      "hash": "f0c263c90574efbe9f65d23c09b2164c8e436e3ae4408d287f1a0fdb8b26c6ae",
+      "length": 1,
+      "async": true
+    },
+    "_battleBornGrantStack": {
+      "hash": "e9ebdd8764e139102d7c7fd76a3bec9abda3052e16707c89138cca5448fd9e7e",
+      "length": 1,
+      "async": true
+    },
+    "_onExperiencedFighterActivate": {
+      "hash": "0c109d5f31f7119fd97bfc64c38d143727dd2a095659aca4ee9a0d42ee3fbeb6",
+      "length": 1,
+      "async": true
+    },
+    "_onExperiencedFighterDeactivate": {
+      "hash": "d85d9971747fdbaecaa569d2e466e78c46ac3b8c5b9a39d752439926c243b433",
+      "length": 1,
+      "async": true
+    },
+    "_prepareAdversaryData": {
+      "hash": "ebff27b82761290fd31341c54eb5746e4ef86040a09b59c7bde6915c7e0b6217",
+      "length": 2,
+      "async": false
+    },
+    "_prepareDowntimeData": {
+      "hash": "e8a2cfb572d822af51fcabb0151373279389e31d5c86efffe3e6e15d726e50b4",
+      "length": 2,
+      "async": false
+    },
+    "_prepareTfCustomizationData": {
+      "hash": "9ead3db2e28e2b741710ba8404535bfef1ecb9ef3c719ac026c30840adf40ee7",
+      "length": 2,
+      "async": false
+    },
+    "_getCharacterTraits": {
+      "hash": "91e31abbfd00e5e204d5afc76e36f2147e1d3a609f2099c1eb68e57a3e2a4690",
+      "length": 1,
+      "async": false
+    },
+    "_getCharacterTalents": {
+      "hash": "585f17074f88331b9d3d7cb78c1af226e47c0c93804ae823a80d9a00c21a0e74",
+      "length": 1,
+      "async": false
+    },
+    "_groupTalentsByCategory": {
+      "hash": "400a40db4c2d971f550ae00d190b8647369f099792222728dac9840ba79fead4",
+      "length": 1,
+      "async": false
+    },
+    "_getSubspeciesOptions": {
+      "hash": "52119088951a933d434c19600d75ea969f28ac3d4db6a605d169216a647d6cc5",
+      "length": 1,
+      "async": false
+    },
+    "_getSubraceOptions": {
+      "hash": "b3634ed7f7ef67ca037944057ba46724f735fc3a10c40c72dd2d84b36339dbf5",
+      "length": 1,
+      "async": false
+    },
+    "_prepareItems": {
+      "hash": "b007fd86e2042831d4a1c8e79f37259f49f9b20585b7d6841f43621ad7ad922f",
+      "length": 1,
+      "async": false
+    },
+    "_prepareBattleJacketTabData": {
+      "hash": "e702aa871635c1ff0fdd00c1b6b3e279cbfd387ca54b25ac8d5e1e272de03d5d",
+      "length": 2,
+      "async": false
+    },
+    "_calcApparelBenefitLabel": {
+      "hash": "9d139188ed1bdf9d323197f09413b2c5b324d73dd1364ee27820952ce76b8a6e",
+      "length": 1,
+      "async": false
+    },
+    "_calcBreakValueMax": {
+      "hash": "16e6371f5deae9790e7a49442235630e7a203d928365734fb91466a97aed7b89",
+      "length": 1,
+      "async": false
+    },
+    "_calcDoffBonus": {
+      "hash": "02a92a7f5eb98e8fb0f1cb6cecc83fb75ee2db440a125d6511f057d466e21e1e",
+      "length": 1,
+      "async": false
+    },
+    "_getGradeLabel": {
+      "hash": "6e129efb81bb97d3ec78031966ff0b22f091511b1ae2ad569453e0d3ace1acd0",
+      "length": 1,
+      "async": false
+    },
+    "_enrichItemQualities": {
+      "hash": "4a989deb73040060b10f7ba4baa0f05ea1b7f91ed4cdcd6d3196b71708c63f63",
+      "length": 1,
+      "async": false
+    },
+    "_resolveQualityConfigOptions": {
+      "hash": "483b2e983586812567f63b29ee2ce0bdf4cfc3d334948afbf0712a31af81d050",
+      "length": 2,
+      "async": false
+    },
+    "activateListeners": {
+      "hash": "39df2ce9921583229e73436994b63dbe56feef3990fbb742ff5555c65c13c67f",
+      "length": 1,
+      "async": false
+    },
+    "_calcSkillBreakdown": {
+      "hash": "7151d004f4ec7b7e1789433895eab641a5f3cb3f0c75ac933a73cd7962bb8758",
+      "length": 1,
+      "async": false
+    },
+    "_onRollSkill": {
+      "hash": "a366fca682a0ae97380daf9fccb463983fe7d840cfd31b75029d1bc5e85c84e2",
+      "length": 1,
+      "async": true
+    },
+    "_onAddCustomBuff": {
+      "hash": "35ab39c5f9167b4301d6ccc88be2fce1a3c60b240571d40ec71e1a437dbf0c2f",
+      "length": 1,
+      "async": true
+    },
+    "_onDeleteCustomBuff": {
+      "hash": "a8e65210c2913845a42bbe884769e5d4f7454d4740c74bfba7b67974cf348251",
+      "length": 1,
+      "async": true
+    },
+    "_onNewRound": {
+      "hash": "7f1974d345016f06bd2b44aae970e69f7cef3a7d6a328cc18bd8c88892e10efa",
+      "length": 1,
+      "async": true
+    },
+    "_onNewEncounter": {
+      "hash": "02bb16fd99fee75cd7059cdff3c6763161aafb7e0d0878b986224675285059ec",
+      "length": 1,
+      "async": true
+    },
+    "_onToggleEffectGroup": {
+      "hash": "2f86518d1913c382a0ed126daa2ff25b2a2fd74bfb6b06403be33bf15d374da5",
+      "length": 1,
+      "async": false
+    },
+    "_onPassiveToggle": {
+      "hash": "7327e8428716c0343cf5e635bf2d95aff22d91476abf7ee7fc8b033df26b347b",
+      "length": 1,
+      "async": true
+    },
+    "_onUsagePipClick": {
+      "hash": "d0cfddf3209483f5922e706221d75bd2b07c116887bb772f9e298749e7c4401e",
+      "length": 1,
+      "async": true
+    },
+    "_onToggleTrait": {
+      "hash": "30c027099f0f40b43dca693100827b860d35b38d0c6f43f866d2bc56597dcc7c",
+      "length": 1,
+      "async": false
+    },
+    "_onAddTrait": {
+      "hash": "edba07dbc54e010eac57a258dabe1629ff97f1235ae3b309cde6a6bdd1116e7f",
+      "length": 1,
+      "async": true
+    },
+    "_confirmDelete": {
+      "hash": "e658480f20619fb52a8e2ed6534139c9ee7b48ec9b1aec8c4a38d9ae88e49002",
+      "length": 2,
+      "async": true
+    },
+    "_onDeleteTrait": {
+      "hash": "9a9b2b271c7344b255213612a759d3753fe2f8914bfd3a253943db57fc0679b3",
+      "length": 1,
+      "async": true
+    },
+    "_onTraitOptionSelect": {
+      "hash": "125804f424df5963e76c3d50c3d1333d89739d254b587ee830df5e3bbfbe164f",
+      "length": 1,
+      "async": true
+    },
+    "_onPartBeastBestialCheck": {
+      "hash": "0e68e3fae871a66feb5c305615f7b76f3613f94e252f71054b6dff5f3dbd9473",
+      "length": 1,
+      "async": true
+    },
+    "_onDivergentMetaSelect": {
+      "hash": "39034a1c93e9e7dad9888ce51ad50361bd0ba5758ef319debd05a9481a2af8be",
+      "length": 1,
+      "async": true
+    },
+    "_onDivergentMetaConfig": {
+      "hash": "6470108653f47f76ea320be6160feaba79a25f7fb5503b5e101f022a2d9da519",
+      "length": 1,
+      "async": true
+    },
+    "_onCrueltyChange": {
+      "hash": "ac89e43a4c4a4e87bc7b61ffb3873ab19eec9d26a3a1a270037615e7f653ac8a",
+      "length": 2,
+      "async": true
+    },
+    "_onUseSurge": {
+      "hash": "374b0ac66f52e27f6f9617f94f1d5625187a871c043779a4cdc367040587e495",
+      "length": 1,
+      "async": true
+    },
+    "_onPartBeastBestialOption": {
+      "hash": "4ad66d4b2ec946c3e29047593e988a7b3de41af5abdea20f6acf08d38cd1d653",
+      "length": 1,
+      "async": true
+    },
+    "_onTraitOptionCheckbox": {
+      "hash": "d2c35b54a5a929f08a3a1c5a7a3d4419c575e30f743f89c57540031f05c6e7c5",
+      "length": 1,
+      "async": true
+    },
+    "_onAddVillainousTrait": {
+      "hash": "c6cf0ea68ebd358b357ca267e5e41b0aaddd4872da1c38c2982f1663b5a01b0a",
+      "length": 1,
+      "async": true
+    },
+    "_onDeleteVillainousTrait": {
+      "hash": "8b8f0f461644a4bdd20afa950655915a0511d5ff730eaac006d7aa4582413124",
+      "length": 1,
+      "async": true
+    },
+    "_onAddWeakness": {
+      "hash": "d526c65d841b4a74d01c084cddf49bb51c0b1c2b0a459aa7ce6e490ebd4e24a1",
+      "length": 1,
+      "async": true
+    },
+    "_onDeleteWeakness": {
+      "hash": "bf803ed9f54b8c423560415672c72b53b9dee97ee5d200072cd86d178e88dffe",
+      "length": 1,
+      "async": true
+    },
+    "_onAddMinionTrait": {
+      "hash": "cc61406048545df8f9c199210b8ab6d79f7afc8414f4428233282dc6c5b37134",
+      "length": 1,
+      "async": true
+    },
+    "_onAddPlayerMinionTrait": {
+      "hash": "89f66f61cb757ba28dec263147b89e139c78019b94bf9addc24d7e726fb4c068",
+      "length": 1,
+      "async": true
+    },
+    "_onCreateDuplicateMinion": {
+      "hash": "e93179d29ca3dc07956b6a772683b47236d8f1ae06183182da55df16786e62f6",
+      "length": 1,
+      "async": true
+    },
+    "_onDeletePlayerMinionTrait": {
+      "hash": "43c8f17169001564ea2db41183dd09371d77d5cf87883c1b01359ea0e91844cb",
+      "length": 1,
+      "async": true
+    },
+    "_onDeleteMinionTrait": {
+      "hash": "9bbfdfa5d11ddc0bc5b514d5d762c2e3f23c7e771388e54d4e1a1901e3aa07dc",
+      "length": 1,
+      "async": true
+    },
+    "_onToggleTraitCard": {
+      "hash": "9515ce0c24becb7b8f809e47f145b226f70848ec77c41ad258a6a664536a1b76",
+      "length": 1,
+      "async": false
+    },
+    "_onAddTalent": {
+      "hash": "b7808ee11fdd185e2fdd868d050b4c180da5f08449bb8a9395be0473e3bfe618",
+      "length": 1,
+      "async": true
+    },
+    "_onDeleteTalent": {
+      "hash": "3b9310c2bd075876c89da1599f816e01cce1bb97df6d09a6ac456d703f19836f",
+      "length": 1,
+      "async": true
+    },
+    "_onTalentCategoryFilter": {
+      "hash": "2c54546331d0f1fe194f790e0a4f22c8fd5252ac25bdf51a645f12bf34b7ae2f",
+      "length": 1,
+      "async": false
+    },
+    "_onAddTechnique": {
+      "hash": "567039bee29b92a7471438f4050d4b5598dfe336bedeb685d58d863cf8dee062",
+      "length": 1,
+      "async": true
+    },
+    "_onDeleteTechnique": {
+      "hash": "4fa1a8ebb64581d841482b2ff6c2e660bcd9718875436221d7c711ccabfdbe10",
+      "length": 1,
+      "async": true
+    },
+    "_onTechniqueFieldChange": {
+      "hash": "9994df52ff51dd96eb146d8cda6841a2a17841fa11e6863a2288b7c73eb95a51",
+      "length": 1,
+      "async": true
+    },
+    "_onTechStyleToggle": {
+      "hash": "b4f6ee85af9c7b8d12c9c5108ebe56ae5425f70be19f7360765c1309ed979d2c",
+      "length": 1,
+      "async": true
+    },
+    "_onAddTechAdvantage": {
+      "hash": "2bde2b966a66a3676cfc214ebddd4c30692c73c8561b3a04a238690809119753",
+      "length": 1,
+      "async": true
+    },
+    "_onRemoveTechAdvantage": {
+      "hash": "1689240eae32382987190b47f2fc25b5362dd2b5382e9aa49470f93c3fb795bc",
+      "length": 1,
+      "async": true
+    },
+    "_onTechAdvField": {
+      "hash": "6df9a4dc1e7bead05c5c35764c2fb2ee4a8ad531c2399f78fbf0597087d6309e",
+      "length": 1,
+      "async": true
+    },
+    "_onAddTechDisadvantage": {
+      "hash": "c3095c157b82f473c228f59be1808e833e60da28c19e0e6640c73acdf374284f",
+      "length": 1,
+      "async": true
+    },
+    "_onRemoveTechDisadvantage": {
+      "hash": "dd433894c91b45b80f713c78bcfad4639f5f6922211671a2b23483c923e4d240",
+      "length": 1,
+      "async": true
+    },
+    "_onTechDisadvField": {
+      "hash": "9bff9d0650881dcf5f1b902d9b2928a7b54839d794ca1de28d6cd4721c2efa76",
+      "length": 1,
+      "async": true
+    },
+    "_lookupAdvTP": {
+      "hash": "5518e2c9dbcd362cdc0a84b57ea1352a027f95589cde7540698b959728d4a035",
+      "length": 2,
+      "async": false
+    },
+    "_lookupDisadvTP": {
+      "hash": "d49a157d53ba86bbec13d950d51c900e49ef068db5670456b123bcc746b524cc",
+      "length": 2,
+      "async": false
+    },
+    "_onAddAura": {
+      "hash": "26a0e4c4084bd23f115e5ead81462b9110d4822c612fe3e8837fe22a428edcce",
+      "length": 1,
+      "async": true
+    },
+    "_onDeleteAura": {
+      "hash": "7870587defce9e9e98f2989922e0121fa8af8f4ae56962c5b8d6d06a4e0f1081",
+      "length": 1,
+      "async": true
+    },
+    "_onToggleAura": {
+      "hash": "3a9e964c75838d406edf047ad97b106c2b183e10f3c317ebdcff8a784408cd0c",
+      "length": 1,
+      "async": true
+    },
+    "_auraEntryBlocked": {
+      "hash": "3affb3e176cb5077de2389c5314e994f049f875c218d43084a4e7f82ffbddca1",
+      "length": 1,
+      "async": false
+    },
+    "_onAuraFieldChange": {
+      "hash": "19c69df8e0a8ae352b63a45a106e6531a7d7dde30b5e0a98e01b396fd37444e7",
+      "length": 1,
+      "async": true
+    },
+    "_onAddAuraAdvantage": {
+      "hash": "802dcebe9dff412fce7a0a75f329ed4b468cd08cedf6b7cb4502017ba179e3c4",
+      "length": 1,
+      "async": true
+    },
+    "_onRemoveAuraAdvantage": {
+      "hash": "0e6c2fe45a529bd240b6452105994013d3e2f29b4e73a00c0ef241a109c0b9cf",
+      "length": 1,
+      "async": true
+    },
+    "_onAuraAdvField": {
+      "hash": "6a5cae5e3080792ee41d531fbd82acd9a292d949cff8b3e0e8e31e53d010d80e",
+      "length": 1,
+      "async": true
+    },
+    "_onAddAuraDisadvantage": {
+      "hash": "42a35102bd531fc1b8e25648132b56f9ec66a518352c5bf08d18421b8f6fe946",
+      "length": 1,
+      "async": true
+    },
+    "_onRemoveAuraDisadvantage": {
+      "hash": "4ac2e22c01a90efc9c1c2e2e65bff42e2d8d2a514eb6e90aeed7941df1fa4571",
+      "length": 1,
+      "async": true
+    },
+    "_onAuraDisadvField": {
+      "hash": "657d20868c48828d0a107b22f50be1245edea67f54c5cfd0a92f099938c71495",
+      "length": 1,
+      "async": true
+    },
+    "_lookupAuraAdvTP": {
+      "hash": "ddddbdae6c892ee055a4524c8e067d59fcf2679e345d2c50e5d6953ebe13c744",
+      "length": 2,
+      "async": false
+    },
+    "_lookupAuraDisadvTP": {
+      "hash": "f9adbb00f37adee118e8e39236bd1de9c5a7e94a9977baae53a9d62d63a4dfe8",
+      "length": 2,
+      "async": false
+    },
+    "_onAddTransformation": {
+      "hash": "ed09ee8dfeda79897e0c946506a2c62235d5b3527fdc5d8eeabdeb306365b8f4",
+      "length": 1,
+      "async": true
+    },
+    "_onDeleteTransformation": {
+      "hash": "ecfccf56f5cb7d8fa0c75380c2d5cdd6f707d20b23dbb5ceae8a3015a90f543a",
+      "length": 1,
+      "async": true
+    },
+    "_onTransformationFieldChange": {
+      "hash": "00a31f3015d042dd59bb07a75ac61dd815d4855950fd41110f0460f60791b1f1",
+      "length": 1,
+      "async": true
+    },
+    "_onTransformationCheckChange": {
+      "hash": "3c9bfb77781b94edf271d3798e4a14467d7070aa18a62b517e9803010125f605",
+      "length": 1,
+      "async": true
+    },
+    "_buildTransformationEntrySnapshot": {
+      "hash": "cda4fde67a2f4589c0735be194855c907a73d05bd0653403eaadf575abb4c012",
+      "length": 2,
+      "async": false
+    },
+    "_parseTransformationGradeOrStacks": {
+      "hash": "b40f02e2b3fbfff63040f2909c1875added14204458dcace4bdf74acd3d59ebd",
+      "length": 1,
+      "async": false
+    },
+    "_getTransformationStageValue": {
+      "hash": "fc7c0eef9fd0fb35057acc99748ed0b3a717979843171647ec2255a3fd203448",
+      "length": 1,
+      "async": false
+    },
+    "_findFormTrigger": {
+      "hash": "1a27396b2d3be8209e855b4aee7b3b55024aaede88cbfc9fb99ccb15c59ddb24",
+      "length": 3,
+      "async": false
+    },
+    "_findAnyFormTrigger": {
+      "hash": "7e897d509176967dedacecd8a438da004fa2f45f85850c054d5a58e136bc0a48",
+      "length": 2,
+      "async": false
+    },
+    "_hasUsedFormTrigger": {
+      "hash": "a13c250709ea9eb5e868a677be4958e159baf885667d26739152c7705de315ad",
+      "length": 3,
+      "async": false
+    },
+    "_applyTransformationEntryEffects": {
+      "hash": "27cbfd2d35b8e8261609332a5a1bdb2888b4d157a25f179518350189db4d083a",
+      "length": 1,
+      "async": true
+    },
+    "_applyTransformationResourceEntryEffects": {
+      "hash": "343898e82a54f0409d2be2e4cb4813cef15521f8ad3108352c52b2fe81d6ba18",
+      "length": 2,
+      "async": true
+    },
+    "_collectPersistentTransformationResources": {
+      "hash": "d50851a1536731677734e5419b4a0d5e67a13e179e9f75ce059f0873fb5ec00d",
+      "length": 0,
+      "async": false
+    },
+    "_syncPersistentTransformationResources": {
+      "hash": "5871745e18944a777c4781fda4de6c348165cf04004dce76a48433e4aef1ae69",
+      "length": 0,
+      "async": true
+    },
+    "_collectPersistentTransformationFlags": {
+      "hash": "02c0c9db432b327e2f536f67fdb4ebba6b0e7580483c3cf8062e759019c68ea0",
+      "length": 0,
+      "async": false
+    },
+    "_syncPersistentTransformationFlags": {
+      "hash": "bda5b43212ec8c849175a919377489dd4601de0e956a5a49ad034b15f47ed348",
+      "length": 0,
+      "async": true
+    },
+    "_activateTransformationByCatalogKey": {
+      "hash": "87bd441f3ac9f7aa4cc68cda492d25b9d9043fed567969dbea0b518cd8757951",
+      "length": 1,
+      "async": true
+    },
+    "_onAddAlbumEntry": {
+      "hash": "35bc39c753c4ebf9edc7eeb824b7cfc0352c01358c0157a78c60c9ec54a5d398",
+      "length": 1,
+      "async": true
+    },
+    "_onBrowseAlbumImage": {
+      "hash": "ca7dd76694d3825e3ce959e619f26ffc66c0866db3bd9f00647d2f788a35bb3d",
+      "length": 1,
+      "async": true
+    },
+    "_onAlbumNameChange": {
+      "hash": "31771efe2f5b6be37c9673e12aa00b041b60178c5667d49035244288988ec6e8",
+      "length": 1,
+      "async": true
+    },
+    "_onRemoveAlbumEntry": {
+      "hash": "280e3d9ad7e5d9b725b55fb946a9edf0bbb7736124d3f345198ae53c13a0704f",
+      "length": 1,
+      "async": true
+    },
+    "_onActivateAlbumToken": {
+      "hash": "cc2f4dec08640a099ca27aefb5011e6ba60a1954841e55e7be8c7f86d0a03965",
+      "length": 1,
+      "async": true
+    },
+    "_onRestoreOriginalToken": {
+      "hash": "08a878be2746755422dfbd667513f8b6bad040fe7b7f2ab5d61f3daea3be8ed2",
+      "length": 1,
+      "async": true
+    },
+    "_onPayKaiokenLp": {
+      "hash": "e716edc61fffde55696a6a72f4d6a2f70a7c9c1a4ed3ece1ce172b7357a060ad",
+      "length": 1,
+      "async": true
+    },
+    "_restoreOriginalToken": {
+      "hash": "12685ede1a8e41b0db39d6d863c2a68a3fd76cec19e26fc3c191780497a99baf",
+      "length": 0,
+      "async": true
+    },
+    "_onOpenTransformationCatalog": {
+      "hash": "faf26b8811e7dbb0fbf92d5b157848da94db37052f5cc5d71dce09ecc3409e7a",
+      "length": 1,
+      "async": true
+    },
+    "_addTransformationFromCatalog": {
+      "hash": "f3f5ef4d81591e5b9a2b801d4e6ca3c6093a78c46f9969f0186b0daacb885b39",
+      "length": 1,
+      "async": true
+    },
+    "_onViewTransformationTraits": {
+      "hash": "a87f02c2e1c77ec126aa2ad4b9c00c4d94d7013ed78872ab45637ceded3aa469",
+      "length": 1,
+      "async": true
+    },
+    "_onLegendaryTraitSelect": {
+      "hash": "5929e310f3ccaadad0f4dd446066f06fd12a1f971fd201c66de372b360a64970",
+      "length": 1,
+      "async": true
+    },
+    "_onAddUnique": {
+      "hash": "d12a20e929a7fbd7fcf69aab6efb62930af4d71011da1f53351ffaceb8fbf4d7",
+      "length": 1,
+      "async": true
+    },
+    "_onDeleteUnique": {
+      "hash": "e9849eb262fabb6fb28435a45196027d8684a0110e0a1b016ba89160e79f4ba9",
+      "length": 1,
+      "async": true
+    },
+    "_onUniqueFreeToggle": {
+      "hash": "6fefcb27d2c75fb181ae597b3ec974e4a06afeb5f3fe44a8450b2008f49e603e",
+      "length": 1,
+      "async": true
+    },
+    "_onAddUniqueAdvancement": {
+      "hash": "96e5085cc5f80a06ff16d669cb949249784a41a7865867b686671c4f299fbc1c",
+      "length": 1,
+      "async": true
+    },
+    "_onRemoveUniqueAdvancement": {
+      "hash": "3db8eb164795b750ce2d74776200b011842ba2114cac34e4745e8905af955c12",
+      "length": 1,
+      "async": true
+    },
+    "_onUniqueAdvSelect": {
+      "hash": "5b2b375a0064737f94870ea5c5760c0bc4f0f32bae7c31ae3b3551aa14db49fd",
+      "length": 1,
+      "async": true
+    },
+    "_onUniqueAdvFree": {
+      "hash": "c594b64ff376c045036debcfc243010a283f6b8d1b4c46c9ef9a947b8d9f7002",
+      "length": 1,
+      "async": true
+    },
+    "_onUniqueAdvAmount": {
+      "hash": "07314911112f9aa54e3bf522c0c4f2cd25b1ceea031204bc14ed4ce8bbbce0a2",
+      "length": 1,
+      "async": true
+    },
+    "_onAddUniqueRestriction": {
+      "hash": "419c832a542b91f8ba1c10eec3f476f06518418eccd7ded4f6ee262091b57c66",
+      "length": 1,
+      "async": true
+    },
+    "_onRemoveUniqueRestriction": {
+      "hash": "f4f1f6cf6e66d01ef7dc3ead42ed2af52c4d414b56f529e7f01c749b389d92b8",
+      "length": 1,
+      "async": true
+    },
+    "_onUniqueResSelect": {
+      "hash": "a4549f1914fa98d60d35622a7f58aab1b4780bc36e27bacb7e7ca1034550a477",
+      "length": 1,
+      "async": true
+    },
+    "_onAddProgressionRow": {
+      "hash": "8586046b0bdfbd11d14f64e3e9e5014b01dfd73f9952f132223428a26dfb51fe",
+      "length": 1,
+      "async": true
+    },
+    "_onDeleteProgressionRow": {
+      "hash": "c72e63f62dd8908147d651dccb551563aba3ab68d2eacd20335f66bd7246cf2b",
+      "length": 1,
+      "async": true
+    },
+    "_onEquipmentWornToggle": {
+      "hash": "d74759b332ed443690cafa31f255420ff9be51d624381ec5a69bb951295fdfc1",
+      "length": 1,
+      "async": true
+    },
+    "_onEquipmentInlineEdit": {
+      "hash": "a3c7b2c36bd1577e31f1df8f62ebdd8c7daf3bb0df92036f4698b36ad997e6ba",
+      "length": 1,
+      "async": true
+    },
+    "_calcWeaponLPMax": {
+      "hash": "d4814b301c35b9129102f934ce2b0a57848321d34b45930e3db0a841ae67d7b5",
+      "length": 1,
+      "async": false
+    },
+    "_onWeaponLPChange": {
+      "hash": "451c85a42d71926594ddca09bea6ed488de0ea72dd5f6f71cea1761f889ae227",
+      "length": 1,
+      "async": true
+    },
+    "_onWeaponRepair": {
+      "hash": "8040391886834e6ae391f3c39e1572f9b2a2327e1d3624a19eb92bc0f094acd5",
+      "length": 1,
+      "async": true
+    },
+    "_onEquipmentInlineCheck": {
+      "hash": "8ddd925d69c81414298f23ca0320b1808a088e4ac1b6570e73c65ab0281e2017",
+      "length": 1,
+      "async": true
+    },
+    "_onAssignLayer": {
+      "hash": "77447c4b5dacf385fe720f720e6c06e9b2dd63beb1b1fdae5329899b144b133b",
+      "length": 1,
+      "async": true
+    },
+    "_onToggleDetail": {
+      "hash": "16ed2d194c42992e6c2aa0d2360d0b72aa213b219d359fe6d6efee04e93ddc01",
+      "length": 1,
+      "async": true
+    },
+    "_onAddQuality": {
+      "hash": "5bdb661a8be969458486e747e902d442341b05f4991a8242ad07cb9c4eec44b5",
+      "length": 1,
+      "async": true
+    },
+    "_onRemoveQuality": {
+      "hash": "db9765229a0f8f8bdfe2cc86762200633b8b95063df1ee184a63ebfac658368c",
+      "length": 1,
+      "async": true
+    },
+    "_onQualityNotesChange": {
+      "hash": "964be28bbdb1fb15ef530ae61d9b16d9a6843730b7d2d9b948d2591f6cb09b30",
+      "length": 1,
+      "async": true
+    },
+    "_onBreakValueChange": {
+      "hash": "0ed078717743c481e78409c80c4823a51a4bcbff1db4ffa076ecec14b17635c0",
+      "length": 1,
+      "async": true
+    },
+    "_onToggleQualityCard": {
+      "hash": "462e80280264609ff8fa843516a270e471a56aac8a93bdce7fb02e33faf66fe1",
+      "length": 1,
+      "async": true
+    },
+    "_onAddItemQuality": {
+      "hash": "5ef680a5b6f49d1fc60c9c28a4e284ded8ef4cb200fb5a6ad2f52889e804f9be",
+      "length": 1,
+      "async": true
+    },
+    "_onRemoveItemQuality": {
+      "hash": "91a30a730f7d57dc66811f8a0e7d1aace415ff478e2821f62c1c4ba6891ab175",
+      "length": 1,
+      "async": true
+    },
+    "_onChangeQualityConfig": {
+      "hash": "12c43358cca2d22295ba62637ed1e8dfe8e418ef036a30584194c8e8d10b8fc4",
+      "length": 1,
+      "async": true
+    },
+    "_onChangeQualityNotes": {
+      "hash": "3c0b2133ac62dadf669dfd15efa8cd3e87a0ef47336e2d95f5ed2bd59bf46613",
+      "length": 1,
+      "async": true
+    },
+    "_onUseResource": {
+      "hash": "faf67dd203346f912eb3c2cce9ceae546878376e5c6c390ea6aa2ef40639d3a0",
+      "length": 1,
+      "async": true
+    },
+    "_onTbTabSwitch": {
+      "hash": "2d1e41f66aefdb8507c0751e18157d915c3dc9eb47f7ae7b0a904ca0fd34c408",
+      "length": 1,
+      "async": true
+    },
+    "_onUnifiedAction": {
+      "hash": "6a4c6a09e0834c4130e08c39494a75637668757746c812226d20e5f8704f66e3",
+      "length": 1,
+      "async": true
+    },
+    "_executeUnifiedStance": {
+      "hash": "55b1a13e88743006961c08430e413d617c74c17bc460099b0775a33d5cb89961",
+      "length": 1,
+      "async": true
+    },
+    "_executeUnifiedTrigger": {
+      "hash": "926a36e291227b7ce0d3f228e24806f028d9018d81e87eb91ed07e8cffae65df",
+      "length": 3,
+      "async": true
+    },
+    "_runTriggerAutomationAndChat": {
+      "hash": "07fe9f622ead8a6a8e05b661c17f77c87187994da7d605c915eb29c71b6bb5dc",
+      "length": 1,
+      "async": true
+    },
+    "_applyTriggerAutomation": {
+      "hash": "6d1e8cdc9a11d14806973f7fdddf06b5c894c759fc256cf4e3a54ec0c4b6c8b8",
+      "length": 1,
+      "async": true
+    },
+    "_reverseAutoApplied": {
+      "hash": "0c6a94c582f4c7faacc73ce7efadded1f569dad109558102a41863d8d438de42",
+      "length": 3,
+      "async": false
+    },
+    "_onUndoResource": {
+      "hash": "41e9ec4d74a26e56cdd266c0d6797c425278f24a69b67de06f1afbff29edbaa3",
+      "length": 1,
+      "async": true
+    },
+    "_onAddResourceUse": {
+      "hash": "02c14b689869946e586da05268f2964e54d59a1ec284ff8a9fc9ccf45f3082e7",
+      "length": 1,
+      "async": true
+    },
+    "_trackCombatUsage": {
+      "hash": "05050d79e4d04296f2bbfa2f6ed2c964ebda488233cb1bb70665b392380848da",
+      "length": 1,
+      "async": true
+    },
+    "_prettifyEffectLabel": {
+      "hash": "e89d8e84093de26becf572665ad326db1c2686a326c207f666a04384857e4ac2",
+      "length": 1,
+      "async": false
+    },
+    "_onCombatNewRound": {
+      "hash": "ea0233684cd42f3ba544e88870668b308cc9570b665e27d1e7cc42b2536ab119",
+      "length": 1,
+      "async": true
+    },
+    "_onEvilAuraPointsAdd": {
+      "hash": "d1fbe3724ececf809c1b5ebcb4fec08f1ea1d7d572a8abe3adcab60a9a893708",
+      "length": 1,
+      "async": true
+    },
+    "_onEvilAuraPointsSub": {
+      "hash": "b266c9f4dca6504cd459aa3a2cc67089fa3f25c72c1ded4a72d6871290423830",
+      "length": 1,
+      "async": true
+    },
+    "_onEvilAuraTechsActivate": {
+      "hash": "4bd0ed4d5045ed70175eb12b6b5db41c33f523247e2b12820b46141cb28e7db0",
+      "length": 1,
+      "async": true
+    },
+    "_onEvilAuraTechsDeactivate": {
+      "hash": "a0a41fb5e33f561c9b4e7cbd2b373e389ea0e89c347b941d6e4f19d413c782e1",
+      "length": 1,
+      "async": true
+    },
+    "_onDkpAdd": {
+      "hash": "e4c63e80cc4e2389dc8d698df5768b1a1cc69c84fe4173eaa513e5a24ff8bbd2",
+      "length": 1,
+      "async": true
+    },
+    "_onDkpSub": {
+      "hash": "b08f64a015169854a76dbd06af1817953940c319b05d2b98988e77088eaf9466",
+      "length": 1,
+      "async": true
+    },
+    "_onDkpRefill": {
+      "hash": "5490c8a422fcb9780f7c7c00ff17dbb04bed84ecae02116a3b58453fcf7c6e5e",
+      "length": 1,
+      "async": true
+    },
+    "_onGodManeuverUse": {
+      "hash": "6c9a635219af5b811473cd8c05ca239e3e48852de978adcff61874dfc005da75",
+      "length": 1,
+      "async": true
+    },
+    "_onCombatNewEncounter": {
+      "hash": "263d94753d97506d13722e6d713fa83cbb86e7bc658062cd7d44433b094d3e85",
+      "length": 1,
+      "async": true
+    },
+    "_getStressBonus": {
+      "hash": "eddafb6440b5a335399d9e15f1e402a68b02e144885f9d6762d55cbe2c151e3e",
+      "length": 0,
+      "async": false
+    },
+    "_onTfStressTest": {
+      "hash": "151a13f6f22a52d59b786d11cc35cbbdbbef0fe93e8a717c562dcbf3ab1c6d5b",
+      "length": 1,
+      "async": true
+    },
+    "_onTfTurbulentRoll": {
+      "hash": "953aa89fff01c16ca6b58c1534fcca0bdc56481c0abac41d7ba6928451d60c00",
+      "length": 1,
+      "async": true
+    },
+    "_onTfSurgingStrength": {
+      "hash": "5d87982be8700b327d6960e6dcec7a41c1af14e314bab1b5133e8b6adf1bd018",
+      "length": 1,
+      "async": true
+    },
+    "_onTfBurstLimit": {
+      "hash": "9de4ae50bb125b13340c4770b956472a6f94a01ae8296abc24e6008423a28b7e",
+      "length": 1,
+      "async": true
+    },
+    "_getTransformationOptions": {
+      "hash": "fea94aa6a777d1b3cd97c23c9e626082ba0b58eb42ca76629242d9874ef713f1",
+      "length": 1,
+      "async": false
+    },
+    "_getResolvedTransformationEffects": {
+      "hash": "4c3563415fe01763b4b1b994571faa6270e81cf38c6f869cde0ed175b5ab7937",
+      "length": 1,
+      "async": false
+    },
+    "_collectPersistentTransformationCombatStates": {
+      "hash": "9cee29b49a22257295ce772604ee86500f2b96496cbff54c76c3982082e4c04a",
+      "length": 0,
+      "async": false
+    },
+    "_syncPersistentTransformationCombatStates": {
+      "hash": "3af0bfb6e0a6a825f4383dfc451c5be11213cab456ce06e05c2c40c67401d54a",
+      "length": 0,
+      "async": true
+    },
+    "_getFirstTransformationOption": {
+      "hash": "d0d9b8c5cbd9f4a42ed995db6778b34b42d8227a1eac3d0db92490aad073efda",
+      "length": 1,
+      "async": false
+    },
+    "_applyLegendRealizedBonuses": {
+      "hash": "004f3caa005c5242556a8a0be9ae68f198e48cf1feba51d46d89a5b69266ede0",
+      "length": 4,
+      "async": true
+    },
+    "_onTfLegendRealized": {
+      "hash": "28b6936a9427b68deecf7fed6e577a148fb74d48f4574e7ed8e1577c8ce4ec98",
+      "length": 1,
+      "async": true
+    },
+    "_onTfNewLevelOfPower": {
+      "hash": "7603fa9b25a248c19ec857694299ac2d67984f4077c4683fc8e209208b10eee8",
+      "length": 1,
+      "async": true
+    },
+    "_onLegendaryTraitTrigger": {
+      "hash": "d7e6ca791ea9c8c961df408ece2b02892087d40c6cfc2e6bf7bab4768aae41de",
+      "length": 1,
+      "async": true
+    },
+    "_onManifestedPowerTrigger": {
+      "hash": "8807737800a154effe326a5c5605866f36a589247b0701f68714d4c0d2d1db79",
+      "length": 1,
+      "async": true
+    },
+    "_onRacialTraitTrigger": {
+      "hash": "759aeed8c0969bc2bb7dc3bf334f81376d04e48c5b3e43ec6681970b992a30c5",
+      "length": 1,
+      "async": true
+    },
+    "_getJusticeChargeContext": {
+      "hash": "b2ac347aacc68d9a39ff29314936d32e4a16b601134dc937430450db49c6763e",
+      "length": 0,
+      "async": false
+    },
+    "_getTransformationScalingLevel": {
+      "hash": "ab7077070da8f8f3dcffe53c389ca59a0074b05f1b42d77a5f3db0f813e9b2dd",
+      "length": 1,
+      "async": false
+    },
+    "_getTransformationGrowthLevel": {
+      "hash": "db1e4395ab730901b9b9bea884435f2d732b02b80a725c223f76be47d1bd593a",
+      "length": 1,
+      "async": false
+    },
+    "_applyJusticeChargeTriggerResource": {
+      "hash": "cdfcf4bf21a422592b3aada1f9858bad1db5963e62175a4cd6cefd54e1a6eb3a",
+      "length": 2,
+      "async": false
+    },
+    "_undoCombatUsage": {
+      "hash": "51e68360a486935a8409a6a8bdbbc1e58cf135b07346134559020bfc484959c9",
+      "length": 2,
+      "async": true
+    },
+    "_handleJusticeChargeKiConversion": {
+      "hash": "3b7fba86adf736f3a5b5e765c39769b7a0f817da709a2e2dd6b3087cd0f5f6a6",
+      "length": 1,
+      "async": true
+    },
+    "_getGodOfMartialArtsSuperiorCost": {
+      "hash": "59f18b295b39f571decc963b1611d12670f52eba8610abeffd0fe7b639235404",
+      "length": 0,
+      "async": false
+    },
+    "_handleAdvantagePointSuperiorTrigger": {
+      "hash": "6bd7d2163f770bd4c6d6236fa2d0d6c13b1a652c9186d01fd1d46cf5aebc8624",
+      "length": 1,
+      "async": true
+    },
+    "_handleAdvantagePointSignatureTrigger": {
+      "hash": "1ca4058b61d9da3161715cc97535bc7adc76ff071879db1908a84b1beef2e68b",
+      "length": 1,
+      "async": true
+    },
+    "_handleDivineKiConversionTrigger": {
+      "hash": "737c1264583f5e8461855cbdcfda1a315217f34fb18b2cb374a95717d5bcf92a",
+      "length": 1,
+      "async": true
+    },
+    "_hasDivineKiSpendKiRefund": {
+      "hash": "d85ae3562f1163af6886fdf93f8270d2b3becf466c7c02e7ecaaf583d5b61e15",
+      "length": 0,
+      "async": false
+    },
+    "_applyDivineKiSpendSideEffects": {
+      "hash": "a898fe8c70ac4d5fed877e5c0a8de267c017e465e8792b760e18c9a878dc558d",
+      "length": 1,
+      "async": true
+    },
+    "_handleDivineKiRollBoostTrigger": {
+      "hash": "7c1f0012cce0af5da7e7326eea8e5bcc59469d86eb297bc97d7aa8e0d371a26a",
+      "length": 1,
+      "async": true
+    },
+    "_handleDivineKiOOSTrigger": {
+      "hash": "9be8b8957aae2b87d811998f416698890b9105d520343701de61283262cf9438",
+      "length": 1,
+      "async": true
+    },
+    "_applyDivineKiRecoveryTrigger": {
+      "hash": "ceca633a94d78161dda2e5874ef11ba090ecd359969d24539a7b97389edcaad0",
+      "length": 1,
+      "async": true
+    },
+    "_handleDivineKiStateTrigger": {
+      "hash": "6aafdd0054b0b21d0de119b2e64083cc9051fda1e10f225de46cc90a71e2f0e1",
+      "length": 1,
+      "async": true
+    },
+    "_handleDivineKiManeuverTrigger": {
+      "hash": "562875c46f42a6de7c5fc3e2fe74952167a208b25eccbeef950d4f381f97e9cb",
+      "length": 1,
+      "async": true
+    },
+    "_handleDivineKiHealingSurgeTrigger": {
+      "hash": "33c4a7c1e921ef19fe11a5987c1c696835a08e51a7ef39af00f9aaea906c191f",
+      "length": 1,
+      "async": true
+    },
+    "_handlePerfectPointManeuverTrigger": {
+      "hash": "cbb7e78ff89f332a5c164301a19102974bd28b66eaa381b596d3e91ada240380",
+      "length": 1,
+      "async": true
+    },
+    "_handleKiSurgingTrigger": {
+      "hash": "589622221536b47c029c1abc0484fbf59f8a08691eb6007dae02aab82a65ce91",
+      "length": 1,
+      "async": true
+    },
+    "_handleLifeforceGainTrigger": {
+      "hash": "a6f7a2b151a94ba508bc14d77c534d62ce14b65e9f5abb074036ae2c66a9aaf3",
+      "length": 1,
+      "async": true
+    },
+    "_handleLifeforceSpendTrigger": {
+      "hash": "45010d1132270069a64d4f0e2ca7246a4c7b3a2a7a7daeb17b573ab267d04f06",
+      "length": 1,
+      "async": true
+    },
+    "_getBattleBornTotal": {
+      "hash": "4377ed6854ff827ee1cddd613e46e0e4d9c6af431e26ea4ec9f1ee5b54f4a115",
+      "length": 0,
+      "async": false
+    },
+    "_applyBattleBornGainSideEffects": {
+      "hash": "af40ef7358993442cf48df94dc9ad846e0aeca67bf0ce309aa57ab5a75155ddb",
+      "length": 0,
+      "async": true
+    },
+    "_applyBattleBornOverflowSideEffects": {
+      "hash": "9c22817d81ef69292520d7651140af828b74b774e54f93449d80518aa78b7d6f",
+      "length": 0,
+      "async": true
+    },
+    "_spendBattleBornStacks": {
+      "hash": "380fa489b5308baa7071cd7e19e11ce6b985d7666b6540f9b3d94dabb5ff9537",
+      "length": 1,
+      "async": true
+    },
+    "_handleBattleBornGainTrigger": {
+      "hash": "a872e019550c362b7c0726eda1dbdc0d6e17823da1093cb13a53edc8375c602a",
+      "length": 1,
+      "async": true
+    },
+    "_handleBattleBornSpendTrigger": {
+      "hash": "08d669d81c642b489a8d0c03b4c80a1c52c351b6dfe37c9ae692fb979cb9fc66",
+      "length": 1,
+      "async": true
+    },
+    "_handlePowerGainTrigger": {
+      "hash": "015479df9a4efc967e669bf0ef1e95c507d582907358a3c6bb6741550e378793",
+      "length": 1,
+      "async": true
+    },
+    "_handleDivineKiPowerLevelRecoveryTrigger": {
+      "hash": "a9f23a55fe4c320d4c379aec0ad9b5c52190463d59ac2a21b01881bd00fec5c6",
+      "length": 1,
+      "async": true
+    },
+    "_handleDivineKiEnergyChargeTrigger": {
+      "hash": "54a3b2e91fad203016bb15367f71c88cc017da11e4feab53806d29bc6d1de08e",
+      "length": 1,
+      "async": true
+    },
+    "_handleDivineKiDamageCategoryTrigger": {
+      "hash": "1a33e53f100d9349516907564d34f0510c0c22d7ed7a69a0bc13143bc4212567",
+      "length": 1,
+      "async": true
+    },
+    "_onEnhancementPowerTrigger": {
+      "hash": "87cf956da7af890481eaca8c0c98ac3a603b6c022bce2eac632a964201cc1770",
+      "length": 1,
+      "async": true
+    },
+    "_onAlternateFormTrigger": {
+      "hash": "eb1b3b6a0c641dddec4a03120cbd156b4a876c9e1ecd4b3cc39dee9e19596f5a",
+      "length": 1,
+      "async": true
+    },
+    "_onLegendaryFormTrigger": {
+      "hash": "75d1677c1268c9c2c29e78e716acfc9a94b74421366a10c2d4e7a63fd50b8121",
+      "length": 1,
+      "async": true
+    },
+    "_onTalentTrigger": {
+      "hash": "aadb6f1fb2905928c9463325cb3922e895d803901d1605ef7e3b1b3f1f7c8e06",
+      "length": 1,
+      "async": true
+    },
+    "_onPatientFighterTransfer": {
+      "hash": "3c6eebca9a4932b76923e7cdb1e86e12725ed9518bd5b193a7ba3f4420316426",
+      "length": 1,
+      "async": true
+    },
+    "_onTalentStanceShift": {
+      "hash": "77479b431938beca7bfca94fbcd55e7fef5f7cc3a6290f9f0bc1df8cdc214a2e",
+      "length": 1,
+      "async": true
+    },
+    "_onDamageCalcInput": {
+      "hash": "e174b4e3e7f04a2e6237f46b00c2443682cbb1ed1431324d19c8a766bc7ba3e4",
+      "length": 1,
+      "async": true
+    },
+    "_calcGuardKiCost": {
+      "hash": "a53e95d217f7bca8915f41cc59669cd5dcfaf168b4fbd0a05acf76d97a087578",
+      "length": 1,
+      "async": false
+    },
+    "_payGuardKi": {
+      "hash": "0d3534262b0a82899786b603429a5eafc05d0307c190847ddded0ea95809d249",
+      "length": 2,
+      "async": true
+    },
+    "_onApplyDamage": {
+      "hash": "58e37260a6916d639c512572f7c8f2c1d8f9716b9c922427ff45ae8a5acfdb6a",
+      "length": 1,
+      "async": true
+    },
+    "_onApplyHeal": {
+      "hash": "0767cb4e37ce69b853934cf05b903a62f2af0520038aefb4063254048abb2e47",
+      "length": 1,
+      "async": true
+    },
+    "_onThresholdCheck": {
+      "hash": "4e21de9fd0e948b583d2953303631bde2db5c8c53e5c1116dd02a3f37bdfa3f8",
+      "length": 1,
+      "async": true
+    },
+    "_onConditionToggle": {
+      "hash": "da8172be228d321ff09eda2574c6de7c357b257ef19e4d04414969b00eaf9e89",
+      "length": 1,
+      "async": true
+    },
+    "_addSelfConditions": {
+      "hash": "ca53bf5ece0d9dfd810b5c9217ea8d328915e1ca15fd1dda9086751276f1c894",
+      "length": 0,
+      "async": true
+    },
+    "_onConditionStack": {
+      "hash": "7647448e39308c6827a2a33b48242984954170e1191fb11f8f6a78305c7874c0",
+      "length": 1,
+      "async": true
+    },
+    "_onTrackerAddAction": {
+      "hash": "e0bf60d6e9dfe49c2a25bb8e61a214d9f0369d533239a80757fff0c1726c2aeb",
+      "length": 1,
+      "async": true
+    },
+    "_onTrackerChargingToggle": {
+      "hash": "76b1ec6d01a69c09b7fce0a4671367b011cd04a72fbd0bd86e67e5c6ca94b2bf",
+      "length": 1,
+      "async": true
+    },
+    "_onTrackerNextRound": {
+      "hash": "b77594a3e32996435d3d3dac28c488fd54ce90d69b691629b56691a64c8e6993",
+      "length": 1,
+      "async": true
+    },
+    "_onTrackerReset": {
+      "hash": "a4177536b17a8054a12d3e571e450299b89b57502abbf7d1690bfa0e8f8e955a",
+      "length": 1,
+      "async": true
+    },
+    "_onDeleteTrackerAction": {
+      "hash": "e7dede9f4e061ca47a4c404f07a8d1fa6165dca3c23d0f965324822da29e7fba",
+      "length": 1,
+      "async": true
+    },
+    "_onTrackerActionChange": {
+      "hash": "7ffa01dd81fe166a90c9203501a56ff10ccf318bdef5efbe577c04ec7c5f4b0c",
+      "length": 1,
+      "async": true
+    },
+    "_onRtActivableUse": {
+      "hash": "b26670c204d4f16f9c76cdc3b984eaef6832f85df7b8e5b71ea5bab23ef9024b",
+      "length": 1,
+      "async": true
+    },
+    "_populateTrackerSources": {
+      "hash": "5ad882a4a0515020dd1609b4e6d171dc597135be8bfe3f9b53d39ddd8d993cf6",
+      "length": 1,
+      "async": false
+    },
+    "_onTrackerSourceChange": {
+      "hash": "a064b9607a15ee0b7f10f365cd9cd954ff3ecdf215a3495781e7a78d2ce51b1f",
+      "length": 1,
+      "async": true
+    },
+    "_onTrackerWagerChange": {
+      "hash": "0fc8abf7d1df7363e15a4175abab592e35ddbcc0e3c36a0b0dd714c0bc9197cd",
+      "length": 1,
+      "async": true
+    },
+    "_onRollTrackerAttack": {
+      "hash": "107bfc82ff4ad271e3dd06b55204849e90b6474e10fde2b6217d583419758e9b",
+      "length": 1,
+      "async": true
+    },
+    "_onTrackerTransformChange": {
+      "hash": "f790ce3e3d5a630c200e16a6eff521671089512055b3a69f6420612d366d2e15",
+      "length": 1,
+      "async": true
+    },
+    "_onTrackerTransformCheckbox": {
+      "hash": "9843ad2f9dd942c1547b9df9edd4eea4a2b23b5a05879a16a452349138877d6b",
+      "length": 1,
+      "async": true
+    },
+    "_activateTransformationAtIndex": {
+      "hash": "2f6a4d88c8b37960c3d9f432a35f906040e11b5cb8df720b1e43c77585882e24",
+      "length": 1,
+      "async": true
+    },
+    "_computeTransformManeuver": {
+      "hash": "858fcb03f4126412b4266cedde7cce62383a9a1cbc28c9ae4440890f44f9eb05",
+      "length": 1,
+      "async": false
+    },
+    "_onRollTrackerTransform": {
+      "hash": "fb0fe6423d013f26c1921a88a8e7f1017ee8e1d93bf5eb6cb65ab8fed90caf27",
+      "length": 1,
+      "async": true
+    },
+    "_onTrackerGrappleOptionChange": {
+      "hash": "98d6efd5aecd200939a559b57c8409e1b2d268b5ad1addb9a551cb890b9938b7",
+      "length": 1,
+      "async": true
+    },
+    "_onUseTrackerGrapple": {
+      "hash": "cd740571312377f8f9fd6d3a849e56538d5f0200a478381dc25b23a91c1eb778",
+      "length": 1,
+      "async": true
+    },
+    "_onUseTrackerThrust": {
+      "hash": "341d6029ad96215469bfc3e40912e2788c8984db4d712d3bf0adf44e1ad556dd",
+      "length": 1,
+      "async": true
+    },
+    "_onUseTrackerTerrify": {
+      "hash": "71d5c1ee40e4fe626f748d437ee556e27be9726f3e50f5200fea033b0eed11b0",
+      "length": 1,
+      "async": true,
+      "relocatedHash": "3cf209ee91e839bfb0e42332497ab0b0fced33530c038721e5e365e166d4a599"
+    },
+    "_onUseTrackerFeint": {
+      "hash": "9912568c02095c41413eb44b6ce8011bd1c51b2eba4399d4c9c67ffddd8e1bc6",
+      "length": 1,
+      "async": true,
+      "relocatedHash": "3540ce3295eabb27e3d66044a2077bcf2b5a5438ab093ea22cd7e2bf98163693"
+    },
+    "_onUseTrackerDirtyTrick": {
+      "hash": "63d4b76c8c2c582e3925fc6f7562f510f13f4f3b57c2c095425079c5df98d2a4",
+      "length": 1,
+      "async": true,
+      "relocatedHash": "9a7949b0ed7f27b4d83f64e3c7bb189b7ebecf122455fb037890f4a3e24962a8"
+    },
+    "_onTrackerDuelModeChange": {
+      "hash": "68dc4bf342d3af8cc010df7de9e23700fe5007fbbac6acdb01e8d559df5eff99",
+      "length": 1,
+      "async": true
+    },
+    "_onTrackerDuelSourceChange": {
+      "hash": "b96ed92d6cc66af450b989cea04bb61bf504151eb5b775fdbc94ab72b29e35cc",
+      "length": 1,
+      "async": true
+    },
+    "_onInitiateDuel": {
+      "hash": "56d1c1a8d02aad56caa7aa91eff2186ac13ff666227399093d36f451f0cfbee8",
+      "length": 1,
+      "async": true
+    },
+    "_onTrackerDefendOptionChange": {
+      "hash": "608c733a7e591698188265b834cfd4e9dee60b613e07ce970c43466805279a4d",
+      "length": 1,
+      "async": true
+    },
+    "_onTrackerDefendInput": {
+      "hash": "125530c43320798e0f87be21ab5c4f23d25ee7ee1ade01b37a23fc6995837924",
+      "length": 1,
+      "async": true
+    },
+    "_onRollTrackerDefend": {
+      "hash": "10d73c04f6b5244472d89e34fc945a44cd20bbdc0a2a6876da73e29a829b4c3e",
+      "length": 1,
+      "async": true
+    },
+    "_onRollTrackerDodge": {
+      "hash": "e16373383d1b0f3bc1b8700d0bfa661f2b8643d72a1747815a7b83acb6c063c4",
+      "length": 1,
+      "async": true
+    },
+    "_onCombatFilter": {
+      "hash": "fbc32190f8ef5800ed2f5e464abafb0cec3e45854f085cd26483673b3b3dafe5",
+      "length": 1,
+      "async": false
+    },
+    "_onClearDamageLog": {
+      "hash": "d8864374a55760f0df0c353c5076f8bf7b94837329ff6e343c51656496117ba2",
+      "length": 1,
+      "async": true
+    },
+    "_onItemCreate": {
+      "hash": "a59c3c0868ee3e7e8a5fec6eb47626b9fb1db6641d92596c7ed5bda26123ff4f",
+      "length": 1,
+      "async": true
+    },
+    "_onBasicItemCatalogChange": {
+      "hash": "3ebe87dfa0c6c707118d39b7a48d83011d620fd7546b5696023fee42a34d5859",
+      "length": 1,
+      "async": true
+    },
+    "_onItemEdit": {
+      "hash": "580e0b5f4808298c90f9bd5204ecc770c7521e80f386d6842033ca19495387e5",
+      "length": 1,
+      "async": false
+    },
+    "_onItemDelete": {
+      "hash": "a47918e024fb825dff349832a8613990722382cd20421bc61a79f49e9b7bcc28",
+      "length": 1,
+      "async": true
+    },
+    "_onAddAttackRef": {
+      "hash": "f8ee8577cc2fdd3fda2f69e12951bce3de1060011cc471d7e7ee43b5a67b9d27",
+      "length": 1,
+      "async": true
+    },
+    "_onRemoveAttackRef": {
+      "hash": "1bcefe5b8e6f1678dcf23ea49374d6340e45e10eeaeefaffbca6ea4a889bb208",
+      "length": 1,
+      "async": true
+    },
+    "_onAddFusedCharacter": {
+      "hash": "4ac18fea2c4d6670be59bd66e65a69406a0b2d01953d2696d54f02a70b369727",
+      "length": 1,
+      "async": true
+    },
+    "_onRemoveFusedCharacter": {
+      "hash": "643fd154d9b78dbf834fe2e50deac70d34148610a80ee765198135e1d3854d92",
+      "length": 1,
+      "async": true
+    },
+    "_onRecalculateFusion": {
+      "hash": "f2354fd7d91128e62a9446e3a4738883c55cf878c084e627773a47254c2a05ae",
+      "length": 1,
+      "async": true
+    },
+    "_onFusionTraitToggle": {
+      "hash": "9ef47e4c88728e5fb07d416589f419912b4e8ceeaf7a695e05ced20796dca7d6",
+      "length": 1,
+      "async": true
+    },
+    "_onFusionBoostAttrToggle": {
+      "hash": "4ee79ccba61224483d8a94fd73f9197501e1370e40d629d46c73808f0d070333",
+      "length": 1,
+      "async": true
+    },
+    "_onFusionBonusTalentToggle": {
+      "hash": "616a86be1d4c7d2b935bfb896785e1fde7c8e6081634f84d28cf6ab0b3bad000",
+      "length": 1,
+      "async": true
+    },
+    "_onAbsorptionTraitSelect": {
+      "hash": "e37e02753173a105914dc9d91ae6fada461b03cf9fe91c696fba3a5fc21a6104",
+      "length": 1,
+      "async": true
+    },
+    "_onPossessionTraitExchange": {
+      "hash": "e1be46b9277fee629e2a377cf86ee8f84cf66ba44afab690b2c12f6aa6ba1239",
+      "length": 1,
+      "async": true
+    },
+    "_onMutationSourceSelect": {
+      "hash": "22ef9b40e30bf73c12f42c9a1a3537c0e2a605fd4fcc346b47c56cb6a4a7c0ad",
+      "length": 1,
+      "async": true
+    },
+    "_onDestroyAbsorbedApparel": {
+      "hash": "6177dc8d5865b6547651214cbb29d0f2c625cdf419553feb28124fbf918b447a",
+      "length": 1,
+      "async": true
+    },
+    "_onFusionModifierToggle": {
+      "hash": "44934ec332a351f86e9b1566dc1fcb0f4df1775f7193f0294eef814ccabcd350",
+      "length": 1,
+      "async": true
+    },
+    "_onFusionRoundDecrement": {
+      "hash": "68d1236ceaddd3f93c2a24e277fb54e4afdc3433c6f2050eefe19986091c73e8",
+      "length": 1,
+      "async": true
+    },
+    "_onFusionRoundReset": {
+      "hash": "9400167324edc28ffd46ad84eb19d9c1d21dd131125a0850b567ca8f6b64dc55",
+      "length": 1,
+      "async": true
+    },
+    "_onFusionDeeplySuppressed": {
+      "hash": "6803245b9183a5b4540f86ab1adb8e31618b9902d6ab97f64f45278f35073cc0",
+      "length": 1,
+      "async": true
+    },
+    "_onFusionStrugglingChange": {
+      "hash": "81633536bd68d90914652f0ddeb631daa0cffef9ae73abc1bc653aafd1c48925",
+      "length": 1,
+      "async": true
+    },
+    "_onEscapeSuppressed": {
+      "hash": "69c757b8870192adea2fdc5bf949fde39e43667d3b3f268163b299b4c1e6b9d5",
+      "length": 1,
+      "async": true
+    },
+    "_onEjectSuppressed": {
+      "hash": "e12ca88ad37492dc1247cbbc17990cf38f40d7d65b0206bf5dd4cc6955dddabb",
+      "length": 1,
+      "async": true
+    },
+    "_onDtStartPeriod": {
+      "hash": "ef41191716b4e9813b2cf15d1a7d9633eb9d2b4f3ac6b7cc21d374f80ae0ce06",
+      "length": 1,
+      "async": true
+    },
+    "_onDtEndPeriod": {
+      "hash": "53407bdbfc48412c168cfe337fa929a5996a8c1918ebde799ba0b14e00a25710",
+      "length": 1,
+      "async": true
+    },
+    "_onDtCancelPeriod": {
+      "hash": "8c0735fe6c36e7a06c46b324d4711db08ee44875b98c83091f8c59d8bdfe68e8",
+      "length": 1,
+      "async": true
+    },
+    "_dtPromptAttributes": {
+      "hash": "66ef05ca55a946d0f115094970b1c3713552c2fb2052b4515d09610cfcebba78",
+      "length": 2,
+      "async": true
+    },
+    "_dtPromptSkills": {
+      "hash": "5a9f6fc312485d2a418487c4261238e5152102020c7783d2bea21879be7cf7d8",
+      "length": 2,
+      "async": true
+    },
+    "_dtPromptSelect": {
+      "hash": "dac40362657477f195edaa733f84a0f7dde4320cb51bfd3ebbd4786efbfcf57d",
+      "length": 3,
+      "async": true
+    },
+    "_dtBuildGainsUpdates": {
+      "hash": "5443abc3f6c6ff1e7b6dbd030da6912c3657adce70a1a55e62e1a8cfca4787e3",
+      "length": 3,
+      "async": false
+    },
+    "_dtReverseTransChanges": {
+      "hash": "ea90c441be922cff5ffbb8e14c3502e520a486aa1b0a0217042668e0a11226e3",
+      "length": 2,
+      "async": false
+    },
+    "_onDtUseActivity": {
+      "hash": "a9114f38340c77160a4d5bee6bd8be508fdb52fe8d84a41417e887f6e5621e3c",
+      "length": 1,
+      "async": true
+    },
+    "_onDtUndoActivity": {
+      "hash": "f4f8b6298c84b65821fc597a16671cc59faad46c2e456156f0502ec3125d88a5",
+      "length": 1,
+      "async": true
+    },
+    "_onDtToggleModifier": {
+      "hash": "42147f846a5435c840a8c0de13b09ee7b731b4d1ca36e7ee0ce5e746ac50b5ab",
+      "length": 1,
+      "async": true
+    },
+    "_onDtDeleteHistory": {
+      "hash": "ff8a7b97e79363c79141b1f607114c030edc2aed281bcc68d4766ee36af585db",
+      "length": 1,
+      "async": true
+    },
+    "_onLinkJacket": {
+      "hash": "34170a16ec2219e47b309acca37877964eb90ddc182e33a001453ef178a60333",
+      "length": 1,
+      "async": true
+    },
+    "_onUnlinkJacket": {
+      "hash": "650b4e2200ff8d3f29e4181edc614e932c14651a6166e725155553a530bd50be",
+      "length": 1,
+      "async": true
+    },
+    "_onEnterJacket": {
+      "hash": "cd10d244b7e39696e75e63bc7ad84042d97dbd6f59f012d77fd590633f9e578e",
+      "length": 1,
+      "async": true
+    },
+    "_onExitJacket": {
+      "hash": "9c96f6524200b8dfe028a9f0da45127c03be926044691fd1df0513c83cebed60",
+      "length": 1,
+      "async": true
+    },
+    "_onOpenJacketSheet": {
+      "hash": "6f686b33226dd8674e2f3d4b4bccfe67b896deadb7709932294a6b297b668bb4",
+      "length": 1,
+      "async": false
+    },
+    "_onBJResourceChange": {
+      "hash": "d7394b7d2ccdbe253a72f1da521d309cb5753538d99527a28d166819e7dd104a",
+      "length": 1,
+      "async": true
+    },
+    "_onBJWeakPointToggle": {
+      "hash": "5cce7c607acb8a9c465b352fc1a6749c430158ee820e31fab9f63aecc4dd8a27",
+      "length": 1,
+      "async": true
+    },
+    "_onTfcRemoveAspect": {
+      "hash": "11b45e5254775c61850004a4a96369959c675af98bef6c7abf6dea5c1fbcbe69",
+      "length": 1,
+      "async": true
+    },
+    "_onTfcAddAspect": {
+      "hash": "f086cc211cdc85230beaac250c415a8823e5a3274e4ede8c1df626f801762e50",
+      "length": 1,
+      "async": true
+    },
+    "_onTfcEditAmb": {
+      "hash": "e5e20163c58d86444b7c4cc25f10bc3272e90dca8b91857e458e8a8a63607313",
+      "length": 1,
+      "async": true
+    },
+    "_onTfcSetPowerImprovement": {
+      "hash": "f010faead194279837245db6b73d8e0f8f9e4d2b4d2d9574c959e950c388c4e4",
+      "length": 1,
+      "async": true
+    },
+    "_onTfcSetLsForm": {
+      "hash": "020954eda7ab49e699fda90eccc26152806c9e2320d9f72199dcbc0e1ff192c1",
+      "length": 1,
+      "async": true
+    },
+    "_onTfcSetLsExceed": {
+      "hash": "35f622da9c8476c92debe01a6c95a9d89dd064cfbb74ddd29fb43ab194245764",
+      "length": 1,
+      "async": true
+    },
+    "_onTfcToggleExceed": {
+      "hash": "969011d37219f1ceab6102a1c459fdb061afbb9f33e80d0779a7c3a7df4c154b",
+      "length": 1,
+      "async": true
+    },
+    "_onTfcSetUpField": {
+      "hash": "2cdfdfce32674a2ef89ddf9ec0469a9c280f43f7b503f73322bc5af03ca2488d",
+      "length": 1,
+      "async": true
+    },
+    "_onTfcAddUp": {
+      "hash": "5ac60b6f91be2cbbcd9c65169cca269a8bbc58a1325721ce0d4725e3825b927a",
+      "length": 1,
+      "async": true
+    },
+    "_onTfcDeleteUp": {
+      "hash": "8875fb37aecb3e83a4c9cecf65492dbddaa786867ac3e081c76ba56cd23ea634",
+      "length": 1,
+      "async": true
+    },
+    "_onAddGodManeuver": {
+      "hash": "92dd8f0e79842d58f1e7a15c12e04c784bd55d9a04c9ed09906423f7bc2b03c7",
+      "length": 1,
+      "async": true
+    },
+    "_onRemoveGodManeuver": {
+      "hash": "eaeaaf853cdb108b7c721e412be36a47db2154e2446c086db44ff5f90c7d23d4",
+      "length": 1,
+      "async": true
+    },
+    "_onGodStrikeProfile": {
+      "hash": "1ca40c6a5123e1d5244599c835fcee14f99c2641027d593b430c1485edce9358",
+      "length": 1,
+      "async": true
+    },
+    "_onAttackRefLookup": {
+      "hash": "43fd01572da3b0fb76e0625b857ebfb5db29a26eae57e5184478922a1931a59d",
+      "length": 1,
+      "async": false
+    },
+    "_onStateLookup": {
+      "hash": "4248435bd276166d923ca5a57e8d1e41f7453d44b964e510f4cebc46d2023892",
+      "length": 1,
+      "async": false
+    }
+  },
+  "defaultOptionsHash": "6c75a19bc1c5d7acbbd8000fe7e6088ff0bd2ac1c2cc28f109cdbeabba046acd",
+  "downtime": {
+    "DT_COSTS": {
+      "basicTraining": 1,
+      "techniqueTraining": 1,
+      "reinforcingForm": 2,
+      "unlockingForm": 2,
+      "transformationTraining": 2,
+      "heartbeatTraining": 1,
+      "resting": 1,
+      "studying": 1,
+      "baseBuilding": 2
+    },
+    "DT_NAMES": {
+      "basicTraining": "Basic Training",
+      "techniqueTraining": "Technique Training",
+      "reinforcingForm": "Reinforcing Form",
+      "unlockingForm": "Unlocking Form",
+      "transformationTraining": "Transformation Training",
+      "heartbeatTraining": "Heartbeat Training",
+      "resting": "Resting",
+      "studying": "Studying",
+      "baseBuilding": "Base Building"
+    },
+    "DT_LIMITS": {
+      "basicTraining": 4,
+      "techniqueTraining": 4,
+      "transformationTraining": 2,
+      "heartbeatTraining": 1,
+      "resting": 4,
+      "studying": 4,
+      "baseBuilding": 4
+    }
+  },
+  "listenersHash": "f5bee7732293a8dc6f47436b71d27a9b4183e7ee245e33e2ae0ae2b4c32c2de4",
+  "listenerBindings": [
+    [
+      "click",
+      ".item-create"
+    ],
+    [
+      "click",
+      ".item-edit"
+    ],
+    [
+      "click",
+      ".item-delete"
+    ],
+    [
+      "change",
+      ".eq-worn-toggle"
+    ],
+    [
+      "change",
+      ".eq-inline-input"
+    ],
+    [
+      "change",
+      ".eq-weapon-lp"
+    ],
+    [
+      "click",
+      "[data-action='weapon-repair']"
+    ],
+    [
+      "change",
+      ".eq-inline-check"
+    ],
+    [
+      "change",
+      ".eq-basic-catalog-select"
+    ],
+    [
+      "change",
+      "[data-action='assign-layer']"
+    ],
+    [
+      "click",
+      "[data-action='toggle-detail']"
+    ],
+    [
+      "click",
+      "[data-action='add-quality']"
+    ],
+    [
+      "click",
+      "[data-action='remove-quality']"
+    ],
+    [
+      "change",
+      ".eq-quality-notes"
+    ],
+    [
+      "change",
+      ".eq-bv-input"
+    ],
+    [
+      "click",
+      "[data-action='toggle-qualities-card']"
+    ],
+    [
+      "click",
+      "[data-action='add-item-quality']"
+    ],
+    [
+      "click",
+      "[data-action='remove-item-quality']"
+    ],
+    [
+      "change",
+      ".eq-quality-config-input"
+    ],
+    [
+      "change",
+      ".eq-quality-notes-input"
+    ],
+    [
+      "click",
+      "[data-action='roll-skill']"
+    ],
+    [
+      "change",
+      ".skill-misc-input"
+    ],
+    [
+      "click",
+      ".skill-spec-add"
+    ],
+    [
+      "click",
+      ".skill-spec-delete"
+    ],
+    [
+      "change",
+      ".skill-spec-name-input, .skill-spec-rank-input"
+    ],
+    [
+      "change",
+      ".skill-genius-select"
+    ],
+    [
+      "change",
+      ".ec-tech-select"
+    ],
+    [
+      "click",
+      "[data-action='add-custom-buff']"
+    ],
+    [
+      "click",
+      "[data-action='delete-custom-buff']"
+    ],
+    [
+      "click",
+      "[data-action='new-round']"
+    ],
+    [
+      "click",
+      "[data-action='new-encounter']"
+    ],
+    [
+      "click",
+      "[data-action='toggle-effect-group']"
+    ],
+    [
+      "change",
+      ".passive-toggle"
+    ],
+    [
+      "click",
+      ".usage-pip"
+    ],
+    [
+      "click",
+      "[data-action='add-trait']"
+    ],
+    [
+      "click",
+      "[data-action='delete-trait']"
+    ],
+    [
+      "click",
+      "[data-action='toggle-trait']"
+    ],
+    [
+      "change",
+      ".option-select"
+    ],
+    [
+      "change",
+      ".option-checkbox"
+    ],
+    [
+      "change",
+      ".pb-bestial-check"
+    ],
+    [
+      "change",
+      ".pb-bestial-option"
+    ],
+    [
+      "change",
+      ".de-meta-select"
+    ],
+    [
+      "change",
+      ".de-meta-config"
+    ],
+    [
+      "change",
+      ".af-foundation-select"
+    ],
+    [
+      "click",
+      ".cruelty-increment"
+    ],
+    [
+      "click",
+      ".cruelty-decrement"
+    ],
+    [
+      "click",
+      "[data-action='use-surge']"
+    ],
+    [
+      "change",
+      ".ss-field"
+    ],
+    [
+      "change",
+      ".ss-effect-check"
+    ],
+    [
+      "change",
+      ".ss-bestial-option"
+    ],
+    [
+      "click",
+      ".ss-toggle-btn"
+    ],
+    [
+      "change",
+      ".unify-attr-input"
+    ],
+    [
+      "click",
+      "[data-action='unify-unlink']"
+    ],
+    [
+      "click",
+      "[data-action='unify-grant-mp']"
+    ],
+    [
+      "click",
+      "[data-action='add-base']"
+    ],
+    [
+      "click",
+      "[data-action='delete-base']"
+    ],
+    [
+      "change",
+      ".base-field"
+    ],
+    [
+      "click",
+      "[data-action='add-base-quality']"
+    ],
+    [
+      "click",
+      "[data-action='delete-base-quality']"
+    ],
+    [
+      "change",
+      ".base-quality-field"
+    ],
+    [
+      "click",
+      "[data-action='repair-base']"
+    ],
+    [
+      "click",
+      "[data-action='add-villainous-trait']"
+    ],
+    [
+      "click",
+      "[data-action='delete-villainous-trait']"
+    ],
+    [
+      "click",
+      "[data-action='toggle-villainous-trait']"
+    ],
+    [
+      "click",
+      "[data-action='add-weakness']"
+    ],
+    [
+      "click",
+      "[data-action='delete-weakness']"
+    ],
+    [
+      "click",
+      "[data-action='toggle-weakness']"
+    ],
+    [
+      "click",
+      "[data-action='add-minion-trait']"
+    ],
+    [
+      "click",
+      "[data-action='delete-minion-trait']"
+    ],
+    [
+      "click",
+      "[data-action='add-player-minion-trait']"
+    ],
+    [
+      "click",
+      "[data-action='create-duplicate-minion']"
+    ],
+    [
+      "click",
+      "[data-action='delete-player-minion-trait']"
+    ],
+    [
+      "change",
+      ".pm-trait-option"
+    ],
+    [
+      "click",
+      ".bb-increment"
+    ],
+    [
+      "click",
+      ".bb-decrement"
+    ],
+    [
+      "click",
+      "[data-action='ef-activate']"
+    ],
+    [
+      "click",
+      "[data-action='ef-deactivate']"
+    ],
+    [
+      "click",
+      "[data-action='add-talent']"
+    ],
+    [
+      "click",
+      "[data-action='delete-talent']"
+    ],
+    [
+      "change",
+      ".talent-category-filter"
+    ],
+    [
+      "click",
+      "[data-action='add-technique']"
+    ],
+    [
+      "click",
+      "[data-action='delete-technique']"
+    ],
+    [
+      "change",
+      ".tech-input"
+    ],
+    [
+      "click",
+      "[data-action='add-advantage']"
+    ],
+    [
+      "click",
+      "[data-action='remove-advantage']"
+    ],
+    [
+      "change",
+      ".adv-input"
+    ],
+    [
+      "click",
+      "[data-action='add-disadvantage']"
+    ],
+    [
+      "click",
+      "[data-action='remove-disadvantage']"
+    ],
+    [
+      "change",
+      ".disadv-input"
+    ],
+    [
+      "click",
+      ".style-btn"
+    ],
+    [
+      "click",
+      "[data-action='add-aura']"
+    ],
+    [
+      "click",
+      "[data-action='delete-aura']"
+    ],
+    [
+      "click",
+      "[data-action='toggle-aura']"
+    ],
+    [
+      "change",
+      ".aura-input"
+    ],
+    [
+      "click",
+      "[data-action='add-aura-advantage']"
+    ],
+    [
+      "click",
+      "[data-action='remove-aura-advantage']"
+    ],
+    [
+      "change",
+      ".aura-adv-input"
+    ],
+    [
+      "click",
+      "[data-action='add-aura-disadvantage']"
+    ],
+    [
+      "click",
+      "[data-action='remove-aura-disadvantage']"
+    ],
+    [
+      "change",
+      ".aura-disadv-input"
+    ],
+    [
+      "click",
+      "[data-action='add-transformation']"
+    ],
+    [
+      "click",
+      "[data-action='delete-transformation']"
+    ],
+    [
+      "change",
+      ".tf-input"
+    ],
+    [
+      "change",
+      ".tf-check"
+    ],
+    [
+      "click",
+      "[data-action='open-transformation-catalog']"
+    ],
+    [
+      "click",
+      "[data-action='view-transformation-traits']"
+    ],
+    [
+      "click",
+      "[data-action='pay-kaioken-lp']"
+    ],
+    [
+      "click",
+      "[data-action='add-token-album-entry']"
+    ],
+    [
+      "click",
+      "[data-action='browse-album-image']"
+    ],
+    [
+      "click",
+      "[data-action='activate-album-token']"
+    ],
+    [
+      "click",
+      "[data-action='remove-album-entry']"
+    ],
+    [
+      "click",
+      "[data-action='restore-original-token']"
+    ],
+    [
+      "change",
+      ".tfi-name-input"
+    ],
+    [
+      "change",
+      ".lt-trait-select"
+    ],
+    [
+      "change",
+      ".kp-plating-select"
+    ],
+    [
+      "click",
+      "[data-action='add-unique']"
+    ],
+    [
+      "click",
+      "[data-action='delete-unique']"
+    ],
+    [
+      "change",
+      ".unique-free-check"
+    ],
+    [
+      "click",
+      "[data-action='add-unique-advancement']"
+    ],
+    [
+      "click",
+      "[data-action='remove-unique-advancement']"
+    ],
+    [
+      "change",
+      ".unique-adv-select"
+    ],
+    [
+      "change",
+      ".unique-adv-free"
+    ],
+    [
+      "change",
+      ".unique-adv-amount"
+    ],
+    [
+      "click",
+      "[data-action='add-unique-restriction']"
+    ],
+    [
+      "click",
+      "[data-action='remove-unique-restriction']"
+    ],
+    [
+      "change",
+      ".unique-res-select"
+    ],
+    [
+      "click",
+      "[data-action='add-progression-row']"
+    ],
+    [
+      "click",
+      "[data-action='delete-progression-row']"
+    ],
+    [
+      "click",
+      "[data-action='unified-action']"
+    ],
+    [
+      "click",
+      ".combat-undo-use"
+    ],
+    [
+      "click",
+      ".combat-add-use"
+    ],
+    [
+      "click",
+      "[data-action='combat-new-round']"
+    ],
+    [
+      "click",
+      "[data-action='combat-new-encounter']"
+    ],
+    [
+      "click",
+      "[data-action='evil-aura-points-add']"
+    ],
+    [
+      "click",
+      "[data-action='evil-aura-points-sub']"
+    ],
+    [
+      "click",
+      "[data-action='evil-aura-techs-activate']"
+    ],
+    [
+      "click",
+      "[data-action='evil-aura-techs-deactivate']"
+    ],
+    [
+      "click",
+      "[data-action='dkp-add']"
+    ],
+    [
+      "click",
+      "[data-action='dkp-sub']"
+    ],
+    [
+      "click",
+      "[data-action='dkp-refill']"
+    ],
+    [
+      "click",
+      "[data-action='god-maneuver-use']"
+    ],
+    [
+      "click",
+      "[data-action='apply-damage']"
+    ],
+    [
+      "click",
+      "[data-action='apply-heal']"
+    ],
+    [
+      "change",
+      ".combat-dmg-input"
+    ],
+    [
+      "change",
+      ".threshold-check"
+    ],
+    [
+      "change",
+      ".condition-toggle"
+    ],
+    [
+      "change",
+      ".condition-stack-input"
+    ],
+    [
+      "click",
+      "[data-action='toggle-ki-wager-ref']"
+    ],
+    [
+      "click",
+      "[data-action='toggle-dice-pools']"
+    ],
+    [
+      "click",
+      "[data-action='tracker-add-action']"
+    ],
+    [
+      "click",
+      "[data-action='tracker-next-round']"
+    ],
+    [
+      "click",
+      "[data-action='tracker-reset']"
+    ],
+    [
+      "click",
+      "[data-action='delete-tracker-action']"
+    ],
+    [
+      "change",
+      ".action-type, .action-ki, .action-dkp, .action-desc"
+    ],
+    [
+      "change",
+      ".tap-charging-toggle"
+    ],
+    [
+      "change",
+      ".action-source"
+    ],
+    [
+      "change",
+      ".tap-wager-input"
+    ],
+    [
+      "click",
+      "[data-action='roll-tracker-attack']"
+    ],
+    [
+      "click",
+      "[data-action='roll-tracker-dodge']"
+    ],
+    [
+      "change",
+      ".tdp-option-select"
+    ],
+    [
+      "change",
+      ".tdp-input"
+    ],
+    [
+      "click",
+      "[data-action='roll-tracker-defend']"
+    ],
+    [
+      "change",
+      ".tdl-mode-select"
+    ],
+    [
+      "change",
+      ".tdl-source-select"
+    ],
+    [
+      "click",
+      "[data-action='initiate-duel']"
+    ],
+    [
+      "change",
+      ".ttf-source-select"
+    ],
+    [
+      "change",
+      ".ttf-checkbox"
+    ],
+    [
+      "click",
+      "[data-action='roll-tracker-transform']"
+    ],
+    [
+      "change",
+      ".tgp-option-select"
+    ],
+    [
+      "click",
+      "[data-action='use-tracker-grapple']"
+    ],
+    [
+      "click",
+      "[data-action='use-tracker-thrust']"
+    ],
+    [
+      "click",
+      "[data-action='use-tracker-terrify']"
+    ],
+    [
+      "click",
+      "[data-action='use-tracker-feint']"
+    ],
+    [
+      "click",
+      "[data-action='use-tracker-dirty-trick']"
+    ],
+    [
+      "click",
+      "[data-action='tb-tab-switch']"
+    ],
+    [
+      "click",
+      "[data-action='rt-activable-use']"
+    ],
+    [
+      "change",
+      ".combat-filter"
+    ],
+    [
+      "click",
+      "[data-action='add-god-maneuver']"
+    ],
+    [
+      "click",
+      "[data-action='remove-god-maneuver']"
+    ],
+    [
+      "change",
+      ".god-strike-profile"
+    ],
+    [
+      "click",
+      "[data-action='clear-damage-log']"
+    ],
+    [
+      "click",
+      "[data-action='tf-stress-test']"
+    ],
+    [
+      "click",
+      "[data-action='tf-turbulent-roll']"
+    ],
+    [
+      "click",
+      "[data-action='tf-surging-strength']"
+    ],
+    [
+      "click",
+      "[data-action='tf-burst-limit']"
+    ],
+    [
+      "click",
+      "[data-action='tf-legend-realized']"
+    ],
+    [
+      "click",
+      "[data-action='tf-new-level-of-power']"
+    ],
+    [
+      "click",
+      "[data-action='lt-trigger']"
+    ],
+    [
+      "click",
+      "[data-action='mp-trigger']"
+    ],
+    [
+      "click",
+      "[data-action='ep-trigger']"
+    ],
+    [
+      "click",
+      "[data-action='af-trigger']"
+    ],
+    [
+      "click",
+      "[data-action='lf-trigger']"
+    ],
+    [
+      "click",
+      "[data-action='talent-trigger']"
+    ],
+    [
+      "click",
+      "[data-action='talent-stance']"
+    ],
+    [
+      "click",
+      "[data-action='rt-trigger']"
+    ],
+    [
+      "click",
+      "[data-action='add-attack-ref']"
+    ],
+    [
+      "click",
+      "[data-action='remove-attack-ref']"
+    ],
+    [
+      "change",
+      "#advdisLookupSelect"
+    ],
+    [
+      "change",
+      "#stateLookupSelect"
+    ],
+    [
+      "click",
+      "[data-action='add-fused-character']"
+    ],
+    [
+      "click",
+      "[data-action='remove-fused-character']"
+    ],
+    [
+      "click",
+      "[data-action='recalculate-fusion']"
+    ],
+    [
+      "change",
+      ".fusion-racial-trait-toggle"
+    ],
+    [
+      "change",
+      ".fusion-boost-attr-toggle"
+    ],
+    [
+      "change",
+      ".fusion-bonus-talent-toggle"
+    ],
+    [
+      "change",
+      ".fusion-modifier-check"
+    ],
+    [
+      "click",
+      "[data-action='fusion-round-decrement']"
+    ],
+    [
+      "click",
+      "[data-action='fusion-round-reset']"
+    ],
+    [
+      "change",
+      ".absorption-trait-select"
+    ],
+    [
+      "change",
+      ".possession-trait-give"
+    ],
+    [
+      "change",
+      ".possession-trait-take"
+    ],
+    [
+      "change",
+      ".mutation-source-select"
+    ],
+    [
+      "click",
+      "[data-action='destroy-absorbed-apparel']"
+    ],
+    [
+      "change",
+      ".fusion-deeply-suppressed"
+    ],
+    [
+      "change",
+      ".fusion-struggling-input"
+    ],
+    [
+      "click",
+      "[data-action='eject-suppressed']"
+    ],
+    [
+      "click",
+      "[data-action='escape-suppressed']"
+    ],
+    [
+      "click",
+      "[data-action='link-jacket']"
+    ],
+    [
+      "click",
+      "[data-action='unlink-jacket']"
+    ],
+    [
+      "click",
+      "[data-action='enter-jacket']"
+    ],
+    [
+      "click",
+      "[data-action='exit-jacket']"
+    ],
+    [
+      "click",
+      "[data-action='open-jacket-sheet']"
+    ],
+    [
+      "change",
+      ".bj-lp-input"
+    ],
+    [
+      "change",
+      ".bj-kp-input"
+    ],
+    [
+      "change",
+      ".bj-weakpoint-toggle"
+    ],
+    [
+      "click",
+      "[data-action='dt-start-period']"
+    ],
+    [
+      "click",
+      "[data-action='dt-end-period']"
+    ],
+    [
+      "click",
+      "[data-action='dt-cancel-period']"
+    ],
+    [
+      "click",
+      "[data-action='dt-use-activity']"
+    ],
+    [
+      "click",
+      "[data-action='dt-undo-activity']"
+    ],
+    [
+      "change",
+      "[data-action='dt-toggle-modifier']"
+    ],
+    [
+      "click",
+      "[data-action='dt-delete-history']"
+    ],
+    [
+      "click",
+      "[data-action='tfc-toggle-section']"
+    ],
+    [
+      "click",
+      "[data-action='tfc-remove-aspect']"
+    ],
+    [
+      "click",
+      "[data-action='tfc-add-aspect']"
+    ],
+    [
+      "keydown",
+      ".tfc-aspect-input"
+    ],
+    [
+      "change",
+      "[data-action='tfc-edit-amb']"
+    ],
+    [
+      "change",
+      "[data-action='tfc-set-power-improvement']"
+    ],
+    [
+      "change",
+      "[data-action='tfc-set-ls-form']"
+    ],
+    [
+      "change",
+      "[data-action='tfc-set-ls-exceed']"
+    ],
+    [
+      "change",
+      "[data-action='tfc-toggle-exceed']"
+    ],
+    [
+      "change",
+      "[data-action='tfc-set-up-form']"
+    ],
+    [
+      "change",
+      "[data-action='tfc-set-up-path']"
+    ],
+    [
+      "change",
+      "[data-action='tfc-set-up-amb']"
+    ],
+    [
+      "click",
+      "[data-action='tfc-add-up']"
+    ],
+    [
+      "click",
+      "[data-action='tfc-delete-up']"
+    ]
+  ]
+}

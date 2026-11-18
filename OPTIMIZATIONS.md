@@ -1,5 +1,7 @@
 # Otimizações — 1.0.11-v14.2
 
+Atualização posterior: a versão 1.0.11-v14.3 também separa a classe da ficha em módulos de domínio. Consulte [o mapa da ficha](module/sheets/character/README.md). O restante deste documento descreve a etapa de índices da v14.2.
+
 ## Mudanças
 
 - `module/helpers/catalog-index.mjs`: índices compartilhados por ID, relação entre IDs de efeitos e traços, e bônus de Stress por traço. Mantém a primeira ocorrência de IDs duplicados, como fazia `Array.find`.

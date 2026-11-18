@@ -2,7 +2,7 @@
   "id": "DBU-MRR-OLD",
   "title": "Dragon Universe RPG - Old System",
   "description": "Automatización para Foundry VTT del juego de rol Dragon Universe (versión antigua), creado por el equipo de https://dbu-rpg.com/. Implementación con permiso de los autores; mecánicas d10, Tiers of Power, Ki y transformaciones. Proyecto sin ánimo de lucro, gratuito, hecho por fans para fans.",
-  "version": "1.0.11-v14.2",
+  "version": "1.0.11-v14.3",
   "compatibility": {
     "minimum": "12",
     "verified": "13",
@@ -100,7 +100,7 @@
   },
   "url": "https://github.com/SupremoBr/DBU-port-V14",
   "manifest": "https://raw.githubusercontent.com/SupremoBr/DBU-port-V14/main/system.json",
-  "download": "https://github.com/SupremoBr/DBU-port-V14/archive/refs/tags/v1.0.11-v14.2.zip",
+  "download": "https://github.com/SupremoBr/DBU-port-V14/archive/refs/tags/v1.0.11-v14.3.zip",
   "readme": "https://github.com/SupremoBr/DBU-port-V14/blob/main/README.md",
   "changelog": "https://github.com/SupremoBr/DBU-port-V14/blob/main/CHANGELOG.md",
   "bugs": "https://github.com/SupremoBr/DBU-port-V14/issues",

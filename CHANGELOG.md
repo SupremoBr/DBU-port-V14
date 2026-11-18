@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.0.11-v14.3] — ficha modular
+
+- Clase principal reducida de 17.613 a 663 líneas; lógica distribuida en 22 módulos de dominio y eventos.
+- Preservados los 385 métodos de prototipo y los 246 registros de eventos, con composición que detecta colisiones antes de instalar métodos.
+- Conservadas las llamadas a super, las tablas de downtime y las llamadas entre módulos/subclases; corregidas tres rutas de import dinámico tras mover el tracker.
+- 25 pruebas aprobadas, incluida la referencia completa de métodos y las 64 comparaciones previas de datos visuales. Sin cambios de reglas ni migración a DBU 0.9.3.
+
+
 ## [1.0.11-v14.2] — optimización de catálogos
 
 - Índices compartidos por ID para rasgos raciales, talentos y otros catálogos.

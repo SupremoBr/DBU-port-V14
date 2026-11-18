@@ -13,7 +13,7 @@ contenido escaneado de los manuales — para eso, visita
 
 ## Adaptación de compatibilidad v14
 
-Este fork conserva la autoría original MRR / ArdillaTactica. Versión local `1.0.11-v14.2`, con ajustes de API y chat para probar en Foundry v14. `verified` permanece en v13: falta validación funcional en v14. Consulte [COMPATIBILITY-V14.md](COMPATIBILITY-V14.md).
+Este fork conserva la autoría original MRR / ArdillaTactica. Versión local `1.0.11-v14.3`, con ajustes de API y chat para probar en Foundry v14. `verified` permanece en v13: falta validación funcional en v14. Consulte [COMPATIBILITY-V14.md](COMPATIBILITY-V14.md).
 
 ## Instalación
 
@@ -67,3 +67,5 @@ arte de los manuales.
 ## Desenvolvimento
 
 Execute `node --test tests/*.test.mjs`. As otimizações de catálogos e a preparação da ficha estão descritas em [OPTIMIZATIONS.md](OPTIMIZATIONS.md). A versão das regras permanece a da base recebida; não inclui a migração para DBU 0.9.3.
+
+A ficha de personagem está organizada por área em [module/sheets/character/](module/sheets/character/README.md). A classe principal mantém o ciclo de vida do Foundry.
