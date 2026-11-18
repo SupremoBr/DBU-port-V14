@@ -13,7 +13,7 @@ contenido escaneado de los manuales — para eso, visita
 
 ## Adaptación de compatibilidad v14
 
-Este fork conserva la autoría original MRR / ArdillaTactica. Versión local `1.0.11-v14.1`, con ajustes de API y chat para probar en Foundry v14. `verified` permanece en v13: falta validación funcional en v14. Consulte [COMPATIBILITY-V14.md](COMPATIBILITY-V14.md).
+Este fork conserva la autoría original MRR / ArdillaTactica. Versión local `1.0.11-v14.2`, con ajustes de API y chat para probar en Foundry v14. `verified` permanece en v13: falta validación funcional en v14. Consulte [COMPATIBILITY-V14.md](COMPATIBILITY-V14.md).
 
 ## Instalación
 
@@ -63,3 +63,7 @@ Las **reglas del juego** pertenecen a sus autores
 ([dbu-rpg.com](https://dbu-rpg.com/)) y se reproducen aquí únicamente como
 mecánicas implementadas en código, con su permiso, y sin redistribuir texto ni
 arte de los manuales.
+
+## Desenvolvimento
+
+Execute `node --test tests/*.test.mjs`. As otimizações de catálogos e a preparação da ficha estão descritas em [OPTIMIZATIONS.md](OPTIMIZATIONS.md). A versão das regras permanece a da base recebida; não inclui a migração para DBU 0.9.3.

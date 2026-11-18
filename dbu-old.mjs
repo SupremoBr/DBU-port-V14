@@ -1,4 +1,5 @@
 import { onRenderChatMessage, registerSystemSheets } from "./module/helpers/foundry-compat.mjs";
+import { getCatalogById, getRacialCatalogIndex, invalidateCatalogIndex } from "./module/helpers/catalog-index.mjs";
 /**
  * DBU-OLD — Dragon Ball Universe RPG System for Foundry VTT
  * Main entry point.
@@ -91,6 +92,14 @@ Hooks.once("init", async () => {
   CONFIG.DBU.baseQualitiesCatalog = BASE_QUALITIES_CATALOG;
   CONFIG.DBU.baseSizes = BASE_SIZES;
   CONFIG.DBU.baseHardness = BASE_HARDNESS;
+
+  // Catalogs are session data. Actor values and option selections stay uncached.
+  invalidateCatalogIndex();
+  getRacialCatalogIndex(CONFIG.DBU.racialTraitsCatalog);
+  for (const catalog of [ALL_TALENTS_DATA, MINION_TRAITS_CATALOG, VILLAINOUS_TRAITS_CATALOG, WEAKNESSES_CATALOG]) {
+    getCatalogById(catalog);
+  }
+  game.dbu.invalidateCatalogIndex = invalidateCatalogIndex;
 
   // Set custom document classes
   CONFIG.Actor.documentClass = DBUActor;

@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.0.11-v14.2] — optimización de catálogos
+
+- Índices compartidos por ID para rasgos raciales, talentos y otros catálogos.
+- Cálculo de pasivas desactivadas por índice de efectos; Stress preparado desde metadatos o texto legado interpretado una sola vez.
+- Preparación de rasgos, talentos, efectos y recursos extraída a character-data.mjs, conservando datos editables separados por personaje.
+- Dieciséis pruebas, incluidas 64 comparaciones de datos de ficha con la versión anterior. Sin cambios en las reglas del juego.
+
+
 ## [1.0.11-v14.1] — adaptación de este fork
 
 - Manifest y descarga apuntan a SupremoBr/DBU-port-V14; el ZIP está fijado al tag de esta versión.

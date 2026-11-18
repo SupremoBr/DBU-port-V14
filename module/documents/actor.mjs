@@ -1,3 +1,4 @@
+import { getDisabledRacialPassives, getRacialStressBonus } from "../helpers/catalog-index.mjs";
 /**
  * Extend the base Actor document for the DBU-OLD system.
  * All character stat calculations are ported from app.js.
@@ -459,24 +460,10 @@ export class DBUActor extends Actor {
     // Reuses nlopTierBoost computed at line 51 (> 0 means active NLoP trans found)
     if (nlopTierBoost > 0) system.aptitudes.stressBonus += (system.baseTier || 1);
 
-    // Racial trait text scan: "increase your stress bonus by 1"
-    const stressTraitCatalog = CONFIG.DBU?.racialTraitsCatalog || {};
-    const stressTraitIds = system.racialTraits || [];
-    const allStressTraits = [];
-    for (const [, traits] of Object.entries(stressTraitCatalog)) {
-      for (const trait of traits) allStressTraits.push(trait);
-    }
-    for (const traitId of stressTraitIds) {
-      const trait = allStressTraits.find(t => t.id === traitId);
-      if (!trait) continue;
-      for (const eff of (trait.effects || [])) {
-        if (eff.activationType !== "passive") continue;
-        const txt = (eff.text || "").toLowerCase();
-        if (txt.includes("increase your stress bonus by 1") || txt.includes("increase stress bonus by 1")) {
-          system.aptitudes.stressBonus += 1;
-        }
-      }
-    }
+    // Catalog metadata is prepared once; actor preparation only sums selected IDs.
+    system.aptitudes.stressBonus += getRacialStressBonus(
+      CONFIG.DBU?.racialTraitsCatalog, system.racialTraits
+    );
 
     // ---- Battle Born: add stack bonuses to combat roll totals ----
     // bb.strikeBonus/dodgeBonus/woundBonus are computed in applySaiyanBonuses (racial automation)
@@ -3141,26 +3128,9 @@ export class DBUActor extends Actor {
   // =============================================================
 
   _computeDisabledRacialPassives(system) {
-    const enabledPassives = system.effectTracking?.enabledPassives || {};
-    const disabled = new Set();
-    const traitCatalog = CONFIG.DBU?.racialTraitsCatalog || {};
-    for (const traits of Object.values(traitCatalog)) {
-      for (const trait of traits) {
-        const traitKey = trait.name.toLowerCase().replace(/[^a-z0-9]/g, "_");
-        const category = trait.traitCategory || "secondary";
-        for (const eff of (trait.effects || [])) {
-          const actType = eff.activationType || "passive";
-          // Check passives and resolved options (both can be toggled)
-          if (actType !== "passive" && !["option", "multi-option", "choice"].includes(actType)) continue;
-          const effectId = `racial_${category}_${traitKey}_${eff.level}`;
-          if (enabledPassives[effectId] === false) {
-            disabled.add(trait.id);
-            break;
-          }
-        }
-      }
-    }
-    return disabled;
+    return getDisabledRacialPassives(
+      CONFIG.DBU?.racialTraitsCatalog, system.effectTracking?.enabledPassives
+    );
   }
 
   // Racial Trait Automation (dispatches to per-race modules)
