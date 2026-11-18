@@ -1,0 +1,160 @@
+<div class="bio-container">
+  <div class="bio-grid">
+
+    {{!-- Z-SOUL --}}
+    <div class="bio-section zsoul">
+      <div class="section-header">Z-Soul</div>
+      <div class="zsoul-grid">
+        <div class="zsoul-item">
+          <label>Alignment</label>
+          <select name="system.zsoul.alignment">
+            {{selectOptions alignmentOptions selected=system.zsoul.alignment}}
+          </select>
+        </div>
+        <div class="zsoul-item">
+          <label>Karma</label>
+          <input type="number" name="system.zsoul.karma" value="{{system.zsoul.karma}}" />
+        </div>
+      </div>
+      <div class="zsoul-quote">
+        <label>Quote</label>
+        <textarea name="system.zsoul.quote" rows="2" placeholder="Character's signature quote...">{{system.zsoul.quote}}</textarea>
+      </div>
+    </div>
+
+    {{!-- DETAILS --}}
+    <div class="bio-section details">
+      <div class="section-header">Details</div>
+      <div class="details-grid">
+        <div class="detail-item">
+          <label>Race</label>
+          <span class="detail-display">{{raceLabel}}</span>
+        </div>
+        <div class="detail-item">
+          <label>Height</label>
+          <span class="detail-display">{{system.details.height}}</span>
+        </div>
+        <div class="detail-item">
+          <label>Weight</label>
+          <span class="detail-display">{{system.details.weight}}</span>
+        </div>
+        <div class="detail-item">
+          <label>Age</label>
+          <span class="detail-display">{{system.details.age}}</span>
+        </div>
+      </div>
+    </div>
+
+    {{!-- BIOGRAPHY --}}
+    <div class="bio-section biography">
+      <div class="section-header">Biography</div>
+      <textarea name="system.biography" rows="10" placeholder="Character background and history...">{{system.biography}}</textarea>
+    </div>
+
+    {{!-- NOTES --}}
+    <div class="bio-section notes">
+      <div class="section-header">Notes</div>
+      <textarea name="system.notes" rows="6" placeholder="Session notes, reminders...">{{system.notes}}</textarea>
+    </div>
+
+  </div>
+
+  {{!-- BASES --}}
+  <div class="bio-section bases-section">
+    <div class="section-header">
+      Bases
+      <button type="button" class="add-btn" data-action="add-base" title="Add Base"><i class="fas fa-plus"></i></button>
+    </div>
+
+    {{#each characterBases}}
+    <div class="base-card {{#if destroyed}}base-destroyed{{/if}}">
+      <div class="base-header-bar">
+        <input type="text" class="base-field base-name" data-base-index="{{baseIndex}}" data-field="name" value="{{name}}" />
+        <select class="base-field" data-base-index="{{baseIndex}}" data-field="category">
+          <option value="constructed" {{#if (eq category "constructed")}}selected{{/if}}>Constructed</option>
+          <option value="premade" {{#if (eq category "premade")}}selected{{/if}}>Pre-Made</option>
+        </select>
+        {{#if destroyed}}<span class="base-destroyed-badge"><i class="fas fa-house-crack"></i> DESTROYED</span>{{/if}}
+        {{#if metal}}<span class="base-metal-badge" title="Hardness 3+: Squares may be declared Metal">Metal</span>{{/if}}
+        <button type="button" class="delete-btn" data-action="delete-base" data-base-index="{{baseIndex}}"><i class="fas fa-trash"></i></button>
+      </div>
+
+      <div class="base-stats-row">
+        <label>Size
+          <select class="base-field" data-base-index="{{baseIndex}}" data-field="size">
+            {{#each ../baseSizeOptions}}
+            <option value="{{value}}" {{#if (eq value ../size)}}selected{{/if}}>{{label}}</option>
+            {{/each}}
+          </select>
+        </label>
+        <label>Hardness
+          <select class="base-field" data-base-index="{{baseIndex}}" data-field="hardness">
+            {{#each ../baseHardnessOptions}}
+            <option value="{{value}}" {{#if (eq value ../hardness)}}selected{{/if}}>{{label}}</option>
+            {{/each}}
+          </select>
+        </label>
+        <span class="base-stat" title="Damage Reduction from Size + Hardness — cannot be ignored except via Limited Destruction">DR <b>{{drFormula}} = {{drResolved}}</b>{{#if structural}} <i class="fas fa-shield-halved" title="Structural Reinforcement: all Damage to the Base −1/2"></i>{{/if}}</span>
+        <span class="base-stat">Squares <b>{{squares}}</b></span>
+      </div>
+
+      <div class="base-stats-row">
+        <span class="base-stat">LP <b>{{lpCurrent}}/{{lpMax}}</b></span>
+        <div class="base-lp-bar"><div class="base-lp-fill {{#if destroyed}}base-lp-zero{{/if}}" style="width: {{lpPct}}%"></div></div>
+        <label>Damage
+          <input type="number" class="base-field base-num" data-base-index="{{baseIndex}}" data-field="damage" value="{{damage}}" min="0" />
+        </label>
+        <button type="button" class="base-repair-btn" data-action="repair-base" data-base-index="{{baseIndex}}" title="A week of work outside Combat completely repairs the Base"><i class="fas fa-tools"></i> Repair</button>
+        <span class="base-substat" title="An Attacking Maneuver knocking LP below this value opens a new Entrance">Entrance &lt; {{entranceLP}}</span>
+        <span class="base-substat" title="Limited Destruction: target a wall/Quality — ignore Size DR, max LP ×1/10 for that attack">Lim. Destr. {{limitedDestructionLP}} LP</span>
+      </div>
+
+      <div class="base-stats-row">
+        <label>Dev Points
+          <input type="number" class="base-field base-num" data-base-index="{{baseIndex}}" data-field="devPointsTotal" value="{{devPointsTotal}}" min="0" />
+        </label>
+        <span class="base-stat">Spent <b>{{devSpent}}</b></span>
+        <span class="base-stat {{#if devOver}}base-dev-over{{/if}}">Remaining <b>{{devRemaining}}</b></span>
+      </div>
+
+      <div class="base-qualities">
+        <div class="base-qualities-header">
+          Base Qualities
+          <button type="button" class="add-btn" data-action="add-base-quality" data-base-index="{{baseIndex}}"><i class="fas fa-plus"></i></button>
+        </div>
+        {{#each qualities}}
+        <div class="base-quality-row">
+          <select class="base-quality-field" data-base-index="{{../baseIndex}}" data-q-index="{{qIndex}}" data-field="qualityKey">
+            <option value="">— choose Quality —</option>
+            {{#each ../../baseQualityOptions}}
+            <option value="{{value}}" {{#if (eq value ../qualityKey)}}selected{{/if}}>{{label}}</option>
+            {{/each}}
+          </select>
+          {{#if data}}
+          <span class="base-q-cost" title="Dev Point Cost{{#if data.variable}} (variable — set spent amount){{/if}}">{{costDisplay}}</span>
+          {{#if data.variable}}
+          <input type="number" class="base-quality-field base-num" data-base-index="{{../baseIndex}}" data-q-index="{{qIndex}}" data-field="devSpent" value="{{devSpent}}" min="0" title="Dev Points spent on this Quality" />
+          {{/if}}
+          <span class="base-q-occ" title="Square Occupancy">{{data.occupancy}}</span>
+          {{/if}}
+          <input type="text" class="base-quality-field base-q-notes" data-base-index="{{../baseIndex}}" data-q-index="{{qIndex}}" data-field="notes" value="{{notes}}" placeholder="Placement / choices…" />
+          <button type="button" class="delete-btn" data-action="delete-base-quality" data-base-index="{{../baseIndex}}" data-q-index="{{qIndex}}"><i class="fas fa-times"></i></button>
+          {{#if data}}
+          <div class="base-q-detail">
+            {{#unless (eq data.prerequisite "N/A")}}<span class="base-q-prereq"><b>Prereq:</b> {{data.prerequisite}}</span>{{/unless}}
+            <span class="base-q-effect">{{data.effect}}</span>
+          </div>
+          {{/if}}
+        </div>
+        {{else}}
+        <div class="empty-message">No Base Qualities.</div>
+        {{/each}}
+      </div>
+
+      <textarea class="base-field base-notes-area" data-base-index="{{baseIndex}}" data-field="notes" rows="2" placeholder="Base layout, Rooms, Entrances, Owners…">{{notes}}</textarea>
+    </div>
+    {{else}}
+    <div class="empty-message">No Bases. Click <i class="fas fa-plus"></i> to add one (given by the ARC — Constructed Bases start with 6~10 Dev Points).</div>
+    {{/each}}
+  </div>
+</div>
