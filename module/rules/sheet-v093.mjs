@@ -174,9 +174,37 @@ export function installRulesSheet093(Sheet) {
     const trans = this.actor.system.transformations?.[Number(event.currentTarget.dataset.transIndex)];
     const entry = CATALOGS_093.transformations[trans?.catalogKey];
     if (!entry) return original(event);
-    const groups = entry.traitGroups.map(g => `<h3>${escape(g.name)}</h3>${g.effects.map(e => `<p>${e.level} [${escape(e.keyword)}]: ${escape(e.text)}</p>`).join('')}`).join('');
-    const content = `<p><a href="${entry.source}" target="_blank" rel="noopener noreferrer">Fonte oficial — ${escape(entry.name)}</a></p><p>Aspectos manuais: ${escape(entry.referenceAspects.join(', ') || 'Nenhum listado')}.</p><p>Pré-requisitos: ${escape(entry.prerequisites)}.</p>${groups}`;
-    new Dialog({ title: entry.name+' — 0.9.3', content, buttons: { close: { label: 'Fechar' } } }, { width: 700 }).render(true);
+    const groups = entry.traitGroups.map(group => `
+      <section class="tf-trait-group-detail">
+        <h3 class="tf-trait-group-header">${escape(group.name)}</h3>
+        ${group.effects.map(effect => `
+          <div class="tf-trait-effect-row">
+            <div class="tf-reference-label">
+              <strong>Lv.${escape(effect.level)}</strong>
+              <span class="tf-trait-keyword-badge ${escape(effect.activationType)}">[${escape(effect.keyword)}]</span>
+            </div>
+            <div class="tf-trait-effect-text">${escape(effect.summary)}</div>
+            ${effect.referenceOptions?.length ? `
+              <dl class="tf-reference-options">
+                ${effect.referenceOptions.map(option => `
+                  <dt>${escape(option.name)} <span>[${escape(option.keyword)}]</span></dt>
+                  <dd>${escape(option.summary)}</dd>
+                `).join('')}
+              </dl>` : ''}
+          </div>`).join('')}
+      </section>`).join('');
+    const content = `
+      <div class="tf-traits-detail">
+        <div class="tf-detail-header-info">
+          <a href="${escape(entry.source)}" target="_blank" rel="noopener noreferrer">Regra completa no site</a>
+        </div>
+        <div class="tf-detail-aspects"><strong>Aspectos manuais</strong> ${escape(entry.referenceAspects.join(', ') || 'Nenhum listado')}</div>
+        <div class="tf-detail-prereqs"><strong>Pré-requisitos</strong> ${escape(entry.prerequisites || 'Nenhum listado')}</div>
+        ${groups}
+      </div>`;
+    new Dialog({
+      title: entry.name+' — 0.9.3', content, buttons: { close: { label: 'Fechar' } }
+    }, { width: 650, classes: ['dbu-old', 'tf-traits-window', 'dbu-transformation-reference'] }).render(true);
   });
   wrap('_onTransformationCheckChange', async function(original, event) {
     const index = Number(event.currentTarget?.dataset?.transIndex), field = event.currentTarget?.dataset?.field;

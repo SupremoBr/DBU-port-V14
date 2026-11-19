@@ -17,8 +17,15 @@ function applyUpdate(object, updates) {
 }
 class ActorStub { constructor(system) { this.system=system; this.uuid='Actor.a'; this.items=[]; } async update(updates) { applyUpdate(this,updates); } }
 class SheetStub { constructor(actor) { this.actor=actor; this.isEditable=true; } activateListeners() {} }
+class DialogStub {
+  static lastRendered;
+  static async wait() { return 'strike'; }
+  static async confirm() { return true; }
+  constructor(data, options) { this.data=data; this.options=options; }
+  render() { DialogStub.lastRendered=this; }
+}
 globalThis.Actor=ActorStub; globalThis.ActorSheet=SheetStub;
-globalThis.Dialog={ wait:async () => 'strike', confirm:async () => true };
+globalThis.Dialog=DialogStub;
 globalThis.foundry={ utils:{deepClone:structuredClone} };
 globalThis.CONFIG={DBU:{}}; registerConfig(); installRules093(CONFIG.DBU);
 globalThis.ui={notifications:{warn:()=>{},info:()=>{}}};
@@ -33,6 +40,23 @@ function activeCombat(actor) {
   const combatant={actor}; game.combat={id:'combat',round:1,turn:0,started:true,combatant,combatants:[combatant]};
 }
 const technique=(extra={})=>({foundation:'Energy',profile:'Beam',advantages:[],disadvantages:[],...extra});
+
+test('transformation details show current summaries and named options for previously saved forms', () => {
+  const entry = Object.values(CATALOGS_093.transformations).find(form => form.name === 'Super Saiyan 1');
+  const actor = new ActorStub({
+    rulesVersion: '0.9.3',
+    transformations: [{ catalogKey: entry.id, structuredTraits: [{ name: 'Legacy placeholder', effects: [] }] }],
+  });
+  new DBUCharacterSheet(actor)._onViewTransformationTraits({ preventDefault() {}, currentTarget: { dataset: { transIndex: '0' } } });
+  const { data, options } = DialogStub.lastRendered;
+  assert.ok(options.classes.includes('tf-traits-window'));
+  assert.match(data.title, /Super Saiyan 1/);
+  assert.match(data.content, /S-Cells.*Lv\.1.*4\+ stacks de Battle Born.*Lv\.2.*Power Up/s);
+  assert.match(data.content, /Super Surger.*Super Speed.*Super Sturdy.*Super Specialist/s);
+  assert.match(data.content, /Golden Power.*Duel Clashes.*Ki Surge/s);
+  assert.match(data.content, /Regra completa no site/);
+  assert.doesNotMatch(data.content, /Referência 0\.9\.3|Legacy placeholder/);
+});
 
 test('actual signature creation uses the full Profile floor and separate half-Profile usage floor',()=>{
   const tech=technique({advantages:[{name:'Efficiency',ranks:2,tpCost:15}],freeTP:20});

@@ -161,7 +161,7 @@ def summarize_rule(text, key):
 
 
 CHOICE_KEYWORD = re.compile(r'^(?:Option|Multi-Option/\d+|Choice(?:, Twinned)?)$')
-OPTION_HEADING = re.compile(r'(?:[:.!?–]|^)\s*([^\[\].:!?]+?)\s*\[([^\]]+)\]\s*:')
+OPTION_HEADING = re.compile(r'(?:[:.!?–]|^)\s*([^\s\[\].:!?][^\[\].:!?]*?(?:[.!?]+)?)\s*\[([^\]]+)\]\s*:')
 DIVINE_DOMAINS = {
     'God of Peace': 'Ao ativar Power, entre em Mindful até o início do próximo turno.',
     'God of Judgment': 'Ao usar a manobra Signature Technique, acrescente 1 Energy Charge ao ataque.',
@@ -255,6 +255,74 @@ def racial_choice(row, current, previous_options):
                     summary=f'Escolha {count} opções.')
     summary = 'Na criação, escolha um domínio.' if row['name'] == 'Divine Magic' else 'Escolha uma opção.'
     return dict(activationType='option', options=options, summary=summary)
+
+
+TRANSFORMATION_ADDENDA = {
+    'absorption': 'Cada Absorption dá +1 nos três maiores atributos do alvo. Limite de duas stacks temporárias. '
+                  'Fusões contam como uma stack, com AMB multiplicado pelo número de integrantes. Fora do combate, a stack é permanente e conta no limite.',
+    'vocation-gain': 'Cada stack tem seu próprio AMB. Warrior +1 FO/TE/MA, Mage ou Priest +1 IN/MA, '
+                     'Martial Artist +1 AG/FO, Thief +1 AG/IN, Ranger +2 AG, Dancer +2 PE, Gadabout +1 em um atributo escolhido e um sorteado.',
+    'big-gete-star-integration': 'O Big Gete Star compartilha seus LP e defesas. Seu terreno é Metallic e você pode tratar '
+                                'qualquer quadrado dele como alcance corpo a corpo. Ataques ao astro acertam automaticamente, mas Defense reduz o dano final.',
+    'overtaken': 'Se uma Fusion que você possui se desfizer, escolha um integrante. Ele recebe Overtaken Lv.2 como Temporary Awakening '
+                 'e você o controla enquanto for o Possessing Character.',
+    'mortal-mentality': 'Efeitos de Healthy ou acima de Bruised passam a valer abaixo de Injured. Efeitos acima de Injured ou Critical '
+                        'passam a valer abaixo de Bruised. Contagens de limiares acima passam a contar os limiares abaixo.',
+    'cybernetic-reconfiguration': 'Ao equipar Cosmic Suit, escolha dois traços de Cybernetic Enhancement. Eles permanecem disponíveis '
+                                   'enquanto você possuir este Awakening.',
+    'dark-factor': 'Só um personagem no cenário pode ter Dark Factor. Ao morrer com ele, seu Origin fica ligado ao Awakening. '
+                   'Um novo portador precisa vencer um Might Clash sem Forms ou Enhancements para evitar ser controlado pelo Origin.',
+    'glass-dragon': 'Ao entrar na forma, crie um Refractive Dragon com metade de seus LP máximos. Só Called Shots direcionados a ele '
+                    'causam dano por ataque. Ele desaparece ao cair a 0 LP, ao sair da forma ou ao fim do encontro.',
+    'metamorphosis': 'Configure cada estágio com um tamanho de Small a Large, Evolution Traits em quantidade igual a S, '
+                     'e escolhas próprias de Tail Attack e Survivor.',
+    'grudge-amplifier': 'Ghost Warriors são Special Minions criados a partir do registro de um personagem na hora da morte. '
+                        'Seu Power Level acompanha o seu, ajustando os Character Perks.',
+    'hyper-mega-form': 'Você pode combinar Supports mortos, absorvidos, possuídos, mesclados ou fundidos. A combinação encerra '
+                       'o vínculo anterior aplicável. Supports destruídos, selados ou fora do campo ficam indisponíveis.',
+    'empowered-form': 'Em uma linha com múltiplos estágios, retire Scaling e acrescente +2(T) em AG/FO/TE/MA. '
+                      'No estágio original 1, Stress +4. No 2, Stress +2 e Tier 5+. No 3, Stress +1 e Tier 6+.',
+    'supreme-form': 'Supreme Form pode ficar acima de um Evolved Stage com Pinnacle, ignorando o limite de Stacking Evolved Stages.',
+}
+
+SUPER_SAIYAN_SUMMARIES = {
+    ('S-Cells', 1): 'Com 4+ stacks de Battle Born, aumente em uma categoria os Extra Dice de Tier dos Combat Rolls e ganhe +1(T) Damage Reduction.',
+    ('S-Cells', 2): 'Com 6+ stacks de Battle Born, use Power Up como Instant Maneuver, uma vez por rodada.',
+    ('S-Cells', 3): 'Ao ganhar a transformação, escolha um dos efeitos abaixo.',
+    ('Golden Power', 1): 'Ganhe +1(T) no Dice Score de Duel Clashes.',
+    ('Golden Power', 2): 'Uma vez por rodada, ao ser atingido abaixo de Bruised, reduza a Damage Category do ataque em um nível para o seu cálculo de dano.',
+    ('Golden Power', 3): 'Ao se transformar, entre em Raging até o fim do turno.',
+    ('Golden Power', 4): 'Ao se transformar, use uma Ki Surge, uma vez por encontro.',
+    ('This is a Super Saiyan', 1): 'Troque Draining e Power High por Natural (Lv.1) e Heartbeat (Lv.1).',
+    ('This is a Super Saiyan', 2): 'Libera o Evolved Stage Full Power de Super Saiyan 1.',
+    ('This is a Super Saiyan', 3): 'Superior conta como Raging para o aspecto Raging.',
+    ('This is a Super Saiyan', 4): 'Quando Golden Power Lv.3 ativar, você pode entrar em Superior em vez de Raging. Superior dura até o início do próximo turno.',
+}
+
+
+def transformation_reference(row, group, effect):
+    key = (row['page'], group['name'], effect['level'])
+    summary = SUPER_SAIYAN_SUMMARIES.get(key[1:]) if row['page'] == 'super-saiyan' and row['name'] == 'Super Saiyan 1' else None
+    if effect['keyword'] == 'Addendum' and effect['text'].startswith('Please refer'):
+        summary = TRANSFORMATION_ADDENDA[row['page']]
+    reference = {'summary': summary or summarize_rule(effect['text'], key)}
+    if re.search(r'\b(?:Option|Choice)\b', effect['keyword']):
+        option_list, = group['extraLists']
+        headings = list(OPTION_HEADING.finditer(option_list))
+        if len(headings) < 2:
+            raise ValueError(f'Missing transformation options for {key}')
+        ends = [*(m.start() + 1 for m in headings[1:]), len(option_list)]
+        options = []
+        for match, end in zip(headings, ends, strict=True):
+            name, keyword = (part.strip() for part in match.groups())
+            text = option_list[match.end():end].strip()
+            if row['page'] == 'cultivation-of-the-self' and name == 'Built Different' and text.startswith('Please refer'):
+                text = ('Fora de Forms e Enhancements, Inherent Power tem Degree mínimo 1. Escolha o Degree no início do combate. '
+                        'Power Up e Transformation podem subir o Degree. Combat Recovery, Holding Back e início do turno podem baixá-lo. '
+                        'Se mudar o Degree numa transformação, faça um Stress Test.')
+            options.append(dict(name=name, keyword=keyword, summary=summarize_rule(text, (*key, name))))
+        reference['referenceOptions'] = options
+    return reference
 
 
 def mechanic_summary(row):

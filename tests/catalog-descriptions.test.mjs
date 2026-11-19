@@ -35,6 +35,22 @@ test('all catalog entries have a summary, an official source and individual leve
   }
 });
 
+test('transformation reference effects and their listed options have summaries', () => {
+  for (const entry of Object.values(CATALOGS_093.transformations)) {
+    for (const group of entry.traitGroups) {
+      for (const effect of group.effects) {
+        const label = `${entry.name}, ${group.name}, Lv.${effect.level}`;
+        assert.ok(effect.summary?.trim(), label);
+        assert.doesNotMatch(effect.summary, /Referência 0\.9\.3|resolver este efeito|Please refer/i, label);
+        if (/\b(?:Option|Choice)\b/.test(effect.keyword)) {
+          assert.ok(effect.referenceOptions?.length >= 2, label);
+          assert.ok(effect.referenceOptions.every(option => option.name.trim() && option.summary.trim()), label);
+        }
+      }
+    }
+  }
+});
+
 test('Divine Magic and Alert describe the corresponding effect at each level', () => {
   const divineMagic = Object.values(CATALOGS_093.racialTraits).flat().find(entry => entry.name === 'Divine Magic');
   const alert = CATALOGS_093.talents.find(entry => entry.name === 'Alert');

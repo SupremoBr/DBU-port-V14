@@ -4,7 +4,7 @@ Usage: python3 scripts/build-rules093.py /path/to/rules093
 The research HTML and rule prose are deliberately not distributed.
 """
 import json, re, sys
-from rules093_reference import continued_choices, level_summary, mechanic_summary, racial_choice, reference_effects, talent_categories
+from rules093_reference import continued_choices, level_summary, mechanic_summary, racial_choice, reference_effects, talent_categories, transformation_reference
 from pathlib import Path
 root = Path(sys.argv[1]); target = Path(__file__).resolve().parents[1] / 'module/rules/catalogs-v093.mjs'
 read = lambda name: json.loads((root / name).read_text())
@@ -103,7 +103,7 @@ for i,row in enumerate(read('parsed-transformations.json')):
  attrs={k.lower():v for k,v in row['attributes'].items()}
  stress=m.get('Stress Test Requirement','0'); stack=m.get('Maximum No of Stacks','1')
  source=row['url']; aspects=[x.strip() for x in re.split(r',\s*(?![^()]*\))',m.get('Aspects','')) if x.strip()]
- transforms[ident]=dict(id=ident,name=row['name'],category=category,awakeningType=m.get('Awakening Type','Lesser' if is_awake else ''),awakeningOrigin=m.get('Awakening Origin',''),racialRequirement=m.get('Racial Requirement','Revisar pré-requisito da forma base'),tierRequirement=m.get('Tier of Power Requirement',''),stressTest=int(stress) if stress.isdigit() else 0,stressFormula=stress,maxStacks=int(stack) if stack.isdigit() else 1,attrBonuses=attrs,aspects=[],referenceAspects=aspects,transcended='transcendent' in m.get('Enhancement Type','').lower(),prerequisites=m.get('Prerequisite(s)',''),source=source,rulesVersion='0.9.3',automation='attributes-only',requiresReview=any(not re.fullmatch(r'(?:[-–—]|\+?\d+(?:\((?:T|bT)\))?|)',str(v).strip()) for v in attrs.values()) or not stress.isdigit(),traitGroups=[dict(name=g['name'],kind=g['kind'],effects=[effect(e,source) for e in g['effects']]) for g in row['traitGroups']])
+ transforms[ident]=dict(id=ident,name=row['name'],category=category,awakeningType=m.get('Awakening Type','Lesser' if is_awake else ''),awakeningOrigin=m.get('Awakening Origin',''),racialRequirement=m.get('Racial Requirement','Revisar pré-requisito da forma base'),tierRequirement=m.get('Tier of Power Requirement',''),stressTest=int(stress) if stress.isdigit() else 0,stressFormula=stress,maxStacks=int(stack) if stack.isdigit() else 1,attrBonuses=attrs,aspects=[],referenceAspects=aspects,transcended='transcendent' in m.get('Enhancement Type','').lower(),prerequisites=m.get('Prerequisite(s)',''),source=source,rulesVersion='0.9.3',automation='attributes-only',requiresReview=any(not re.fullmatch(r'(?:[-–—]|\+?\d+(?:\((?:T|bT)\))?|)',str(v).strip()) for v in attrs.values()) or not stress.isdigit(),traitGroups=[dict(name=g['name'],kind=g['kind'],effects=[dict(effect(e,source), **transformation_reference(row,g,e)) for e in g['effects']]) for g in row['traitGroups']])
 for oldkey,t in old['transformations'].items():
  # Category disambiguates duplicate names such as Super Perfect Form.
  matches=[x['id'] for x in transforms.values() if norm(x['name'])==norm(t['name']) and x['category']==t['category']]

@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.0.12-rules093-alpha.9] — referência de transformações
+
+- Os traços de transformação exibem o resumo de cada nível e as opções descritas pela regra 0.9.3 em uma janela com o tema escuro do sistema.
+- Os seletores de opções dos traços têm altura para exibir o texto completo na vertical.
+
 ## [1.0.12-rules093-alpha.8] — escolhas dos traços raciais
 
 - Os traços com opções 0.9.3 agora exibem seletores e resumos por opção. As escolhas são gravadas na ficha, com os limites para seleção múltipla e os efeitos que acompanham uma escolha anterior.

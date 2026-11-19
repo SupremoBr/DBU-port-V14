@@ -1898,7 +1898,10 @@
 
 .dbu-old.sheet .option-select {
   width: 100%;
-  padding: 8px 10px;
+  height: auto;
+  min-height: 2.5rem;
+  padding: 4px 10px;
+  line-height: normal;
   background: var(--bg-darker);
   border: 1px solid var(--border-color);
   border-radius: 4px;
@@ -4176,6 +4179,69 @@
 .tf-traits-window .tf-trait-effect-text {
   flex: 1;
   line-height: 1.4;
+}
+
+.dbu-transformation-reference .tf-detail-header-info a {
+  color: #ffb270;
+  text-decoration: underline;
+}
+
+.dbu-transformation-reference .tf-trait-group-header {
+  margin: 0;
+  border: 0;
+}
+
+.dbu-transformation-reference .tf-trait-effect-row {
+  display: block;
+  padding-block: 8px;
+  overflow-wrap: anywhere;
+}
+
+.dbu-transformation-reference .tf-reference-label {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: baseline;
+  margin-bottom: 3px;
+  color: #ffd700;
+}
+
+.dbu-transformation-reference .tf-trait-keyword-badge {
+  white-space: normal;
+  color: #aeeaff;
+}
+
+.dbu-transformation-reference .tf-reference-options {
+  margin: 8px 0 0;
+  padding-left: 10px;
+  border-left: 2px solid #00bfff;
+}
+
+.dbu-transformation-reference .tf-reference-options dt {
+  color: #e8ecf1;
+  font-weight: bold;
+}
+
+.dbu-transformation-reference .tf-reference-options dt span {
+  color: #aeeaff;
+  font-size: 0.85em;
+  font-weight: normal;
+}
+
+.dbu-transformation-reference .tf-reference-options dd {
+  margin: 2px 0 6px;
+}
+
+.dbu-transformation-reference .dialog-buttons button {
+  min-height: 2.25rem;
+  background: #293544;
+  color: #fff;
+  border: 1px solid #2a4a6a;
+}
+
+.dbu-transformation-reference .dialog-buttons button:hover,
+.dbu-transformation-reference .dialog-buttons button:focus-visible {
+  border-color: #00bfff;
 }
 
 .tf-traits-window .tf-special-trait-header {
