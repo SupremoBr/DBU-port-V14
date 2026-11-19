@@ -1,6 +1,7 @@
 import { prepareCharacterTraits, prepareCharacterTalents } from "../character-data.mjs";
 import { getCatalogById, getRacialCatalogIndex } from "../../helpers/catalog-index.mjs";
 import { Dialog } from "../../helpers/foundry-compat.mjs";
+import { ELEMENTAL_PROFILES_093 } from "../../rules/profiles-v093.mjs";
 
 /** Character sheet domain: traits-talents. Methods run with the sheet as this. */
 export const traitsTalentsMethods = {
@@ -654,11 +655,33 @@ export const traitsTalentsMethods = {
   },
 
   async _onTraitOptionSelect(event) {
-    const { traitId, effectLevel } = event.currentTarget.dataset;
+    const { dataset: { traitId, effectLevel, elementalProfile }, value } = event.currentTarget;
     if (!traitId || !effectLevel) return;
+    const system = this.actor.system;
+    const trait = getRacialCatalogIndex(CONFIG.DBU?.racialTraitsCatalog).byId.get(traitId);
+    if (trait?.rulesVersion === "0.9.3") {
+      const effect = trait.effects.find(entry => String(entry.level) === effectLevel);
+      if (!this.isEditable || !system.racialTraits?.includes(traitId) || effect?.activationType !== "option") return;
+      const path = `system.racialOptionSelections.${traitId}`;
+      const saved = system.racialOptionSelections?.[traitId];
+      const options = effect.options.filter(opt => !opt.requiredRace || opt.requiredRace === system.race);
+      if (elementalProfile) {
+        if (options.some(opt => opt.selectElement && opt.name === saved?.[effectLevel]) && ELEMENTAL_PROFILES_093.includes(value)) {
+          await this.actor.update({ [`${path}.elementalProfiles.${effectLevel}`]: value });
+        }
+        return;
+      }
+      if (!options.some(opt => opt.name === value)) return;
+      const update = { [`${path}.${effectLevel}`]: value };
+      if (value !== saved?.[effectLevel] && saved?.elementalProfiles?.[effectLevel]) {
+        update[`${path}.elementalProfiles.-=${effectLevel}`] = null;
+      }
+      await this.actor.update(update);
+      return;
+    }
     const options = foundry.utils.deepClone(this.actor.system.racialOptionSelections || {});
     if (!options[traitId]) options[traitId] = {};
-    options[traitId][effectLevel] = event.currentTarget.value;
+    options[traitId][effectLevel] = value;
     await this.actor.update({ "system.racialOptionSelections": options });
   },
 
@@ -711,6 +734,23 @@ export const traitsTalentsMethods = {
   async _onTraitOptionCheckbox(event) {
     const { traitId, effectLevel, optionName, maxOptions } = event.currentTarget.dataset;
     if (!traitId || !effectLevel || !optionName) return;
+    const system = this.actor.system;
+    const trait = getRacialCatalogIndex(CONFIG.DBU?.racialTraitsCatalog).byId.get(traitId);
+    if (trait?.rulesVersion === "0.9.3") {
+      const effect = trait.effects.find(entry => String(entry.level) === effectLevel);
+      if (!this.isEditable || !system.racialTraits?.includes(traitId) || effect?.activationType !== "multi-option") return;
+      const allowed = effect.options.filter(opt => !opt.requiredRace || opt.requiredRace === system.race).map(opt => opt.name);
+      if (!allowed.includes(optionName)) return;
+      const saved = system.racialOptionSelections?.[traitId]?.[effectLevel];
+      const current = (Array.isArray(saved) ? saved : [saved]).filter(name => allowed.includes(name));
+      const next = event.currentTarget.checked ? [...new Set([...current, optionName])] : current.filter(name => name !== optionName);
+      if (next.length > effect.optionCount) {
+        event.currentTarget.checked = current.includes(optionName);
+        return;
+      }
+      await this.actor.update({ [`system.racialOptionSelections.${traitId}.${effectLevel}`]: next });
+      return;
+    }
     const options = foundry.utils.deepClone(this.actor.system.racialOptionSelections || {});
     if (!options[traitId]) options[traitId] = {};
     let current = options[traitId][effectLevel];

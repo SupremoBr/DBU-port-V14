@@ -1917,6 +1917,25 @@
   box-shadow: 0 0 0 2px rgba(255, 152, 0, 0.2);
 }
 
+.dbu-old.sheet .trait-option-previews {
+  margin-top: 8px;
+  color: var(--text-primary);
+}
+
+.dbu-old.sheet .trait-option-previews summary {
+  cursor: pointer;
+}
+
+.dbu-old.sheet .trait-option-previews dd {
+  margin: 2px 0 8px 12px;
+}
+
+.dbu-old.sheet .effect-options select.option-select,
+.dbu-old.sheet .effect-options select.option-select option {
+  color: #fff;
+  background-color: var(--bg-darker);
+}
+
 .dbu-old.sheet .effect-option.hidden-option {
   display: none;
 }

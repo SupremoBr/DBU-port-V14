@@ -30,6 +30,12 @@ export const PROFILES_093 = Object.freeze({
   'Elemental (Wind)': profile(['Magic'], 'Direct', 4, { weaponCategory: 'Slashing' })
 });
 
+// Plantlife is available as a Favored Element even before its combat rules are implemented.
+export const ELEMENTAL_PROFILES_093 = Object.freeze([
+  ...Object.keys(PROFILES_093).filter(name => name.startsWith('Elemental (')),
+  'Elemental (Plantlife)'
+].sort());
+
 export function profileKiUnits(profileName) { return PROFILES_093[profileName]?.kpCost ?? null; }
 export function minimumAttackKiUnits(profileName) {
   const base = profileKiUnits(profileName);

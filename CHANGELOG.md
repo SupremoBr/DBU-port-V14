@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.0.12-rules093-alpha.8] — escolhas dos traços raciais
+
+- Os traços com opções 0.9.3 agora exibem seletores e resumos por opção. As escolhas são gravadas na ficha, com os limites para seleção múltipla e os efeitos que acompanham uma escolha anterior.
+- Divine Magic oferece dez domínios no Lv.3. As opções que concedem Favored Element exibem também a seleção do Profile Elemental.
+
 ## [1.0.12-rules093-alpha.7] — resumos por nível
 
 - Cada nível dos traços raciais e talentos descreve seu efeito na ficha. Os links para as regras completas e as descrições personalizadas continuam disponíveis.

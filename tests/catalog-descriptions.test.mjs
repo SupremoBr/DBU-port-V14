@@ -44,7 +44,13 @@ test('Divine Magic and Alert describe the corresponding effect at each level', (
   assert.deepEqual(divineMagic.effects.map(effect => effect.level), [1, 2, 3]);
   assert.match(abilities.summary, /Magical Materialization.*Telepathy.*Telekinesis.*Second Sight/);
   assert.match(skills.summary, /1 rank.*Knowledge.*Investigation/);
-  assert.match(domains.summary, /escolha um domínio.*Peace:.*Element:/);
+  assert.match(domains.summary, /escolha um domínio/);
+  assert.deepEqual(domains.options.map(option => option.name), [
+    'God of Peace', 'God of Judgment', 'God of Power', 'God of Survival', 'God of Wisdom',
+    'God of War', 'God of Magic', 'God of Many', 'God of Time', 'God of an Element'
+  ]);
+  assert.match(domains.options[0].summary, /Power.*Mindful/);
+  assert.equal(domains.options.at(-1).selectElement, true);
 
   assert.deepEqual(alert.effects.map(effect => effect.level), [1, 2, 3, 4]);
   assert.match(initiative.summary, /Initiative Value \+1\(bT\)/);

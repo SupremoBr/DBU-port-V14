@@ -4,7 +4,7 @@ Usage: python3 scripts/build-rules093.py /path/to/rules093
 The research HTML and rule prose are deliberately not distributed.
 """
 import json, re, sys
-from rules093_reference import level_summary, mechanic_summary, reference_effects, talent_categories
+from rules093_reference import continued_choices, level_summary, mechanic_summary, racial_choice, reference_effects, talent_categories
 from pathlib import Path
 root = Path(sys.argv[1]); target = Path(__file__).resolve().parents[1] / 'module/rules/catalogs-v093.mjs'
 read = lambda name: json.loads((root / name).read_text())
@@ -30,17 +30,24 @@ def effect(e, source):
  rule=mechanic(e)
  summary=(str(rule['target'])+': '+str(rule['amount'])+' × '+rule['scale']+'.') if rule else 'Referência 0.9.3: resolver este efeito na fonte oficial; sem automação herdada.'
  return dict(level=e['level'], keyword=kw, activationType='limited' if match else 'option' if 'Option' in kw else 'triggered' if 'Triggered' in kw else 'passive', usageLimit=match[2].lower() if match else None, maxUses=int(match[1]) if match else None, text=summary, source=source, mechanic=rule)
-def catalog_effects(row, source, legacy_effects=None):
- effects = reference_effects(row)
+def catalog_effects(row, source, legacy_effects=None, continuations=()):
+ effects = sorted([*reference_effects(row), *continuations], key=lambda entry: entry['level'])
  if legacy_effects is not None:
   return [dict(legacy, summary=level_summary(row, current)) for legacy,current in zip(legacy_effects,effects,strict=True)]
  result = []
+ previous_options = []
  for current in effects:
   entry = effect(current, source)
   if not row['effects']:
    # Recover display blocks without opting the previously unparsed row into automation.
    entry['mechanic'] = None
   entry['summary'] = level_summary(row, current)
+  if row.get('source', 'talents') != 'talents':
+   choice = racial_choice(row, current, previous_options)
+   if choice:
+    entry.update(choice)
+    if choice['activationType'] == 'option':
+     previous_options.append(entry['level'])
   result.append(entry)
  return result
 
@@ -49,6 +56,7 @@ by_title = {next(e['title'] for e in nav['Races'] if e['slug']==slug):race for r
 old_traits = [t for ts in old['races'].values() for t in ts]
 traits = {}; racial_map = {}; factor_options = {}; subrace_options = {}
 for slug, rows in read('parsed-racial.json').items():
+ extra_choices = continued_choices((root / 'sources' / f'{slug}.html').read_text(), rows) if rows else {}
  entry = next(e for e in nav['Races'] if e['slug']==slug)
  path = entry['path']; race = by_title.get(path[1] if len(path)>1 else '', 'factors')
  if race != 'factors' and len(path)>2:
@@ -58,14 +66,14 @@ for slug, rows in read('parsed-racial.json').items():
   same = [t for t in candidates if equivalent(t.get('effects',[]),row['effects'])]
   reviewed = False
   ident = same[0]['id'] if reviewed else 'r093_'+key(slug+'_'+row['name'])
-  item = dict(id=ident, name=row['name'], race=race, category=row['category'], traitCategory=row['traitCategory'], subrace=slug if len(path)>2 else '', source=url(slug), rulesVersion='0.9.3', automation='legacy-reviewed' if reviewed else 'manual', description=mechanic_summary(row), effects=catalog_effects(row,url(slug),same[0]['effects'] if reviewed else None), isSelectable=True)
+  item = dict(id=ident, name=row['name'], race=race, category=row['category'], traitCategory=row['traitCategory'], subrace=slug if len(path)>2 else '', source=url(slug), rulesVersion='0.9.3', automation='legacy-reviewed' if reviewed else 'manual', description=mechanic_summary(row), effects=catalog_effects(row,url(slug),same[0]['effects'] if reviewed else None, extra_choices.get(row['name'], [])), isSelectable=True)
   traits.setdefault(race, []).append(item)
   for t in candidates: racial_map.setdefault(t['id'],[]).append(ident)
 # Explicit rename verified on the Saiyan page. No approximate-name matching.
 born = next(t for t in traits['saiyan'] if t['name']=='Born for Battle')
 racial_map['908d85ede236e3ce'] = [born['id']]
 heritage = next(t for t in traits['saiyan'] if t['name']=='Saiyan Heritage')
-heritage['effects'][-1]['options']=[dict(name='Tailed',activationType='passive',keyword='Passive',text='Cauda: Stress +1; +2 a partir de bT 5.'),dict(name='Tailless',activationType='passive',keyword='Passive',text='Em Form ou Enhancement: Wound e Soak +1(T).')]
+heritage['effects'][-1]['options']=[dict(name='Tailed',activationType='passive',keyword='Passive',summary='Cauda: acesso à Oozaru; Stress +1, ou +2 a partir de bT 5.'),dict(name='Tailless',activationType='passive',keyword='Passive',summary='Em Form ou Enhancement: Wound e Soak +1(T).')]
 heritage['effects'][-1]['text']='Escolha a opção racial de cauda.'
 heritage['effects'][-1]['summary']=heritage['effects'][-1]['text']
 heritage['effects'][-1]['activationType']='option'

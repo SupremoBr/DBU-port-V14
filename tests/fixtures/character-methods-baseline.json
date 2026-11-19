@@ -550,7 +550,8 @@
     "_onTraitOptionSelect": {
       "hash": "125804f424df5963e76c3d50c3d1333d89739d254b587ee830df5e3bbfbe164f",
       "length": 1,
-      "async": true
+      "async": true,
+      "rules093Hash": "4b6acd83639168fbb6d1a9def1bf8463a549c1efb2e86d89c7edd06d0c2b6806"
     },
     "_onPartBeastBestialCheck": {
       "hash": "0e68e3fae871a66feb5c305615f7b76f3613f94e252f71054b6dff5f3dbd9473",
@@ -585,7 +586,8 @@
     "_onTraitOptionCheckbox": {
       "hash": "d2c35b54a5a929f08a3a1c5a7a3d4419c575e30f743f89c57540031f05c6e7c5",
       "length": 1,
-      "async": true
+      "async": true,
+      "rules093Hash": "55a608a4329335e16b0157d06bdfed1017a40142b26755ca093821ce050aeca5"
     },
     "_onAddVillainousTrait": {
       "hash": "c6cf0ea68ebd358b357ca267e5e41b0aaddd4872da1c38c2982f1663b5a01b0a",

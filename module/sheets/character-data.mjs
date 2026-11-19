@@ -1,4 +1,5 @@
 import { getCatalogById, getRacialCatalogIndex } from "../helpers/catalog-index.mjs";
+import { ELEMENTAL_PROFILES_093 } from "../rules/profiles-v093.mjs";
 
 // View data only: keep clones for editable selections; never cache actor state.
 
@@ -16,6 +17,29 @@ export function prepareCharacterTraits(system) {
     const trait = foundry.utils.deepClone(traitData);
     const traitSelections = optionSelections[id] || {};
     for (const effect of (trait.effects || [])) {
+      if (trait.rulesVersion === "0.9.3" && effect.options?.length) {
+        const { choiceSource } = effect;
+        const sourceId = choiceSource?.traitId || id;
+        const sourceLevel = choiceSource?.level ?? effect.level;
+        const saved = selectedIds.includes(sourceId) ? optionSelections[sourceId]?.[sourceLevel] : undefined;
+        const chosen = Array.isArray(saved) ? saved : [saved];
+        effect.options = effect.options.filter(opt => !opt.requiredRace || opt.requiredRace === system.race);
+        for (const opt of effect.options) {
+          opt.selected = chosen.includes(opt.name);
+          if (opt.selected && opt.selectElement) {
+            const profile = traitSelections.elementalProfiles?.[effect.level];
+            opt.elementalProfiles = ELEMENTAL_PROFILES_093.map(name => ({ name, selected: name === profile }));
+            opt.hasSelectedProfile = ELEMENTAL_PROFILES_093.includes(profile);
+          }
+        }
+        const count = effect.options.filter(opt => opt.selected).length;
+        effect.hasSelection = count > 0;
+        if (effect.activationType === "multi-option") {
+          effect.selectedCount = count;
+          for (const opt of effect.options) opt.disabled = !opt.selected && count >= effect.optionCount;
+        }
+        continue;
+      }
       if (effect.options && (effect.activationType === "option" || effect.activationType === "choice")) {
         const selected = traitSelections[effect.level];
         for (const opt of effect.options) opt.selected = (opt.name === selected);
@@ -379,7 +403,7 @@ export function prepareActiveEffects(context, system) {
           level: eff.level || 0,
           type: optType,
           keyword: optKeyword,
-          text: chosenOpt.text || "",
+          text: chosenOpt.text || chosenOpt.summary || "",
           maxUses: optMaxUses,
           usageLimit: optUsageLimit,
           usedCount: optUsedCount,

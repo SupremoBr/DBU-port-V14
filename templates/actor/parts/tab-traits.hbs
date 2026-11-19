@@ -75,7 +75,10 @@
             <div class="effect-options">
               {{#if (eq activationType "option")}}
                 {{!-- Single option: dropdown --}}
-                <select class="option-select" data-trait-id="{{../id}}" data-effect-level="{{level}}">
+                <select class="option-select" data-trait-id="{{../id}}" data-effect-level="{{level}}" aria-label="{{../name}} Lv.{{level}}" {{#unless @root.editable}}disabled{{/unless}}>
+                  {{#if ../rulesVersion}}
+                  <option value="" disabled {{#unless hasSelection}}selected{{/unless}}>Escolha uma opção</option>
+                  {{/if}}
                   {{#each options}}
                   <option value="{{name}}" {{#if selected}}selected{{/if}}>{{name}}</option>
                   {{/each}}
@@ -85,18 +88,40 @@
                   {{#if selected}}
                   <div class="option-detail">
                     <span class="option-keyword">[{{keyword}}]</span>
-                    <span class="option-text">{{{text}}}</span>
+                    <span class="option-text">{{#if summary}}{{summary}}{{else}}{{{text}}}{{/if}}</span>
                   </div>
+                  {{#if elementalProfiles}}
+                  <label class="option-selector">
+                    Favored Element
+                    <select class="option-select" data-trait-id="{{../../id}}" data-effect-level="{{../level}}" data-elemental-profile="true" {{#unless @root.editable}}disabled{{/unless}}>
+                      <option value="" disabled {{#unless hasSelectedProfile}}selected{{/unless}}>Escolha um Profile Elemental</option>
+                      {{#each elementalProfiles}}
+                      <option value="{{name}}" {{#if selected}}selected{{/if}}>{{name}}</option>
+                      {{/each}}
+                    </select>
+                  </label>
+                  {{/if}}
                   {{/if}}
                 {{/each}}
+                {{#if ../rulesVersion}}
+                <details class="trait-option-previews">
+                  <summary>Ver efeitos das opções</summary>
+                  <dl>
+                    {{#each options}}
+                    <dt>{{name}} [{{keyword}}]</dt>
+                    <dd>{{summary}}</dd>
+                    {{/each}}
+                  </dl>
+                </details>
+                {{/if}}
               {{else if (eq activationType "multi-option")}}
                 {{!-- Multi-option: checkboxes --}}
-                {{#if optionCount}}<div class="option-limit">Choose up to {{optionCount}} ({{selectedCount}}/{{optionCount}} selected)</div>{{/if}}
+                {{#if optionCount}}<div class="option-limit">{{#if ../rulesVersion}}{{selectedCount}}/{{optionCount}} selecionadas{{else}}Choose up to {{optionCount}} ({{selectedCount}}/{{optionCount}} selected){{/if}}</div>{{/if}}
                 {{#each options}}
                 <label class="effect-option-checkbox">
-                  <input type="checkbox" class="option-checkbox" data-trait-id="{{../../id}}" data-effect-level="{{../level}}" data-option-name="{{name}}" data-max-options="{{../optionCount}}" {{#if selected}}checked{{/if}} {{#if disabled}}disabled{{/if}} />
+                  <input type="checkbox" class="option-checkbox" data-trait-id="{{../../id}}" data-effect-level="{{../level}}" data-option-name="{{name}}" data-max-options="{{../optionCount}}" {{#if selected}}checked{{/if}} {{#if disabled}}disabled{{else unless @root.editable}}disabled{{/if}} />
                   <span class="option-name">{{name}}</span>
-                  <span class="option-text">{{{text}}}</span>
+                  <span class="option-text">{{#if summary}}{{summary}}{{else}}{{{text}}}{{/if}}</span>
                 </label>
                 {{/each}}
               {{else if (eq activationType "choice")}}
@@ -106,7 +131,7 @@
                   <div class="option-detail choice-detail">
                     <span class="option-name">{{name}}</span>
                     <span class="option-keyword">[{{keyword}}]</span>
-                    <span class="option-text">{{{text}}}</span>
+                    <span class="option-text">{{#if summary}}{{summary}}{{else}}{{{text}}}{{/if}}</span>
                   </div>
                   {{/if}}
                 {{/each}}

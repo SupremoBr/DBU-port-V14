@@ -4,6 +4,7 @@ import { readFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { installCharacterMethods } from '../module/sheets/character/install-methods.mjs';
 import { listenersMethods } from '../module/sheets/character/listeners.mjs';
+import { CATALOGS_093 } from '../module/rules/catalogs-v093.mjs';
 
 // Exercise the actual exported sheet against a small Foundry lifecycle stub.
 class ActorSheetStub {
@@ -70,6 +71,68 @@ test('read-only sheet calls the base lifecycle without installing edit handlers'
   sheet.activateListeners({ on: (...args) => registrations.push(args) });
   assert.equal(sheet.baseListenerCalls, 1);
   assert.equal(registrations.length, 0);
+});
+
+test('0.9.3 racial choices bind to the sheet, persist by effect, and resolve linked choices', async () => {
+  const catalog = CATALOGS_093.racialTraits;
+  CONFIG.DBU.racialTraitsCatalog = catalog;
+  const find = name => Object.values(catalog).flat().find(trait => trait.name === name);
+  const divine = find('Divine Magic');
+  const quick = find('Quick to Master');
+  const eye = find('Eye of the Dragon');
+  const refined = find('Refined Combat');
+  const writes = [];
+  const system = {
+    race: 'shinjin', racialTraits: [divine.id, quick.id, eye.id, refined.id],
+    racialOptionSelections: {},
+  };
+  const sheet = new DBUCharacterSheet({ system, update: async update => writes.push(update) });
+  const registrations = [];
+  sheet._populateTrackerSources = () => {};
+  sheet.activateListeners({ on: (...args) => registrations.push(args) });
+  const select = (trait, level, value, extra = {}) => registrations.find(([, selector]) => selector === '.option-select')[2]({
+    currentTarget: { dataset: { traitId: trait.id, effectLevel: String(level), ...extra }, value },
+  });
+  const effect = (trait, level) => sheet._getCharacterTraits(system).find(entry => entry.id === trait.id).effects.find(e => e.level === level);
+  const writeKey = (trait, path) => `system.racialOptionSelections.${trait.id}.${path}`;
+
+  try {
+    assert.equal(effect(divine, 3).hasSelection, false);
+    await select(divine, 3, 'God of an Element');
+    assert.deepEqual(writes.pop(), { [writeKey(divine, '3')]: 'God of an Element' });
+    system.racialOptionSelections[divine.id] = { 3: 'God of an Element' };
+    await select(divine, 3, 'Elemental (Metal)', { elementalProfile: 'true' });
+    assert.deepEqual(writes.pop(), { [writeKey(divine, 'elementalProfiles.3')]: 'Elemental (Metal)' });
+    system.racialOptionSelections[divine.id].elementalProfiles = { 3: 'Elemental (Metal)' };
+    const domain = effect(divine, 3).options.find(option => option.selected);
+    assert.equal(domain.elementalProfiles.find(profile => profile.selected).name, 'Elemental (Metal)');
+    assert.ok(domain.elementalProfiles.some(profile => profile.name === 'Elemental (Plantlife)'));
+    await select(divine, 3, 'God of Peace');
+    assert.deepEqual(writes.pop(), { [writeKey(divine, '3')]: 'God of Peace', [writeKey(divine, 'elementalProfiles.-=3')]: null });
+
+    assert.equal(effect(eye, 3).hasSelection, false);
+    await select(quick, 3, 'Way of the Warrior');
+    assert.deepEqual(writes.pop(), { [writeKey(quick, '3')]: 'Way of the Warrior' });
+    system.racialOptionSelections[quick.id] = { 3: 'Way of the Warrior' };
+    assert.equal(effect(eye, 3).options.find(option => option.selected).name, 'Way of the Warrior');
+    await select(eye, 3, 'Way of the Serene');
+    assert.equal(writes.length, 0);
+
+    system.racialOptionSelections[refined.id] = { 3: ['Hand to Hand'] };
+    const toggle = registrations.find(([, selector]) => selector === '.option-checkbox')[2];
+    const checkbox = optionName => ({ dataset: { traitId: refined.id, effectLevel: '3', optionName }, checked: true });
+    await toggle({ currentTarget: checkbox('Blaster') });
+    assert.deepEqual(writes.pop(), { [writeKey(refined, '3')]: ['Hand to Hand', 'Blaster'] });
+    system.racialOptionSelections[refined.id][3].push('Blaster');
+    assert.equal(effect(refined, 3).selectedCount, 2);
+    assert.equal(effect(refined, 3).options.find(option => option.name === 'Grappler').disabled, true);
+    const third = checkbox('Grappler');
+    await toggle({ currentTarget: third });
+    assert.equal(third.checked, false);
+    assert.equal(writes.length, 0);
+  } finally {
+    delete CONFIG.DBU.racialTraitsCatalog;
+  }
 });
 
 test('form submission can call moved normalization and forwards to its base once', async () => {

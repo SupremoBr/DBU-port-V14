@@ -1,4 +1,4 @@
-"""Read the official talent category labels from a local HTML snapshot."""
+"""Extract and summarize catalog data from a local rules snapshot."""
 import re
 
 
@@ -95,17 +95,6 @@ LEVEL_SUMMARIES = {
     ('shinjin', 'Divine Magic', 2):
         'Na criação, ganhe 1 rank em cada uma: Knowledge (especialidade à escolha), Creature Handling, '
         'Clairvoyance, Perception, Use Magic e Investigation.',
-    ('shinjin', 'Divine Magic', 3):
-        'Na criação, escolha um domínio. Peace: ao ativar Power, entre em Mindful até seu próximo turno (1/rodada). '
-        'Judgment: adicione 1 Energy Charge a uma Signature Technique (1/rodada). '
-        'Power: ganhe Muscular Warrior e +1(T) Force Modifier em Form ou Enhancement. '
-        'Survival: +2 em Steadfast e metade de Insight Modifier em Surgency (arredonde para cima). '
-        'Wisdom: +1(bT) em Combat Rolls e Initiative quando Scholarship ou Personality for seu maior atributo. '
-        'War: ganhe Weapon Specialist e Weapon Assisted grátis ao criar Signatures. '
-        'Magic: Unique Abilities mágicas custam −3 TP e −2(T) KP. '
-        'Many: ganhe Master of Minions. Seus Minions recebem +1(T) em Combat Rolls enquanto você estiver em Spectator. '
-        'Time: libere Time Freeze com Straining e Difficult. Ganhe +2(T) Wound em Frozen Turns. '
-        'Element: escolha um Profile Elemental como Favored Element.',
     ('talents', 'Alert', 1): 'Initiative Value +1(bT).',
     ('talents', 'Alert', 2): 'Ignore os efeitos de Surprise Rounds.',
     ('talents', 'Alert', 3): 'Com Initiative Advantage, ganhe +1(T) nas rolagens de Wound.',
@@ -148,7 +137,11 @@ def level_summary(row, effect):
     if key in LEVEL_SUMMARIES:
         return LEVEL_SUMMARIES[key]
 
-    note = compact_rule(effect['text'].strip())
+    return summarize_rule(effect['text'], key)
+
+
+def summarize_rule(text, key):
+    note = compact_rule(text.strip())
     if not note or re.match(r'Please (refer|see)', note, re.I):
         raise ValueError(f'Missing reference summary for {key}')
 
@@ -164,6 +157,104 @@ def level_summary(row, effect):
         note = ' '.join(kept) or note[:345].rsplit(' ', 1)[0].rstrip(' ,;:')
         note += ' …'
     return note
+
+
+
+CHOICE_KEYWORD = re.compile(r'^(?:Option|Multi-Option/\d+|Choice(?:, Twinned)?)$')
+OPTION_HEADING = re.compile(r'(?:[:.!?–]|^)\s*([^\[\].:!?]+?)\s*\[([^\]]+)\]\s*:')
+DIVINE_DOMAINS = {
+    'God of Peace': 'Ao ativar Power, entre em Mindful até o início do próximo turno.',
+    'God of Judgment': 'Ao usar a manobra Signature Technique, acrescente 1 Energy Charge ao ataque.',
+    'God of Power': 'Ganhe Muscular Warrior e +1(T) em Force Modifier em Form ou Enhancement.',
+    'God of Survival': '+2 em Steadfast e metade do Insight Modifier em Surgency, arredondando para cima.',
+    'God of Wisdom': '+1(bT) em Combat Rolls e Initiative se Scholarship ou Personality tiver o maior valor de atributo.',
+    'God of War': 'Ganhe Weapon Specialist e adicione Weapon Assisted sem custo de TP ao criar Signature Techniques.',
+    'God of Magic': 'Unique Abilities mágicas custam 3 TP e 2(T) KP a menos.',
+    'God of Many': 'Ganhe Master of Minions. Seus Minions recebem +1(T) em Combat Rolls enquanto você estiver em Spectator.',
+    'God of Time': 'Libera Time Freeze com Straining e Difficult. Ganhe +2(T) em Wound durante Frozen Turns.',
+    'God of an Element': 'Escolha um Profile Elemental como seu Favored Element.',
+}
+
+# Cross-trait Choice effects follow an existing Option on another card.
+CHOICE_SOURCES = {
+    'Combat Blueprint': ('r093_bio_android_artificial_warrior', 4, 'Artificial Warrior'),
+    'Arcosian Genes [Any – you decide]': ('r093_bio_android_artificial_warrior', 4, 'Artificial Warrior'),
+    'Eye of the Dragon': ('r093_earthlings_quick_to_master', 3, 'Quick to Master'),
+    'Draconic Physique': ('r093_shadow_dragons_personified_dragon_ball', 6, 'Personified Dragon Ball'),
+}
+
+
+def continued_choices(html, rows):
+    """Recover effects whose numbered heading follows a separate list in the same trait."""
+    from bs4 import BeautifulSoup
+
+    headings = {f"{row['name']} ({row['category']})".casefold(): row['name'] for row in rows}
+    result = {}
+    if not headings:
+        return result
+    page = BeautifulSoup(html, 'html.parser').select_one('.entry-content')
+    for paragraph in page.find_all('p'):
+        if not paragraph.strong:
+            continue
+        name = headings.get(paragraph.strong.get_text(' ', strip=True).casefold())
+        if not name:
+            continue
+        for sibling in paragraph.next_siblings:
+            if not getattr(sibling, 'name', None) or sibling.name == 'ul':
+                continue
+            if sibling.name != 'p':
+                break
+            match = re.fullmatch(
+                r'\(\s*(\d+)\s*\)\s*-\s*\[\s*(Option|Multi-Option/\d+|Choice(?:, Twinned)?)\s*\]?\s*:\s*(.*)',
+                sibling.get_text(' ', strip=True),
+            )
+            if not match:
+                break
+            options = sibling.find_next_sibling()
+            if not options or options.name != 'ul':
+                raise ValueError(f'Missing continuation list for {name} level {match[1]}')
+            result.setdefault(name, []).append(dict(
+                level=int(match[1]), keyword=match[2], text=f"{match[3]} {options.get_text(' ', strip=True)}",
+            ))
+    return result
+
+
+def racial_choice(row, current, previous_options):
+    keyword = current['keyword']
+    if not CHOICE_KEYWORD.fullmatch(keyword):
+        return {}
+    matches = list(OPTION_HEADING.finditer(current['text']))
+    if len(matches) < 2:
+        raise ValueError(f"Missing options for {row['name']} level {current['level']}")
+    options = []
+    for index, match in enumerate(matches):
+        name, kind = (part.strip() for part in match.groups())
+        end = matches[index + 1].start() + 1 if index + 1 < len(matches) else len(current['text'])
+        text = current['text'][match.end():end].strip()
+        summary = DIVINE_DOMAINS.get(name) if row['name'] == 'Divine Magic' else None
+        if (row['name'], current['level'], name) == ('Artificial Warrior', 5, 'Pursuit of Perfection'):
+            summary = ('Defina um Perfection Target com o ARC. Enquanto mantiver a Absorption desse alvo, '
+                       'ganhe Perfection como Temporary Awakening Lv.1, inclusive após o encontro.')
+        option = dict(name=name, keyword=kind, summary=summary or summarize_rule(text, (row['name'], current['level'], name)))
+        if re.search(r'select a Profile with [‘\']Elemental', text) and 'Favored Element' in text:
+            option['selectElement'] = True
+        if row['name'] == 'Heart of Evil' and (race := re.search(r'\((Saiyan|Namekian|Shinjin)\)$', name)):
+            option['requiredRace'] = race[1].lower()
+        options.append(option)
+    if keyword.startswith('Choice'):
+        trait_id, level, source = CHOICE_SOURCES.get(row['name'], ('', previous_options[-1] if previous_options else None, row['name']))
+        if level is None:
+            raise ValueError(f"Missing source selection for {row['name']}")
+        summary = f'Efeito definido pela escolha no Lv.{level} de {source}.'
+        if 'Twinned' in keyword:
+            summary += ' Disponível se este for um traço primário.'
+        return dict(activationType='choice', options=options, choiceSource=dict(traitId=trait_id, level=level), summary=summary)
+    if keyword.startswith('Multi-Option'):
+        count = int(keyword.split('/')[-1])
+        return dict(activationType='multi-option', options=options, optionCount=count,
+                    summary=f'Escolha {count} opções.')
+    summary = 'Na criação, escolha um domínio.' if row['name'] == 'Divine Magic' else 'Escolha uma opção.'
+    return dict(activationType='option', options=options, summary=summary)
 
 
 def mechanic_summary(row):
