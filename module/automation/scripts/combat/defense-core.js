@@ -1,3 +1,6 @@
+import { defendKiCost093 } from "../../../rules/defenses-v093.mjs";
+import { uses093 } from "../../../rules/v093.mjs";
+import { validateActionUse } from "../action-economy.js";
 import { SYSTEM_ID as MODULE_ID, readAutomationFlag } from "../../package.mjs";
 // DBU Automation — rolagens, resolução e dano de defesa
 import { prepareTerrainShield, resolveTerrainShield } from "../maneuvers.js";
@@ -224,7 +227,7 @@ async function dbuRollDefend(
       )
     : 0;
 
-  const penalty = penaltyRanks * tier;
+  const penalty = penaltyRanks * (uses093(defender.system) ? baseTier : tier);
 
   const baseFormula = isParry
     ? (
@@ -627,6 +630,11 @@ async function dbuResolveDefense(
     attack.woundTotal || 0
   );
 
+  if (uses093(defender.system) && !["dodge", "duelClash"].includes(defenseType)) {
+    const check = validateActionUse(defender, { label: "Defend", effectiveType: "counter", actionCost: 1, isAttackTarget: true });
+    if (!check.ok) return null;
+  }
+
   // DUEL CLASH — v6.5
   if (defenseType === "duelClash") {
     if (!context.message) {
@@ -831,7 +839,7 @@ async function dbuResolveDefense(
       defender.system.tier || 1
     );
 
-    const cost = 2 * tier + wager;
+    const cost = (uses093(defender.system) ? 0 : 2 * tier) + wager;
 
     const payment = await dbuPayKiAndCapacity(
       defender,
@@ -853,7 +861,7 @@ async function dbuResolveDefense(
       { silent: deferReveal }
     );
 
-    const success = roll.total >= wound;
+    const success = uses093(defender.system) ? roll.total > wound : roll.total >= wound;
 
     if (!deferReveal) {
       await dbuDefenseResult(
@@ -892,7 +900,7 @@ async function dbuResolveDefense(
       defender.system.tier || 1
     );
 
-    const cost = 2 * tier;
+    const cost = uses093(defender.system) ? 0 : 2 * tier;
 
     const payment = await dbuPayKiAndCapacity(
       defender,
@@ -971,9 +979,9 @@ async function dbuResolveDefense(
       )
     );
 
-    let cost = (8 + ec) * tier;
+    let cost = uses093(defender.system) ? defendKiCost093(defender.system, 'guard', ec) : (8 + ec) * tier;
 
-    if (
+    if (!uses093(defender.system) &&
       defender._isConditionActive?.(
         defender.system,
         "guardDown"
@@ -987,7 +995,7 @@ async function dbuResolveDefense(
         ?.guardKPReduction || 0
     );
 
-    cost = Math.max(
+    if (!uses093(defender.system)) cost = Math.max(
       0,
       cost - reduction
     );

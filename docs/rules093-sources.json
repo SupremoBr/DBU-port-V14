@@ -1,0 +1,3662 @@
+{
+  "target": "0.9.3",
+  "consultedLocalDate": "2026-11-18",
+  "timezone": "America/Sao_Paulo",
+  "note": "Índice de URLs e hashes SHA-256 do HTML consultado; não inclui cópias do texto das regras. A identificação 0.9.3 corresponde ao alvo solicitado; os fatos foram conferidos nas páginas atuais, não no changelog arquivado.",
+  "sources": [
+    {
+      "slug": "absorbed-power",
+      "url": "https://dbu-rpg.com/absorbed-power/",
+      "title": "Absorbed Power – Dragon Ball Universe",
+      "characters": 3518,
+      "sha256": "8a16478ea1d7d1d04f0518409859b60a27838d29df6ef9c346f12434a584e417"
+    },
+    {
+      "slug": "absorption",
+      "url": "https://dbu-rpg.com/absorption/",
+      "title": "Absorption – Dragon Ball Universe",
+      "characters": 5427,
+      "sha256": "ca9043a36a263c8acf3e5ee47f692c54901b6f3090223bdf187b75acaeb75786"
+    },
+    {
+      "slug": "abundant-s-cells",
+      "url": "https://dbu-rpg.com/abundant-s-cells/",
+      "title": "Abundant S-Cells – Dragon Ball Universe",
+      "characters": 1371,
+      "sha256": "5198f2427255d6d7d2aa4aa528ed091e5feaa946d129cb55dd84684eb309a89d"
+    },
+    {
+      "slug": "actions-maneuvers",
+      "url": "https://dbu-rpg.com/actions-maneuvers/",
+      "title": "Actions & Maneuvers – Dragon Ball Universe",
+      "characters": 45428,
+      "sha256": "ee2b7cdf7cd9915722c302e00d7a079b7eb37d997477916972493725416ad00c"
+    },
+    {
+      "slug": "adaptive-monster",
+      "url": "https://dbu-rpg.com/adaptive-monster/",
+      "title": "Adaptive Monster – Dragon Ball Universe",
+      "characters": 2004,
+      "sha256": "1a65f6f5e96fc8b709c8356cf97cad1cdfe6712b772a2baa5b92bd0c96973cc6"
+    },
+    {
+      "slug": "adjusted-armor",
+      "url": "https://dbu-rpg.com/adjusted-armor/",
+      "title": "Adjusted Armor – Dragon Ball Universe",
+      "characters": 1626,
+      "sha256": "901a8071e363c4feffc953c7e345b30774330753378902cb4135e4003e90c38f"
+    },
+    {
+      "slug": "advanced-vocation",
+      "url": "https://dbu-rpg.com/advanced-vocation/",
+      "title": "Advanced Vocation – Dragon Ball Universe",
+      "characters": 12394,
+      "sha256": "9888ce55114a7736b0fab0abb2023d3b2b18aadbe726a3ed4f220a86a5e7bd99"
+    },
+    {
+      "slug": "agile-style",
+      "url": "https://dbu-rpg.com/agile-style/",
+      "title": "Agile Style – Dragon Ball Universe",
+      "characters": 2324,
+      "sha256": "a272c4f5d318353c50b5622f06b8a07ae6c75fb42ab2f4a2af053cb50284ec23"
+    },
+    {
+      "slug": "ajisa-namekian",
+      "url": "https://dbu-rpg.com/ajisa-namekian/",
+      "title": "Ajisa Namekian – Dragon Ball Universe",
+      "characters": 4790,
+      "sha256": "ab24cf1ed0f19b54544f09c6a439233e05653ce4b35681647ebe610042ebf0a0"
+    },
+    {
+      "slug": "all-consuming-appetite",
+      "url": "https://dbu-rpg.com/all-consuming-appetite/",
+      "title": "All-Consuming Appetite – Dragon Ball Universe",
+      "characters": 3464,
+      "sha256": "dc4e54375501c343cb346617380704a4b2623b1973a840537369c3b41edfba0b"
+    },
+    {
+      "slug": "all-out-form",
+      "url": "https://dbu-rpg.com/all-out-form/",
+      "title": "All-Out Form – Dragon Ball Universe",
+      "characters": 3931,
+      "sha256": "f65ccd3184065ca1b32dddb2d830e2a8820b922dd771abd52168a66c59068dea"
+    },
+    {
+      "slug": "all-range-combat",
+      "url": "https://dbu-rpg.com/all-range-combat/",
+      "title": "All-Range Combat – Dragon Ball Universe",
+      "characters": 4032,
+      "sha256": "91e4d79d047644b1844504a4322871fb3bff633bbac5750aef38513f262770ed"
+    },
+    {
+      "slug": "alternate-universe-saiyan",
+      "url": "https://dbu-rpg.com/alternate-universe-saiyan/",
+      "title": "Alternate Universe Saiyan – Dragon Ball Universe",
+      "characters": 1424,
+      "sha256": "a1136090584e03a522911c069d5744772b782de206aefe9705a746bf481945dc"
+    },
+    {
+      "slug": "alternate-upbringing",
+      "url": "https://dbu-rpg.com/alternate-upbringing/",
+      "title": "Alternate Upbringing – Dragon Ball Universe",
+      "characters": 19385,
+      "sha256": "bb32b340fa133230ecf84d9602be637af0b640b9a556d3b21d213716c496d064"
+    },
+    {
+      "slug": "analytical-genius",
+      "url": "https://dbu-rpg.com/analytical-genius/",
+      "title": "Analytical Genius – Dragon Ball Universe",
+      "characters": 2274,
+      "sha256": "4a63e947ab9629c7180195d7cc9d1674acb9ddcbbb47650df367d98f62cd48d3"
+    },
+    {
+      "slug": "ancestral-super-saiyan",
+      "url": "https://dbu-rpg.com/ancestral-super-saiyan/",
+      "title": "Ancestral Super Saiyan – Dragon Ball Universe",
+      "characters": 2763,
+      "sha256": "5de4b403a3fd1d4ec18c093e551160453a38539099623302b1fb6f80198a1a02"
+    },
+    {
+      "slug": "ancient-saiyan",
+      "url": "https://dbu-rpg.com/ancient-saiyan/",
+      "title": "Ancient Saiyan – Dragon Ball Universe",
+      "characters": 1174,
+      "sha256": "0ba4c1496f8bb40ce394699218b2fcd4d522de70e32b82c933e2ebea7ffd23bf"
+    },
+    {
+      "slug": "android-conversion",
+      "url": "https://dbu-rpg.com/android-conversion/",
+      "title": "Android Conversion – Dragon Ball Universe",
+      "characters": 1417,
+      "sha256": "337af89d6bd3e9ac996b4164bf22ea124ac47697530e0dc190908086e5116424"
+    },
+    {
+      "slug": "android-majin",
+      "url": "https://dbu-rpg.com/android-majin/",
+      "title": "Android Majin – Dragon Ball Universe",
+      "characters": 2353,
+      "sha256": "5596a4465de3a15a7e3d189b745a095dbb27bdc53f32ed0484272815af7a5c6a"
+    },
+    {
+      "slug": "android-power",
+      "url": "https://dbu-rpg.com/android-power/",
+      "title": "Android Power – Dragon Ball Universe",
+      "characters": 3179,
+      "sha256": "c409e564ad24353c6a8274ec97319715553f79d7a330a4f8ff5cbf409af469f9"
+    },
+    {
+      "slug": "androids",
+      "url": "https://dbu-rpg.com/androids/",
+      "title": "Androids – Dragon Ball Universe",
+      "characters": 17369,
+      "sha256": "2346827008054857dcffc9c0d58c8c3956187a2bf73ccef7713acb926721070b"
+    },
+    {
+      "slug": "angelic-tutor",
+      "url": "https://dbu-rpg.com/angelic-tutor/",
+      "title": "Angelic Tutor – Dragon Ball Universe",
+      "characters": 1927,
+      "sha256": "6ec6e043ccea02f99eead9437d86aeb4d0bfde5376df3d9bf9683d01271325f4"
+    },
+    {
+      "slug": "angels",
+      "url": "https://dbu-rpg.com/angels/",
+      "title": "Angels – Dragon Ball Universe",
+      "characters": 5389,
+      "sha256": "7949000f9221ad4743d43a44c2a0fe04389dc86aeb192cd93870b38d74772299"
+    },
+    {
+      "slug": "appointed-god",
+      "url": "https://dbu-rpg.com/appointed-god/",
+      "title": "Appointed God – Dragon Ball Universe",
+      "characters": 21223,
+      "sha256": "ee7aa37d9dd2ee7bcb48a502d766226c89910b548c38345ec97a58612c677d1f"
+    },
+    {
+      "slug": "arcosians",
+      "url": "https://dbu-rpg.com/arcosians/",
+      "title": "Arcosians – Dragon Ball Universe",
+      "characters": 25882,
+      "sha256": "cbaaf48122886ba6b0c6c132f7818d8e39718eb7f13e916f49339405e01cae85"
+    },
+    {
+      "slug": "artificial-class-up",
+      "url": "https://dbu-rpg.com/artificial-class-up/",
+      "title": "Artificial Class Up – Dragon Ball Universe",
+      "characters": 1979,
+      "sha256": "6297edf1ddb1e343e76d9940e46ddd5e1139d0f033842daa5ecf34b0e123dae2"
+    },
+    {
+      "slug": "artificial-demon",
+      "url": "https://dbu-rpg.com/artificial-demon/",
+      "title": "Artificial Demon – Dragon Ball Universe",
+      "characters": 1369,
+      "sha256": "a4e9b8e57b5b34afd18fc8b362b7d45f4c2ccd9e4451d776f67c0d27fdd447d6"
+    },
+    {
+      "slug": "ascended-super-saiyan",
+      "url": "https://dbu-rpg.com/ascended-super-saiyan/",
+      "title": "Ascended Super Saiyan – Dragon Ball Universe",
+      "characters": 2329,
+      "sha256": "38df8513aee5f1afb1858e40fc3fc8d618f0d5206ce447e1012f6dcfe96a0558"
+    },
+    {
+      "slug": "ascension",
+      "url": "https://dbu-rpg.com/ascension/",
+      "title": "Ascension – Dragon Ball Universe",
+      "characters": 1828,
+      "sha256": "4461f971e10d29701254e02d7709a429063a1eac377bb33e14cf2e52fa89619e"
+    },
+    {
+      "slug": "assimilating-majin",
+      "url": "https://dbu-rpg.com/assimilating-majin/",
+      "title": "Assimilating Majin – Dragon Ball Universe",
+      "characters": 1440,
+      "sha256": "36b5e5407f7356c7768dc0111e6f8c8532de3f1368063aae8517952e4704cd4b"
+    },
+    {
+      "slug": "at-peace",
+      "url": "https://dbu-rpg.com/at-peace/",
+      "title": "At Peace – Dragon Ball Universe",
+      "characters": 1367,
+      "sha256": "e1c31220c21a1e205637c8e075b21121b89a4c11dba45d68ecc31ea400ce8dea"
+    },
+    {
+      "slug": "attacking",
+      "url": "https://dbu-rpg.com/attacking/",
+      "title": "Attacking – Dragon Ball Universe",
+      "characters": 11453,
+      "sha256": "5654f83292a9971a44c859bd983e99c2e745d867c7db3c141ae565aa232bf38d"
+    },
+    {
+      "slug": "autonomous-ultra-instinct",
+      "url": "https://dbu-rpg.com/autonomous-ultra-instinct/",
+      "title": "Autonomous Ultra Instinct – Dragon Ball Universe",
+      "characters": 3845,
+      "sha256": "4ffdd63b8610def5278137f3200667212354c9fc04e50e144a61fdf4b674fb19"
+    },
+    {
+      "slug": "awakened-monster",
+      "url": "https://dbu-rpg.com/awakened-monster/",
+      "title": "Awakened Monster – Dragon Ball Universe",
+      "characters": 1778,
+      "sha256": "fc75d3c1335f6978be91d51d1c6d858ebb1291377dfd1d57d51b34294e6c0acb"
+    },
+    {
+      "slug": "awakened-potential",
+      "url": "https://dbu-rpg.com/awakened-potential/",
+      "title": "Awakened Potential – Dragon Ball Universe",
+      "characters": 1266,
+      "sha256": "f69bf86ef847423fa52b9df2700569767359e573a99417e0e06e2f6f4374eeaf"
+    },
+    {
+      "slug": "awakened-wings",
+      "url": "https://dbu-rpg.com/awakened-wings/",
+      "title": "Awakened Wings – Dragon Ball Universe",
+      "characters": 1629,
+      "sha256": "b09ff6d0c328658a31e37513a07227c5db10aa10237ed135a22d7cabbebea923"
+    },
+    {
+      "slug": "awoken-genetics",
+      "url": "https://dbu-rpg.com/awoken-genetics/",
+      "title": "Awoken Genetics – Dragon Ball Universe",
+      "characters": 5617,
+      "sha256": "31baa0f570ab906ec8bc39e486bdbf69efa917b9865cd5e64fe38e41cf0dedac"
+    },
+    {
+      "slug": "awoken-left-eye",
+      "url": "https://dbu-rpg.com/awoken-left-eye/",
+      "title": "Awoken Left Eye – Dragon Ball Universe",
+      "characters": 4804,
+      "sha256": "b13e803b797701e271f75b8a539e8f9e7316acffdf00399a9aafae510e18a892"
+    },
+    {
+      "slug": "awoken",
+      "url": "https://dbu-rpg.com/awoken/",
+      "title": "Awoken – Dragon Ball Universe",
+      "characters": 2689,
+      "sha256": "e53d40dbb306aa42bc006e59f129c5f8ccf94ae3ec88fe52ed965b666d601c80"
+    },
+    {
+      "slug": "barrier-focus",
+      "url": "https://dbu-rpg.com/barrier-focus/",
+      "title": "Barrier Focus – Dragon Ball Universe",
+      "characters": 5781,
+      "sha256": "d4b822bca33762fab1fdb70aa7e014bdc954635cf02b6732a11111cc1ab02a1e"
+    },
+    {
+      "slug": "barrier-form",
+      "url": "https://dbu-rpg.com/barrier-form/",
+      "title": "Barrier Form – Dragon Ball Universe",
+      "characters": 1059,
+      "sha256": "66d98c2965fd3053c39e10a32edc7b04825c3ad82e92b33f4a7ce8f9e1698917"
+    },
+    {
+      "slug": "battle-brigand",
+      "url": "https://dbu-rpg.com/battle-brigand/",
+      "title": "Battle Brigand – Dragon Ball Universe",
+      "characters": 1472,
+      "sha256": "04d5efab08798412d34b3cfca2fef57a4385a1f3a6d5f1bf5d336891c30c3d31"
+    },
+    {
+      "slug": "battle-yardrat",
+      "url": "https://dbu-rpg.com/battle-yardrat/",
+      "title": "Battle Yardrat – Dragon Ball Universe",
+      "characters": 1577,
+      "sha256": "82c2368781d9b47d0e8ca634615f7d5998ab965608eebe936db3b0be0c0ec52f"
+    },
+    {
+      "slug": "beast-man",
+      "url": "https://dbu-rpg.com/beast-man/",
+      "title": "Beast-Man – Dragon Ball Universe",
+      "characters": 2496,
+      "sha256": "89b0ca75bdebff03d03f206a791a130a4c063d15026a4302273d2fb1861e8d9a"
+    },
+    {
+      "slug": "beast",
+      "url": "https://dbu-rpg.com/beast/",
+      "title": "Beast – Dragon Ball Universe",
+      "characters": 4392,
+      "sha256": "b480220b755958612399358aed3b7d2eedc0613e59b9c56e816fbe323958cc1b"
+    },
+    {
+      "slug": "beatdown-specialist",
+      "url": "https://dbu-rpg.com/beatdown-specialist/",
+      "title": "Beatdown Specialist – Dragon Ball Universe",
+      "characters": 1873,
+      "sha256": "e6aaabd407d409124e90900418a8a4e676f9048afe730e4ecaa32594fb00238f"
+    },
+    {
+      "slug": "berserk-controlled",
+      "url": "https://dbu-rpg.com/berserk-controlled/",
+      "title": "Berserk Controlled – Dragon Ball Universe",
+      "characters": 1593,
+      "sha256": "e8ce9f307b941e465a790ffd55977f6faf40195c73f328ca60102518b3e3afaa"
+    },
+    {
+      "slug": "bestial-traits",
+      "url": "https://dbu-rpg.com/bestial-traits/",
+      "title": "Bestial Traits – Dragon Ball Universe",
+      "characters": 14716,
+      "sha256": "d4eebaf29674d5f548afaab2fb780d8d966212e5ef9d123d98805dba54aa8858"
+    },
+    {
+      "slug": "bestial-transfiguration",
+      "url": "https://dbu-rpg.com/bestial-transfiguration/",
+      "title": "Bestial Transfiguration – Dragon Ball Universe",
+      "characters": 812,
+      "sha256": "eabdd3b0fe60d1b0b7dde149b561fcdb41ef45e580a273c0034b3887ecb46045"
+    },
+    {
+      "slug": "beyond-divine-saiyan",
+      "url": "https://dbu-rpg.com/beyond-divine-saiyan/",
+      "title": "Beyond Divine Saiyan – Dragon Ball Universe",
+      "characters": 3284,
+      "sha256": "700b05c5013c891cd0cb6f45e8dcc5144e7d61c9894ef75a3eb3de46d79be714"
+    },
+    {
+      "slug": "beyond-god",
+      "url": "https://dbu-rpg.com/beyond-god/",
+      "title": "Beyond God – Dragon Ball Universe",
+      "characters": 3975,
+      "sha256": "4ca339fe1f69eb9c8dde7b580d822a68b67bd30c6213a4b34936d055d998aee9"
+    },
+    {
+      "slug": "big-gete-star-integration",
+      "url": "https://dbu-rpg.com/big-gete-star-integration/",
+      "title": "Big Gete Star Integration – Dragon Ball Universe",
+      "characters": 3282,
+      "sha256": "e5f44711d29598d81f6ede315df8a98469dc8bd3f1022560e92b1d3143752a5d"
+    },
+    {
+      "slug": "bio-android",
+      "url": "https://dbu-rpg.com/bio-android/",
+      "title": "Bio Androids – Dragon Ball Universe",
+      "characters": 10825,
+      "sha256": "21ece94a0479145de654a884835c5628797c3155a4881abbb80e3c6daf8a7f79"
+    },
+    {
+      "slug": "bio-diversity",
+      "url": "https://dbu-rpg.com/bio-diversity/",
+      "title": "Bio-Diversity – Dragon Ball Universe",
+      "characters": 891,
+      "sha256": "fdba4ce63a0cad7d2bfb9e45cb1e2bff7ceca9897b58c1da49a12a7fb8527fc9"
+    },
+    {
+      "slug": "bio-focus",
+      "url": "https://dbu-rpg.com/bio-focus/",
+      "title": "Bio-Focus – Dragon Ball Universe",
+      "characters": 16213,
+      "sha256": "1c4d1d90c34fd27f180e17e199b14fe73e89de4426b032e530e64f64a4f892b0"
+    },
+    {
+      "slug": "bio-super-saiyan",
+      "url": "https://dbu-rpg.com/bio-super-saiyan/",
+      "title": "Bio Super Saiyan – Dragon Ball Universe",
+      "characters": 1857,
+      "sha256": "00a6c0af9d002571f03690571fd9964f6a2f3c58de4e4403324431beefda9fab"
+    },
+    {
+      "slug": "blessed-by-fate",
+      "url": "https://dbu-rpg.com/blessed-by-fate/",
+      "title": "Blessed by Fate – Dragon Ball Universe",
+      "characters": 2171,
+      "sha256": "ddeac778513958c6a65f60535fed948500676621e60d0f0dc02bec040c614514"
+    },
+    {
+      "slug": "body-suit",
+      "url": "https://dbu-rpg.com/body-suit/",
+      "title": "Body Suit – Dragon Ball Universe",
+      "characters": 2645,
+      "sha256": "e971e244aa5e03f0d9fd14fd39260554f36998a8d12b7ec16a4d4fe7925eb848"
+    },
+    {
+      "slug": "body-swapper",
+      "url": "https://dbu-rpg.com/body-swapper/",
+      "title": "Body Swapper – Dragon Ball Universe",
+      "characters": 1547,
+      "sha256": "b378a4155bee6b661cb087bf62c5bf4666178bf59e7db9107aba04874f687cf2"
+    },
+    {
+      "slug": "boiling-rage",
+      "url": "https://dbu-rpg.com/boiling-rage/",
+      "title": "Boiling Rage – Dragon Ball Universe",
+      "characters": 3245,
+      "sha256": "9640b24e28bdb4be149fab5b538a9142f78b1dddba1fdabaaa5ac7aba824ec27"
+    },
+    {
+      "slug": "bonded-by-battle",
+      "url": "https://dbu-rpg.com/bonded-by-battle/",
+      "title": "Bonded by Battle – Dragon Ball Universe",
+      "characters": 1916,
+      "sha256": "5adc6056fb13cedf19c30c60dd6e87ec7bd8ac40af41e2e54d0119f928315ef5"
+    },
+    {
+      "slug": "bottomless-potential",
+      "url": "https://dbu-rpg.com/bottomless-potential/",
+      "title": "Bottomless Potential – Dragon Ball Universe",
+      "characters": 2712,
+      "sha256": "677026ded71b7a19bf3967a76b009288d9733413e98545138d37cbe74781594a"
+    },
+    {
+      "slug": "boundless-evolution",
+      "url": "https://dbu-rpg.com/boundless-evolution/",
+      "title": "Boundless Evolution – Dragon Ball Universe",
+      "characters": 2747,
+      "sha256": "c2150ddae9c393158bc2668c33104917ddff15d9d53485db32a4e5867bcd9e2f"
+    },
+    {
+      "slug": "breaking-point",
+      "url": "https://dbu-rpg.com/breaking-point/",
+      "title": "Breaking Point – Dragon Ball Universe",
+      "characters": 3497,
+      "sha256": "5bc0a2d67a36499fdc317207010ba4bf7c4f1e41171c08cc69ed1f428b569786"
+    },
+    {
+      "slug": "brilliant-evolution",
+      "url": "https://dbu-rpg.com/brilliant-evolution/",
+      "title": "Brilliant Evolution – Dragon Ball Universe",
+      "characters": 11657,
+      "sha256": "e39b41e786c36621e4b08b59c7fa936666c1cbed2af7c5a3bd22ad8f83ade3ff"
+    },
+    {
+      "slug": "built-for-bulk",
+      "url": "https://dbu-rpg.com/built-for-bulk/",
+      "title": "Built for Bulk – Dragon Ball Universe",
+      "characters": 1201,
+      "sha256": "24fc4bca1f3d27a9d69fda24ad5c486bf8421a143f781580e25e927aceac3cc4"
+    },
+    {
+      "slug": "burst-attack",
+      "url": "https://dbu-rpg.com/burst-attack/",
+      "title": "Burst Attack – Dragon Ball Universe",
+      "characters": 2146,
+      "sha256": "1446b076c4e8f37c51b02c256dabe76c61acd6141233bdd9eca59fc7159fd8ee"
+    },
+    {
+      "slug": "cerealian-power",
+      "url": "https://dbu-rpg.com/cerealian-power/",
+      "title": "Cerealian Power – Dragon Ball Universe",
+      "characters": 2964,
+      "sha256": "e95e440adaaa7801ea56bc669f2c1b443f817ba6f1ebdce1efaf54b8c3c53f39"
+    },
+    {
+      "slug": "cerealians",
+      "url": "https://dbu-rpg.com/cerealians/",
+      "title": "Cerealians – Dragon Ball Universe",
+      "characters": 7320,
+      "sha256": "4365ac911fd7821a299bdcb80103255c4b296c44c10e4f3118ce55f77915bfe6"
+    },
+    {
+      "slug": "chaotic-majin",
+      "url": "https://dbu-rpg.com/chaotic-majin/",
+      "title": "Chaotic Majin – Dragon Ball Universe",
+      "characters": 1835,
+      "sha256": "ceea1e932f599350ee3cabd20e08989059b747d2e2d1f67a66cc34bb8f9e7b48"
+    },
+    {
+      "slug": "character-creation",
+      "url": "https://dbu-rpg.com/character-creation/",
+      "title": "Character Creation – Dragon Ball Universe",
+      "characters": 9013,
+      "sha256": "f45e8bb776b8c5fb7f2fe123a7ebb7976d6beed988c8ae9602477ed7aff8971b"
+    },
+    {
+      "slug": "charge-expert",
+      "url": "https://dbu-rpg.com/charge-expert/",
+      "title": "Charge Expert – Dragon Ball Universe",
+      "characters": 1528,
+      "sha256": "7daf76227f559ff5129cb6f01cf00d96e8a95d038dfb1c6a7b15444355d6a37d"
+    },
+    {
+      "slug": "class-avatar",
+      "url": "https://dbu-rpg.com/class-avatar/",
+      "title": "Class Avatar – Dragon Ball Universe",
+      "characters": 2337,
+      "sha256": "e6df593b1e83769d58a9e6d47d1696913120a393159243e80a659f209965cd47"
+    },
+    {
+      "slug": "class-up",
+      "url": "https://dbu-rpg.com/class-up/",
+      "title": "Class Up – Dragon Ball Universe",
+      "characters": 1567,
+      "sha256": "cc21d5999358b3f5bb6b94d9e406323d600cc93060f64c51cc3f1c008da12295"
+    },
+    {
+      "slug": "combat-connoisseur",
+      "url": "https://dbu-rpg.com/combat-connoisseur/",
+      "title": "Combat Connoisseur – Dragon Ball Universe",
+      "characters": 1875,
+      "sha256": "54edbe4046e073e5903bd52b3e55ce2c12a1ed44448f35d318708349c2aee260"
+    },
+    {
+      "slug": "combat-enthusiast",
+      "url": "https://dbu-rpg.com/combat-enthusiast/",
+      "title": "Combat Enthusiast – Dragon Ball Universe",
+      "characters": 1530,
+      "sha256": "abc7e35f0dd2192e27ccd20af3dde824127d4b5bfe0db4aaf9f0b98164c1800a"
+    },
+    {
+      "slug": "commander",
+      "url": "https://dbu-rpg.com/commander/",
+      "title": "Commander – Dragon Ball Universe",
+      "characters": 10213,
+      "sha256": "e3b7f9ba03abca7d9a780d02fe0382ed3cd8928d266cdefdedb3736407ea721c"
+    },
+    {
+      "slug": "condensed-legend",
+      "url": "https://dbu-rpg.com/condensed-legend/",
+      "title": "Condensed Legend – Dragon Ball Universe",
+      "characters": 1991,
+      "sha256": "2c8f62305968625f8a1b3dcdeb2883a34157b10c8013b1c55df3c18752c5ee7e"
+    },
+    {
+      "slug": "control-master",
+      "url": "https://dbu-rpg.com/control-master/",
+      "title": "Control Master – Dragon Ball Universe",
+      "characters": 1530,
+      "sha256": "69bb6a005e5b67226ea60abf39b20144d517494aceb0861ab02dfa04a8f6e83e"
+    },
+    {
+      "slug": "controlled-wrathful",
+      "url": "https://dbu-rpg.com/controlled-wrathful/",
+      "title": "Controlled Wrathful – Dragon Ball Universe",
+      "characters": 2686,
+      "sha256": "e205f36427a914238178b98b8d3136ea83cc1eded5ca107d1b34b62d04eb70ae"
+    },
+    {
+      "slug": "copy-master",
+      "url": "https://dbu-rpg.com/copy-master/",
+      "title": "Copy Master – Dragon Ball Universe",
+      "characters": 2101,
+      "sha256": "e9cc494b7e120c344bca6e75e8b41742708543133f9a3132578c0b339b3fd120"
+    },
+    {
+      "slug": "core-burst",
+      "url": "https://dbu-rpg.com/core-burst/",
+      "title": "Core Burst – Dragon Ball Universe",
+      "characters": 2530,
+      "sha256": "081f1c8f0dcaed450926abb7cc51bc9a22680ae35e91ee8fe1cef4cc41a95be6"
+    },
+    {
+      "slug": "core-rules",
+      "url": "https://dbu-rpg.com/core-rules/",
+      "title": "Core Rules – Dragon Ball Universe",
+      "characters": 29995,
+      "sha256": "c41befa64209f35a7aa2f637c49c1412cbdaa8a95dd4276465387cfeb03d4ace"
+    },
+    {
+      "slug": "crane-school-master",
+      "url": "https://dbu-rpg.com/crane-school-master/",
+      "title": "Crane School Master – Dragon Ball Universe",
+      "characters": 1988,
+      "sha256": "2d535c88da52f4634560311b4ce73fb99078da36ec9844f75a4101659a050350"
+    },
+    {
+      "slug": "crimson-super-saiyan-4",
+      "url": "https://dbu-rpg.com/crimson-super-saiyan-4/",
+      "title": "Crimson Super Saiyan 4 – Dragon Ball Universe",
+      "characters": 3403,
+      "sha256": "2d46659e77ecbcab05b142c436d73c27896a1d7e10bbe2f34b4b86dadfe7e0f7"
+    },
+    {
+      "slug": "crusher-form",
+      "url": "https://dbu-rpg.com/crusher-form/",
+      "title": "Crusher Form – Dragon Ball Universe",
+      "characters": 6510,
+      "sha256": "1865d336283679a536883d1028766564a58074ffabc8e2f42fe11c6af507bfcc"
+    },
+    {
+      "slug": "cultivation-of-the-self",
+      "url": "https://dbu-rpg.com/cultivation-of-the-self/",
+      "title": "Cultivation of the Self – Dragon Ball Universe",
+      "characters": 6061,
+      "sha256": "71210feeeca225f11f11cc151cc635bcd3cd955767b642e44aa699bc9d421f42"
+    },
+    {
+      "slug": "culture-fluid-corruption",
+      "url": "https://dbu-rpg.com/culture-fluid-corruption/",
+      "title": "Culture Fluid Corruption – Dragon Ball Universe",
+      "characters": 2084,
+      "sha256": "b41539c83c6147e76fb91fb53135404d4d6128ea2789673fb5bbd5eb4cb42de7"
+    },
+    {
+      "slug": "custom-ascension",
+      "url": "https://dbu-rpg.com/custom-ascension/",
+      "title": "Custom Ascension – Dragon Ball Universe",
+      "characters": 919,
+      "sha256": "361e96a102e4ec835859fa87e98fd3525d1fe0b1d214ff735822230d578b7df0"
+    },
+    {
+      "slug": "custom-species-examples",
+      "url": "https://dbu-rpg.com/custom-species-examples/",
+      "title": "Custom Species Examples – Dragon Ball Universe",
+      "characters": 11194,
+      "sha256": "d59ccd0a348f19b5961fc2d2a7c082b4f365fcaab30506b41820925d16a04a06"
+    },
+    {
+      "slug": "custom-species",
+      "url": "https://dbu-rpg.com/custom-species/",
+      "title": "Custom Species – Dragon Ball Universe",
+      "characters": 51164,
+      "sha256": "e8fa5e3cc46eed89f5ae8b477fbcb434aad486c814c481fa4715988899968ffc"
+    },
+    {
+      "slug": "cybernetic-enhancement",
+      "url": "https://dbu-rpg.com/cybernetic-enhancement/",
+      "title": "Cybernetic Enhancement – Dragon Ball Universe",
+      "characters": 6840,
+      "sha256": "3f270434ffdd2269844f2694c662ce869b895d39bfc0b4e62ad6e584bd5c7f0e"
+    },
+    {
+      "slug": "cybernetic-reconfiguration",
+      "url": "https://dbu-rpg.com/cybernetic-reconfiguration/",
+      "title": "Cybernetic Reconfiguration – Dragon Ball Universe",
+      "characters": 2543,
+      "sha256": "d0998f5593f34c9d352e2dc498cb97e081bfc9b9191c2e7f81e283461090fbea"
+    },
+    {
+      "slug": "cybernetic-upgrade",
+      "url": "https://dbu-rpg.com/cybernetic-upgrade/",
+      "title": "Cybernetic Upgrade – Dragon Ball Universe",
+      "characters": 894,
+      "sha256": "b6a0cbfcb69781de6f839225fe55aafe4fa59fcd8a7f6d3c3d8e3b32da20bdb1"
+    },
+    {
+      "slug": "damage-recovery",
+      "url": "https://dbu-rpg.com/damage-recovery/",
+      "title": "Damage & Recovery – Dragon Ball Universe",
+      "characters": 8088,
+      "sha256": "060793b476c0323b1869602e96a947caaacb5c7b6a86a31005bdca6aceeb28dd"
+    },
+    {
+      "slug": "dangerous-glare",
+      "url": "https://dbu-rpg.com/dangerous-glare/",
+      "title": "Dangerous Glare – Dragon Ball Universe",
+      "characters": 1842,
+      "sha256": "39eca9e474d4a0b203eca2d1102b6695e92b314e95626178ce1d98040cc28549"
+    },
+    {
+      "slug": "dark-demon",
+      "url": "https://dbu-rpg.com/dark-demon/",
+      "title": "Dark Demon – Dragon Ball Universe",
+      "characters": 4211,
+      "sha256": "7dfdf6b63b13df37ad11ddc642916b99225b6572773281062a287e99fc560b8d"
+    },
+    {
+      "slug": "dark-enhancement",
+      "url": "https://dbu-rpg.com/dark-enhancement/",
+      "title": "Dark Enhancement – Dragon Ball Universe",
+      "characters": 1472,
+      "sha256": "039a4e5a6a84036f57aecaa3f9b2c54943b838b729df54279de4ad64878961d2"
+    },
+    {
+      "slug": "dark-evolution",
+      "url": "https://dbu-rpg.com/dark-evolution/",
+      "title": "Dark Evolution – Dragon Ball Universe",
+      "characters": 1541,
+      "sha256": "d1eb760c4a5592924e849643d72f4031bb44fa0580f21594b029f3b7de5d4a9e"
+    },
+    {
+      "slug": "dark-factor-infusion",
+      "url": "https://dbu-rpg.com/dark-factor-infusion/",
+      "title": "Dark Factor Infusion – Dragon Ball Universe",
+      "characters": 1790,
+      "sha256": "14b66db30e3948d590ac09b2106c5fb8c9909689c5cd15d0a320b80e0015587e"
+    },
+    {
+      "slug": "dark-factor",
+      "url": "https://dbu-rpg.com/dark-factor/",
+      "title": "Dark Factor – Dragon Ball Universe",
+      "characters": 3845,
+      "sha256": "b9b912f9f78fbc433549d8395f94af219946df706ecb2604c6e44f039959e683"
+    },
+    {
+      "slug": "dark-infusion",
+      "url": "https://dbu-rpg.com/dark-infusion/",
+      "title": "Dark Infusion – Dragon Ball Universe",
+      "characters": 1549,
+      "sha256": "d450037ec8def1f0baffd921255f30246c33a4b5e27a2696ff45353ae0c79168"
+    },
+    {
+      "slug": "dark-ki-unleashed",
+      "url": "https://dbu-rpg.com/dark-ki-unleashed/",
+      "title": "Dark Ki: Unleashed – Dragon Ball Universe",
+      "characters": 1402,
+      "sha256": "279d2c1eeabdd837541b0d2d5773d03c710c551fcd5b586d624f292e52e719fe"
+    },
+    {
+      "slug": "dark-ki",
+      "url": "https://dbu-rpg.com/dark-ki/",
+      "title": "Dark Ki – Dragon Ball Universe",
+      "characters": 2728,
+      "sha256": "c94bd3ab40cdc3f58c18084509cfb9489ec2bab9fbf40dd1d850b4e0e6180cd1"
+    },
+    {
+      "slug": "dark-king",
+      "url": "https://dbu-rpg.com/dark-king/",
+      "title": "Dark King – Dragon Ball Universe",
+      "characters": 6552,
+      "sha256": "a150f5a974a3a0bd5fa5de5b9f1229c1c016b646785eb6d7583106abfaef344e"
+    },
+    {
+      "slug": "dark-vassal",
+      "url": "https://dbu-rpg.com/dark-vassal/",
+      "title": "Dark Vassal – Dragon Ball Universe",
+      "characters": 1193,
+      "sha256": "c8887176963fd73e3cf229746fbec1db7bcfe28ab863e85aa54f9eb2e3d4711c"
+    },
+    {
+      "slug": "data-input",
+      "url": "https://dbu-rpg.com/data-input/",
+      "title": "Data Input – Dragon Ball Universe",
+      "characters": 1294,
+      "sha256": "088fb843427731e4b7e024cb7f328b11707961ba3c89d9a9860b6c81a0d41904"
+    },
+    {
+      "slug": "dedicated-warrior",
+      "url": "https://dbu-rpg.com/dedicated-warrior/",
+      "title": "Dedicated Warrior – Dragon Ball Universe",
+      "characters": 1432,
+      "sha256": "a3f0ea70c08393449a67e79337e570675b1762ef24cbdd6325d966b57f1d35c9"
+    },
+    {
+      "slug": "deep-sleeper",
+      "url": "https://dbu-rpg.com/deep-sleeper/",
+      "title": "Deep Sleeper – Dragon Ball Universe",
+      "characters": 2886,
+      "sha256": "6c2ccb221f3f190018162ce8ffde0e60a96d340b093161df0ef85cd0131b797e"
+    },
+    {
+      "slug": "demon-clansman",
+      "url": "https://dbu-rpg.com/demon-clansman/",
+      "title": "Demon Clansman – Dragon Ball Universe",
+      "characters": 2696,
+      "sha256": "78ff1f421646ad871bc929404989b1de854348212a4f797fde8f2d6e83a35e13"
+    },
+    {
+      "slug": "demon-god",
+      "url": "https://dbu-rpg.com/demon-god/",
+      "title": "Demon God – Dragon Ball Universe",
+      "characters": 6208,
+      "sha256": "b133ed5654e46fd91ef8c7b0bb3cf4a9c4e1847f87ce5ced6754603783a7a877"
+    },
+    {
+      "slug": "demonic-class-up",
+      "url": "https://dbu-rpg.com/demonic-class-up/",
+      "title": "Demonic Class Up – Dragon Ball Universe",
+      "characters": 2576,
+      "sha256": "ee12d8d4d90a35a440883aa35ebcee0da3307ba92e6c54755d9fdaa716017071"
+    },
+    {
+      "slug": "demonic-heart",
+      "url": "https://dbu-rpg.com/demonic-heart/",
+      "title": "Demonic Heart – Dragon Ball Universe",
+      "characters": 2401,
+      "sha256": "a2be95d6a4cd34ba62926ca38d6195636d24e41ef9afff3029c86a1b9de02015"
+    },
+    {
+      "slug": "demonic-third-eye",
+      "url": "https://dbu-rpg.com/demonic-third-eye/",
+      "title": "Demonic Third Eye – Dragon Ball Universe",
+      "characters": 3138,
+      "sha256": "1ae2e6ba9a1b59577176aa4d7593cd893035ff3be9fdafdf8fc10a1c2848ff70"
+    },
+    {
+      "slug": "demonic-wager",
+      "url": "https://dbu-rpg.com/demonic-wager/",
+      "title": "Demonic Wager – Dragon Ball Universe",
+      "characters": 1699,
+      "sha256": "e5fbc656b450abb07f1be422e469e03dae405dc5bf5e14220fa570d6c706e7b2"
+    },
+    {
+      "slug": "demonic-will",
+      "url": "https://dbu-rpg.com/demonic-will/",
+      "title": "Demonic Will – Dragon Ball Universe",
+      "characters": 3753,
+      "sha256": "b73cc0844e0993b9126df9da17010080e5a64cf10b871cd261cbb2f44610b971"
+    },
+    {
+      "slug": "demons",
+      "url": "https://dbu-rpg.com/demons/",
+      "title": "Demons – Dragon Ball Universe",
+      "characters": 8232,
+      "sha256": "288888ebba2dc75fd56c8cca5c57bb4a544f33605893495c1caf060c5fca3b23"
+    },
+    {
+      "slug": "descended-super-saiyan-blue",
+      "url": "https://dbu-rpg.com/descended-super-saiyan-blue/",
+      "title": "Descended Super Saiyan Blue – Dragon Ball Universe",
+      "characters": 5408,
+      "sha256": "31475a4b09b34b1b9ab6da6e6f6aa83c68e6a6066cb19b56cb37edb51e75add9"
+    },
+    {
+      "slug": "descended-super-saiyan",
+      "url": "https://dbu-rpg.com/descended-super-saiyan/",
+      "title": "Descended Super Saiyan – Dragon Ball Universe",
+      "characters": 2808,
+      "sha256": "f5b2ea71d4301bd9840a249ef9bcc5902556b3bf1e61fb08bc391d3ac5387cfd"
+    },
+    {
+      "slug": "designated-target",
+      "url": "https://dbu-rpg.com/designated-target/",
+      "title": "Designated Target – Dragon Ball Universe",
+      "characters": 1793,
+      "sha256": "3da2d8130ca1d429e5ff5fe33ffb2396dc291c2cc23d6144f5b0a0d0e1382f71"
+    },
+    {
+      "slug": "desperate-warrior",
+      "url": "https://dbu-rpg.com/desperate-warrior/",
+      "title": "Desperate Warrior – Dragon Ball Universe",
+      "characters": 1530,
+      "sha256": "82fc8b6db74a517216026de476308e1ae020b223a5e8022cd504ecc0c3e09f08"
+    },
+    {
+      "slug": "destroyer-form",
+      "url": "https://dbu-rpg.com/destroyer-form/",
+      "title": "Destroyer Form – Dragon Ball Universe",
+      "characters": 4953,
+      "sha256": "2d11e3b1aee6ee836ba3cfeb7be1206073dc3f5751a02a723024a57e7969074e"
+    },
+    {
+      "slug": "different-path",
+      "url": "https://dbu-rpg.com/different-path/",
+      "title": "Different Path – Dragon Ball Universe",
+      "characters": 880,
+      "sha256": "c26f482fcf7bab1095ee02eb3ab27dd17cf01c48b17156ea49740cc1b07133dc"
+    },
+    {
+      "slug": "diluted-majin",
+      "url": "https://dbu-rpg.com/diluted-majin/",
+      "title": "Diluted Majin – Dragon Ball Universe",
+      "characters": 1414,
+      "sha256": "ac5f8ad9a4520ccef2600f90cc6ca7811cdcd0aef7a26701dae9d07f9c61dc7b"
+    },
+    {
+      "slug": "dirty-fighter",
+      "url": "https://dbu-rpg.com/dirty-fighter/",
+      "title": "Dirty Fighter – Dragon Ball Universe",
+      "characters": 2135,
+      "sha256": "d54b71f750f64513825bf4418d4f8dcbc7007e7baa7231b0624388d4c06286c7"
+    },
+    {
+      "slug": "disguised-dragon",
+      "url": "https://dbu-rpg.com/disguised-dragon/",
+      "title": "Disguised Dragon – Dragon Ball Universe",
+      "characters": 2737,
+      "sha256": "d0a5ffa6ae2e6a341fd4c53fe117bf802d3be009c7478fa275713af419bb465e"
+    },
+    {
+      "slug": "diverse-leader",
+      "url": "https://dbu-rpg.com/diverse-leader/",
+      "title": "Diverse Leader – Dragon Ball Universe",
+      "characters": 657,
+      "sha256": "6aaf5d2a3d1d257318bdd10a0771d77c3be2512f12f030bf27e903298ced52e3"
+    },
+    {
+      "slug": "divine-ascension",
+      "url": "https://dbu-rpg.com/divine-ascension/",
+      "title": "Divine Ascension – Dragon Ball Universe",
+      "characters": 1992,
+      "sha256": "96ffcb79fd5454be913560deab6e18c66af39233694fd7eafc22ce6c5af6321e"
+    },
+    {
+      "slug": "divine-attendant",
+      "url": "https://dbu-rpg.com/divine-attendant/",
+      "title": "Divine Attendant – Dragon Ball Universe",
+      "characters": 2001,
+      "sha256": "16d9ad50517e4f9e0e57ed910a7ad0afd340401796b9993a6e92149175ae887a"
+    },
+    {
+      "slug": "divine-authority",
+      "url": "https://dbu-rpg.com/divine-authority/",
+      "title": "Divine Authority – Dragon Ball Universe",
+      "characters": 3421,
+      "sha256": "5b164e99ed9fb96ae4f186b3eeed13d2529c0661fb38c183ce6c00e5b77f076f"
+    },
+    {
+      "slug": "divine-candidate",
+      "url": "https://dbu-rpg.com/divine-candidate/",
+      "title": "Divine Candidate – Dragon Ball Universe",
+      "characters": 1346,
+      "sha256": "be7f021959fe5e274e05adf2bc9d034daed318cc5f87925bcff6dffafee6dce4"
+    },
+    {
+      "slug": "divine-halo",
+      "url": "https://dbu-rpg.com/divine-halo/",
+      "title": "Divine Halo – Dragon Ball Universe",
+      "characters": 5486,
+      "sha256": "276428deb90d90b5fd101966697b22395c3308f737d7a975f60dbc1631a52fca"
+    },
+    {
+      "slug": "divine-overseer",
+      "url": "https://dbu-rpg.com/divine-overseer/",
+      "title": "Divine Overseer – Dragon Ball Universe",
+      "characters": 2552,
+      "sha256": "79a385a8679084688744df91b5fe4e726085441e0902def4db81672c12d1bf10"
+    },
+    {
+      "slug": "divine-saiyan",
+      "url": "https://dbu-rpg.com/divine-saiyan/",
+      "title": "Divine Saiyan – Dragon Ball Universe",
+      "characters": 11607,
+      "sha256": "5ac88e47000ebb40af550f506fb29a5f026686c7f302ca8849a87a866378db8c"
+    },
+    {
+      "slug": "doping",
+      "url": "https://dbu-rpg.com/doping/",
+      "title": "Doping – Dragon Ball Universe",
+      "characters": 2558,
+      "sha256": "f06b89e8f97b5f85375dd8abe44abef31c1d36646f62ad1e339ad38688a2db16"
+    },
+    {
+      "slug": "draconic-ascension",
+      "url": "https://dbu-rpg.com/draconic-ascension/",
+      "title": "Draconic Ascension – Dragon Ball Universe",
+      "characters": 2503,
+      "sha256": "0a7069c07c9e487937188c5d9ff89886cf44ce70ae216beb5951584b1677d648"
+    },
+    {
+      "slug": "dragon-ball-hero",
+      "url": "https://dbu-rpg.com/dragon-ball-hero/",
+      "title": "Dragon Ball Hero – Dragon Ball Universe",
+      "characters": 2282,
+      "sha256": "490d55505affbcd29d824819eedc2ccbc97c4029b0c9dc12bc7f908aa5150e9b"
+    },
+    {
+      "slug": "dragon-class-up",
+      "url": "https://dbu-rpg.com/dragon-class-up/",
+      "title": "Dragon Class Up – Dragon Ball Universe",
+      "characters": 1960,
+      "sha256": "6168b0089f4868c88605e3fd735536dbae4729db2c615b402d7387121472d56c"
+    },
+    {
+      "slug": "dragon-master",
+      "url": "https://dbu-rpg.com/dragon-master/",
+      "title": "Dragon Master – Dragon Ball Universe",
+      "characters": 1796,
+      "sha256": "01f0ebe23cd0798f93ce99c437f39ccf741c3e4adf3a9bfa3536007df35be82b"
+    },
+    {
+      "slug": "dragon-shell",
+      "url": "https://dbu-rpg.com/dragon-shell/",
+      "title": "Dragon Shell – Dragon Ball Universe",
+      "characters": 5159,
+      "sha256": "a24f9dafcaac9f1eea4e1af7be33ddfdc6a88694b76a2c4c6e57d3fa699d9f89"
+    },
+    {
+      "slug": "dragon-warrior",
+      "url": "https://dbu-rpg.com/dragon-warrior/",
+      "title": "Dragon Warrior – Dragon Ball Universe",
+      "characters": 1640,
+      "sha256": "c3d409d7e2d175eb9112e8dda85e22d723af27441cb3a7a8f3ac44561f4d9a19"
+    },
+    {
+      "slug": "dragons-blessing",
+      "url": "https://dbu-rpg.com/dragons-blessing/",
+      "title": "Dragon’s Blessing – Dragon Ball Universe",
+      "characters": 2417,
+      "sha256": "b8b519aef308bdc0d44364dc474cb27e730c4f7b37240dd9ec1d589ab1ad0944"
+    },
+    {
+      "slug": "drunken-fist",
+      "url": "https://dbu-rpg.com/drunken-fist/",
+      "title": "Drunken Fist – Dragon Ball Universe",
+      "characters": 3029,
+      "sha256": "6e69b9b2e7a46f60e7f0e3a944eff94515928e69aab05c0093da4a6affa5c446"
+    },
+    {
+      "slug": "earned-evolution",
+      "url": "https://dbu-rpg.com/earned-evolution/",
+      "title": "Earned Evolution – Dragon Ball Universe",
+      "characters": 1966,
+      "sha256": "b50e81fc6dc336f2a7499d40721688f620d8dcb857367afc302f2bd974acedc3"
+    },
+    {
+      "slug": "earthling-power",
+      "url": "https://dbu-rpg.com/earthling-power/",
+      "title": "Earthling Power – Dragon Ball Universe",
+      "characters": 3212,
+      "sha256": "5da3e7f8ef99b4b9a996517427599c51b75a961a95e09b9abc0fc0acdcdbbbfc"
+    },
+    {
+      "slug": "earthling-spirit",
+      "url": "https://dbu-rpg.com/earthling-spirit/",
+      "title": "Earthling Spirit – Dragon Ball Universe",
+      "characters": 5013,
+      "sha256": "f8c3232ef7ade072d0d435f546bafa868a003e5bd982a1804e0e77722b0516aa"
+    },
+    {
+      "slug": "earthlings",
+      "url": "https://dbu-rpg.com/earthlings/",
+      "title": "Earthlings – Dragon Ball Universe",
+      "characters": 14338,
+      "sha256": "8f421061725cb8dabe9fbb38ab0e2058ffb5a0e8bb45c83759b544229c7bc272"
+    },
+    {
+      "slug": "effortless",
+      "url": "https://dbu-rpg.com/effortless/",
+      "title": "Effortless – Dragon Ball Universe",
+      "characters": 2034,
+      "sha256": "b4d5e86bc5ff22d5224fe301a0b27df86a905298da9828108d1d32a6e4305e8c"
+    },
+    {
+      "slug": "elemental-force",
+      "url": "https://dbu-rpg.com/elemental-force/",
+      "title": "Elemental Force – Dragon Ball Universe",
+      "characters": 2676,
+      "sha256": "3ad3a0842bf2c89fd30c94dd803c4dcb62cf00602887218d5788fc02cc236f6d"
+    },
+    {
+      "slug": "elemental-preference",
+      "url": "https://dbu-rpg.com/elemental-preference/",
+      "title": "Elemental Preference – Dragon Ball Universe",
+      "characters": 2048,
+      "sha256": "4c11e1a0c9ddef815e1a3e44f8f1814bcc824666b9480d371968186f3e14a746"
+    },
+    {
+      "slug": "elemental-supremacy",
+      "url": "https://dbu-rpg.com/elemental-supremacy/",
+      "title": "Elemental Supremacy – Dragon Ball Universe",
+      "characters": 12123,
+      "sha256": "1b68f6d205fd2ed25f712a109cfdf8c19c1ca5b1af969c62c6aa4a276f0b8880"
+    },
+    {
+      "slug": "empowered-form",
+      "url": "https://dbu-rpg.com/empowered-form/",
+      "title": "Empowered Form – Dragon Ball Universe",
+      "characters": 4182,
+      "sha256": "f67402c31902ae22a266ebeee6d5cdd2e09847333c9bf0863c96ab0b594f5215"
+    },
+    {
+      "slug": "endless-zenkai",
+      "url": "https://dbu-rpg.com/endless-zenkai/",
+      "title": "Endless Zenkai – Dragon Ball Universe",
+      "characters": 2566,
+      "sha256": "376ae3e05e52a2ef6327c99141918fae17c3e1c8c427dc796c3b5a8a0fd909fa"
+    },
+    {
+      "slug": "energy-consumption",
+      "url": "https://dbu-rpg.com/energy-consumption/",
+      "title": "Energy Consumption – Dragon Ball Universe",
+      "characters": 5162,
+      "sha256": "02defb962adf69ebce5f7ea460596db548882bc353c6f4cf532ad14134920859"
+    },
+    {
+      "slug": "energy-poacher",
+      "url": "https://dbu-rpg.com/energy-poacher/",
+      "title": "Energy Poacher – Dragon Ball Universe",
+      "characters": 3881,
+      "sha256": "be25ac81e5ab1d9f2f2d7255e3b2eec950a49413053672546aa6046bee68402f"
+    },
+    {
+      "slug": "enraged",
+      "url": "https://dbu-rpg.com/enraged/",
+      "title": "Enraged – Dragon Ball Universe",
+      "characters": 3465,
+      "sha256": "625f19c6ac8859fae3f888ca956b7fe9e2983830067fdaabf7822a7f7f92fa3d"
+    },
+    {
+      "slug": "eternally-entwined",
+      "url": "https://dbu-rpg.com/eternally-entwined/",
+      "title": "Eternally Entwined – Dragon Ball Universe",
+      "characters": 2906,
+      "sha256": "bc75fed7fb7066ea316220b2641947918b152c66760ab15c2250e8e0ec48462f"
+    },
+    {
+      "slug": "evil-aura",
+      "url": "https://dbu-rpg.com/evil-aura/",
+      "title": "Evil Aura – Dragon Ball Universe",
+      "characters": 4827,
+      "sha256": "3436550d10b1239f5d474c1843754adb00a2b2897a786a78b3a3e5eaa09ca5e3"
+    },
+    {
+      "slug": "evil-saiyan",
+      "url": "https://dbu-rpg.com/evil-saiyan/",
+      "title": "Evil Saiyan – Dragon Ball Universe",
+      "characters": 5240,
+      "sha256": "7c581d45ad8b57e1853c19ff0ff2118b4e34d7b0ac687e3dd23ca3d705d16f09"
+    },
+    {
+      "slug": "evolved-super-form",
+      "url": "https://dbu-rpg.com/evolved-super-form/",
+      "title": "Evolved Super Form – Dragon Ball Universe",
+      "characters": 1326,
+      "sha256": "a1b4e2e521e6b22ad1be1409c4b0f9c589e98d7fe895713c03fa85409b0017b9"
+    },
+    {
+      "slug": "evolving-class-up",
+      "url": "https://dbu-rpg.com/evolving-class-up/",
+      "title": "Evolving Class Up – Dragon Ball Universe",
+      "characters": 2702,
+      "sha256": "314f4e9961c9bf894aeaaa10c5605d58cf49de962a6da6a9409a3980868f1825"
+    },
+    {
+      "slug": "experienced-angel",
+      "url": "https://dbu-rpg.com/experienced-angel/",
+      "title": "Experienced Angel – Dragon Ball Universe",
+      "characters": 2253,
+      "sha256": "60aae9097a75e4d119a39210a0c51fe00fdef572276abdcb00c1031f98d21de9"
+    },
+    {
+      "slug": "explosive-power",
+      "url": "https://dbu-rpg.com/explosive-power/",
+      "title": "Explosive Power – Dragon Ball Universe",
+      "characters": 5881,
+      "sha256": "a1bbb0d431b204161b31ac85a667bc30ce69551d538acd8dc0059e02010394b2"
+    },
+    {
+      "slug": "extra-minus-energy",
+      "url": "https://dbu-rpg.com/extra-minus-energy/",
+      "title": "Extra Minus Energy – Dragon Ball Universe",
+      "characters": 1149,
+      "sha256": "d33196665d373c0c00700add3b85ff5960c2cbb7a9c20a3d845a7644e7bed792"
+    },
+    {
+      "slug": "feline-originality",
+      "url": "https://dbu-rpg.com/feline-originality/",
+      "title": "Feline Originality – Dragon Ball Universe",
+      "characters": 1617,
+      "sha256": "456bcb8435981ca1578fb587388593b8e9ad2dc99eedd0fe16b36d9f30ea9435"
+    },
+    {
+      "slug": "feline-warrior",
+      "url": "https://dbu-rpg.com/feline-warrior/",
+      "title": "Feline Warrior – Dragon Ball Universe",
+      "characters": 1382,
+      "sha256": "e5cd9c20e17018d502517b06ce88d5b94bdbfb547c0d89afbc9ce547f93dd86b"
+    },
+    {
+      "slug": "feral-fist",
+      "url": "https://dbu-rpg.com/feral-fist/",
+      "title": "Feral Fist – Dragon Ball Universe",
+      "characters": 2523,
+      "sha256": "729cb5650ba930090f06bbf316e3d999055541421bd5fc3479530ae6bf148d00"
+    },
+    {
+      "slug": "final-mode-change",
+      "url": "https://dbu-rpg.com/final-mode-change/",
+      "title": "Final Mode Change – Dragon Ball Universe",
+      "characters": 3641,
+      "sha256": "39856a6711cf3b3559694d482a41fc7a4f1c92b42e0878d0ffbe9568e633d2bb"
+    },
+    {
+      "slug": "final-trump-card",
+      "url": "https://dbu-rpg.com/final-trump-card/",
+      "title": "Final Trump Card – Dragon Ball Universe",
+      "characters": 1977,
+      "sha256": "5133ca7a444bfe358860ac3b7bd2a8738e69623503863ee84cd464e985a1f26b"
+    },
+    {
+      "slug": "focused-tracking",
+      "url": "https://dbu-rpg.com/focused-tracking/",
+      "title": "Focused Tracking – Dragon Ball Universe",
+      "characters": 2530,
+      "sha256": "5ca614a5e27e12fd79410acadea359ede4cd666fcdfcc3ca2ecc7161523770cc"
+    },
+    {
+      "slug": "formation",
+      "url": "https://dbu-rpg.com/formation/",
+      "title": "Formation – Dragon Ball Universe",
+      "characters": 7816,
+      "sha256": "edd88cf20c0ef1af2e9ba907df9c9cc965d751368f6c81ff05b95d064f0c52eb"
+    },
+    {
+      "slug": "foundations-profiles",
+      "url": "https://dbu-rpg.com/foundations-profiles/",
+      "title": "Foundations & Profiles – Dragon Ball Universe",
+      "characters": 16060,
+      "sha256": "a1a9577b916a72095a278677764c8ab9102cb785a0e2a4470c5313e613e96fcb"
+    },
+    {
+      "slug": "fruits-might",
+      "url": "https://dbu-rpg.com/fruits-might/",
+      "title": "Fruit’s Might – Dragon Ball Universe",
+      "characters": 2017,
+      "sha256": "3d098eee35cff84a42d22207fe25c1e079c8149e79bdefe4164086a116b2c86e"
+    },
+    {
+      "slug": "full-force-super-saiyan-2",
+      "url": "https://dbu-rpg.com/full-force-super-saiyan-2/",
+      "title": "Full Force Super Saiyan 2 – Dragon Ball Universe",
+      "characters": 1580,
+      "sha256": "2e579b40f3902275c0d6982d8756e930799d735389aa5dbe1266ab6a61ddc5b3"
+    },
+    {
+      "slug": "full-power-boost",
+      "url": "https://dbu-rpg.com/full-power-boost/",
+      "title": "Full Power Boost – Dragon Ball Universe",
+      "characters": 6634,
+      "sha256": "4751a71ff816c75c7d06d8a6360d84a7a0a6fe4de464c340dec138fb748374ab"
+    },
+    {
+      "slug": "full-power-super-saiyan",
+      "url": "https://dbu-rpg.com/full-power-super-saiyan/",
+      "title": "Full Power Super Saiyan – Dragon Ball Universe",
+      "characters": 9624,
+      "sha256": "76ff8771fc91d81984715dd567bd6e04f64a5393938e3c2543ebbe72b3f21bd3"
+    },
+    {
+      "slug": "full-power",
+      "url": "https://dbu-rpg.com/full-power/",
+      "title": "Full Power – Dragon Ball Universe",
+      "characters": 1183,
+      "sha256": "38eac56298ed785230315fc6575447668181a8f94bab26cafd1b1635d25d7925"
+    },
+    {
+      "slug": "furious-form",
+      "url": "https://dbu-rpg.com/furious-form/",
+      "title": "Furious Form – Dragon Ball Universe",
+      "characters": 1213,
+      "sha256": "c96269df4c54046af6c31317672f344cd4f3b374e9be0ebc79ec83e2738b29a6"
+    },
+    {
+      "slug": "future-hero",
+      "url": "https://dbu-rpg.com/future-hero/",
+      "title": "Future Hero – Dragon Ball Universe",
+      "characters": 7130,
+      "sha256": "25b5b2b50947ae9be89d9cf5bd6aa03de4c037b088186fe2ef9abd3249169b5d"
+    },
+    {
+      "slug": "future-super-saiyan",
+      "url": "https://dbu-rpg.com/future-super-saiyan/",
+      "title": "Future Super Saiyan – Dragon Ball Universe",
+      "characters": 3232,
+      "sha256": "2370c3e84ee49ae45d3f08e4f734ebbe54556696cfefe2888995d8b596223c76"
+    },
+    {
+      "slug": "galactic-heran",
+      "url": "https://dbu-rpg.com/galactic-heran/",
+      "title": "Galactic Heran – Dragon Ball Universe",
+      "characters": 2358,
+      "sha256": "c85101d3ef900cb5821dadd048b1bff637dcc181cdfa63712d3d82e09e03b0d9"
+    },
+    {
+      "slug": "genetic-max",
+      "url": "https://dbu-rpg.com/genetic-max/",
+      "title": "Genetic Max – Dragon Ball Universe",
+      "characters": 3103,
+      "sha256": "b1cfc68cc2b605e3f26a920c2ea48b96a6fc23f92c7c6452ecb99e2b3fd23b19"
+    },
+    {
+      "slug": "genetic-power",
+      "url": "https://dbu-rpg.com/genetic-power/",
+      "title": "Genetic Power – Dragon Ball Universe",
+      "characters": 9274,
+      "sha256": "14f1a0f0514b35f42d4349d4fcd4bba42e0dd2caa41ab3b6cf013e785f069fa7"
+    },
+    {
+      "slug": "genetic-splicing",
+      "url": "https://dbu-rpg.com/genetic-splicing/",
+      "title": "Genetic Splicing – Dragon Ball Universe",
+      "characters": 16297,
+      "sha256": "ff7568aeafc1890f498947a503c8dd2bfa6247ca292aaf11e220071357e46820"
+    },
+    {
+      "slug": "giant-form",
+      "url": "https://dbu-rpg.com/giant-form/",
+      "title": "Giant Form – Dragon Ball Universe",
+      "characters": 3025,
+      "sha256": "48673279d4089756a7c7cf402f545ad4b86ee603d2ae60dd453fba7eff2160d5"
+    },
+    {
+      "slug": "glass-burst",
+      "url": "https://dbu-rpg.com/glass-burst/",
+      "title": "Glass Burst – Dragon Ball Universe",
+      "characters": 1644,
+      "sha256": "ce87a51a782c4a791d288e559d1f2113f1ba8daa4d8f184d65f3faf5d052ebf1"
+    },
+    {
+      "slug": "glass-dragon",
+      "url": "https://dbu-rpg.com/glass-dragon/",
+      "title": "Glass Dragon – Dragon Ball Universe",
+      "characters": 4019,
+      "sha256": "e528829cc6c881ea08d153b9df031a340893b696dd79e97c406326454d349fe0"
+    },
+    {
+      "slug": "glass-power",
+      "url": "https://dbu-rpg.com/glass-power/",
+      "title": "Glass Power – Dragon Ball Universe",
+      "characters": 3906,
+      "sha256": "c2b0d02f3bc56e6baa17ba5e578e4dccda84ba048ddfdc9d6928f7b40173de60"
+    },
+    {
+      "slug": "glass-tribe",
+      "url": "https://dbu-rpg.com/glass-tribe/",
+      "title": "Glass Tribe – Dragon Ball Universe",
+      "characters": 12067,
+      "sha256": "478c7ba61f93cf45a67d9bcecd87fad9bc1e65706ccceb0925095d2f1a4413c8"
+    },
+    {
+      "slug": "glasswork-master",
+      "url": "https://dbu-rpg.com/glasswork-master/",
+      "title": "Glasswork Master – Dragon Ball Universe",
+      "characters": 2185,
+      "sha256": "101710c1732d87224e6c53984ff1b9378b70aec9b288dbb780941fbc728e60c6"
+    },
+    {
+      "slug": "god-aura",
+      "url": "https://dbu-rpg.com/god-aura/",
+      "title": "God Aura – Dragon Ball Universe",
+      "characters": 4015,
+      "sha256": "ffce6853856642e59c1c69bdd8364ba1d061b9ec6096f8437409e0e1d58461b8"
+    },
+    {
+      "slug": "god-class-up",
+      "url": "https://dbu-rpg.com/god-class-up/",
+      "title": "God Class Up – Dragon Ball Universe",
+      "characters": 1947,
+      "sha256": "8839bc17cb23417e0f4bc11042761a465153f43dcfd2f4d28827463f2a1990e4"
+    },
+    {
+      "slug": "godly-powers",
+      "url": "https://dbu-rpg.com/godly-powers/",
+      "title": "Godly Powers – Dragon Ball Universe",
+      "characters": 3971,
+      "sha256": "148167166d998e3945e157cf470e87a42ba1fcac6b79472535a0ae713539a40a"
+    },
+    {
+      "slug": "godslayer",
+      "url": "https://dbu-rpg.com/godslayer/",
+      "title": "Godslayer – Dragon Ball Universe",
+      "characters": 3506,
+      "sha256": "ffd4f351d0dda8457f1da6d77fceb5e25268bacab37db6b38df090a8fb5d9538"
+    },
+    {
+      "slug": "golden-oozaru",
+      "url": "https://dbu-rpg.com/golden-oozaru/",
+      "title": "Golden Oozaru – Dragon Ball Universe",
+      "characters": 2697,
+      "sha256": "56ed11b875391ddfa95d0ce7fbd6197b76c7420b937f5d1332c8654e34defee9"
+    },
+    {
+      "slug": "grandmaster",
+      "url": "https://dbu-rpg.com/grandmaster/",
+      "title": "Grandmaster – Dragon Ball Universe",
+      "characters": 3023,
+      "sha256": "81970b6a6fec1a78611f8404a41f5b531c5fe130a275a85ce424d636a463e2f4"
+    },
+    {
+      "slug": "grappler",
+      "url": "https://dbu-rpg.com/grappler/",
+      "title": "Grappler – Dragon Ball Universe",
+      "characters": 1516,
+      "sha256": "ec381662ec4e366542922020e520c9f342f6ed8d65cc4d046f47f2244a387a5d"
+    },
+    {
+      "slug": "gravity-controller",
+      "url": "https://dbu-rpg.com/gravity-controller/",
+      "title": "Gravity Controller – Dragon Ball Universe",
+      "characters": 4997,
+      "sha256": "738159264ca269f40067a1d91ffc44273ce2154b9edf30b9f5550867efaacca3"
+    },
+    {
+      "slug": "great-namekian",
+      "url": "https://dbu-rpg.com/great-namekian/",
+      "title": "Great Namekian – Dragon Ball Universe",
+      "characters": 2430,
+      "sha256": "9ab6411a3089ecf9c6ac156978ffe6c26eba2d8ac670a86a16e04139a768ebcf"
+    },
+    {
+      "slug": "greater-mutation",
+      "url": "https://dbu-rpg.com/greater-mutation/",
+      "title": "Greater Mutation – Dragon Ball Universe",
+      "characters": 1064,
+      "sha256": "6f74e4b5bbc107ad940ffd8799947c5279897ee339b4d442ea37c95f7d5f6f23"
+    },
+    {
+      "slug": "greatest-cerealian",
+      "url": "https://dbu-rpg.com/greatest-cerealian/",
+      "title": "Greatest Cerealian – Dragon Ball Universe",
+      "characters": 2822,
+      "sha256": "dcf1a6aadbcd8ad3619cba5696ebbc5e87429aad5f008e11c4497851f3dd3f5f"
+    },
+    {
+      "slug": "greatest-warrior-in-the-universe",
+      "url": "https://dbu-rpg.com/greatest-warrior-in-the-universe/",
+      "title": "Greatest Warrior? in the Universe – Dragon Ball Universe",
+      "characters": 4028,
+      "sha256": "9ad8493eafa94c0f11255def9e5e3b7577ff9bfec3577b0c699500eb161bc5a8"
+    },
+    {
+      "slug": "greatest-warrior",
+      "url": "https://dbu-rpg.com/greatest-warrior/",
+      "title": "Greatest Warrior? – Dragon Ball Universe",
+      "characters": 2181,
+      "sha256": "ae7893f7d90df0c8c28d6ca8369ca4f296b6c8f9db93e3855a397d8a5785af37"
+    },
+    {
+      "slug": "grudge-amplifier",
+      "url": "https://dbu-rpg.com/grudge-amplifier/",
+      "title": "Grudge Amplifier – Dragon Ball Universe",
+      "characters": 6891,
+      "sha256": "8d1aad773296f74c95ba80a62154ba500799ef210dbcbff5c8c11d20e82aa350"
+    },
+    {
+      "slug": "half-saiyan-heritage",
+      "url": "https://dbu-rpg.com/half-saiyan-heritage/",
+      "title": "Half-Saiyan Heritage – Dragon Ball Universe",
+      "characters": 2109,
+      "sha256": "25d041af3345a88830cc20bd8d6c219f465c9fc625c4d79273a8e11df983f6c4"
+    },
+    {
+      "slug": "half-saiyan",
+      "url": "https://dbu-rpg.com/half-saiyan/",
+      "title": "Half-Saiyan – Dragon Ball Universe",
+      "characters": 2955,
+      "sha256": "0e8f7c826fbde9be4d53539ef82a1c4e754938883620a36681848b0ae183202d"
+    },
+    {
+      "slug": "heavyweight",
+      "url": "https://dbu-rpg.com/heavyweight/",
+      "title": "Heavyweight – Dragon Ball Universe",
+      "characters": 1551,
+      "sha256": "08da6a07a8d86cf894b5ed7015db2ca7202dbad270f65c5c80797784c2f50876"
+    },
+    {
+      "slug": "heightened-focus",
+      "url": "https://dbu-rpg.com/heightened-focus/",
+      "title": "Heightened Focus – Dragon Ball Universe",
+      "characters": 3675,
+      "sha256": "f2a557e3f8dc9fe75d37a56a9b4c08da55257a099f2553f7b507cdcf43919554"
+    },
+    {
+      "slug": "hell-fighter",
+      "url": "https://dbu-rpg.com/hell-fighter/",
+      "title": "Hell Fighter – Dragon Ball Universe",
+      "characters": 1286,
+      "sha256": "ab53d38d5a40f5acd56811c0087714270abb2985b6f0a8c0f9f7beaef1e1d2ad"
+    },
+    {
+      "slug": "heran-style",
+      "url": "https://dbu-rpg.com/heran-style/",
+      "title": "Heran Style – Dragon Ball Universe",
+      "characters": 2359,
+      "sha256": "2d0fae74c5b9cebc07997e209be44754618a758ee3c7571fc5839dfa18a852f1"
+    },
+    {
+      "slug": "herans",
+      "url": "https://dbu-rpg.com/herans/",
+      "title": "Herans – Dragon Ball Universe",
+      "characters": 5731,
+      "sha256": "13e71c4066ba99e395e33b9fb05931937aab0422ec369a229d433de8cb773cf0"
+    },
+    {
+      "slug": "hero",
+      "url": "https://dbu-rpg.com/hero/",
+      "title": "Hero – Dragon Ball Universe",
+      "characters": 5649,
+      "sha256": "f820423855266fedc31cecf249f75281e231fd549890cdfe35eafae7a0350e83"
+    },
+    {
+      "slug": "heroic-melodies",
+      "url": "https://dbu-rpg.com/heroic-melodies/",
+      "title": "Heroic Melodies – Dragon Ball Universe",
+      "characters": 4792,
+      "sha256": "9b5103aa5082ed9c178af705269b24613d837d74ced6c0472c2e9ebc68644446"
+    },
+    {
+      "slug": "hi-tension",
+      "url": "https://dbu-rpg.com/hi-tension/",
+      "title": "Hi-Tension – Dragon Ball Universe",
+      "characters": 4560,
+      "sha256": "c03eed6d44ee9839e83c5e13a89c2f035a61e938ec77ed98533d12056c12cc78"
+    },
+    {
+      "slug": "hidden-beast",
+      "url": "https://dbu-rpg.com/hidden-beast/",
+      "title": "Hidden Beast – Dragon Ball Universe",
+      "characters": 1749,
+      "sha256": "d0560b749c72648cdbfe252c2faa60f7a9c8e7659058cfab369de54eafdee311"
+    },
+    {
+      "slug": "hyper-diva",
+      "url": "https://dbu-rpg.com/hyper-diva/",
+      "title": "Hyper Diva – Dragon Ball Universe",
+      "characters": 2036,
+      "sha256": "75fd92998dc6610e9dc6157f8be84d9158bb6221ebcc3f51b90908bc5b29ae58"
+    },
+    {
+      "slug": "hyper-mega-form",
+      "url": "https://dbu-rpg.com/hyper-mega-form/",
+      "title": "Hyper Mega Form – Dragon Ball Universe",
+      "characters": 5596,
+      "sha256": "01f858177645f18910ee4d5472d14695eb45f9831b5b9833585c6b9a9ea9768f"
+    },
+    {
+      "slug": "ice-cold-combatant",
+      "url": "https://dbu-rpg.com/ice-cold-combatant/",
+      "title": "Ice-Cold Combatant – Dragon Ball Universe",
+      "characters": 3817,
+      "sha256": "582177bcaff9e2bcca9826a51235295d62b022b1647f74ee733b09c139cca744"
+    },
+    {
+      "slug": "immemorial-chaos",
+      "url": "https://dbu-rpg.com/immemorial-chaos/",
+      "title": "Immemorial Chaos – Dragon Ball Universe",
+      "characters": 2593,
+      "sha256": "d5543f9df36d8022eb2a1c65c818d50baeddc316614019a9247d7b8c00e71b9f"
+    },
+    {
+      "slug": "immensely-wrathful",
+      "url": "https://dbu-rpg.com/immensely-wrathful/",
+      "title": "Immensely Wrathful – Dragon Ball Universe",
+      "characters": 2835,
+      "sha256": "3638fe5c005c174e32c41d1ac9871a768c5e8dc574031bb0ebf0b330c455c034"
+    },
+    {
+      "slug": "improved-core",
+      "url": "https://dbu-rpg.com/improved-core/",
+      "title": "Improved Core – Dragon Ball Universe",
+      "characters": 2841,
+      "sha256": "37ad01a14bae4e9759c152892f0b89c270fafa1e7cadb5946ebe786dd458e309"
+    },
+    {
+      "slug": "improved-schematics",
+      "url": "https://dbu-rpg.com/improved-schematics/",
+      "title": "Improved Schematics – Dragon Ball Universe",
+      "characters": 3479,
+      "sha256": "d14817b8e8a4c7a790c1d0aa9ba40348316ab147db37f869d42a2dffee650ccb"
+    },
+    {
+      "slug": "impulse",
+      "url": "https://dbu-rpg.com/impulse/",
+      "title": "Impulse – Dragon Ball Universe",
+      "characters": 1774,
+      "sha256": "aacfa4883e27388d1fd9276ef96d13dd7d9882371ffbde9f9d471e469ad49a1e"
+    },
+    {
+      "slug": "inherited-life",
+      "url": "https://dbu-rpg.com/inherited-life/",
+      "title": "Inherited Life – Dragon Ball Universe",
+      "characters": 1521,
+      "sha256": "ff7006dc364cf1174a789909b12dd109fa7f28eb7bfa475f988cfec6c1a3bc6a"
+    },
+    {
+      "slug": "initial-class",
+      "url": "https://dbu-rpg.com/initial-class/",
+      "title": "Initial Class – Dragon Ball Universe",
+      "characters": 7031,
+      "sha256": "ff4f8ced988a36e0f0ccfe4ebc23915ba75a2b5a673d5d3cb89e77cdc8574fec"
+    },
+    {
+      "slug": "inner-purpose",
+      "url": "https://dbu-rpg.com/inner-purpose/",
+      "title": "Inner Purpose – Dragon Ball Universe",
+      "characters": 1472,
+      "sha256": "b203838c937f52ea71f52aac0c34eeeeec5217c3853f16a09e66abad77fc5b1a"
+    },
+    {
+      "slug": "insatiable",
+      "url": "https://dbu-rpg.com/insatiable/",
+      "title": "Insatiable – Dragon Ball Universe",
+      "characters": 1629,
+      "sha256": "a826d87cc69e9d4df77db9aaf3a502489d551ee95fd48140e8b1b3b5bc65a0a2"
+    },
+    {
+      "slug": "intuitive-fighter",
+      "url": "https://dbu-rpg.com/intuitive-fighter/",
+      "title": "Intuitive Fighter – Dragon Ball Universe",
+      "characters": 1789,
+      "sha256": "18bee4afe4c65c1e154b683c60fc4aa06e64823f48e08d6048e51d85a457f274"
+    },
+    {
+      "slug": "inverted-shadow",
+      "url": "https://dbu-rpg.com/inverted-shadow/",
+      "title": "Inverted Shadow – Dragon Ball Universe",
+      "characters": 1706,
+      "sha256": "a77b55bfbf7dfe30bd0f2b234f3bcf8982c9bdbb2d2779677f110fc722b56740"
+    },
+    {
+      "slug": "jacket-specialist",
+      "url": "https://dbu-rpg.com/jacket-specialist/",
+      "title": "Jacket Specialist – Dragon Ball Universe",
+      "characters": 2874,
+      "sha256": "53f8e145644e256b911c5ea2ac6df8434c97d5862e470ab4d0d8ee932a6821a8"
+    },
+    {
+      "slug": "janemba",
+      "url": "https://dbu-rpg.com/janemba/",
+      "title": "Janemba – Dragon Ball Universe",
+      "characters": 16622,
+      "sha256": "046a99d7d7197388e2828c4c0885444954aa18af05777869a6384c873ce73d4c"
+    },
+    {
+      "slug": "jiang-shi-talisman",
+      "url": "https://dbu-rpg.com/jiang-shi-talisman/",
+      "title": "Jiang Shi Talisman – Dragon Ball Universe",
+      "characters": 1383,
+      "sha256": "d5bf5e216a21046df1c4101da81d836f87f11a84299c961533ef6debef1f979e"
+    },
+    {
+      "slug": "juggernaut",
+      "url": "https://dbu-rpg.com/juggernaut/",
+      "title": "Juggernaut – Dragon Ball Universe",
+      "characters": 2727,
+      "sha256": "c4fc1e2af2b4da2fcbfc1b0cd1e2b7f2a67af0140c1757d3922e729a1fb56163"
+    },
+    {
+      "slug": "kaioken",
+      "url": "https://dbu-rpg.com/kaioken/",
+      "title": "Kaioken – Dragon Ball Universe",
+      "characters": 4021,
+      "sha256": "e372c8f815fc73fcb05ac5a376ae1cce28bfca8e67a98dc9c69251e9fa8e9ef7"
+    },
+    {
+      "slug": "karmic-empowerment",
+      "url": "https://dbu-rpg.com/karmic-empowerment/",
+      "title": "Karmic Empowerment – Dragon Ball Universe",
+      "characters": 1411,
+      "sha256": "a291b3d94cf39dde706f7f2fdebfccad50ee1bd9a21052e01eb7ad5f334c10e6"
+    },
+    {
+      "slug": "katchin-combat",
+      "url": "https://dbu-rpg.com/katchin-combat/",
+      "title": "Katchin Combat – Dragon Ball Universe",
+      "characters": 1401,
+      "sha256": "1d08871a9b2d7dd578328165cd8821c7780770c5185f6988b277236415dafe8d"
+    },
+    {
+      "slug": "ki-blade",
+      "url": "https://dbu-rpg.com/ki-blade/",
+      "title": "Ki Blade – Dragon Ball Universe",
+      "characters": 3774,
+      "sha256": "0c7a26baa6c72541b1c87b29bf9a4367ecfd88bfc1e034f8a816b03f13720bd2"
+    },
+    {
+      "slug": "ki-fist",
+      "url": "https://dbu-rpg.com/ki-fist/",
+      "title": "Ki Fist – Dragon Ball Universe",
+      "characters": 2314,
+      "sha256": "cf5661e2f7f6e3dcf300e6df27d94fa500ab2d03a89a240c1852d05f2cfa8f71"
+    },
+    {
+      "slug": "ki-shift",
+      "url": "https://dbu-rpg.com/ki-shift/",
+      "title": "Ki Shift – Dragon Ball Universe",
+      "characters": 3697,
+      "sha256": "390b302d9a947802b9844f8433062850bd5722975424788509769aa3c0615495"
+    },
+    {
+      "slug": "ki-technician",
+      "url": "https://dbu-rpg.com/ki-technician/",
+      "title": "Ki Technician – Dragon Ball Universe",
+      "characters": 5618,
+      "sha256": "b43efa6d10cec7e10b856d9a2156a0de8cdd32d3dd9521346c31cf71f47285e6"
+    },
+    {
+      "slug": "konatsian-power",
+      "url": "https://dbu-rpg.com/konatsian-power/",
+      "title": "Konatsian Power – Dragon Ball Universe",
+      "characters": 2823,
+      "sha256": "509dada1a64869fbb6c5ddd918287eb3aff382d422e45afc4f5df91532b99c3e"
+    },
+    {
+      "slug": "konatsian-will",
+      "url": "https://dbu-rpg.com/konatsian-will/",
+      "title": "Konatsian Will – Dragon Ball Universe",
+      "characters": 2646,
+      "sha256": "d4b09444cc5b1384f80069e9049504f1cd5df9e1ec8f0a780a1b4ed306411a9c"
+    },
+    {
+      "slug": "konatsians",
+      "url": "https://dbu-rpg.com/konatsians/",
+      "title": "Konatsians – Dragon Ball Universe",
+      "characters": 16394,
+      "sha256": "0dc1d06a91ffe00fa6d13ddf8ec992a855eb5fb35c6fb1f2d4a878b736cee897"
+    },
+    {
+      "slug": "larva-form",
+      "url": "https://dbu-rpg.com/larva-form/",
+      "title": "Larva Form – Dragon Ball Universe",
+      "characters": 2626,
+      "sha256": "4aeaab1c5c3390f8e012b98161c01cf0055389dcad81d5d82d92b791da8dfd02"
+    },
+    {
+      "slug": "last-hope",
+      "url": "https://dbu-rpg.com/last-hope/",
+      "title": "Last Hope – Dragon Ball Universe",
+      "characters": 1194,
+      "sha256": "16b128300488ce5b4f259ee81f551b1a047f7cbca108ebd63710a00eb88afbe8"
+    },
+    {
+      "slug": "learned-path",
+      "url": "https://dbu-rpg.com/learned-path/",
+      "title": "Learned Path – Dragon Ball Universe",
+      "characters": 1808,
+      "sha256": "c019e591e31852d534f9523a208d6267ec953f9bf840bad4fe8b7b3e0eac2b0b"
+    },
+    {
+      "slug": "legendary-saiyan-god",
+      "url": "https://dbu-rpg.com/legendary-saiyan-god/",
+      "title": "Legendary Saiyan God – Dragon Ball Universe",
+      "characters": 4016,
+      "sha256": "36a6502d4ff7b9c1ff7d336728c3587f1477b58772ecd70984ea0f56c4659c0d"
+    },
+    {
+      "slug": "legendary",
+      "url": "https://dbu-rpg.com/legendary/",
+      "title": "Legendary – Dragon Ball Universe",
+      "characters": 2449,
+      "sha256": "9b3c937b137773e11889194b13b226412e40f3049e54c98895c198d1fcb766bc"
+    },
+    {
+      "slug": "lesser-mutation",
+      "url": "https://dbu-rpg.com/lesser-mutation/",
+      "title": "Lesser Mutation – Dragon Ball Universe",
+      "characters": 661,
+      "sha256": "259d50fad06cdb14d7bb9d48d27a6c32e24675854cdd4f2acb65b4359c956b1e"
+    },
+    {
+      "slug": "light-blade",
+      "url": "https://dbu-rpg.com/light-blade/",
+      "title": "Light Blade – Dragon Ball Universe",
+      "characters": 3375,
+      "sha256": "b3f32af173919ae8107e69fde77e7f25ec7efd78930066b087a28d915ae01f62"
+    },
+    {
+      "slug": "lightspeed-mode",
+      "url": "https://dbu-rpg.com/lightspeed-mode/",
+      "title": "Lightspeed Mode – Dragon Ball Universe",
+      "characters": 4666,
+      "sha256": "92246bc5ac9796c06158c46d9eed7d45de4c170709a1f0723a79e8eed9e405f7"
+    },
+    {
+      "slug": "limit-shattering-blaze",
+      "url": "https://dbu-rpg.com/limit-shattering-blaze/",
+      "title": "Limit-Shattering Blaze – Dragon Ball Universe",
+      "characters": 2199,
+      "sha256": "a3e229f536f95c50eb3456f9064a75866c04b90c1a30a2a532ddfcda34f7988e"
+    },
+    {
+      "slug": "limitless-ki",
+      "url": "https://dbu-rpg.com/limitless-ki/",
+      "title": "Limitless Ki – Dragon Ball Universe",
+      "characters": 1167,
+      "sha256": "fa102bc8519c0aa72baa3bccc8d627061eb9fecc497f51cd6112e3909de91fae"
+    },
+    {
+      "slug": "limitless-saiyan",
+      "url": "https://dbu-rpg.com/limitless-saiyan/",
+      "title": "Limitless Saiyan – Dragon Ball Universe",
+      "characters": 2516,
+      "sha256": "20243136686e21eddf4ae79883ebec494a673430fa5a83cc9e4118f6009d7d92"
+    },
+    {
+      "slug": "liquid-metal",
+      "url": "https://dbu-rpg.com/liquid-metal/",
+      "title": "Liquid Metal – Dragon Ball Universe",
+      "characters": 6968,
+      "sha256": "6b902627736912e5b8db6f0ea4da9bc5abfedf394ee51b0e9b4aedd3152603cf"
+    },
+    {
+      "slug": "lockdown-fighter",
+      "url": "https://dbu-rpg.com/lockdown-fighter/",
+      "title": "Lockdown Fighter – Dragon Ball Universe",
+      "characters": 1697,
+      "sha256": "305803e4ab6867102c0c73872be5d058a6c7454148cfdfd0cb8aaaa410070083"
+    },
+    {
+      "slug": "lone-buccaneer",
+      "url": "https://dbu-rpg.com/lone-buccaneer/",
+      "title": "Lone Buccaneer – Dragon Ball Universe",
+      "characters": 1655,
+      "sha256": "22715c4b90e2388f2adc52c0bf80d0a2eeeb4d0ea286344153d34131f2a900b7"
+    },
+    {
+      "slug": "lone-warrior",
+      "url": "https://dbu-rpg.com/lone-warrior/",
+      "title": "Lone Warrior – Dragon Ball Universe",
+      "characters": 1821,
+      "sha256": "efcd1c2536738ba9fa8daf5d01c3b9bb66f1fb17b5d756d6da4da3b833c50e3e"
+    },
+    {
+      "slug": "lovely-formation",
+      "url": "https://dbu-rpg.com/lovely-formation/",
+      "title": "Lovely Formation – Dragon Ball Universe",
+      "characters": 2814,
+      "sha256": "c0529bf808e5d50383186f54ead7fa45a16e7f1a470b245620596e281b24558b"
+    },
+    {
+      "slug": "machine-mutant",
+      "url": "https://dbu-rpg.com/machine-mutant/",
+      "title": "Machine Mutant – Dragon Ball Universe",
+      "characters": 1508,
+      "sha256": "8834687786b1df90600c58ab7b6c15452cba2c556dce6aba4398e345cb639fa6"
+    },
+    {
+      "slug": "magic-manifestation",
+      "url": "https://dbu-rpg.com/magic-manifestation/",
+      "title": "Magic Manifestation – Dragon Ball Universe",
+      "characters": 3654,
+      "sha256": "47f3537bd09b8c83b8dc43a164afba9fe8c13cbbb1d94563c71d65cd6f64c07c"
+    },
+    {
+      "slug": "majin-mark",
+      "url": "https://dbu-rpg.com/majin-mark/",
+      "title": "Majin Mark – Dragon Ball Universe",
+      "characters": 1704,
+      "sha256": "a5d2837e3645368aa73f215fbcee8b68187251e4560a3e4f30d7825d1139893e"
+    },
+    {
+      "slug": "majin-power",
+      "url": "https://dbu-rpg.com/majin-power/",
+      "title": "Majin Power – Dragon Ball Universe",
+      "characters": 3343,
+      "sha256": "74d70e80abb7836d63e2a81c16ba2e0a2f6eebbfbe3a2bdd7bb48cb452a43722"
+    },
+    {
+      "slug": "majins",
+      "url": "https://dbu-rpg.com/majins/",
+      "title": "Majins – Dragon Ball Universe",
+      "characters": 17836,
+      "sha256": "0fec8fc681763b1c07918e1c1f014e7e3985cf968cfb987a35409cc3af1fdd8a"
+    },
+    {
+      "slug": "makyo-star",
+      "url": "https://dbu-rpg.com/makyo-star/",
+      "title": "Makyo Star – Dragon Ball Universe",
+      "characters": 1308,
+      "sha256": "7d33c3c4d9dafd76b4bf9cf2df5bd1fbd18ebba975a1d91331df0f2f5fb57620"
+    },
+    {
+      "slug": "martial-focus",
+      "url": "https://dbu-rpg.com/martial-focus/",
+      "title": "Martial Focus – Dragon Ball Universe",
+      "characters": 5863,
+      "sha256": "9d8d7d8fe2ae9d0451de64e848d82af0b2c202c4c36df986ab2fbed241affb0b"
+    },
+    {
+      "slug": "martial-prowess",
+      "url": "https://dbu-rpg.com/martial-prowess/",
+      "title": "Martial Prowess – Dragon Ball Universe",
+      "characters": 1249,
+      "sha256": "acd87e9874a0f23df09c3e29454382de774248fa94e1e892bf0fd93b972b09fc"
+    },
+    {
+      "slug": "martial-skill",
+      "url": "https://dbu-rpg.com/martial-skill/",
+      "title": "Martial Skill – Dragon Ball Universe",
+      "characters": 2826,
+      "sha256": "9525198282ac1bb37f0ba4e430f6658b9d39996b426743ff024778832c40d10d"
+    },
+    {
+      "slug": "marvelous-master",
+      "url": "https://dbu-rpg.com/marvelous-master/",
+      "title": "Marvelous Master – Dragon Ball Universe",
+      "characters": 2900,
+      "sha256": "1e6b4041b83d66f5102517e7b368934c97be8c926d8b21f7bcd68de3c23b30b7"
+    },
+    {
+      "slug": "masked-warrior",
+      "url": "https://dbu-rpg.com/masked-warrior/",
+      "title": "Masked Warrior – Dragon Ball Universe",
+      "characters": 1535,
+      "sha256": "caf79bd2b113ad1d3915ef63183a9b89fa30e0865c06dfcec6b63b53f8854f60"
+    },
+    {
+      "slug": "mass-consumption",
+      "url": "https://dbu-rpg.com/mass-consumption/",
+      "title": "Mass Consumption – Dragon Ball Universe",
+      "characters": 2243,
+      "sha256": "5572b49dfad15c7397623f32fcb8434f0cf32cd3c6531c8f72ed4f3f481584e2"
+    },
+    {
+      "slug": "mass-fusion",
+      "url": "https://dbu-rpg.com/mass-fusion/",
+      "title": "Mass-Fusion – Dragon Ball Universe",
+      "characters": 2632,
+      "sha256": "acd38eaca281ce45454e86a5be7cb30aa64226c2889286e8550d3c39e5995423"
+    },
+    {
+      "slug": "master-class",
+      "url": "https://dbu-rpg.com/master-class/",
+      "title": "Master Class – Dragon Ball Universe",
+      "characters": 20406,
+      "sha256": "eab31edc6a6872a0b50b1b29f275b8467cf750d1433ec65cdeccf94a768b1886"
+    },
+    {
+      "slug": "master-of-ki",
+      "url": "https://dbu-rpg.com/master-of-ki/",
+      "title": "Master of Ki – Dragon Ball Universe",
+      "characters": 1604,
+      "sha256": "ff60160bf7738a4b1e70808acb52137ea88b4d530883468e9409c075fa1fabf4"
+    },
+    {
+      "slug": "master-of-many-hands",
+      "url": "https://dbu-rpg.com/master-of-many-hands/",
+      "title": "Master of Many Hands – Dragon Ball Universe",
+      "characters": 1565,
+      "sha256": "298ed14b67c486516c82dbbdd3e3ae742f7b2d012892ebf950d807f755af218e"
+    },
+    {
+      "slug": "master-of-martial-arts",
+      "url": "https://dbu-rpg.com/master-of-martial-arts/",
+      "title": "Master of Martial Arts – Dragon Ball Universe",
+      "characters": 4719,
+      "sha256": "5a8e7544bfb3bde8aa4af6a56f778c9bda887676f6b172a2ceb832cfce12f34b"
+    },
+    {
+      "slug": "mastery-of-the-self",
+      "url": "https://dbu-rpg.com/mastery-of-the-self/",
+      "title": "Mastery of the Self – Dragon Ball Universe",
+      "characters": 1343,
+      "sha256": "beed2abc2495d36e1f5ad20086990df7aa7a0c6183f1666812c20b496bd1b613"
+    },
+    {
+      "slug": "maximum-super-saiyan-3",
+      "url": "https://dbu-rpg.com/maximum-super-saiyan-3/",
+      "title": "Maximum Super Saiyan 3 – Dragon Ball Universe",
+      "characters": 2303,
+      "sha256": "6a71f705b86c8005f5c0b5a5c4b20c098fcd312d6b3510a78538907cbd50b116"
+    },
+    {
+      "slug": "megath",
+      "url": "https://dbu-rpg.com/megath/",
+      "title": "Megath – Dragon Ball Universe",
+      "characters": 985,
+      "sha256": "6bf6a4787c994aefaf32aad73ed3ae732bfb72b7442c889dda951115e7929894"
+    },
+    {
+      "slug": "meta-form",
+      "url": "https://dbu-rpg.com/meta-form/",
+      "title": "Meta Form – Dragon Ball Universe",
+      "characters": 4470,
+      "sha256": "7c9644d7e68d10738b83730f0430e8e17a1fca4d2da38752059df130c4a263d9"
+    },
+    {
+      "slug": "metamorphosis",
+      "url": "https://dbu-rpg.com/metamorphosis/",
+      "title": "Metamorphosis – Dragon Ball Universe",
+      "characters": 8434,
+      "sha256": "01b2906f7310fff8a15f129b34e319b936bf204c7c3c0141f12a99cf158c3cc4"
+    },
+    {
+      "slug": "mightiest-android",
+      "url": "https://dbu-rpg.com/mightiest-android/",
+      "title": "Mightiest Android – Dragon Ball Universe",
+      "characters": 2428,
+      "sha256": "eba6940f75acf59984567f0538cc5154f5af83b02a524b9b173b0e651bb37b6a"
+    },
+    {
+      "slug": "mightiest-majin",
+      "url": "https://dbu-rpg.com/mightiest-majin/",
+      "title": "Mightiest Majin – Dragon Ball Universe",
+      "characters": 2327,
+      "sha256": "8d1813b8cde16dbee964261dcebea3e79e953b7ca88e5fe1ff0353b50ec3b84c"
+    },
+    {
+      "slug": "mighty-namekian",
+      "url": "https://dbu-rpg.com/mighty-namekian/",
+      "title": "Mighty Namekian – Dragon Ball Universe",
+      "characters": 1629,
+      "sha256": "ec7755efe0d6fe13d21289c5ddadc6ef046ce30243fe97a0038541bcf24e899a"
+    },
+    {
+      "slug": "mode-change",
+      "url": "https://dbu-rpg.com/mode-change/",
+      "title": "Mode Change – Dragon Ball Universe",
+      "characters": 7352,
+      "sha256": "b4064fb6d915611359f52a589e2eebdf5870b8d0a1bdefdea2acf1016ed47d25"
+    },
+    {
+      "slug": "monster-form",
+      "url": "https://dbu-rpg.com/monster-form/",
+      "title": "Monster Form – Dragon Ball Universe",
+      "characters": 5182,
+      "sha256": "6b1da559e3707180f67cb7454aa2aee94d1ccfe7f1adae69cdf077ee0e4da498"
+    },
+    {
+      "slug": "monster",
+      "url": "https://dbu-rpg.com/monster/",
+      "title": "Monster – Dragon Ball Universe",
+      "characters": 7247,
+      "sha256": "d70d93585ad66504c94fa54df181ff7691172d6a6511b691a08f8119b2ade1eb"
+    },
+    {
+      "slug": "monstrous-traits",
+      "url": "https://dbu-rpg.com/monstrous-traits/",
+      "title": "Monstrous Traits – Dragon Ball Universe",
+      "characters": 17450,
+      "sha256": "86549296f9097335a95b36285873be0db5d7f9c46c895acede502d8787bb7b6b"
+    },
+    {
+      "slug": "mortal-flames",
+      "url": "https://dbu-rpg.com/mortal-flames/",
+      "title": "Mortal Flames – Dragon Ball Universe",
+      "characters": 2789,
+      "sha256": "68ef712bd119f8e095fe3f75452a8ac6e9250021d82be2bdfcebdba353cf1d53"
+    },
+    {
+      "slug": "mortal-mentality",
+      "url": "https://dbu-rpg.com/mortal-mentality/",
+      "title": "Mortal Mentality – Dragon Ball Universe",
+      "characters": 2859,
+      "sha256": "58876e903bccb0ab3728c68cd813aae3286e17901a254e7d8f1dd37b6becf719"
+    },
+    {
+      "slug": "mortal-power",
+      "url": "https://dbu-rpg.com/mortal-power/",
+      "title": "Mortal Power – Dragon Ball Universe",
+      "characters": 2970,
+      "sha256": "2a55679332e59157cba4e2346c17944d387dd752fe92c6e922028e96608951eb"
+    },
+    {
+      "slug": "muscular-form",
+      "url": "https://dbu-rpg.com/muscular-form/",
+      "title": "Muscular Form – Dragon Ball Universe",
+      "characters": 1363,
+      "sha256": "ec6aed34a94bf09cbea6e5e82501b6b97ff4c07c36bb8cf763acb283050b5320"
+    },
+    {
+      "slug": "mushin",
+      "url": "https://dbu-rpg.com/mushin/",
+      "title": "Mushin – Dragon Ball Universe",
+      "characters": 3424,
+      "sha256": "2900e1d235a52786fe623f3b23aeb8cf2baba5731d674a4d87157bb6f8478267"
+    },
+    {
+      "slug": "mutation",
+      "url": "https://dbu-rpg.com/mutation/",
+      "title": "Mutation – Dragon Ball Universe",
+      "characters": 8843,
+      "sha256": "d76879814e9ceaa8b2492ce6c034a85bed022e0abbbf6f8e4a3897a0ac96bdaf"
+    },
+    {
+      "slug": "mystical-might",
+      "url": "https://dbu-rpg.com/mystical-might/",
+      "title": "Mystical Might – Dragon Ball Universe",
+      "characters": 1989,
+      "sha256": "85bb71031c2d21de3443524529539086e90bc7baeca5d1d5260890ff88272992"
+    },
+    {
+      "slug": "namekian-glare",
+      "url": "https://dbu-rpg.com/namekian-glare/",
+      "title": "Namekian Glare – Dragon Ball Universe",
+      "characters": 2405,
+      "sha256": "b01db0587ede17d04d87826d8b98878b91e55403a0e253ccdfb92d623e18b306"
+    },
+    {
+      "slug": "namekian-potential",
+      "url": "https://dbu-rpg.com/namekian-potential/",
+      "title": "Namekian Potential – Dragon Ball Universe",
+      "characters": 2849,
+      "sha256": "27662058bfde447018c04c24767308879075586b066cd17ac3193862934b509f"
+    },
+    {
+      "slug": "namekian-power",
+      "url": "https://dbu-rpg.com/namekian-power/",
+      "title": "Namekian Power – Dragon Ball Universe",
+      "characters": 3126,
+      "sha256": "9f3c934d984d2bbfb172986d93352fd7093e039e506d5cbe3ba3631250f9866f"
+    },
+    {
+      "slug": "namekian-prodigy",
+      "url": "https://dbu-rpg.com/namekian-prodigy/",
+      "title": "Namekian Prodigy – Dragon Ball Universe",
+      "characters": 1667,
+      "sha256": "f8925e856eefd9c301a7edb838693dde5cbbd689b388b45c40ae98157bc37fd2"
+    },
+    {
+      "slug": "namekians",
+      "url": "https://dbu-rpg.com/namekians/",
+      "title": "Namekians – Dragon Ball Universe",
+      "characters": 15306,
+      "sha256": "66f2410aec52c90d46ccc5096e3c1d5ce64913c5101f46f6d7b60bb4ee1c9e3b"
+    },
+    {
+      "slug": "natural-evolution",
+      "url": "https://dbu-rpg.com/natural-evolution/",
+      "title": "Natural Evolution – Dragon Ball Universe",
+      "characters": 1360,
+      "sha256": "8d92791c5514a62c967820d7fa8753dcdb3e3cd4378f7e45e66c96d4222678b7"
+    },
+    {
+      "slug": "negative-aura",
+      "url": "https://dbu-rpg.com/negative-aura/",
+      "title": "Negative Aura – Dragon Ball Universe",
+      "characters": 4363,
+      "sha256": "9e2f8c7a33374526c487cafb2c9339cffa67f7f200ed1798aa7ac44fb0b50452"
+    },
+    {
+      "slug": "negative-power",
+      "url": "https://dbu-rpg.com/negative-power/",
+      "title": "Negative Power – Dragon Ball Universe",
+      "characters": 3404,
+      "sha256": "635f0174a8348f54427e6fb15873da6eb413ce344697ddf867eb5237fe8a6bc9"
+    },
+    {
+      "slug": "neko-majins",
+      "url": "https://dbu-rpg.com/neko-majins/",
+      "title": "Neko Majins – Dragon Ball Universe",
+      "characters": 7885,
+      "sha256": "035473ef8146a13c73c0054179fbddcd7a6bfafeb296103346c4a1f348c2d81f"
+    },
+    {
+      "slug": "neko-power",
+      "url": "https://dbu-rpg.com/neko-power/",
+      "title": "Neko Power – Dragon Ball Universe",
+      "characters": 3335,
+      "sha256": "6437601fab5f9765501f2e1f0fd79eb5e847133dc8bb78173f10367715a92354"
+    },
+    {
+      "slug": "neo-power",
+      "url": "https://dbu-rpg.com/neo-power/",
+      "title": "Neo Power – Dragon Ball Universe",
+      "characters": 3454,
+      "sha256": "f7132392b6db018c3f9b539c4d59718db9a4dfa571008e3c7e6c8c2e7abd6369"
+    },
+    {
+      "slug": "neo-tuffles",
+      "url": "https://dbu-rpg.com/neo-tuffles/",
+      "title": "Neo-Tuffles – Dragon Ball Universe",
+      "characters": 10360,
+      "sha256": "48e315ea108207bd5ecaf4efe10820a001930ae989ccc074210eeac3d66e96d9"
+    },
+    {
+      "slug": "nimbus-pro",
+      "url": "https://dbu-rpg.com/nimbus-pro/",
+      "title": "Nimbus Pro – Dragon Ball Universe",
+      "characters": 2844,
+      "sha256": "e38940aac7940286d1b2396fef0525442a28e044796da4420d76bc4e0911186e"
+    },
+    {
+      "slug": "ninja",
+      "url": "https://dbu-rpg.com/ninja/",
+      "title": "Ninja – Dragon Ball Universe",
+      "characters": 4939,
+      "sha256": "0aaa4c0ec48092d370b19b122769ec4d723e27f193ea13f41e0177c491a05f01"
+    },
+    {
+      "slug": "no-ego-zone",
+      "url": "https://dbu-rpg.com/no-ego-zone/",
+      "title": "No Ego Zone – Dragon Ball Universe",
+      "characters": 5230,
+      "sha256": "cafd4c917a7c03ebd50fe94e23b898837526d5271a03db4a0f5cb9f67696d9d2"
+    },
+    {
+      "slug": "ocular-acclimation",
+      "url": "https://dbu-rpg.com/ocular-acclimation/",
+      "title": "Ocular Acclimation – Dragon Ball Universe",
+      "characters": 1925,
+      "sha256": "c0d0be23e024d560e0d074bf1eafef6644d3f56364a26fafd0798d81a340f696"
+    },
+    {
+      "slug": "og-soldier",
+      "url": "https://dbu-rpg.com/og-soldier/",
+      "title": "OG Soldier – Dragon Ball Universe",
+      "characters": 2090,
+      "sha256": "5caa7e766b20ba2a2e7cdea0f88787d495fb7b8df0fd2d413a6e4e9832983267"
+    },
+    {
+      "slug": "omega",
+      "url": "https://dbu-rpg.com/omega/",
+      "title": "Omega – Dragon Ball Universe",
+      "characters": 2612,
+      "sha256": "6648ca82af02f3ca66b09ac4e7791cedec7be35dd9481c8ddd24047e2b7c6e74"
+    },
+    {
+      "slug": "ominous-saiyan",
+      "url": "https://dbu-rpg.com/ominous-saiyan/",
+      "title": "Ominous Saiyan – Dragon Ball Universe",
+      "characters": 1278,
+      "sha256": "b94cad199e18f06d5b494cc315d49382e99b0bf2edcb99fe88ebb6c0fb6fad25"
+    },
+    {
+      "slug": "one-with-nature",
+      "url": "https://dbu-rpg.com/one-with-nature/",
+      "title": "One with Nature – Dragon Ball Universe",
+      "characters": 991,
+      "sha256": "22a27670c0c9915a58220f223357f031caa89da24a605a848779e435f5613568"
+    },
+    {
+      "slug": "oozaru-burst",
+      "url": "https://dbu-rpg.com/oozaru-burst/",
+      "title": "Oozaru Burst – Dragon Ball Universe",
+      "characters": 2263,
+      "sha256": "031269272f4e1117df591182be838e7e3e704f650c985cb1cd2ece7176b057b7"
+    },
+    {
+      "slug": "oozaru",
+      "url": "https://dbu-rpg.com/oozaru/",
+      "title": "Oozaru – Dragon Ball Universe",
+      "characters": 3433,
+      "sha256": "8ee49df9256a189c5041befd03d32632043e0f5f2f1e220f73f752426c8079ad"
+    },
+    {
+      "slug": "otherworldly-class-up",
+      "url": "https://dbu-rpg.com/otherworldly-class-up/",
+      "title": "Otherworldly Class Up – Dragon Ball Universe",
+      "characters": 1726,
+      "sha256": "511464a4f86ad89d953ac3869308b6f78a8931fdbec7b569564d00487f64e15b"
+    },
+    {
+      "slug": "overdrive",
+      "url": "https://dbu-rpg.com/overdrive/",
+      "title": "Overdrive – Dragon Ball Universe",
+      "characters": 3788,
+      "sha256": "ea3a0228e0eac82d5d67dee1a4d1cea22cb1568725b4c9e16490755304578977"
+    },
+    {
+      "slug": "overtaken",
+      "url": "https://dbu-rpg.com/overtaken/",
+      "title": "Overtaken – Dragon Ball Universe",
+      "characters": 3613,
+      "sha256": "9b9dd0b9230866c2850a321e1b4bf8b8a027d211f420bfc8361db006a4e37c73"
+    },
+    {
+      "slug": "path-of-control",
+      "url": "https://dbu-rpg.com/path-of-control/",
+      "title": "Path of Control – Dragon Ball Universe",
+      "characters": 1204,
+      "sha256": "6ca3a1bc7256c570bb89cde5d544b7d5559499b7302b7c10e33aa3d8245e330b"
+    },
+    {
+      "slug": "path-of-might",
+      "url": "https://dbu-rpg.com/path-of-might/",
+      "title": "Path of Might – Dragon Ball Universe",
+      "characters": 2259,
+      "sha256": "e293c2d47ebeb726e530dfee6974d76954fc9b17a75ee64cb754f0c467be7165"
+    },
+    {
+      "slug": "path-of-resilience",
+      "url": "https://dbu-rpg.com/path-of-resilience/",
+      "title": "Path of Resilience – Dragon Ball Universe",
+      "characters": 1714,
+      "sha256": "ee83706f823b7fd092267cd98dd16bfc83235b42be0b79c40aafb57779188356"
+    },
+    {
+      "slug": "path-of-speed",
+      "url": "https://dbu-rpg.com/path-of-speed/",
+      "title": "Path of Speed – Dragon Ball Universe",
+      "characters": 1882,
+      "sha256": "f82968220154ac0b5b44ceedf7d85ce9511ebdaf83c9a10a9696c778c90d782f"
+    },
+    {
+      "slug": "path-of-the-heart",
+      "url": "https://dbu-rpg.com/path-of-the-heart/",
+      "title": "Path of the Heart – Dragon Ball Universe",
+      "characters": 1218,
+      "sha256": "efd303be345fc3fd4499d0ea67efcdb089c43d369897855734d019ed21bff6d1"
+    },
+    {
+      "slug": "path-of-the-scholar",
+      "url": "https://dbu-rpg.com/path-of-the-scholar/",
+      "title": "Path of the Scholar – Dragon Ball Universe",
+      "characters": 1648,
+      "sha256": "a5773b73dde67ef6b653e0041298baedf980e2c518a1f3b9ae9286c53b159afc"
+    },
+    {
+      "slug": "peak-condition",
+      "url": "https://dbu-rpg.com/peak-condition/",
+      "title": "Peak Condition – Dragon Ball Universe",
+      "characters": 1215,
+      "sha256": "8569153504e9ec7256853a8e664462522951ed80cac9cd571dccb44e77e8906b"
+    },
+    {
+      "slug": "perfect-positioning",
+      "url": "https://dbu-rpg.com/perfect-positioning/",
+      "title": "Perfect Positioning – Dragon Ball Universe",
+      "characters": 1603,
+      "sha256": "5ff249993317b1d99a8966277a323fb3347d1a032a3454a7020904ef43cf3283"
+    },
+    {
+      "slug": "perfected-constraint",
+      "url": "https://dbu-rpg.com/perfected-constraint/",
+      "title": "Perfected Constraint – Dragon Ball Universe",
+      "characters": 1391,
+      "sha256": "ca438b5fd127dd42955f9d4ef65a87d78bd7b4597a46f6f40664ab12a9694151"
+    },
+    {
+      "slug": "perfected-super-saiyan",
+      "url": "https://dbu-rpg.com/perfected-super-saiyan/",
+      "title": "Perfected Super Saiyan – Dragon Ball Universe",
+      "characters": 5770,
+      "sha256": "7c4523303b59c31e79306a97e572a37ba2183cf4f1e472caec02e5329b6999d5"
+    },
+    {
+      "slug": "perfected-technique",
+      "url": "https://dbu-rpg.com/perfected-technique/",
+      "title": "Perfected Technique – Dragon Ball Universe",
+      "characters": 1616,
+      "sha256": "50243fb72fe362b86ef7c2df8efc4cadb7ee9b558d460dae80d1a5023d17f4c3"
+    },
+    {
+      "slug": "perfection",
+      "url": "https://dbu-rpg.com/perfection/",
+      "title": "Perfection – Dragon Ball Universe",
+      "characters": 6416,
+      "sha256": "68072678f257e3e3a3cd634da55d7231424056d42905bdeed2b59dc422a6226f"
+    },
+    {
+      "slug": "performer",
+      "url": "https://dbu-rpg.com/performer/",
+      "title": "Performer – Dragon Ball Universe",
+      "characters": 1861,
+      "sha256": "19d44af846f0c87b1e82913ce2d929a68f7cfe7ebd4690e25a0167cae0120c86"
+    },
+    {
+      "slug": "poisoner",
+      "url": "https://dbu-rpg.com/poisoner/",
+      "title": "Poisoner – Dragon Ball Universe",
+      "characters": 2895,
+      "sha256": "cd6ceb06458449ba3095448f586b12260bd85b4687d7aa5af9f8ac26b4d23e8a"
+    },
+    {
+      "slug": "potential-unleashed",
+      "url": "https://dbu-rpg.com/potential-unleashed/",
+      "title": "Potential Unleashed – Dragon Ball Universe",
+      "characters": 4555,
+      "sha256": "aa35c9501e50cac702edb4cc9ecdae3a5d90e8c121be688d23236e773aef7512"
+    },
+    {
+      "slug": "power-boost",
+      "url": "https://dbu-rpg.com/power-boost/",
+      "title": "Power Boost – Dragon Ball Universe",
+      "characters": 3563,
+      "sha256": "d78f60360709991e2f2db9b9827f87c6ed17b65dcf2d84891ae5d5c299bfe068"
+    },
+    {
+      "slug": "power-of-a-demon-god",
+      "url": "https://dbu-rpg.com/power-of-a-demon-god/",
+      "title": "Power of a Demon God – Dragon Ball Universe",
+      "characters": 3068,
+      "sha256": "c78247a0f9a57ffafa663aaf589e697294b782415ecd143b5fe8bccea93daf80"
+    },
+    {
+      "slug": "power-of-a-god",
+      "url": "https://dbu-rpg.com/power-of-a-god/",
+      "title": "Power of a God – Dragon Ball Universe",
+      "characters": 2718,
+      "sha256": "99a3bfd34dba552efaa1b4c8eeee7291587ce630c633b145f1e5913e692998a5"
+    },
+    {
+      "slug": "power-of-destruction",
+      "url": "https://dbu-rpg.com/power-of-destruction/",
+      "title": "Power of Destruction – Dragon Ball Universe",
+      "characters": 5608,
+      "sha256": "395f678888b6b4db98d28b04de8d07225ae9cf5be45172c9bf02c883d625880d"
+    },
+    {
+      "slug": "power-stressed",
+      "url": "https://dbu-rpg.com/power-stressed/",
+      "title": "Power Stressed – Dragon Ball Universe",
+      "characters": 874,
+      "sha256": "ac2f2f5b37901884e8c1fd497c560453337ea4e9a048c57136f982dfa6dd69e3"
+    },
+    {
+      "slug": "powerhouse",
+      "url": "https://dbu-rpg.com/powerhouse/",
+      "title": "Powerhouse – Dragon Ball Universe",
+      "characters": 2852,
+      "sha256": "faf00c9e09b2cdbe457349100f10628a3c538aeebe1f3751b7605a019956cc4e"
+    },
+    {
+      "slug": "prescient-sight",
+      "url": "https://dbu-rpg.com/prescient-sight/",
+      "title": "Prescient Sight – Dragon Ball Universe",
+      "characters": 3055,
+      "sha256": "5b37160b90f7cf9e1c814ccdaf2b33a7080046805cf43ce51b082787abf25ff7"
+    },
+    {
+      "slug": "primal-class-up",
+      "url": "https://dbu-rpg.com/primal-class-up/",
+      "title": "Primal Class Up – Dragon Ball Universe",
+      "characters": 1966,
+      "sha256": "5e00b2975638ec0d794ee14582a274b1baf585bc1ae20ac1b1a9093754fdb3d6"
+    },
+    {
+      "slug": "primal-connection",
+      "url": "https://dbu-rpg.com/primal-connection/",
+      "title": "Primal Connection – Dragon Ball Universe",
+      "characters": 1762,
+      "sha256": "5c9e8895e9a86834702eff7a2f5861325f63111a86bb68bc3689ccbc179e4bab"
+    },
+    {
+      "slug": "primordial-majin",
+      "url": "https://dbu-rpg.com/primordial-majin/",
+      "title": "Primordial Majin – Dragon Ball Universe",
+      "characters": 2659,
+      "sha256": "208618d7dcbaa120b6d78a5a4be733a016c47e17e220cc8b72777d94ff5a098c"
+    },
+    {
+      "slug": "principles-of-kaioken",
+      "url": "https://dbu-rpg.com/principles-of-kaioken/",
+      "title": "Principles of Kaioken – Dragon Ball Universe",
+      "characters": 1342,
+      "sha256": "13213a6dafb008ced7e2a33dbbc5e4a3c1e2615e94d8a98a9864c151f2b7b8f0"
+    },
+    {
+      "slug": "progression",
+      "url": "https://dbu-rpg.com/progression/",
+      "title": "Progression – Dragon Ball Universe",
+      "characters": 12237,
+      "sha256": "1df14c67a104f3c5fa747ff0540574f0b71c64d5a6330101b53ccd6e8a4b4ff2"
+    },
+    {
+      "slug": "pseudo-super-saiyan",
+      "url": "https://dbu-rpg.com/pseudo-super-saiyan/",
+      "title": "Pseudo Super Saiyan – Dragon Ball Universe",
+      "characters": 1411,
+      "sha256": "4ed3c4b4543611951c4968b9cac475878112077ee9a42c544b9deb1047e97efc"
+    },
+    {
+      "slug": "pure-form",
+      "url": "https://dbu-rpg.com/pure-form/",
+      "title": "Pure Form – Dragon Ball Universe",
+      "characters": 6686,
+      "sha256": "68d04a3c8d77563b3b23f3bb1df1ac2254c7eafe00d1a280f249a76233012283"
+    },
+    {
+      "slug": "pure-progress",
+      "url": "https://dbu-rpg.com/pure-progress/",
+      "title": "Pure Progress – Dragon Ball Universe",
+      "characters": 2861,
+      "sha256": "016336308239fabc4d5bdde72def0ab20c20af7cd162e430cbb469e7e241e15a"
+    },
+    {
+      "slug": "purified-dragon",
+      "url": "https://dbu-rpg.com/purified-dragon/",
+      "title": "Purified Dragon – Dragon Ball Universe",
+      "characters": 1299,
+      "sha256": "82504d73185baf85bed200a790c21259943aa49ba94bb60460eba0f52d890068"
+    },
+    {
+      "slug": "rabbit-hoard",
+      "url": "https://dbu-rpg.com/rabbit-hoard/",
+      "title": "Rabbit Hoard – Dragon Ball Universe",
+      "characters": 932,
+      "sha256": "258175ccdb2e9465ba32511b8ddaa7e4595e970b08d41dceb9329802ff73b231"
+    },
+    {
+      "slug": "racial-factors",
+      "url": "https://dbu-rpg.com/racial-factors/",
+      "title": "Racial Factors – Dragon Ball Universe",
+      "characters": 1930,
+      "sha256": "6b28a5619c39089a037f6a54bd62498b272c1cfa446f1108f09c5f40c36e49b0"
+    },
+    {
+      "slug": "racial-rules",
+      "url": "https://dbu-rpg.com/racial-rules/",
+      "title": "Racial Rules – Dragon Ball Universe",
+      "characters": 3975,
+      "sha256": "a98bcc7c77194c23a01548055377930f4540079d6d98c63bbeaeddaa5b48e115"
+    },
+    {
+      "slug": "rampage-form",
+      "url": "https://dbu-rpg.com/rampage-form/",
+      "title": "Rampage Form – Dragon Ball Universe",
+      "characters": 1314,
+      "sha256": "ffae61bd5bc76bf1d24e572996d955bb5cf46f7029c324aa521253fac6b76e9d"
+    },
+    {
+      "slug": "rebellious-spirit",
+      "url": "https://dbu-rpg.com/rebellious-spirit/",
+      "title": "Rebellious Spirit – Dragon Ball Universe",
+      "characters": 2876,
+      "sha256": "cc29ffac6799b91f422cc3cc3dd7a7ea1ba7576d271e935fd0c49a04aa1111df"
+    },
+    {
+      "slug": "reborn-potential",
+      "url": "https://dbu-rpg.com/reborn-potential/",
+      "title": "Reborn Potential – Dragon Ball Universe",
+      "characters": 1324,
+      "sha256": "ebc9f599f7e2e6542351ef2f0091e2f103ddeeeed449c419a0f63bfbd51b380e"
+    },
+    {
+      "slug": "reclaimed-heritage",
+      "url": "https://dbu-rpg.com/reclaimed-heritage/",
+      "title": "Reclaimed Heritage – Dragon Ball Universe",
+      "characters": 982,
+      "sha256": "25d32cef18da9c0e5ba813a9b5b27d3c422c98c149b43224ce04aee96bf2f286"
+    },
+    {
+      "slug": "red-eyed-namekian",
+      "url": "https://dbu-rpg.com/red-eyed-namekian/",
+      "title": "Red-Eyed Namekian – Dragon Ball Universe",
+      "characters": 4917,
+      "sha256": "bdafe93d255ec4a3578f6c2d3d9d3099cafaa8033e9dc1f7274e73123bcc1a23"
+    },
+    {
+      "slug": "reincarnated",
+      "url": "https://dbu-rpg.com/reincarnated/",
+      "title": "Reincarnated – Dragon Ball Universe",
+      "characters": 1368,
+      "sha256": "24a0abe7ffb82363e59417ea4c9ec5175b982625be0137a6539839cda60dbb00"
+    },
+    {
+      "slug": "relaxed-warrior",
+      "url": "https://dbu-rpg.com/relaxed-warrior/",
+      "title": "Relaxed Warrior – Dragon Ball Universe",
+      "characters": 2792,
+      "sha256": "231924a49fcda2954c2682b580ea6d5f100a9e72bdf6c34caf313b7671e49612"
+    },
+    {
+      "slug": "resolute-burst",
+      "url": "https://dbu-rpg.com/resolute-burst/",
+      "title": "Resolute Burst – Dragon Ball Universe",
+      "characters": 1630,
+      "sha256": "dca513df2a9d28e49a6a034947e11fb780a8c7c07a02135f0bfa337ae6327a7b"
+    },
+    {
+      "slug": "restrained-warrior",
+      "url": "https://dbu-rpg.com/restrained-warrior/",
+      "title": "Restrained Warrior – Dragon Ball Universe",
+      "characters": 1805,
+      "sha256": "b8a8ae7367e604d99eed35bfad1fdec6946f0479caf36cec955933d216692854"
+    },
+    {
+      "slug": "results-of-intense-training",
+      "url": "https://dbu-rpg.com/results-of-intense-training/",
+      "title": "Results of Intense Training – Dragon Ball Universe",
+      "characters": 915,
+      "sha256": "2251bce0dac32fe746995f51bdf5640e8fd8e2c773bafe18428f0606cad5b223"
+    },
+    {
+      "slug": "results-of-supreme-training",
+      "url": "https://dbu-rpg.com/results-of-supreme-training/",
+      "title": "Results of Supreme Training – Dragon Ball Universe",
+      "characters": 2188,
+      "sha256": "e98a119953842b06141726fda1a37d62e4cdc14d9c59e9c6bb14100083905366"
+    },
+    {
+      "slug": "results-of-training",
+      "url": "https://dbu-rpg.com/results-of-training/",
+      "title": "Results of Training – Dragon Ball Universe",
+      "characters": 1333,
+      "sha256": "975dbeec4c7b9870ae7b7a2ad5e2766a0271fe8404108fcb7078df86314331e8"
+    },
+    {
+      "slug": "revenger-charge",
+      "url": "https://dbu-rpg.com/revenger-charge/",
+      "title": "Revenger Charge – Dragon Ball Universe",
+      "characters": 1447,
+      "sha256": "f1fdf28289a23bee4af019b2e492efb556738284566d7377ab0e61b272c51172"
+    },
+    {
+      "slug": "ruler-of-time",
+      "url": "https://dbu-rpg.com/ruler-of-time/",
+      "title": "Ruler of Time – Dragon Ball Universe",
+      "characters": 4262,
+      "sha256": "c941a4f06d6e94bba8df90241effece19a34845983da4fd0c0f8da31d589d253"
+    },
+    {
+      "slug": "rushdown-fighter",
+      "url": "https://dbu-rpg.com/rushdown-fighter/",
+      "title": "Rushdown Fighter – Dragon Ball Universe",
+      "characters": 1970,
+      "sha256": "b352895f3a6c9f9da56c42fee3714162aab3ce19b0c1046316632d07d9ed0a4d"
+    },
+    {
+      "slug": "saibaking",
+      "url": "https://dbu-rpg.com/saibaking/",
+      "title": "Saibaking – Dragon Ball Universe",
+      "characters": 2768,
+      "sha256": "e4ac28113ae753c18a21361d9469c418f4ae70fccfd175008ceaf73456e5c46a"
+    },
+    {
+      "slug": "saiyan-ancestry",
+      "url": "https://dbu-rpg.com/saiyan-ancestry/",
+      "title": "Saiyan Ancestry – Dragon Ball Universe",
+      "characters": 1325,
+      "sha256": "4907f4b0ce3142936e32d238a65654d8aee39f35821924ca4a14ad195df63047"
+    },
+    {
+      "slug": "saiyan-elite",
+      "url": "https://dbu-rpg.com/saiyan-elite/",
+      "title": "Saiyan Elite – Dragon Ball Universe",
+      "characters": 1960,
+      "sha256": "fab017fd25e98a4e32523ec53052dd57fda5cf9e29adc3b121dca4c6cfb535ad"
+    },
+    {
+      "slug": "saiyan-pride",
+      "url": "https://dbu-rpg.com/saiyan-pride/",
+      "title": "Saiyan Pride – Dragon Ball Universe",
+      "characters": 3349,
+      "sha256": "0e081c3f4bf70da0b629c6a98daa6eaff2d528e6399fc9211f0b21c91f65178c"
+    },
+    {
+      "slug": "saiyan-prodigy",
+      "url": "https://dbu-rpg.com/saiyan-prodigy/",
+      "title": "Saiyan Prodigy – Dragon Ball Universe",
+      "characters": 2539,
+      "sha256": "27e78369125e3a9dd5b04f2528f8cd8165d0eb70f8e22d0563823d768bf7fb89"
+    },
+    {
+      "slug": "saiyans",
+      "url": "https://dbu-rpg.com/saiyans/",
+      "title": "Saiyans – Dragon Ball Universe",
+      "characters": 13505,
+      "sha256": "801570737c338e41e846e9b06600c13d2f23d50cb21e41e86af284ef7d3b7ec6"
+    },
+    {
+      "slug": "scholar",
+      "url": "https://dbu-rpg.com/scholar/",
+      "title": "Scholar – Dragon Ball Universe",
+      "characters": 1706,
+      "sha256": "95d6143e280fb2e31e414fc5daa4286621f99b8845f180995536b548569fbd1e"
+    },
+    {
+      "slug": "seasoned-warrior",
+      "url": "https://dbu-rpg.com/seasoned-warrior/",
+      "title": "Seasoned Warrior – Dragon Ball Universe",
+      "characters": 1713,
+      "sha256": "7036b92fd550208b41cf734f3b0074ba373f28ab3150554e579de188ee75ce2e"
+    },
+    {
+      "slug": "seeking-balance",
+      "url": "https://dbu-rpg.com/seeking-balance/",
+      "title": "Seeking Balance – Dragon Ball Universe",
+      "characters": 723,
+      "sha256": "93b6cf5918898592b0b76ab1d8e6d5bc26ddd3411bb1252330699300e4bdaeff"
+    },
+    {
+      "slug": "seeking-skill",
+      "url": "https://dbu-rpg.com/seeking-skill/",
+      "title": "Seeking Skill – Dragon Ball Universe",
+      "characters": 2028,
+      "sha256": "e1e47ee70e3debf29780e98bcbb72a35e1b0d501414e41b99dd9e2ff3d6a2224"
+    },
+    {
+      "slug": "seeking-strength",
+      "url": "https://dbu-rpg.com/seeking-strength/",
+      "title": "Seeking Strength – Dragon Ball Universe",
+      "characters": 1700,
+      "sha256": "ef0945935a49c1077b8db63c48602d7b2f181c5586069e62fbb53124486dfca4"
+    },
+    {
+      "slug": "seething-fury",
+      "url": "https://dbu-rpg.com/seething-fury/",
+      "title": "Seething Fury – Dragon Ball Universe",
+      "characters": 2064,
+      "sha256": "9a40f8db1edd6f2d98573f88672b0d19469ad7d71e342b5018e7fe456c929d0e"
+    },
+    {
+      "slug": "self-restraint",
+      "url": "https://dbu-rpg.com/self-restraint/",
+      "title": "Self-Restraint – Dragon Ball Universe",
+      "characters": 3037,
+      "sha256": "fa105e53441f70b528fc3edae2bada3533e410fc0433cdcaf85a49d3c515d365"
+    },
+    {
+      "slug": "serene-form",
+      "url": "https://dbu-rpg.com/serene-form/",
+      "title": "Serene Form – Dragon Ball Universe",
+      "characters": 1178,
+      "sha256": "86b0f1adb0158b037841311f991b02b1e9779f2b756e6f2bdc79db85b8f44ac2"
+    },
+    {
+      "slug": "shadow-dragons",
+      "url": "https://dbu-rpg.com/shadow-dragons/",
+      "title": "Shadow Dragons – Dragon Ball Universe",
+      "characters": 12628,
+      "sha256": "ac32b0aed01f0788cceacfd1afdd692264da3e1798dbe501f221bc23c3bc7bea"
+    },
+    {
+      "slug": "shapeshifting-focus",
+      "url": "https://dbu-rpg.com/shapeshifting-focus/",
+      "title": "Shapeshifting Focus – Dragon Ball Universe",
+      "characters": 1976,
+      "sha256": "014f3c191f3ab93b5e203b3ffe1a03369acd7d2a51edb769123b517f17dee1e6"
+    },
+    {
+      "slug": "shinjin-power",
+      "url": "https://dbu-rpg.com/shinjin-power/",
+      "title": "Shinjin Power – Dragon Ball Universe",
+      "characters": 3057,
+      "sha256": "fb0cba1d929ae34bbc2fdd8f84e383eb09262e51853e004f53fe0d7ee829cb16"
+    },
+    {
+      "slug": "shinjin",
+      "url": "https://dbu-rpg.com/shinjin/",
+      "title": "Shinjin – Dragon Ball Universe",
+      "characters": 14884,
+      "sha256": "99e7d7709f0b0f83edf72d16c02fe8ca503bd8ac429868ad469f666972b2204c"
+    },
+    {
+      "slug": "signature",
+      "url": "https://dbu-rpg.com/signature/",
+      "title": "Signature Techniques – Dragon Ball Universe",
+      "characters": 49199,
+      "sha256": "e61ffcdcbb039b5fa6d1af5859dcf7bfd002898840cb6d1079d71d76d79d5a4b"
+    },
+    {
+      "slug": "snack-empowerment",
+      "url": "https://dbu-rpg.com/snack-empowerment/",
+      "title": "Snack Empowerment – Dragon Ball Universe",
+      "characters": 3956,
+      "sha256": "43f2db90b45e4daf08e6e342520dc55ff8845eaa91f6769dc3911d9a07857c8f"
+    },
+    {
+      "slug": "snipers-burst",
+      "url": "https://dbu-rpg.com/snipers-burst/",
+      "title": "Sniper’s Burst – Dragon Ball Universe",
+      "characters": 2339,
+      "sha256": "83532a780c54578950f2616308566c90a7ac03859422c7c2610df288d70aa83f"
+    },
+    {
+      "slug": "solitary-dragon",
+      "url": "https://dbu-rpg.com/solitary-dragon/",
+      "title": "Solitary Dragon – Dragon Ball Universe",
+      "characters": 2196,
+      "sha256": "bdf4f3e3b1ae8b51d8d9de35c3b22ef0682e0f80bd99228171dcf17c1e082774"
+    },
+    {
+      "slug": "son-of-namek",
+      "url": "https://dbu-rpg.com/son-of-namek/",
+      "title": "Son of Namek – Dragon Ball Universe",
+      "characters": 1792,
+      "sha256": "d729944f6cc1308b76b187fab3cab8023f7eec6642a424e039cfac423b2ea8f9"
+    },
+    {
+      "slug": "spark-of-divinity",
+      "url": "https://dbu-rpg.com/spark-of-divinity/",
+      "title": "Spark of Divinity – Dragon Ball Universe",
+      "characters": 1736,
+      "sha256": "79f784fde860a2d4124d9f223845affaf0bdfb3d90017a9a025ec18e27cdc81c"
+    },
+    {
+      "slug": "sparking-aura",
+      "url": "https://dbu-rpg.com/sparking-aura/",
+      "title": "Sparking Aura – Dragon Ball Universe",
+      "characters": 16500,
+      "sha256": "72fabc6cf26f965d7dfe5df55cab2b1d01fcbfe0504307e2dbf4537d4b9a4aa5"
+    },
+    {
+      "slug": "special-maneuvers",
+      "url": "https://dbu-rpg.com/special-maneuvers/",
+      "title": "Special Maneuvers – Dragon Ball Universe",
+      "characters": 21354,
+      "sha256": "a228bdb4cce65fcf2f604887d632de5b3694424a77fb614b26b4e806920d1905"
+    },
+    {
+      "slug": "spirit-consumer",
+      "url": "https://dbu-rpg.com/spirit-consumer/",
+      "title": "Spirit Consumer – Dragon Ball Universe",
+      "characters": 3973,
+      "sha256": "b9d3f501dac2751083a91b09c3fe8df8a52c1199ec024be3621cae55615a7351"
+    },
+    {
+      "slug": "spirit-control",
+      "url": "https://dbu-rpg.com/spirit-control/",
+      "title": "Spirit Control – Dragon Ball Universe",
+      "characters": 10002,
+      "sha256": "c23bd228ad2cfa7ec3d74aa3ef0e84c114cb2503db1a45f4117c6486164b91aa"
+    },
+    {
+      "slug": "spiritual-power",
+      "url": "https://dbu-rpg.com/spiritual-power/",
+      "title": "Spiritual Power – Dragon Ball Universe",
+      "characters": 3679,
+      "sha256": "2f31acfadf58da3113cd9b15c0d82c2b4664789e24083c7f158596009544b268"
+    },
+    {
+      "slug": "splendid-evolution",
+      "url": "https://dbu-rpg.com/splendid-evolution/",
+      "title": "Splendid Evolution – Dragon Ball Universe",
+      "characters": 1802,
+      "sha256": "a83a20c74fa41918ea5463db2eb07f46378387797e1e9fb2297843191a50ee4e"
+    },
+    {
+      "slug": "stable-clone",
+      "url": "https://dbu-rpg.com/stable-clone/",
+      "title": "Stable Clone – Dragon Ball Universe",
+      "characters": 1529,
+      "sha256": "3f534c2eaa22e5f4fe239e3806705a112f12afbe4c78c2913c93f1c97192c1ad"
+    },
+    {
+      "slug": "stained-heart",
+      "url": "https://dbu-rpg.com/stained-heart/",
+      "title": "Stained Heart – Dragon Ball Universe",
+      "characters": 1931,
+      "sha256": "a5628e6db242f987c14d235d270fcdc2d4e9342a7a5c8aeaec6d97c1fa2f416b"
+    },
+    {
+      "slug": "states",
+      "url": "https://dbu-rpg.com/states/",
+      "title": "States – Dragon Ball Universe",
+      "characters": 7165,
+      "sha256": "24322985fbff359a830eef500662b6143499277e6a527ddad5895934f43fa9c8"
+    },
+    {
+      "slug": "steel-frame",
+      "url": "https://dbu-rpg.com/steel-frame/",
+      "title": "Steel Frame – Dragon Ball Universe",
+      "characters": 1211,
+      "sha256": "f58c58212060af5549eff3aaac62b91fa54fbfa821fe90392a3a4a54cdaa7cae"
+    },
+    {
+      "slug": "strongest-form",
+      "url": "https://dbu-rpg.com/strongest-form/",
+      "title": "Strongest Form – Dragon Ball Universe",
+      "characters": 2681,
+      "sha256": "4121af9e9102ab135da8d2dc023bd604327c7077d0d05018b0985986db10a6f8"
+    },
+    {
+      "slug": "strongest-neko",
+      "url": "https://dbu-rpg.com/strongest-neko/",
+      "title": "Strongest Neko – Dragon Ball Universe",
+      "characters": 2359,
+      "sha256": "f7e8f1180c695f3dea5c8146df1e1f5e0900a6c7222ce76e1cc701edfa4063be"
+    },
+    {
+      "slug": "style-of-formation",
+      "url": "https://dbu-rpg.com/style-of-formation/",
+      "title": "Style of Formation – Dragon Ball Universe",
+      "characters": 1800,
+      "sha256": "9eb97fbde901c2481feec853587c744998685d990ffe39a869a98fd71dce3c47"
+    },
+    {
+      "slug": "super-android",
+      "url": "https://dbu-rpg.com/super-android/",
+      "title": "Super Android – Dragon Ball Universe",
+      "characters": 2334,
+      "sha256": "e7fe0451968f03f8a5a28cbe74bc705cc60e1f425bd8508d21370e0687b3e7b9"
+    },
+    {
+      "slug": "super-class-up",
+      "url": "https://dbu-rpg.com/super-class-up/",
+      "title": "Super Class Up – Dragon Ball Universe",
+      "characters": 2193,
+      "sha256": "b1a4e837c5bb382fba67c09617325248c36e32115d5ca4041d20e284b1393992"
+    },
+    {
+      "slug": "super-demon",
+      "url": "https://dbu-rpg.com/super-demon/",
+      "title": "Super Demon – Dragon Ball Universe",
+      "characters": 6024,
+      "sha256": "c17cd7013b0633f03c54f42baf9cecb747fd610d3fd9186d2d737ef7d0933051"
+    },
+    {
+      "slug": "super-evolution",
+      "url": "https://dbu-rpg.com/super-evolution/",
+      "title": "Super Evolution – Dragon Ball Universe",
+      "characters": 8551,
+      "sha256": "d8d9c632a80fff8585d4dfd82918e461cf6da4102743bded1a3d56fd600bf903"
+    },
+    {
+      "slug": "super-form",
+      "url": "https://dbu-rpg.com/super-form/",
+      "title": "Super Form – Dragon Ball Universe",
+      "characters": 17617,
+      "sha256": "583d735c062cd760b1e3597d684e2e82ff8682d4d28fa2ac938b0b52c38bf732"
+    },
+    {
+      "slug": "super-formation",
+      "url": "https://dbu-rpg.com/super-formation/",
+      "title": "Super Formation – Dragon Ball Universe",
+      "characters": 1552,
+      "sha256": "f308a5342dbcf8142d95cba1c03a2df02dd8621574dc9a73993e1a6d6d51c353"
+    },
+    {
+      "slug": "super-full-power-saiyan-4",
+      "url": "https://dbu-rpg.com/super-full-power-saiyan-4/",
+      "title": "Super Full Power Saiyan 4 – Dragon Ball Universe",
+      "characters": 2049,
+      "sha256": "16d5712f4440e41669048d2fbccef59d0b69fdd0b2480aee6ddb1519e1363167"
+    },
+    {
+      "slug": "super-grudge-amplification",
+      "url": "https://dbu-rpg.com/super-grudge-amplification/",
+      "title": "Super Grudge Amplification – Dragon Ball Universe",
+      "characters": 5181,
+      "sha256": "61ebe72c00b43d0fae391ee542f655c5c277f50f2d4b2f73479a82c57e1c003f"
+    },
+    {
+      "slug": "super-high-tension",
+      "url": "https://dbu-rpg.com/super-high-tension/",
+      "title": "Super High Tension – Dragon Ball Universe",
+      "characters": 3959,
+      "sha256": "e37880df872011d46e39a66f5af841af095a0f838b73625204d8df52f15187da"
+    },
+    {
+      "slug": "super-incredible-guy",
+      "url": "https://dbu-rpg.com/super-incredible-guy/",
+      "title": "Super Incredible Guy – Dragon Ball Universe",
+      "characters": 4604,
+      "sha256": "304ad1939b455d1364b995c94055a96f3ce8d57f9bb417ec2312eb71d0f85de6"
+    },
+    {
+      "slug": "super-kaioken",
+      "url": "https://dbu-rpg.com/super-kaioken/",
+      "title": "Super Kaioken – Dragon Ball Universe",
+      "characters": 2747,
+      "sha256": "77bd9ee4f701457e76dfa2691e789c12f1c01e3fea6946b2da7d2bf38f5e40c6"
+    },
+    {
+      "slug": "super-majin",
+      "url": "https://dbu-rpg.com/super-majin/",
+      "title": "Super Majin – Dragon Ball Universe",
+      "characters": 2485,
+      "sha256": "ce3d4edd781b894a3f00ab698d84608ae2807740be516c6cd342553344c9270a"
+    },
+    {
+      "slug": "super-mutation",
+      "url": "https://dbu-rpg.com/super-mutation/",
+      "title": "Super Mutation – Dragon Ball Universe",
+      "characters": 8762,
+      "sha256": "7ec264a26d017368107e51e6dc0e4f64e3ccd8afe18187d63c93b0990b07589b"
+    },
+    {
+      "slug": "super-namekian",
+      "url": "https://dbu-rpg.com/super-namekian/",
+      "title": "Super Namekian – Dragon Ball Universe",
+      "characters": 2201,
+      "sha256": "12f84da3f787f40cdb5dc1556bbb2fb1fd21fdd0a4d01699da0c1738b1f83326"
+    },
+    {
+      "slug": "super-neko-majin",
+      "url": "https://dbu-rpg.com/super-neko-majin/",
+      "title": "Super Neko Majin – Dragon Ball Universe",
+      "characters": 2630,
+      "sha256": "d45ce5d7ab6797fde384c71c7bdd79e4a9d894fc36c9860b27d2d11c84cf4397"
+    },
+    {
+      "slug": "super-perfect-form",
+      "url": "https://dbu-rpg.com/super-perfect-form/",
+      "title": "Super Perfect Form – Dragon Ball Universe",
+      "characters": 2815,
+      "sha256": "2b1c1055dfdd9b5845c67d437bc972c4218309dd000941ce062697c75b4b7179"
+    },
+    {
+      "slug": "super-perfecter-form",
+      "url": "https://dbu-rpg.com/super-perfecter-form/",
+      "title": "Super Perfect Form – Dragon Ball Universe",
+      "characters": 11806,
+      "sha256": "c67d447062b4eed04b6b43f1bf3dcdce9e17a46953b81aac3d6a997296e37810"
+    },
+    {
+      "slug": "super-powerhouse",
+      "url": "https://dbu-rpg.com/super-powerhouse/",
+      "title": "Super Powerhouse – Dragon Ball Universe",
+      "characters": 4031,
+      "sha256": "02301ca151d2e6684ca3c57bee989b5f20f546861a94d0c4d3e485a97c14505e"
+    },
+    {
+      "slug": "super-profiles",
+      "url": "https://dbu-rpg.com/super-profiles/",
+      "title": "Super Profiles – Dragon Ball Universe",
+      "characters": 7617,
+      "sha256": "e1d92224e239b381a96388ac9fb9a5a9e282010ed8f12038b1780cc91b8a31fa"
+    },
+    {
+      "slug": "super-regeneration",
+      "url": "https://dbu-rpg.com/super-regeneration/",
+      "title": "Super Regeneration – Dragon Ball Universe",
+      "characters": 1609,
+      "sha256": "50366c9c481164623d8567fe83ea0fcc499e8af32a935433568c514739c40081"
+    },
+    {
+      "slug": "super-saiyan-4-limit-breaker",
+      "url": "https://dbu-rpg.com/super-saiyan-4-limit-breaker/",
+      "title": "Super Saiyan 4 Limit Breaker – Dragon Ball Universe",
+      "characters": 2694,
+      "sha256": "e76155bd617c9862e6ba31256e3e9692be5fba75cbf867ff24bd11e169f0e7ab"
+    },
+    {
+      "slug": "super-saiyan-4",
+      "url": "https://dbu-rpg.com/super-saiyan-4/",
+      "title": "Super Saiyan 4 – Dragon Ball Universe",
+      "characters": 5605,
+      "sha256": "a947d9b7ed59eef3dd7d9f4a3e10c749d6f7251c31da84c7f1ec4a4c9553729b"
+    },
+    {
+      "slug": "super-saiyan-blue-evolved",
+      "url": "https://dbu-rpg.com/super-saiyan-blue-evolved/",
+      "title": "Super Saiyan Blue Evolved – Dragon Ball Universe",
+      "characters": 2896,
+      "sha256": "93cb29c3a54c4cba64f4b3f51f7bffdfaf528d3a596f2c2e634796c3889c9439"
+    },
+    {
+      "slug": "super-saiyan-power",
+      "url": "https://dbu-rpg.com/super-saiyan-power/",
+      "title": "Super Saiyan Power – Dragon Ball Universe",
+      "characters": 1978,
+      "sha256": "6d00b12cfba82107fdd5399be381c0ba7dd17de7c378170dd0a0a435bd8bb090"
+    },
+    {
+      "slug": "super-saiyan-rage",
+      "url": "https://dbu-rpg.com/super-saiyan-rage/",
+      "title": "Super Saiyan Rage – Dragon Ball Universe",
+      "characters": 3054,
+      "sha256": "eaef856216d458982771cba3fadf283bd9ea660117b4070f0e6c1491cef90f04"
+    },
+    {
+      "slug": "super-saiyan-resurgence",
+      "url": "https://dbu-rpg.com/super-saiyan-resurgence/",
+      "title": "Super Saiyan Resurgence – Dragon Ball Universe",
+      "characters": 2590,
+      "sha256": "8ae7de8e20ba37e95d2b107c41e0fbe11ddf7fa7f10b35a1ba0aef63e9d69c54"
+    },
+    {
+      "slug": "super-saiyan-rose",
+      "url": "https://dbu-rpg.com/super-saiyan-rose/",
+      "title": "Super Saiyan Rosé – Dragon Ball Universe",
+      "characters": 3085,
+      "sha256": "1f1f99035c7d5965f1ca3eaff56f94e59ccd2b04f659e5e8b70cc158c1a455db"
+    },
+    {
+      "slug": "super-saiyan",
+      "url": "https://dbu-rpg.com/super-saiyan/",
+      "title": "Super Saiyan – Dragon Ball Universe",
+      "characters": 6704,
+      "sha256": "8c1c29cbd151c2e32afc519029c00a7fb84cbe35fcd048923226013af55a444a"
+    },
+    {
+      "slug": "super-star-dragon",
+      "url": "https://dbu-rpg.com/super-star-dragon/",
+      "title": "Super Star Dragon – Dragon Ball Universe",
+      "characters": 6427,
+      "sha256": "ddbc1a87436a63e07b110c7bad2dd3c3cce3040747905db02e582cdd48b51e05"
+    },
+    {
+      "slug": "super-tuffle",
+      "url": "https://dbu-rpg.com/super-tuffle/",
+      "title": "Super Tuffle – Dragon Ball Universe",
+      "characters": 1661,
+      "sha256": "8c0319b971c8f6b7bfbbc1a7fe45f2b6c18f87e3a520b1d122a7275482f967d8"
+    },
+    {
+      "slug": "superior-demon-god",
+      "url": "https://dbu-rpg.com/superior-demon-god/",
+      "title": "Superior Demon God – Dragon Ball Universe",
+      "characters": 1340,
+      "sha256": "fbac6fb8be0942461937bf80b950cc513e08bf93f86e2eb49f5d32d554015c0c"
+    },
+    {
+      "slug": "superior-fission",
+      "url": "https://dbu-rpg.com/superior-fission/",
+      "title": "Superior Fission – Dragon Ball Universe",
+      "characters": 1666,
+      "sha256": "684a7aa756f92bf67bfdbddee45fb4bfa6f88051789008398b62ab4031bd1ed1"
+    },
+    {
+      "slug": "superior-super-saiyan",
+      "url": "https://dbu-rpg.com/superior-super-saiyan/",
+      "title": "Superior Super Saiyan – Dragon Ball Universe",
+      "characters": 2594,
+      "sha256": "cffc23bd0a1c63c03fdb6b448a66a965f6429b9b5af851c66b73ccb899517902"
+    },
+    {
+      "slug": "supporter",
+      "url": "https://dbu-rpg.com/supporter/",
+      "title": "Supporter – Dragon Ball Universe",
+      "characters": 1897,
+      "sha256": "7151059468b9881e2383c90fc85873f42eb20193a7e2faa36d2bc2030d460f5a"
+    },
+    {
+      "slug": "suppressed-evolution",
+      "url": "https://dbu-rpg.com/suppressed-evolution/",
+      "title": "Suppressed Evolution – Dragon Ball Universe",
+      "characters": 2354,
+      "sha256": "c86f7a05d37b248523dddcbeed448a5cf1283a23d5c2f09f7366e8311e664cfb"
+    },
+    {
+      "slug": "supreme-form",
+      "url": "https://dbu-rpg.com/supreme-form/",
+      "title": "Supreme Form – Dragon Ball Universe",
+      "characters": 3154,
+      "sha256": "d193be6f390d3e126546048c846aa5f48e95b8eb7b5b802c1aec664b1632f7a5"
+    },
+    {
+      "slug": "sworn-comrades",
+      "url": "https://dbu-rpg.com/sworn-comrades/",
+      "title": "Sworn Comrades – Dragon Ball Universe",
+      "characters": 1502,
+      "sha256": "fbec2419c4682231d0224ddd64d412f86dadca9a77dc1f13c6e4722fe34dbb4a"
+    },
+    {
+      "slug": "tactician",
+      "url": "https://dbu-rpg.com/tactician/",
+      "title": "Tactician – Dragon Ball Universe",
+      "characters": 3962,
+      "sha256": "6ae11b1f75e7cc20296d27b0a1ddef8a5eee180acc27e0b6ac156fe3d5ccdc4e"
+    },
+    {
+      "slug": "talents",
+      "url": "https://dbu-rpg.com/talents/",
+      "title": "Talents – Dragon Ball Universe",
+      "characters": 153859,
+      "sha256": "69655fc3f1c48a8e08b0589d51a3f0b2bfcf4f23d7abc31814e3be297b2f09f0"
+    },
+    {
+      "slug": "tamagami",
+      "url": "https://dbu-rpg.com/tamagami/",
+      "title": "Tamagami – Dragon Ball Universe",
+      "characters": 2101,
+      "sha256": "cbe5a54a7e90abd59619e1358755059d881af299c51c875257bb5cd6bd0f2a66"
+    },
+    {
+      "slug": "team-dynamic",
+      "url": "https://dbu-rpg.com/team-dynamic/",
+      "title": "Team Dynamic – Dragon Ball Universe",
+      "characters": 5497,
+      "sha256": "34e994e4a96f133b7f01c65ff71964da4794f68a22f928d39b7a33663f68e229"
+    },
+    {
+      "slug": "technique-dedication",
+      "url": "https://dbu-rpg.com/technique-dedication/",
+      "title": "Technique Dedication – Dragon Ball Universe",
+      "characters": 2354,
+      "sha256": "7ac9e32dfda1df7e0c861547cfb99317ff0e427757883dc7d66b5365ad108322"
+    },
+    {
+      "slug": "telekinetic-focus",
+      "url": "https://dbu-rpg.com/telekinetic-focus/",
+      "title": "Telekinetic Focus – Dragon Ball Universe",
+      "characters": 1910,
+      "sha256": "65ec8ade089a80ae673f012f2a403af58c6ba0d36f7b9b40a643f0bd03bc87c4"
+    },
+    {
+      "slug": "tempered-fury",
+      "url": "https://dbu-rpg.com/tempered-fury/",
+      "title": "Tempered Fury – Dragon Ball Universe",
+      "characters": 1378,
+      "sha256": "bf6f2607ba90219b7999c662c017315914d0570d5a4333aca0214f7cb690eb18"
+    },
+    {
+      "slug": "terrifying-presence",
+      "url": "https://dbu-rpg.com/terrifying-presence/",
+      "title": "Terrifying Presence – Dragon Ball Universe",
+      "characters": 3330,
+      "sha256": "cc248434cdeffb65d14f65e5082767b525b9844b79eac199d85d95cc50236f49"
+    },
+    {
+      "slug": "the-hero",
+      "url": "https://dbu-rpg.com/the-hero/",
+      "title": "The Hero – Dragon Ball Universe",
+      "characters": 2904,
+      "sha256": "401343017d9fcfe01a38fffb573fd87e1250378de27fd020d9c2bec2309d752b"
+    },
+    {
+      "slug": "the-incredible-mightiest",
+      "url": "https://dbu-rpg.com/the-incredible-mightiest/",
+      "title": "The Incredible Mightiest – Dragon Ball Universe",
+      "characters": 1630,
+      "sha256": "92ed0022d5dead4b1649097e890824d48b6256e255a21ecfc4609d1bc9ee8f4a"
+    },
+    {
+      "slug": "thresholds-conditions",
+      "url": "https://dbu-rpg.com/thresholds-conditions/",
+      "title": "Thresholds & Conditions – Dragon Ball Universe",
+      "characters": 14525,
+      "sha256": "526facb19c7d58d47546ad7c231117db1d16d813ca8344ae5b39f1b61de0aece"
+    },
+    {
+      "slug": "time-power",
+      "url": "https://dbu-rpg.com/time-power/",
+      "title": "Time Power – Dragon Ball Universe",
+      "characters": 4773,
+      "sha256": "db5bbf031bd2529f99e62c5a9bc13816232da4333c0c3cd620e83d17a093a348"
+    },
+    {
+      "slug": "time-skipper",
+      "url": "https://dbu-rpg.com/time-skipper/",
+      "title": "Time-Skipper – Dragon Ball Universe",
+      "characters": 6332,
+      "sha256": "8e53548ee3619e6a24bb48352d5acb6506831dad05b68d5c61bae1abd2ba4f07"
+    },
+    {
+      "slug": "transcended-demon-god",
+      "url": "https://dbu-rpg.com/transcended-demon-god/",
+      "title": "Transcended Demon God – Dragon Ball Universe",
+      "characters": 2277,
+      "sha256": "a554dfa03e7a4e4a16565ea354aee149b1c6eae1bf27200567f255e3035f57dd"
+    },
+    {
+      "slug": "transformation-aspects",
+      "url": "https://dbu-rpg.com/transformation-aspects/",
+      "title": "Aspects – Dragon Ball Universe",
+      "characters": 16673,
+      "sha256": "a7e104a9214c0acf736bfb320efac266606d11f4906445590c9e25628be78124"
+    },
+    {
+      "slug": "transformation-catalog",
+      "url": "https://dbu-rpg.com/transformation-catalog/",
+      "title": "Transformation Catalog – Dragon Ball Universe",
+      "characters": 10913,
+      "sha256": "c4ac156ca0ded078414b067ddacb8910f5e5377f9997b52f3b8d6a690649d442"
+    },
+    {
+      "slug": "transformation-reliant",
+      "url": "https://dbu-rpg.com/transformation-reliant/",
+      "title": "Transformation Reliant – Dragon Ball Universe",
+      "characters": 2014,
+      "sha256": "fb67eeb0763216f07023dbb6b8c7c1cbd686b8592530d3417fcf98b773c6b117"
+    },
+    {
+      "slug": "transformation-rules",
+      "url": "https://dbu-rpg.com/transformation-rules/",
+      "title": "Transformation Rules – Dragon Ball Universe",
+      "characters": 23579,
+      "sha256": "01ce055c0b6dafc07f8246f342feee4daff4f3c7db50cde3a6b69daced1d942e"
+    },
+    {
+      "slug": "transforming-class-up",
+      "url": "https://dbu-rpg.com/transforming-class-up/",
+      "title": "Transforming Class Up – Dragon Ball Universe",
+      "characters": 2043,
+      "sha256": "3e707b1f49f6ce05db2a57e04d86417ce6e4b88446bb9996a97e8e75aff5a22e"
+    },
+    {
+      "slug": "triclops",
+      "url": "https://dbu-rpg.com/triclops/",
+      "title": "Triclops – Dragon Ball Universe",
+      "characters": 1755,
+      "sha256": "970c7b7eaa2122ed77a3332252fcc183e0ac334a026883da1a0284ce55d7ebc8"
+    },
+    {
+      "slug": "true-angel",
+      "url": "https://dbu-rpg.com/true-angel/",
+      "title": "True Angel – Dragon Ball Universe",
+      "characters": 2715,
+      "sha256": "d0c9326816ae916d8f847c642f05620fcda99857a44f5e31eb041bcfd53d31e7"
+    },
+    {
+      "slug": "true-brilliant-evolution",
+      "url": "https://dbu-rpg.com/true-brilliant-evolution/",
+      "title": "True Brilliant Evolution – Dragon Ball Universe",
+      "characters": 1918,
+      "sha256": "fed2cb1c4f127313794be177ffc77630fc6f555897a43ad60927ab7e85d238d2"
+    },
+    {
+      "slug": "true-demon-god",
+      "url": "https://dbu-rpg.com/true-demon-god/",
+      "title": "True Demon God – Dragon Ball Universe",
+      "characters": 2056,
+      "sha256": "241da5b789356f5ec271a39884aed7168de66c2271e006fd69e90a50e5e90284"
+    },
+    {
+      "slug": "true-super-saiyan-god",
+      "url": "https://dbu-rpg.com/true-super-saiyan-god/",
+      "title": "True Super Saiyan God – Dragon Ball Universe",
+      "characters": 2433,
+      "sha256": "cdb0f06c8e3dbd729b05556a2c2a490e54a3a62777436b87caa0c801906d0e40"
+    },
+    {
+      "slug": "true-ultra-instinct",
+      "url": "https://dbu-rpg.com/true-ultra-instinct/",
+      "title": "True Ultra Instinct – Dragon Ball Universe",
+      "characters": 1323,
+      "sha256": "66c16c5239b2c7a914d1e24b9134440fabccf98a3a0d932931692bf2b9d7a085"
+    },
+    {
+      "slug": "tuffle-masterpiece",
+      "url": "https://dbu-rpg.com/tuffle-masterpiece/",
+      "title": "Tuffle Masterpiece – Dragon Ball Universe",
+      "characters": 2971,
+      "sha256": "b2a0160193f4471a472c7ce7cd4fdf050c5f19513afd138c0b4b107659671efe"
+    },
+    {
+      "slug": "tuffleization",
+      "url": "https://dbu-rpg.com/tuffleization/",
+      "title": "Tuffleization – Dragon Ball Universe",
+      "characters": 1757,
+      "sha256": "6eec60a0ebf2ef92ce706ee55bec7d1ae65317582d915829f7d55f43ab338656"
+    },
+    {
+      "slug": "tuffleized-form",
+      "url": "https://dbu-rpg.com/tuffleized-form/",
+      "title": "Tuffleized Form – Dragon Ball Universe",
+      "characters": 1260,
+      "sha256": "a401e2d30a74c0dc4ff53bc0794c8c49bc778fb39cbf2d37ee5706a15bb5a898"
+    },
+    {
+      "slug": "turtle-school-master",
+      "url": "https://dbu-rpg.com/turtle-school-master/",
+      "title": "Turtle School Master – Dragon Ball Universe",
+      "characters": 2118,
+      "sha256": "2eda7cbcc4259c1813f88cca5d91956e264759dcf1b63660664fa6e1a2bb9749"
+    },
+    {
+      "slug": "ultimate-android",
+      "url": "https://dbu-rpg.com/ultimate-android/",
+      "title": "Ultimate Android – Dragon Ball Universe",
+      "characters": 4538,
+      "sha256": "10aab8ecc50d858d9a455e19aa37f77ac37bac23f0fb5a85313b3e54d172f0e7"
+    },
+    {
+      "slug": "ultimate-being",
+      "url": "https://dbu-rpg.com/ultimate-being/",
+      "title": "Ultimate Being – Dragon Ball Universe",
+      "characters": 2994,
+      "sha256": "6ab712e706e9adc0b6426224a2b9ac7361147a3e1ea92b8b4976fde45c65e206"
+    },
+    {
+      "slug": "ultimate-class-up",
+      "url": "https://dbu-rpg.com/ultimate-class-up/",
+      "title": "Ultimate Class Up – Dragon Ball Universe",
+      "characters": 1805,
+      "sha256": "a481c050249ff9ae8beed89bce473c386b7febd65852aa373f7e879d6df5ee4d"
+    },
+    {
+      "slug": "ultimate-majin",
+      "url": "https://dbu-rpg.com/ultimate-majin/",
+      "title": "Ultimate Majin – Dragon Ball Universe",
+      "characters": 3970,
+      "sha256": "4f689531067b0f1086b4def5d732812ba9aa5b3fb75058303b45905857a66c78"
+    },
+    {
+      "slug": "ultimate",
+      "url": "https://dbu-rpg.com/ultimate/",
+      "title": "Ultimate – Dragon Ball Universe",
+      "characters": 1217,
+      "sha256": "cfea83274556fc0a09bd41d5f43973b273af701e8870cb582689e492ff6c58c9"
+    },
+    {
+      "slug": "ultra-ego",
+      "url": "https://dbu-rpg.com/ultra-ego/",
+      "title": "Ultra Ego – Dragon Ball Universe",
+      "characters": 6588,
+      "sha256": "0a6abb370c603c82e5c3b7a53585674d726b47c53f9d1be3582bbd47f0d4541d"
+    },
+    {
+      "slug": "ultra-instinct",
+      "url": "https://dbu-rpg.com/ultra-instinct/",
+      "title": "Ultra Instinct – Dragon Ball Universe",
+      "characters": 8976,
+      "sha256": "2a1a03ee7b8ad17dbec46f9b3a6f65522129f97d1ec43d7909d3ce1269ae91c7"
+    },
+    {
+      "slug": "ultra-supervillain",
+      "url": "https://dbu-rpg.com/ultra-supervillain/",
+      "title": "Ultra Supervillain – Dragon Ball Universe",
+      "characters": 2363,
+      "sha256": "07379f9dc38ecf6766a0c102b1be95ee0517c0da0254c50d215a77adf8e319a8"
+    },
+    {
+      "slug": "unbound",
+      "url": "https://dbu-rpg.com/unbound/",
+      "title": "Unbound – Dragon Ball Universe",
+      "characters": 5797,
+      "sha256": "5a01d0044af5c476ce9912841076320f8d5d9b6e14f825c79c0ba3d76f8104bf"
+    },
+    {
+      "slug": "unburdened",
+      "url": "https://dbu-rpg.com/unburdened/",
+      "title": "Unburdened – Dragon Ball Universe",
+      "characters": 2987,
+      "sha256": "0dc447eac4277b44552c31a683cdaf3520a34f7f38500bc4db28bf38cde2d4d7"
+    },
+    {
+      "slug": "undead",
+      "url": "https://dbu-rpg.com/undead/",
+      "title": "Undead – Dragon Ball Universe",
+      "characters": 1407,
+      "sha256": "1942f45c5b2086ee07adcdbb95247cd34c5dcf28706c974c5d3b195d1b513944"
+    },
+    {
+      "slug": "understanding-of-perfection",
+      "url": "https://dbu-rpg.com/understanding-of-perfection/",
+      "title": "Understanding of Perfection – Dragon Ball Universe",
+      "characters": 1494,
+      "sha256": "041f68ca92b6f6b2e30d0563bc5e6f6e73b8f2535b4d3e169af30539aedcdfc9"
+    },
+    {
+      "slug": "unified",
+      "url": "https://dbu-rpg.com/unified/",
+      "title": "Unified – Dragon Ball Universe",
+      "characters": 1914,
+      "sha256": "524dd416edf1a1807bed44a7ae02ef4f8b3e730f23d1957346eb15b28a3835de"
+    },
+    {
+      "slug": "unique-abilities",
+      "url": "https://dbu-rpg.com/unique-abilities/",
+      "title": "Unique Abilities – Dragon Ball Universe",
+      "characters": 111453,
+      "sha256": "a1f720bb1e67b636fb0b29b793275cc24e5d8cf4f5354c453e1392361bac4fdc"
+    },
+    {
+      "slug": "united-android",
+      "url": "https://dbu-rpg.com/united-android/",
+      "title": "United Android – Dragon Ball Universe",
+      "characters": 5834,
+      "sha256": "ef067747bf5fc1876835e9c2a495e2e7a0822f38ef8b45d0daf8b82fe2ff6a3e"
+    },
+    {
+      "slug": "united-lives",
+      "url": "https://dbu-rpg.com/united-lives/",
+      "title": "United Lives – Dragon Ball Universe",
+      "characters": 2173,
+      "sha256": "c6241c3f076a65f67f94981bc6c22da513006c4ce0b9e4246c8c7ac743a28a1a"
+    },
+    {
+      "slug": "unkillable-majin",
+      "url": "https://dbu-rpg.com/unkillable-majin/",
+      "title": "Unkillable Majin – Dragon Ball Universe",
+      "characters": 2423,
+      "sha256": "7aad30a5f628df8613d69ab572f8ee8ab09b0ae0a34c4db39e515394285e5a59"
+    },
+    {
+      "slug": "unlimited-construction",
+      "url": "https://dbu-rpg.com/unlimited-construction/",
+      "title": "Unlimited Construction – Dragon Ball Universe",
+      "characters": 3828,
+      "sha256": "dc5c1d44d93492f9775735a674572aa13f4f43009f00134e09aeb7cd84ba331d"
+    },
+    {
+      "slug": "unlock-potential",
+      "url": "https://dbu-rpg.com/unlock-potential/",
+      "title": "Unlocked Potential – Dragon Ball Universe",
+      "characters": 2177,
+      "sha256": "1f6fef1da5ae5cc11e39328cf449a852f6db158036cf8fdeb43a5ba708e97469"
+    },
+    {
+      "slug": "unstable-clone",
+      "url": "https://dbu-rpg.com/unstable-clone/",
+      "title": "Unstable Clone – Dragon Ball Universe",
+      "characters": 2750,
+      "sha256": "92a58418626b3579f7cb908e6f716f0b494e7c37592b3fd1eecdeb289f0853b8"
+    },
+    {
+      "slug": "untouched-angel",
+      "url": "https://dbu-rpg.com/untouched-angel/",
+      "title": "Untouched Angel – Dragon Ball Universe",
+      "characters": 1921,
+      "sha256": "2db9c8b0bd64af9f311025ab02a709e32d14375335dd2483e92f77e2cbcb237c"
+    },
+    {
+      "slug": "usagi-majin",
+      "url": "https://dbu-rpg.com/usagi-majin/",
+      "title": "Usagi Majin – Dragon Ball Universe",
+      "characters": 1372,
+      "sha256": "52d07b64cdfb000d3225066d9ed0810fc2bc1389de23e65320803bfb4f82ef32"
+    },
+    {
+      "slug": "vanguard",
+      "url": "https://dbu-rpg.com/vanguard/",
+      "title": "Vanguard – Dragon Ball Universe",
+      "characters": 1313,
+      "sha256": "9e5045835fa37f0ea8625a8a6710e9b94b2d4452e75f4d30924cfcdc61b2f43d"
+    },
+    {
+      "slug": "vengeful-god",
+      "url": "https://dbu-rpg.com/vengeful-god/",
+      "title": "Vengeful God – Dragon Ball Universe",
+      "characters": 1453,
+      "sha256": "ae6df6d52c716677958d8ae34a5790b3e21ef7abb27596c8e482422dd5d646ac"
+    },
+    {
+      "slug": "vocation-gain",
+      "url": "https://dbu-rpg.com/vocation-gain/",
+      "title": "Vocation Gain – Dragon Ball Universe",
+      "characters": 2428,
+      "sha256": "580369c380f34063b0229b7129234b4716dfdd281436970b0c811495b88981c4"
+    },
+    {
+      "slug": "vocational-burst",
+      "url": "https://dbu-rpg.com/vocational-burst/",
+      "title": "Vocational Burst – Dragon Ball Universe",
+      "characters": 5335,
+      "sha256": "25fdd53c7d509a9b7bb2cc96dfdcd17e71ca3e1d89825f8f7dfb941f01acbc2e"
+    },
+    {
+      "slug": "warlock",
+      "url": "https://dbu-rpg.com/warlock/",
+      "title": "Warlock – Dragon Ball Universe",
+      "characters": 7866,
+      "sha256": "009002dece35fbcf181318db05e41461eb306d4c5e13fe0d81a6ac83446003cb"
+    },
+    {
+      "slug": "warrior-of-cereal",
+      "url": "https://dbu-rpg.com/warrior-of-cereal/",
+      "title": "Warrior of Cereal – Dragon Ball Universe",
+      "characters": 1546,
+      "sha256": "446b7ec4686b7ac93d3951fc39f4bcb4ba7aad89ea299f3803bbcc3ecaae833e"
+    },
+    {
+      "slug": "warrior-of-earth",
+      "url": "https://dbu-rpg.com/warrior-of-earth/",
+      "title": "Warrior of Earth – Dragon Ball Universe",
+      "characters": 1566,
+      "sha256": "8cdc798820acb88741fece5801bdfe4642e6529e10296a718c85c7bbae5b1084"
+    },
+    {
+      "slug": "warrior-of-hera",
+      "url": "https://dbu-rpg.com/warrior-of-hera/",
+      "title": "Warrior of Hera – Dragon Ball Universe",
+      "characters": 1654,
+      "sha256": "9672b4cdb6b972d400d5f518d9a33d578966724609687928852a558dfac3b4ac"
+    },
+    {
+      "slug": "warrior-of-namek",
+      "url": "https://dbu-rpg.com/warrior-of-namek/",
+      "title": "Warrior of Namek – Dragon Ball Universe",
+      "characters": 1610,
+      "sha256": "154d71ac41732049663fa7dc22162aa899181c993f87223040abb2e897fa7dc7"
+    },
+    {
+      "slug": "warrior-of-sadala",
+      "url": "https://dbu-rpg.com/warrior-of-sadala/",
+      "title": "Warrior of Sadala – Dragon Ball Universe",
+      "characters": 1960,
+      "sha256": "991b7c9f2b0a2fde1a3c184b30e32d7fa8bc2d9a2f50aaabc62e865d05000cb3"
+    },
+    {
+      "slug": "warrior-of-the-core-world",
+      "url": "https://dbu-rpg.com/warrior-of-the-core-world/",
+      "title": "Warrior of the Core World – Dragon Ball Universe",
+      "characters": 1548,
+      "sha256": "00eb3d8b0d65741c84e0471d2f85623482aa6d03fc1f3843d940f7320e33b8a6"
+    },
+    {
+      "slug": "warrior-of-the-demon-realm",
+      "url": "https://dbu-rpg.com/warrior-of-the-demon-realm/",
+      "title": "Warrior of the Demon Realm – Dragon Ball Universe",
+      "characters": 1372,
+      "sha256": "9682d5e49d4b8fe89489f513f10a1d92d099845c3c79818734f2e8b04f46367b"
+    },
+    {
+      "slug": "warrior-of-yardrat",
+      "url": "https://dbu-rpg.com/warrior-of-yardrat/",
+      "title": "Warrior of Yardrat – Dragon Ball Universe",
+      "characters": 1939,
+      "sha256": "0f621e534bb55b4c0a089f6e01838a795d8512bc43833e3cc00c769554c9c57b"
+    },
+    {
+      "slug": "weapon-of-hope",
+      "url": "https://dbu-rpg.com/weapon-of-hope/",
+      "title": "Weapon of Hope – Dragon Ball Universe",
+      "characters": 4208,
+      "sha256": "53a27265f5c266d54b736027d2df905a330db3e552aaacf5c7c192be1296f26e"
+    },
+    {
+      "slug": "weapon-of-mass-destruction",
+      "url": "https://dbu-rpg.com/weapon-of-mass-destruction/",
+      "title": "Weapon of Mass Destruction – Dragon Ball Universe",
+      "characters": 1484,
+      "sha256": "2f99d1c3a8efe8bc800db274b17f9e8327f652d76ca51df1c111b990aad6edf7"
+    },
+    {
+      "slug": "weapon-of-sorrow",
+      "url": "https://dbu-rpg.com/weapon-of-sorrow/",
+      "title": "Weapon of Sorrow – Dragon Ball Universe",
+      "characters": 4763,
+      "sha256": "6110574610f06c4059db525dfa2d3f1b2c7c8b61b3b15493ae3890a395b542c2"
+    },
+    {
+      "slug": "whimsical-class-up",
+      "url": "https://dbu-rpg.com/whimsical-class-up/",
+      "title": "Whimsical Class Up – Dragon Ball Universe",
+      "characters": 1956,
+      "sha256": "1a44ffbdfd4383427b6f6a9a7e6385e1af487996b6e9fca3ed3968ed021eea13"
+    },
+    {
+      "slug": "whimsical-majin",
+      "url": "https://dbu-rpg.com/whimsical-majin/",
+      "title": "Whimsical Majin – Dragon Ball Universe",
+      "characters": 3294,
+      "sha256": "826883c4541a2b9993bba5975ef2fac3902e69f1de6d62e31a99f319ec0a4a0f"
+    },
+    {
+      "slug": "wings-of-time",
+      "url": "https://dbu-rpg.com/wings-of-time/",
+      "title": "Wings of Time – Dragon Ball Universe",
+      "characters": 1679,
+      "sha256": "d35eaaa725f8b579eb6f68a5f4e8321e5075ce6af92a5ebb0951e0b9224c5692"
+    },
+    {
+      "slug": "wise-yardrat",
+      "url": "https://dbu-rpg.com/wise-yardrat/",
+      "title": "Wise Yardrat – Dragon Ball Universe",
+      "characters": 1158,
+      "sha256": "1c939b5bdb9e3c6dfedd54850a954f40104f3674a02df4c5ab5e40bb7b6f391a"
+    },
+    {
+      "slug": "witchcraft",
+      "url": "https://dbu-rpg.com/witchcraft/",
+      "title": "Witchcraft – Dragon Ball Universe",
+      "characters": 3018,
+      "sha256": "fc6a6bccb0446d77414148c8ba4c072b518a7c696797f0b3caceab98c81b66da"
+    },
+    {
+      "slug": "wrathful",
+      "url": "https://dbu-rpg.com/wrathful/",
+      "title": "Wrathful – Dragon Ball Universe",
+      "characters": 3172,
+      "sha256": "653e10303f298c65c4d436a4e03396894fc075ea7b434c4734c83da891168526"
+    },
+    {
+      "slug": "xeno-super-saiyan-4",
+      "url": "https://dbu-rpg.com/xeno-super-saiyan-4/",
+      "title": "Xeno Super Saiyan 4 – Dragon Ball Universe",
+      "characters": 3270,
+      "sha256": "9708d3ec5047aba1ed726c8efbb79b6c234d3cf5cc12d67d079dc56749a43c1c"
+    },
+    {
+      "slug": "xeno-super-saiyan",
+      "url": "https://dbu-rpg.com/xeno-super-saiyan/",
+      "title": "Xeno Super Saiyan – Dragon Ball Universe",
+      "characters": 2955,
+      "sha256": "5a7b02a6057f1570ba5352a6dd8561226f60f6e1a39c3568a6e3b7dadd8ddb00"
+    },
+    {
+      "slug": "yardrat-master",
+      "url": "https://dbu-rpg.com/yardrat-master/",
+      "title": "Yardrat Master – Dragon Ball Universe",
+      "characters": 1792,
+      "sha256": "d357080f5d522c86f96c4e201addc6a288f363a8ab1dd581ea29ed441d7c7454"
+    },
+    {
+      "slug": "yardrats",
+      "url": "https://dbu-rpg.com/yardrats/",
+      "title": "Yardrats – Dragon Ball Universe",
+      "characters": 8538,
+      "sha256": "0c10a2342c28a1ffdb397c52e8a0a8c356226e8e64efae64ed70b4e829e8d8cd"
+    },
+    {
+      "slug": "zenkai",
+      "url": "https://dbu-rpg.com/zenkai/",
+      "title": "Zenkai – Dragon Ball Universe",
+      "characters": 2343,
+      "sha256": "d8eb3c7731cc2622ead074291fb58acd6133bc61b2e41ced418c6cd4dd7bcb85"
+    }
+  ],
+  "unavailable": [
+    "https://dbu-rpg.com/?page_id=10503",
+    "https://dbu-rpg.com/damage-conditions/"
+  ],
+  "replacementLinks": {
+    "https://dbu-rpg.com/damage-conditions/": "https://dbu-rpg.com/thresholds-conditions/"
+  }
+}

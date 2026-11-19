@@ -15182,3 +15182,8 @@
 .dp-buffs-note b {
   color: #b9c4cf;
 }
+
+/* Current rules: compact action pools and persistent migration notices. */
+.dbu-old .dbu-rules-actions { display:flex; gap:.5rem; align-items:center; flex-wrap:wrap; padding:.5rem; }
+.dbu-old .dbu-rules-actions button, .dbu-old .dbu-rules-review button { width:auto; }
+.dbu-old .dbu-rules-review { padding:.5rem; border:1px solid #b68b38; margin:.25rem; max-height:18rem; overflow:auto; }

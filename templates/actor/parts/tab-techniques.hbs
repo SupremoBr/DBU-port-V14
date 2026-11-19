@@ -92,6 +92,21 @@
               {{/each}}
             </select>
           </div>
+          {{#if ../rules093}}
+          <div class="tech-row">
+            <label>Super Profile</label>
+            <select class="tech-input" data-tech-id="{{id}}" data-field="superProfile">
+              <option value="">Nenhum</option>
+              {{#each ../superProfileOptions093}}<option value="{{this}}" {{#if (eq this ../superProfile)}}selected{{/if}}>{{this}}</option>{{/each}}
+            </select>
+          </div>
+          {{#if superProfile}}
+          <p><a href="https://dbu-rpg.com/super-profiles/" target="_blank" rel="noopener noreferrer">Pré-requisitos e efeitos do Super Profile — resolver manualmente</a></p>
+          <div class="tech-row"><label>Multi-Profile: perfil adicional</label><select class="tech-input" data-tech-id="{{id}}" data-field="secondaryProfile"><option value="">Nenhum</option>{{#each ../profileOptions}}<option value="{{this}}" {{#if (eq this ../secondaryProfile)}}selected{{/if}}>{{this}}</option>{{/each}}</select></div>
+          <div class="tech-row"><label>Giga Flare: Actions adicionais</label><input type="number" class="tech-input" data-tech-id="{{id}}" data-field="superProfileActions" value="{{superProfileActions}}" min="0" max="2" /></div>
+          <label><input type="checkbox" class="tech-input" data-tech-id="{{id}}" data-field="superProfileGranted" {{#if superProfileGranted}}checked{{/if}} />Concedido por efeito (fora de Dramatic Finisher)</label>
+          {{/if}}
+          {{/if}}
           <div class="tech-row">
             <label>Base Energy Charges</label>
             <input type="number" class="tech-input" data-tech-id="{{id}}" data-field="baseEnergyCharges" value="{{baseEnergyCharges}}" min="0" />
@@ -103,7 +118,7 @@
           <div class="tech-row check-field">
             <label>
               <input type="checkbox" class="tech-input" data-tech-id="{{id}}" data-field="isLimitBreak" {{#if isLimitBreak}}checked{{/if}} />
-              Limit Break
+              {{#if ../rules093}}Legado: Limit Break — revisar e desmarcar{{else}}Limit Break{{/if}}
             </label>
           </div>
         </div>
@@ -148,6 +163,7 @@
         <span class="profile-tag">{{profileInfo.damageCat}}</span>
         <span class="profile-tag">{{profileInfo.range}}</span>
         <div class="profile-effect">{{profileInfo.effect}}</div>
+        {{#if profileInfo.source}}<a href="{{profileInfo.source}}" target="_blank" rel="noopener noreferrer">Fonte oficial do perfil</a>{{/if}}
       </div>
       {{/if}}
 

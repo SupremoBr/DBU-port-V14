@@ -1,3 +1,4 @@
+import { PROFILES_093 } from "../../rules/profiles-v093.mjs";
 import { SYSTEM_ID as MODULE_ID } from "../package.mjs";
 import { previewMeasuredTemplate } from "./area-preview.js";
 
@@ -148,6 +149,12 @@ export function getAreaSpec(source) {
   // DBU snapshot (2025-09-13), Signature Techniques: Controlled Blast
   // (5 TP; requires Blast Profile) may originate from any Square that is
   // NOT at Long Range. Attacking defines Long Range as 9+ Squares.
+  const currentArea = PROFILES_093[profile]?.area;
+  if (CONFIG.DBU?.rulesVersion === '0.9.3' && currentArea) {
+    const shape = { sphere: 'circle', cone: 'cone', line: 'ray' }[currentArea.type];
+    spec = { ...spec, isAoE: true, shape, magnitude: currentArea.magnitude === 'Minor' ? 0 : 1, centeredOnAttacker: !!currentArea.centeredOnSelf || !currentArea.remoteOrigin, excludeAllies: !!PROFILES_093[profile].excludeAllies, source: 'profile', reasons: [profile+' — 0.9.3'] };
+  }
+
   if (profile === "Blast" && advantage(source, /^Controlled Blast$/i)) {
     spec.controlledBlast = true;
     spec.reasons.push("Controlled Blast: origem livre até 8 Squares; direção escolhida");

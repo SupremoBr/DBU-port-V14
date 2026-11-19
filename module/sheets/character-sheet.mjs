@@ -1,3 +1,5 @@
+import { uses093 } from "../rules/v093.mjs";
+import { RACES_093 } from "../rules/races-v093.mjs";
 import { ActorSheet, Dialog } from "../helpers/foundry-compat.mjs";
 import { installCharacterMethods } from "./character/install-methods.mjs";
 import { transformationStateMethods } from "./character/transformation-state.mjs";
@@ -353,6 +355,9 @@ export class DBUCharacterSheet extends ActorSheet {
       undead: "Undead",
       customSpecies: "Custom Species"
     };
+    if (uses093(system)) context.raceOptions = Object.fromEntries(Object.entries(RACES_093).map(([id, race]) => [id, race.name]));
+    context.rules093 = uses093(system);
+    context.rules093Issues = this.actor.getFlag("DBU-MRR-OLD", "rules093Review")?.issues || [];
     context.sizeOptions = {
       nano: "Nano", tiny: "Tiny", small: "Small", medium: "Medium",
       large: "Large", enormous: "Enormous", gigantic: "Gigantic", colossal: "Colossal"

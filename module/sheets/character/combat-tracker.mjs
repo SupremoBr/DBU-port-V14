@@ -1,3 +1,6 @@
+import { defendKiCost093 } from "../../rules/defenses-v093.mjs";
+import { uses093 } from "../../rules/v093.mjs";
+import { profileRoll093 } from "../../rules/profiles-v093.mjs";
 import { initiateDuel, initiateClash } from "../../helpers/duel.mjs";
 
 /** Character sheet domain: combat-tracker. Methods run with the sheet as this. */
@@ -430,8 +433,10 @@ export const combatTrackerMethods = {
     const critFormula = this._critExtraFormula(sysTier);
     const botchPenalty = 2 * sysBaseTier;
 
-    const strikeCrit = strikeNat !== "?" && strikeNat >= strikeCT;
-    const strikeBotch = strikeNat === 1;
+    const profileRoll = uses093(this.actor.system) && strikeNat !== "?" ? profileRoll093(sd.profile, { strikeNatural: strikeNat, strikeCT, damageCat: sd.damageCat }) : null;
+    const strikeCrit = profileRoll ? profileRoll.critical : strikeNat !== "?" && strikeNat >= strikeCT;
+    const strikeBotch = profileRoll ? profileRoll.botch : strikeNat === 1;
+    if (profileRoll) sd = { ...sd, damageCat: profileRoll.damageCat };
     const woundCrit = woundNat !== "?" && woundNat >= woundCT;
     const woundBotch = woundNat === 1;
 
@@ -439,7 +444,7 @@ export const combatTrackerMethods = {
     if (strikeCrit) { strikeCritRoll = new Roll(critFormula); await strikeCritRoll.evaluate(); }
     if (woundCrit) { woundCritRoll = new Roll(critFormula); await woundCritRoll.evaluate(); }
 
-    const strikeTotal = strikeRoll.total
+    const strikeTotal = strikeRoll.total + (profileRoll?.strikeAdjustment || 0)
       + (strikeCritRoll?.total || 0) - (strikeBotch ? botchPenalty : 0);
     const woundTotal = woundRoll.total
       + (woundCritRoll?.total || 0) - (woundBotch ? botchPenalty : 0);
@@ -1057,7 +1062,7 @@ export const combatTrackerMethods = {
       const isParry = opt.key === "parry";
       const cts2 = this._calcCombatCTs(this.actor.system);
       const rollCT = isParry ? cts2.strikeCT : cts2.woundCT;
-      const penalty = isParry ? Math.max(0, Number(action.defendPenalty) || 0) * tier : 0;
+      const penalty = isParry ? Math.max(0, Number(action.defendPenalty) || 0) * (uses093(this.actor.system) ? baseTier : tier) : 0;
       const wager = !isParry
         ? Math.max(0, Math.min(Number(action.defendWager) || 0, this._trackerDefend?.maxFlareWager || 0))
         : 0;
@@ -1070,7 +1075,7 @@ export const combatTrackerMethods = {
         ? (Number(this.actor.system._cyberParryStrike) || 0) + (Number(this.actor.system.aptitudes?.fierceCounterStrike) || 0)
         : 0;
       if (parryBonus > 0) formula += `+${parryBonus}`;
-      const kiCost = opt.costT * tier;
+      const kiCost = uses093(this.actor.system) ? defendKiCost093(this.actor.system, opt.key, action.defendEC) : opt.costT * tier;
       const totalPay = kiCost + wager;
 
       const roll = new Roll(formula);
@@ -1158,11 +1163,13 @@ export const combatTrackerMethods = {
     }
 
     // ---- Non-roll options: Guard / Direct Hit / Cross Counter ----
-    let kiCost = opt.costT * tier;
+    let kiCost = uses093(this.actor.system) ? defendKiCost093(this.actor.system, opt.key, action.defendEC) : opt.costT * tier;
     if (opt.key === "guard") {
       const ec = Math.min(Math.max(0, Number(action.defendEC) || 0), 4);
-      kiCost = (8 + ec) * tier;
-      if (this.actor._isConditionActive?.(this.actor.system, "guardDown")) kiCost = Math.ceil(kiCost * 1.5);
+      if (!uses093(this.actor.system)) {
+        kiCost = (8 + ec) * tier;
+        if (this.actor._isConditionActive?.(this.actor.system, "guardDown")) kiCost = Math.ceil(kiCost * 1.5);
+      }
       // Pre-configure the Damage Tracker; Apply Damage will NOT charge again.
       updates["system.damageCalc.defense"] = "guard";
       updates["system.damageCalc.incomingEC"] = Math.min(Math.max(0, Number(action.defendEC) || 0), 4);

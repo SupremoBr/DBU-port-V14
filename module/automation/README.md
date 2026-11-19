@@ -40,7 +40,7 @@ Esta é uma importação inicial, não sincronização bidirecional contínua co
 
 `upstream.json` registra versão, URL, autoria e hashes SHA-256 do ZIP e dos arquivos recebidos. `UPSTREAM-README.txt` preserva a documentação do módulo como referência histórica; as instruções deste README descrevem a instalação integrada. O nome e os créditos do sistema original foram preservados, e DBU Automation foi acrescentado aos autores do manifesto.
 
-A cópia é fixada na versão 1.9.22; atualizações futuras do repositório do módulo não são baixadas durante o jogo. Precisam ser incorporadas e testadas em uma nova versão do sistema. As regras continuam na base 0.9.2 informada pelo usuário; a atualização para DBU 0.9.3 é uma tarefa separada.
+A cópia é fixada na versão 1.9.22; atualizações futuras do repositório do módulo não são baixadas durante o jogo. Precisam ser incorporadas e testadas em uma nova versão do sistema. A versão original do módulo usava regras 0.9.2. Este fork aplica ajustes locais para a prévia 0.9.3: custos e orçamento de Actions/Defend, Profiles, validação de técnicas e regras gerais de transformação. O boot aguarda a migração do mundo. Os hashes em upstream.json identificam os arquivos recebidos antes dessas adaptações. Consulte [o escopo e os efeitos ainda manuais](../../RULES-0.9.3.md).
 
 ## Validação
 

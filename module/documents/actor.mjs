@@ -1,3 +1,5 @@
+import { uses093 } from "../rules/v093.mjs";
+import { racialSaves093, racialLife093, applyRacial093, applyCatalogPassives093, applyRacialAttribute093, ignoresSaiyanPenalties093 } from "../rules/runtime-v093.mjs";
 import { getDisabledRacialPassives, getRacialStressBonus } from "../helpers/catalog-index.mjs";
 /**
  * Extend the base Actor document for the DBU-OLD system.
@@ -211,6 +213,7 @@ export class DBUActor extends Actor {
 
     // ---- Attribute Modifiers (with transformations, auras, buffs) ----
     this._calculateAttributeModifiers(system, tier);
+    applyRacialAttribute093(system, tier);
 
     // ---- One-Sided Fusion Attribute Bonuses ----
     this._applyOneSidedFusionBonuses(system, tier, baseTier);
@@ -228,7 +231,7 @@ export class DBUActor extends Actor {
       if (effectiveRace === "customSpecies") {
         system.proficientSave = system.customSpeciesSave || "corporeal";
       } else {
-        system.proficientSave = DBUActor.RACIAL_SAVES[effectiveRace] || "corporeal";
+        system.proficientSave = (uses093(system) ? racialSaves093({ ...system, race: effectiveRace })[0] : DBUActor.RACIAL_SAVES[effectiveRace]) || "corporeal";
       }
     }
 
@@ -345,7 +348,8 @@ export class DBUActor extends Actor {
     system._disabledRacialPassives = this._computeDisabledRacialPassives(system);
 
     // ---- Racial Trait Automation ----
-    this._calculateRacialTraitBonuses(system, tier, baseTier);
+    if (uses093(system)) applyRacial093(system, tier, baseTier);
+    else this._calculateRacialTraitBonuses(system, tier, baseTier);
 
     // ---- Manifested Power Trait Automation ----
     applyManifestedPowerBonuses(system, tier, baseTier);
@@ -367,6 +371,7 @@ export class DBUActor extends Actor {
 
     // ---- Talent Automation ----
     applyTalentBonuses(system, tier, baseTier);
+    applyCatalogPassives093(system, tier, baseTier);
 
     // ---- Damage Reduction Finalizer ----
     // Now that racial + talent + bestial DR additions are accumulated in
@@ -869,7 +874,7 @@ export class DBUActor extends Actor {
       rlm = system.fusion._fusionRLM;
     } else {
       const effectiveRaceForLP = system.fusion?._possessionRace || system.race;
-      rlm = DBUActor.RACIAL_LIFE_MODIFIERS[effectiveRaceForLP] || 3;
+      rlm = uses093(system) ? racialLife093(system, effectiveRaceForLP) : (DBUActor.RACIAL_LIFE_MODIFIERS[effectiveRaceForLP] || 3);
     }
     const modifyLife = system.lifePoints?.modify || 0;
     // Custom buff "Racial Life Modifier" — added to rlm before the formula uses it (scales by level)
@@ -1049,7 +1054,7 @@ export class DBUActor extends Actor {
       if (!trans.active) continue;
       const tt = trans.transformationType || "";
       if (tt === "form_alternate" || tt === "form_legendary") {
-        if (trans.catalogKey !== "full_suppression") kiMultActive = true;
+        if (trans.catalogKey !== "full_suppression" && (!uses093(system) || meta.enteredViaManeuver093?.includes(trans.id))) kiMultActive = true;
         const trMatch = String(trans.tierRequirement || "").match(/(\d+)/);
         if (trMatch) stepByStepReduction = Math.max(stepByStepReduction, parseInt(trMatch[1]));
       }
@@ -1295,7 +1300,7 @@ export class DBUActor extends Actor {
       const attrScore = system.attributes[attrKey]?.score ?? 0;
       // Fusion: multiple proficient saves from composite races (don't stack same save)
       const allProfSaves = system.fusion?._allProficientSaves;
-      const isProficient = allProfSaves ? allProfSaves.includes(saveKey) : (saveKey === system.proficientSave);
+      const isProficient = allProfSaves ? allProfSaves.includes(saveKey) : uses093(system) ? racialSaves093(system).includes(saveKey) : (saveKey === system.proficientSave);
       const profBonus = isProficient ? tier : 0;
 
       // Custom buff saves — accept singular AND plural ("Impulsive Save" /
@@ -1384,6 +1389,8 @@ export class DBUActor extends Actor {
     if ((system.talents || []).includes("transformation_stressor")) {
       system.thresholds.stressPenalty = 0;
     }
+
+    if (ignoresSaiyanPenalties093(system)) { system.thresholds.penalties = 0; system.thresholds.stressPenalty = 0; }
 
     // Count of crossed thresholds (regardless of save), used by talents/transformations.
     system.thresholds.crossedCount = (system.thresholds.bruised.crossed ? 1 : 0)
@@ -3426,11 +3433,13 @@ export class DBUActor extends Actor {
   }
 
   _isConditionActive(system, id) {
+    if (["impaired", "fatigued"].includes(id) && ignoresSaiyanPenalties093(system)) return false;
     const c = (system.conditions || []).find(c => c.id === id);
     return c ? c.active : false;
   }
 
   _getConditionStacks(system, id) {
+    if (["impaired", "fatigued"].includes(id) && ignoresSaiyanPenalties093(system)) return 0;
     const c = (system.conditions || []).find(c => c.id === id);
     return (c && c.active) ? (c.stacks || 1) : 0;
   }

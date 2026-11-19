@@ -1,5 +1,8 @@
 
 
+import { techniqueKiCost093, signatureEnergyCharges093 } from "../../rules/techniques-v093.mjs";
+import { uses093, techniquePointCost } from "../../rules/v093.mjs";
+
 /** Character sheet domain: techniques. Methods run with the sheet as this. */
 export const techniquesMethods = {
 
@@ -278,6 +281,7 @@ export const techniquesMethods = {
    * Magical Flavor swaps in the chosen Energy Profile's KP cost/minimum.
    */
   _calcTechKP(tech) {
+    if (uses093(this.actor.system)) return techniqueKiCost093(tech);
     const profileKpCosts = CONFIG.DBU?.profileKpCosts || {};
     const mfProfile = this._techMagicalFlavor(tech);
     const profileBaseKP = profileKpCosts[mfProfile || tech.profile] || 0;
@@ -325,6 +329,7 @@ export const techniquesMethods = {
   },
 
   _calcTechTPCost(tech) {
+    if (uses093(this.actor.system)) return techniquePointCost(tech);
     // Base: 8 TP for all Signature Techniques
     let total = 8;
     // Sum advantages TP (positive)
@@ -349,10 +354,12 @@ export const techniquesMethods = {
     let awareness = system.aptitudes?.awareness ?? 0;
 
     // Cutting: "1/2 (rounded up) of your Haste and 3/4 of your Awareness" to Strike Roll (attacking.txt)
-    if (tech.profile === "Cutting") {
+    if (tech.profile === "Cutting" && !uses093(system)) {
       haste = Math.ceil(haste / 2);
       awareness = Math.floor(awareness * 3 / 4);
     }
+
+    if (uses093(system) && tech.profile === "Crushing") haste = Math.floor(haste / 2);
 
     // Accurate bonus
     let accurateBonus = 0;
@@ -425,7 +432,7 @@ export const techniquesMethods = {
     // Damage attribute: Physical/Energy → Force Modifier, Magic → Magic Modifier
     let damageAttr = tech.foundation === "Magic" ? getAttrTotal("ma") : getAttrTotal("fo");
     // Crushing: "Reduce the bonus to your Wound Roll from your Force by 1/2" (attacking.txt)
-    if (tech.profile === "Crushing") damageAttr = Math.floor(damageAttr / 2);
+    if (tech.profile === "Crushing" && !uses093(system)) damageAttr = Math.floor(damageAttr / 2);
     // Powered: double damage attribute
     let extraDamageAttr = tech.profile === "Powered" ? damageAttr : 0;
 
@@ -440,7 +447,7 @@ export const techniquesMethods = {
       if (dis.name === "Low Penetration") lowPenPenalty += (dis.ranks || 1) * tier;
     }
 
-    const charges = (tech.baseEnergyCharges || 0) + (tech.extraEnergyCharges || 0);
+    const charges = uses093(system) ? signatureEnergyCharges093(tech, system) : (tech.baseEnergyCharges || 0) + (tech.extraEnergyCharges || 0);
     // Unified wound buff total (talents, states, maneuvers, custom buffs)
     const woundBuffTotal = system.aptitudes?.woundBuffTotal ?? 0;
     // Per-foundation wound bonuses — buffs "Wound (Physical/Energy/Magic)" plus

@@ -1,3 +1,5 @@
+import { PROFILES_093 } from "../../rules/profiles-v093.mjs";
+import { uses093 } from "../../rules/v093.mjs";
 
 
 /** Character sheet domain: combat-math. Methods run with the sheet as this. */
@@ -119,7 +121,7 @@ export const combatMathMethods = {
     if (talents.includes("instinctual_evasion")) dodgeCT -= 1;
 
     strikeCT = clamp(strikeCT);
-    woundCT = clamp(woundCT);
+    woundCT = uses093(system) && profile === "Cutting" ? 5 : clamp(woundCT);
     dodgeCT = clamp(dodgeCT);
 
     return { strikeCT, woundCT, dodgeCT };
@@ -252,7 +254,7 @@ export const combatMathMethods = {
     const refs = system.attackRefs || [];
     context.attackRefs = refs.map((ref, idx) => {
       const profile = profileData[ref.profile] || {};
-      const charges = ref.energyCharges || 0;
+      const charges = (ref.energyCharges || 0) + (uses093(system) ? ((PROFILES_093[ref.profile]?.freeCharges || 0) + (PROFILES_093[ref.profile]?.freeChargesOutsideLimit || 0)) : 0);
       const wager = ref.kiWager || 0;
       const ps = ref.powerShot || 0;
       const targetRange = ref.targetRange || 0;
@@ -307,10 +309,11 @@ export const combatMathMethods = {
       let awareness = system.aptitudes?.awareness ?? 0;
       if (isProne) haste = Math.floor(haste / 2);
       // Cutting: "1/2 (rounded up) of your Haste and 3/4 of your Awareness" (attacking.txt)
-      if (ref.profile === "Cutting") {
+      if (ref.profile === "Cutting" && !uses093(system)) {
         haste = Math.ceil(haste / 2);
         awareness = Math.floor(awareness * 3 / 4);
       }
+      if (uses093(system) && ref.profile === "Crushing") haste = Math.floor(haste / 2);
       const strikePenShaken = isShaken ? 2 * tier : 0;
       // Long Range threshold: 9 + sizes-above-Large + "Long Range Distance"
       // buff (status.longRangeNumeric — the hardcoded 9 ignored both).
@@ -364,7 +367,7 @@ export const combatMathMethods = {
       const isMagic = ref.foundation === "Magic";
       let damageAttr = isMagic ? ma : fo;
       // Crushing: "Reduce the bonus to your Wound Roll from your Force by 1/2" (attacking.txt)
-      if (ref.profile === "Crushing") damageAttr = Math.floor(damageAttr / 2);
+      if (ref.profile === "Crushing" && !uses093(system)) damageAttr = Math.floor(damageAttr / 2);
       const isPowered = ref.profile === "Powered";
       const extraDmgAttr = isPowered ? damageAttr : 0;
       const woundPSBonus = ps * 2 * tier;
@@ -379,7 +382,7 @@ export const combatMathMethods = {
       // Attack Refs are Basic Attacking Maneuvers (not Signature Techniques),
       // so per attacking.txt:31 each Energy Charge adds 1d6(T) to the Wound Roll
       // (Sig Techs use d8 — handled separately in _calcTechWound).
-      const chargesStr = charges > 0 ? `+${charges * tier}d6` : "";
+      const chargesStr = (charges > 0 ? `+${charges * tier}d6` : "") + (uses093(system) && ref.profile === "Mega Flare" && charges > 0 ? `+${charges * tier}` : "");
       // Super Stack Extra Dice: "+1d4(T), increasing dice category per stack after first" (attributes.txt)
       const ssWoundDice = system.aptitudes?.superStackWoundDice || "";
       const ssWoundExtra = (ssWoundDice && (ref.foundation === "Physical" || ref.foundation === "Energy"))

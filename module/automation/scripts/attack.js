@@ -1,3 +1,7 @@
+import { inCombat093 } from "../../rules/actions-v093.mjs";
+import { profileRoll093 } from "../../rules/profiles-v093.mjs";
+import { uses093 } from "../../rules/v093.mjs";
+import { validateTechnique093, validateTechniqueUsage093, maximumWager093 } from "../../rules/techniques-v093.mjs";
 // DBU Automation v1.8.12 DEV — Attack Core
 import { getAttackVisualSettings } from "./visual-config.js";
 import { getAreaSpec, resolveAreaTargets, magnitudeLabel } from "./area-attack.js";
@@ -1220,8 +1224,19 @@ const selected = sources[selection.index];
 if (!selected) return ui.notifications.error("Ataque selecionado não encontrado.");
 
 const source = selected.source;
+if (uses093(actor.system) && source.key?.startsWith("tech_")) {
+  const technique = (actor.system.signatureTechniques || []).find(t => "tech_"+t.id === source.key);
+  if (technique) {
+    const validation = validateTechnique093(technique);
+    if (!validation.ok) return ui.notifications.warn(validation.issues.join("; "));
+    if (inCombat093(actor)) {
+      const usage = validateTechniqueUsage093(actor, technique);
+      if (!usage.ok) return ui.notifications.warn(usage.reason);
+    }
+  }
+}
 const originalDamageCategory = dbuNormalizeDamageCategory(source.damageCat);
-const chosenDamageCategory = dbuNormalizeDamageCategory(
+let chosenDamageCategory = dbuNormalizeDamageCategory(
   selection.damageCategory || originalDamageCategory
 );
 const damageCategoryAdjusted = chosenDamageCategory !== originalDamageCategory;
@@ -1302,6 +1317,10 @@ const wager = Number(selection.wager || 0);
 
 const attackKiCost = Math.max(0, Number(source.kiCost || 0));
 const attackTotalCost = attackKiCost + Math.max(0, wager);
+if (uses093(actor.system)) {
+  const technique = (actor.system.signatureTechniques || []).find(t => 'tech_'+t.id === source.key);
+  if (wager > maximumWager093(actor, technique || source, attackKiCost)) return ui.notifications.warn('Ki Wager acima do limite atual de Capacity/Ki.');
+}
 
 let affordability = null;
 
@@ -1404,6 +1423,7 @@ const actionIndex = currentRound.actions.length;
 
 currentRound.actions.push({
   type: "attack",
+  effectiveType: context?.effectiveType || "standard",
   source: source.key,
   kiCost: Number(source.kiCost || 0),
   dkpCost: 0,
@@ -1552,10 +1572,12 @@ const woundCT = Math.max(1, defaultWoundCT + Number(selection.woundCTMod || 0));
 const strikeBotchThreshold = dbuClampInt(selection.strikeBotch, 0, 10);
 const woundBotchThreshold = dbuClampInt(selection.woundBotch, 0, 10);
 
-const strikeCrit = strikeNat >= strikeCT;
+const profileRoll = uses093(actor.system) ? profileRoll093(source.profile, { strikeNatural: strikeNat, strikeCT, strikeBotchThreshold, damageCat: chosenDamageCategory }) : null;
+if (profileRoll) chosenDamageCategory = profileRoll.damageCat;
+const strikeCrit = profileRoll ? profileRoll.critical : strikeNat >= strikeCT;
 const woundCrit = woundNat >= woundCT;
 
-const strikeBotch = strikeBotchThreshold > 0 && strikeNat <= strikeBotchThreshold;
+const strikeBotch = profileRoll ? profileRoll.botch : strikeBotchThreshold > 0 && strikeNat <= strikeBotchThreshold;
 const woundBotch = woundBotchThreshold > 0 && woundNat <= woundBotchThreshold;
 
 const critFormula = typeof sheet._critExtraFormula === "function"
@@ -1605,7 +1627,7 @@ const woundBaseAdjusted =
   + Number(woundBonus.total || 0);
 
 const strikeTotal =
-  strikeBaseAdjusted
+  strikeBaseAdjusted + (profileRoll?.strikeAdjustment || 0)
   + Number(strikeCritRoll?.total || 0)
   - (strikeBotch ? botchPenalty : 0);
 

@@ -1,3 +1,6 @@
+import { installRulesSheet093 } from "./module/rules/sheet-v093.mjs";
+import { installRules093 } from "./module/rules/config-v093.mjs";
+import { migrateWorld093, convertActor093, exportRulesBackup, waitForRules093, SYSTEM_ID, MIGRATION_KEY } from "./module/rules/migration-v093.mjs";
 import { onRenderChatMessage, registerSystemSheets } from "./module/helpers/foundry-compat.mjs";
 import { getCatalogById, getRacialCatalogIndex, invalidateCatalogIndex } from "./module/helpers/catalog-index.mjs";
 /**
@@ -93,6 +96,11 @@ Hooks.once("init", async () => {
   CONFIG.DBU.baseSizes = BASE_SIZES;
   CONFIG.DBU.baseHardness = BASE_HARDNESS;
 
+  installRules093(CONFIG.DBU);
+  installRulesSheet093(DBUCharacterSheet);
+  game.settings.register(SYSTEM_ID, MIGRATION_KEY, { scope: "world", config: false, type: Object, default: {} });
+  game.dbu.exportRulesBackup = () => exportRulesBackup(game);
+
   // Catalogs are session data. Actor values and option selections stay uncached.
   invalidateCatalogIndex();
   getRacialCatalogIndex(CONFIG.DBU.racialTraitsCatalog);
@@ -150,7 +158,24 @@ Hooks.once("init", async () => {
  * Ready Hook — runs once after all game data is loaded.
  */
 Hooks.once("ready", () => {
-  console.log("DBU-OLD | System ready");
+  const alreadyMigrated = game.settings.get(SYSTEM_ID, MIGRATION_KEY)?.complete;
+  game.dbu.rulesReady = migrateWorld093(game).then(async result => {
+    if (result.skipped) return waitForRules093(game);
+    if (result.complete && !alreadyMigrated) ui.notifications.info("DBU 0.9.3: mundo convertido. Backup disponível no Diário; revise os avisos nas fichas.", { permanent: true });
+    return result;
+  }).catch(error => {
+    ui.notifications.error("DBU: migração 0.9.3 interrompida. Confira o console e o backup antes de continuar.", { permanent: true });
+    console.error("DBU | Rules migration", error);
+    throw error;
+  });
+});
+
+Hooks.on("preCreateActor", (actor, data) => {
+  if (actor.type !== "character" || data.system?.rulesVersion === "0.9.3") return;
+  if (data.system && Object.keys(data.system).length) {
+    const plan = convertActor093(data);
+    if (plan) actor.updateSource({ system: plan.system, [`flags.${SYSTEM_ID}.rules093ImportedOriginal`]: foundry.utils.deepClone(data), [`flags.${SYSTEM_ID}.rules093Review`]: { issues: plan.issues } });
+  } else actor.updateSource({ "system.rulesVersion": "0.9.3" });
 });
 
 /**

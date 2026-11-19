@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.0.12-rules093-alpha.1] — prévia de regras 0.9.3
+
+- Catálogos atuais de raças/traços, talentos e transformações, com fontes oficiais; tabelas de criação e passivos básicos de Saiyan revistos.
+- Pools Standard/Counter integrados à ficha e automação; conversão de Actions, ajustes explícitos de Momentum e custos atuais de Defend.
+- Custos TP/KP atuais, Profiles e Super Profiles/Dramatic Finisher, validação de escolhas removidas e correções de Crushing/Cutting/Clearing e charges.
+- Limites de Awakenings/stacking, entrada por Transformation Maneuver e regras gerais de NLoP/Legend Realized/Full Awakening.
+- Migração pelo GM com backup anterior a qualquer alteração, dados de tokens desvinculados, retomada após falhas e avisos de revisão nas fichas.
+- **Prévia com resolução manual de muitos efeitos. Não representa automação integral da edição nem teste funcional no Foundry real.** Veja [RULES-0.9.3.md](RULES-0.9.3.md). Foundry v13 preservado.
+
 ## [1.0.11-v14.4] — DBU Automation integrada
 
 - Incluye DBU Automation DEV 1.9.22 en el sistema: HUD, paneles, ataques/defensas, auras, transformaciones, equipos y demás recursos del módulo. Foundry v13 sigue soportado.

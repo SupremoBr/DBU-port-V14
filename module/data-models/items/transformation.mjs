@@ -10,6 +10,8 @@ export default class DBUTransformationData extends foundry.abstract.TypeDataMode
   static defineSchema() {
     return {
       // Key into the transformations catalog (null for manual entries)
+      awakeningType: new StringField({ initial: "" }),
+      transcended: new BooleanField({ initial: false }),
       catalogKey: new StringField({ nullable: true, initial: null }),
 
       // Transformation type ID (e.g. "manifested_power", "enhancement_standard", "form_alternate", "form_legendary")

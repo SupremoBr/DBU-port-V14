@@ -30,6 +30,10 @@ export default class DBUTechniqueData extends foundry.abstract.TypeDataModel {
 
       // Profile: "Beam", "Sphere", "Blitz", etc.
       profile: new StringField({ initial: "" }),
+      superProfile: new StringField({ initial: "" }),
+      secondaryProfile: new StringField({ initial: "" }),
+      superProfileActions: new NumberField({ initial: 0, integer: true, min: 0, max: 2 }),
+      superProfileGranted: new BooleanField({ initial: false }),
 
       // TP fields
       tpCost: new NumberField({ required: true, nullable: false, initial: 0, integer: true }),

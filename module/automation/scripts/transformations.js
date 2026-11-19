@@ -1,3 +1,5 @@
+import { uses093 } from "../../rules/v093.mjs";
+import { applyLegendRealized093 } from "../../rules/transformations-v093.mjs";
 import { unsetAutomationFlag } from "../migration.mjs";
 import { readAutomationFlag } from "../package.mjs";
 import { TRANSFORMATION_CONFIG } from "./transformation-config.js";
@@ -691,6 +693,7 @@ async function markKiMultiplierEntry(actor, trans) {
 }
 
 async function applyKiMultiplierEntryRecovery(actor, trans, { prepared = false } = {}) {
+  if (uses093(actor.system)) return false;
   const state = kiMultiplierEntryState(actor, trans);
   if (!state.eligible) return false;
   if (!prepared) await actor.sheet?.getData?.();
@@ -716,6 +719,7 @@ async function applyKiMultiplierEntryRecovery(actor, trans, { prepared = false }
 }
 
 async function applyLegendRealized(actor, trans) {
+  if (uses093(actor.system)) return applyLegendRealized093(actor, actor.system.transformations?.[trans.transIndex] || trans);
   if (!legendRealizedEligible(trans) || !encounterKey()) return false;
   await actor.sheet?.getData?.();
 

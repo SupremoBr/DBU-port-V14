@@ -1,3 +1,5 @@
+import { uses093 } from "../../rules/v093.mjs";
+import { roundPools093, isOwnTurn093 } from "../../rules/actions-v093.mjs";
 // DBU Automation — Action economy informativa (DBU 0.9.2)
 import { combatantForIdentity } from "./core/token-identity.js";
 import { MODULE_ID } from "./core/module-id.js";
@@ -78,6 +80,10 @@ function brawlerPinnedBonus(actor) {
  * character effects do not need to be guessed here.
  */
 export function standardActionBudget(actor, { limitBonus = 0 } = {}) {
+  if (uses093(actor?.system) && actorInActiveCombat(actor)) {
+    const pools = roundPools093(actor, { standardBonus: limitBonus });
+    return { base: 3, limit: pools.standard.granted, spent: pools.standard.spent, remaining: pools.standard.remaining, pinned: conditionActive(actor, "pinned"), slowedStacks: 0, inCombat: true, counter: pools.counter };
+  }
   const pinned = conditionActive(actor, "pinned");
   const slowed = conditionState(actor, "slowed");
   const slowedStacks = slowed?.active ? Math.max(0, Math.trunc(number(slowed.stacks, 0))) : 0;
@@ -106,7 +112,10 @@ export function validateActionUse(actor, {
   movement = false,
   allowPinnedEscape = false,
   limitBonus = 0,
-  notify = true
+  notify = true,
+  timingOverride = false,
+  isAttackTarget = false,
+  triggerId = null
 } = {}) {
   if (!actor) return { ok: false, reason: "actor", message: `${label}: personagem não encontrado.` };
   const budget = standardActionBudget(actor, { limitBonus });
@@ -126,12 +135,21 @@ export function validateActionUse(actor, {
   const requestedCost = Math.max(0, Number(actionCost) || 0);
   const overBudget = effectiveType === "standard" && budget.inCombat && budget.remaining < requestedCost;
 
+  if (uses093(actor.system) && budget.inCombat) {
+    const pools = roundPools093(actor, { standardBonus: limitBonus });
+    if (effectiveType === "standard" && !timingOverride && !isOwnTurn093(actor)) message ||= "Standard Maneuvers exigem seu turno.";
+    if (effectiveType === "standard" && pools.standard.remaining < requestedCost) message ||= "Standard Actions insuficientes.";
+    if (effectiveType === "counter" && !isAttackTarget && !timingOverride) message ||= "Counter Maneuver exige ser alvo de um ataque.";
+    if (effectiveType === "counter" && pools.counter.remaining < requestedCost) message ||= "Counter Actions insuficientes. Converta uma Standard Action na ficha.";
+    if (effectiveType === "out-of-sequence" && !triggerId && !timingOverride) message ||= "Out-of-Sequence exige um efeito que a conceda.";
+  }
+
   if (message) {
     if (notify) ui.notifications.warn(message);
     return { ok: false, reason: "state", message, budget, overBudget };
   }
 
-  if (overBudget && notify) {
+  if (overBudget && notify && !uses093(actor.system)) {
     ui.notifications.info(`${actor.name}: custo padrão ${requestedCost} Action${requestedCost === 1 ? "" : "s"}; contador base restante ${budget.remaining}. O uso foi permitido para respeitar efeitos que alteram a economia de Actions.`);
   }
 

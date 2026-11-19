@@ -18,7 +18,7 @@ const { DBUCharacterSheet } = await import('../module/sheets/character-sheet.mjs
 const baseline = JSON.parse(readFileSync(new URL('./fixtures/character-methods-baseline.json', import.meta.url)));
 const hash = fn => createHash('sha256').update(fn.toString()).digest('hex');
 
-test('all 385 prototype methods retain names, signatures, descriptors and inheritance', () => {
+test('385 prototype methods retain their contract, with reviewed 0.9.3 rule changes', () => {
   assert.equal(Object.getPrototypeOf(DBUCharacterSheet.prototype), ActorSheetStub.prototype);
   const actual = Object.getOwnPropertyDescriptors(DBUCharacterSheet.prototype);
   assert.deepEqual(Object.keys(actual).filter(n => n !== 'constructor').sort(), Object.keys(baseline.methods).sort());
@@ -30,8 +30,9 @@ test('all 385 prototype methods retain names, signatures, descriptors and inheri
     assert.equal(d.writable, true, name);
     assert.equal(d.value.length, expected.length, name);
     assert.equal(d.value.constructor.name === 'AsyncFunction', expected.async, name);
-    // Only this lifecycle wrapper changed: its original body moved to listeners.
-    if (name !== 'activateListeners') assert.equal(hash(d.value), expected.relocatedHash ?? expected.hash, name);
+    // Original hashes are retained; ten intentional rule/UI changes have separate reviewed hashes.
+    // Their 0.9.3 behavior is exercised in rules093-integration.test.mjs.
+    if (name !== 'activateListeners') assert.equal(hash(d.value), expected.rules093Hash ?? expected.relocatedHash ?? expected.hash, name);
   }
 });
 

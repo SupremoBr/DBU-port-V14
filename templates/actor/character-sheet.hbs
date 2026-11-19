@@ -1,5 +1,24 @@
 <form class="{{cssClass}} flexcol" autocomplete="off">
   <div class="dbu-old-sheet">
+    {{#if rules093}}
+    <div class="dbu-rules-actions">
+      <b>Standard: {{rules093Pools.standard.remaining}} / {{rules093Pools.standard.granted}}</b>
+      <b>Counter: {{rules093Pools.counter.remaining}} / {{rules093Pools.counter.granted}}</b>
+      <button type="button" data-rules093-convert>Standard → Counter</button>
+      <button type="button" data-rules093-adjust>Ajustar bônus de Actions</button>
+      {{#if rules093Born}}<button type="button" data-rules093-born-max>Born for Battle 3 — após Heritage 2</button>{{/if}}
+      <button type="button" data-rules093-full-awakening>Full Awakening</button>
+    </div>
+    <details class="dbu-rules-review">
+      <summary>DBU 0.9.3 — fontes e revisão ({{rules093Issues.length}} avisos)</summary>
+      <p>Efeitos marcados como manuais devem ser aplicados pela fonte oficial.</p>
+      {{#if rules093Race}}<p><b>{{rules093Race.name}}</b>: Life Modifier {{rules093Race.life}}; saves {{rules093Race.saves}}; {{rules093Race.skills}} Skill Ranks. Atributos: {{rules093RaceAttributes}}.</p>{{/if}}
+      {{#if canExportRulesBackup}}<button type="button" data-rules093-backup>Baixar backup anterior à 0.9.3</button>{{/if}}
+      <button type="button" data-rules093-source>Fontes das escolhas da ficha</button>
+      <p><a href="https://dbu-rpg.com/racial-rules/" target="_blank" rel="noopener noreferrer">Raças</a> · <a href="https://dbu-rpg.com/transformation-rules/" target="_blank" rel="noopener noreferrer">Transformações</a> · <a href="https://dbu-rpg.com/actions-maneuvers/" target="_blank" rel="noopener noreferrer">Ações</a> · <a href="https://dbu-rpg.com/talents/" target="_blank" rel="noopener noreferrer">Talentos</a> · <a href="https://dbu-rpg.com/signature/" target="_blank" rel="noopener noreferrer">Técnicas</a></p>
+      {{#each rules093Issues}}<p><b>{{name}}</b>: {{reason}}</p>{{/each}}
+    </details>
+    {{/if}}
     {{!-- ==================== HEADER ==================== --}}
     <header class="sheet-header flexrow">
       <div class="header-bg"></div>

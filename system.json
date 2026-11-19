@@ -1,8 +1,8 @@
 {
   "id": "DBU-MRR-OLD",
-  "title": "Dragon Universe RPG - Old System",
-  "description": "Automatización para Foundry VTT del juego de rol Dragon Universe (versión antigua), creado por el equipo de https://dbu-rpg.com/. Implementación con permiso de los autores; mecánicas d10, Tiers of Power, Ki y transformaciones. Proyecto sin ánimo de lucro, gratuito, hecho por fans para fans.",
-  "version": "1.0.11-v14.4",
+  "title": "Dragon Universe RPG — regras 0.9.3 (prévia)",
+  "description": "Fork do sistema de MRR / ArdillaTactica, com DBU Automation integrada e base de regras atualizada a partir de dbu-rpg.com. Prévia 0.9.3: migração com backup e efeitos manuais identificados. Consulte RULES-0.9.3.md antes de atualizar um mundo.",
+  "version": "1.0.12-rules093-alpha.1",
   "compatibility": {
     "minimum": "12",
     "verified": "13",
@@ -98,7 +98,7 @@
   "packs": [
     {
       "name": "racial-traits",
-      "label": "Racial Traits",
+      "label": "Racial Traits — referência legada 0.9.2",
       "path": "packs/racial-traits",
       "type": "Item",
       "ownership": {
@@ -113,7 +113,7 @@
   },
   "url": "https://github.com/SupremoBr/DBU-port-V14",
   "manifest": "https://raw.githubusercontent.com/SupremoBr/DBU-port-V14/main/system.json",
-  "download": "https://github.com/SupremoBr/DBU-port-V14/archive/refs/tags/v1.0.11-v14.4.zip",
+  "download": "https://github.com/SupremoBr/DBU-port-V14/archive/refs/tags/v1.0.12-rules093-alpha.1.zip",
   "readme": "https://github.com/SupremoBr/DBU-port-V14/blob/main/README.md",
   "changelog": "https://github.com/SupremoBr/DBU-port-V14/blob/main/CHANGELOG.md",
   "bugs": "https://github.com/SupremoBr/DBU-port-V14/issues",

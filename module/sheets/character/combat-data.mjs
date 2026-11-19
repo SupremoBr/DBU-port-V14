@@ -1,3 +1,6 @@
+import { signatureEnergyCharges093 } from "../../rules/techniques-v093.mjs";
+import { PROFILES_093 } from "../../rules/profiles-v093.mjs";
+import { uses093 } from "../../rules/v093.mjs";
 import { prepareCombatResources, prepareActiveEffects } from "../character-data.mjs";
 
 /** Character sheet domain: combat-data. Methods run with the sheet as this. */
@@ -269,7 +272,7 @@ export const combatDataMethods = {
     }));
 
     // --- Tracker Attack Sources (for "attack" action type) ---
-    const trackerTier = system.tier || 1;
+    const trackerTier = uses093(system) ? (system.baseTier || 1) : (system.tier || 1);
     const trackerSourceGroups = [];
     const configDBU = CONFIG.DBU ?? {};
 
@@ -352,6 +355,7 @@ export const combatDataMethods = {
         + (system.aptitudes?.kiCostAttacks || 0)
         + (system.aptitudes?.kiCostAttacksNoCap || 0)
         - (system.aptitudes?.allManeuverKiReduction || 0));
+      if (uses093(system)) kiCost = Math.floor(Math.max((profile.kpCost || 0) * trackerTier / 2, kiCost));
       const prep = prepRefs[i] || {};
       // Unified CTs — includes talents (Focused Strike, Critical Specialist for
       // armed attacks), Mindful state, and CT buffs. Fixes the old fallback that
@@ -371,7 +375,7 @@ export const combatDataMethods = {
         damageCat: prep.damageCat || "Standard",
         foundation: ref.foundation || "",
         profile: ref.profile || "",
-        energyCharges: ref.energyCharges || 0,
+        energyCharges: (ref.energyCharges || 0) + (uses093(system) ? ((PROFILES_093[ref.profile]?.freeCharges || 0) + (PROFILES_093[ref.profile]?.freeChargesOutsideLimit || 0)) : 0),
         powerShot: ref.powerShot || 0,
         defaultWager: prep.maxWager || 0,
         activeBuffs
@@ -398,10 +402,10 @@ export const combatDataMethods = {
         name: tech.name,
         // finalKP×tier plus the "Ki Point Cost Attacks" buff deltas and Deep
         // Control's all-maneuver reduction (previously dead aptitudes)
-        kiCost: Math.max(0, (tech.finalKP || 0) * trackerTier
+        kiCost: Math.floor(Math.max(uses093(system) ? (tech.profileBaseKP || 0) * trackerTier / 2 : 0, (tech.finalKP || 0) * trackerTier
           + (system.aptitudes?.kiCostAttacks || 0)
           + (system.aptitudes?.kiCostAttacksNoCap || 0)
-          - (system.aptitudes?.allManeuverKiReduction || 0)),
+          - (system.aptitudes?.allManeuverKiReduction || 0))),
         strikeFormula: tech.strikeFormula || "",
         woundFormula: tech.woundFormula || "",
         strikeCT: tech.strikeCT || 10,
@@ -409,7 +413,7 @@ export const combatDataMethods = {
         damageCat: tech.damageCat || "Standard",
         foundation: tech.foundation || "",
         profile: tech.profile || "",
-        energyCharges: (tech.baseEnergyCharges || 0) + (tech.extraEnergyCharges || 0),
+        energyCharges: uses093(system) ? signatureEnergyCharges093(tech, system) : (tech.baseEnergyCharges || 0) + (tech.extraEnergyCharges || 0),
         powerShot: (tech.advantages || []).find(a => a.name === "Power Shot")?.ranks || 0,
         defaultWager: 0,
         twinLinked,

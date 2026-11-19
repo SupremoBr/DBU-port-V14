@@ -1,3 +1,5 @@
+import { uses093 } from "../../../rules/v093.mjs";
+import { defendKiCost093 } from "../../../rules/defenses-v093.mjs";
 // DBU Automation — Round Tracker / registro de Defend
 export function dbuGetCurrentRound(actor, cts) {
   cts.rounds ??= [];
@@ -66,7 +68,7 @@ export async function dbuRecordDefend(
   round.actions.push({
     type: "defend",
     source: "",
-    kiCost: baseCosts[defenseType] || 0,
+    kiCost: uses093(actor.system) ? defendKiCost093(actor.system, defenseType, incomingEC) : baseCosts[defenseType] || 0,
     dkpCost: 0,
     kiWager: 0,
     description: `Defend: ${names[defenseType] || defenseType}`,

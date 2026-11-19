@@ -1,0 +1,37 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+
+test('the real system init installs the current catalogs, schema, sheet adapter and migration before ready',async()=>{
+  const hooks=new Map(), events=[], callbacks=new Map();
+  globalThis.Hooks={once(name,fn){hooks.set(name,fn);return name;},on(name,fn){events.push(name);callbacks.set(name,fn);return name;}};
+  globalThis.Actor=class{}; globalThis.Item=class{}; globalThis.Combat=class{};
+  globalThis.ActorSheet=class{}; globalThis.ItemSheet=class{};
+  globalThis.Dialog=class{};
+  globalThis.Actors={unregisterSheet(){},registerSheet(){}};
+  globalThis.Items={unregisterSheet(){},registerSheet(){}};
+  globalThis.Handlebars={registerHelper(){}};
+  globalThis.foundry={abstract:{TypeDataModel:class{}},data:{fields:new Proxy({},{get:()=>class{}})},utils:{deepClone:structuredClone},applications:{handlebars:{loadTemplates:async paths=>{events.push(['templates',paths.length]);}}}};
+  globalThis.CONFIG={Actor:{},Item:{},Combat:{}};
+  const settings=new Map();
+  globalThis.game={release:{generation:13},settings:{settings,register(ns,key,definition){settings.set(ns+'.'+key,definition);},get(ns,key){return settings.get(ns+'.'+key)?.default;}},user:{isGM:true}};
+  await import('../dbu-old.mjs');
+  await hooks.get('init')();
+  assert.equal(CONFIG.DBU.rulesVersion,'0.9.3');
+  assert.equal(CONFIG.DBU.talentsCatalog.length,275);
+  assert.equal(Object.keys(CONFIG.DBU.transformationsCatalog).length,464);
+  assert.equal(CONFIG.DBU.profileKpCosts.Beam,8);
+  assert.equal(CONFIG.DBU.racialSkillRanks.yardrat,3);
+  assert.equal(CONFIG.Actor.documentClass.name,'DBUActor');
+  assert.equal(typeof CONFIG.Actor.dataModels.character.defineSchema,'function');
+  assert.equal(typeof game.dbu.exportRulesBackup,'function');
+  assert.ok(settings.has('DBU-MRR-OLD.rules093Migration'));
+  assert.ok(hooks.has('ready')); assert.ok(events.includes('preCreateActor'));
+  const updates=[];
+  const actor={type:'character',updateSource:changes=>updates.push(changes)};
+  callbacks.get('preCreateActor')(actor,{type:'character',name:'Imported',system:{race:'saiyan',racialTraits:['908d85ede236e3ce']}});
+  assert.equal(updates[0].system.rulesVersion,'0.9.3');
+  assert.equal(updates[0]['flags.DBU-MRR-OLD.rules093ImportedOriginal'].system.racialTraits[0],'908d85ede236e3ce');
+  assert.ok(CONFIG.Actor.dataModels.character.defineSchema().rules093State);
+  assert.ok(CONFIG.Item.dataModels.technique.defineSchema().superProfile);
+  assert.ok(events.some(e=>Array.isArray(e)&&e[0]==='templates'&&e[1]>=24));
+});

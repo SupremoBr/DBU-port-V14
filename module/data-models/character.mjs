@@ -148,6 +148,10 @@ function signatureTechniqueField() {
     type: new StringField({ initial: "signature" }),
     foundation: new StringField({ initial: "Physical" }),
     profile: new StringField({ initial: "Simple" }),
+    superProfile: new StringField({ initial: "" }),
+    secondaryProfile: new StringField({ initial: "" }),
+    superProfileActions: new NumberField({ initial: 0, integer: true, min: 0, max: 2 }),
+    superProfileGranted: new BooleanField({ initial: false }),
     description: new StringField({ initial: "" }),
     tpMax: new NumberField({ required: true, nullable: false, initial: 10, integer: true }),
     freeTP: new NumberField({ required: true, nullable: false, initial: 0, integer: true }),
@@ -183,6 +187,8 @@ function signatureAuraField() {
 function transformationField() {
   return new SchemaField({
     id: new NumberField({ required: true, nullable: false, integer: true }),
+    awakeningType: new StringField({ initial: "" }),
+    transcended: new BooleanField({ initial: false }),
     catalogKey: new StringField({ nullable: true, initial: null }),
     name: new StringField({ initial: "" }),
     active: new BooleanField({ initial: false }),
@@ -241,6 +247,8 @@ export default class DBUCharacterData extends foundry.abstract.TypeDataModel {
   static defineSchema() {
     return {
       // ---- Core identity ----
+      rules093State: new ObjectField(),
+      rulesVersion: new StringField({ initial: "0.9.2" }),
       level: new NumberField({ required: true, nullable: false, initial: 1, integer: true, min: 1, max: 30 }),
       race: new StringField({ initial: "saiyan" }),
       subrace: new StringField({ initial: "" }),

@@ -37,6 +37,7 @@ export function createAutomationLifecycle({ getGame = () => globalThis.game, loa
       const runtime = await prepare();
       if (!runtime) return status;
       const game = getGame();
+      await game.dbu?.rulesReady;
       status.migration = await migrate(game);
       await runtime.boot();
       if (!getAPI()?.coreReady) throw new Error(getAPI()?.lastError || 'DBU Automation: inicialização incompleta.');
