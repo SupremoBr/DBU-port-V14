@@ -15222,3 +15222,36 @@
   display: block;
   color: #ffda94;
 }
+
+.dbu-catalog-buff-editor {
+  margin-top: 0.75rem;
+}
+
+.dbu-catalog-buff-editor [data-catalog-buff-list] {
+  max-height: 40vh;
+  overflow: auto;
+}
+
+.dbu-catalog-buff-fields {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.5rem;
+  align-items: end;
+}
+
+.dbu-catalog-buff-fields label,
+.dbu-buff-state {
+  display: block;
+}
+
+.dbu-catalog-buff-fields [hidden] {
+  display: none;
+}
+
+.dbu-old.sheet .col-trigger {
+  min-width: 7rem;
+}
+
+.dbu-old .dbu-linked-buffs {
+  margin: 0.3rem 0;
+}

@@ -102,6 +102,8 @@ function customBuffField() {
     flat: new NumberField({ required: true, nullable: false, initial: 0, integer: true }),
     bT: new NumberField({ required: true, nullable: false, initial: 0, integer: true }),
     T: new NumberField({ required: true, nullable: false, initial: 0, integer: true }),
+    trigger: new StringField({ initial: "always" }),
+    triggerPercent: new NumberField({ initial: 50, integer: true, min: 0, max: 100 }),
     notes: new StringField({ initial: "" })
   });
 }

@@ -69,3 +69,34 @@ test('the editor saves and restores an individual entry without modifying the ca
   await editCatalogDescription(sheet, 'traits', entry.id);
   assert.equal(writes.length, 2);
 });
+
+test('the editor saves a linked buff separately from an unchanged description', async () => {
+  const entry = { id: 'test_talent', name: 'Test', description: 'Minha descrição\nSegunda linha' };
+  const saved = [];
+  const buff = { effect: 'Strike (All)', active: true, flat: 2, bT: 0, T: -1, trigger: 'lpBelow', triggerPercent: 50 };
+  const row = {
+    querySelector(selector) {
+      const field = selector.match(/"([^"]+)"/)[1];
+      return field === 'active' ? { checked: buff.active } : { value: String(buff[field]) };
+    },
+  };
+  const actor = {
+    system: { talents: [entry.id] },
+    update: async changes => saved.push(changes),
+  };
+  const sheet = { actor, isEditable: true, _getCharacterTalents: () => [entry] };
+  const previousWait = Dialog.wait;
+  Dialog.wait = async options => {
+    assert.match(options.content, /Adicionar Custom Buff/);
+    return options.buttons.save.callback({
+      0: { querySelectorAll: () => [row] },
+      find: () => ({ val: () => entry.description }),
+    });
+  };
+  try {
+    await editCatalogDescription(sheet, 'talents', entry.id);
+  } finally {
+    Dialog.wait = previousWait;
+  }
+  assert.deepEqual(saved, [{ 'flags.DBU-MRR-OLD.catalogBuffs.talents.test_talent': [buff] }]);
+});

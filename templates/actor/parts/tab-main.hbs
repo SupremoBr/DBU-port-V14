@@ -449,8 +449,14 @@
         <button type="button" class="add-btn" data-action="add-custom-buff"><i class="fas fa-plus"></i></button>
       </div>
       <p class="notes">Use valores negativos para reduzir bônus, custos ou quantidades. Para CT, um valor positivo reduz o alvo de crítico. Greater Dice ajusta a categoria quando a rolagem já recebe esses dados.</p>
+      <p class="notes">A condição de LP usa o máximo atual. Bônus que alteram recursos ou atributos base exigem a opção Sempre.</p>
       <datalist id="buff-effect-options">
         {{#each automaticBuffOptions}}
+        <option value="{{this}}"></option>
+        {{/each}}
+      </datalist>
+      <datalist id="conditional-buff-effect-options">
+        {{#each conditionalBuffOptions}}
         <option value="{{this}}"></option>
         {{/each}}
       </datalist>
@@ -464,6 +470,7 @@
               <th class="col-bt">×bT</th>
               <th class="col-t">×T</th>
               <th class="col-total">Total</th>
+              <th class="col-trigger">Condição</th>
               <th class="col-notes">Notes</th>
               <th class="col-del"></th>
             </tr>
@@ -476,7 +483,7 @@
               </td>
               <td class="col-effect">
                 <input class="buff-effect-input" type="text" name="system.customBuffs.{{@index}}.effect" value="{{effect}}"
-                  list="buff-effect-options" autocomplete="off" />
+                  list="{{#if hasBuffTrigger}}conditional-buff-effect-options{{else}}buff-effect-options{{/if}}" autocomplete="off" />
                 {{#if buffWarning}}<small class="buff-effect-warning">{{buffWarning}}</small>{{/if}}
               </td>
               <td class="col-flat">
@@ -490,6 +497,15 @@
               </td>
               <td class="col-total">
                 {{buffTotal}}
+              </td>
+              <td class="col-trigger">
+                <select name="system.customBuffs.{{@index}}.trigger" aria-label="Condição do buff">
+                  {{selectOptions @root.buffTriggers selected=trigger}}
+                </select>
+                {{#if showTriggerPercent}}
+                <input type="number" name="system.customBuffs.{{@index}}.triggerPercent" value="{{triggerPercent}}" min="0" max="100" aria-label="Porcentagem de LP" />
+                {{/if}}
+                <small class="dbu-buff-state">{{buffState}}</small>
               </td>
               <td class="col-notes">
                 <input class="buff-notes-input" type="text" name="system.customBuffs.{{@index}}.notes" value="{{notes}}"

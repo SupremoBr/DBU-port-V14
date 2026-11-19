@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.0.12-rules093-alpha.6] — buffs por traço e talento
+
+- O lápis de cada traço e talento permite configurar buffs próprios do personagem. A ficha mostra o estado de cada buff.
+- Buffs vinculados e avulsos podem ativar abaixo de uma porcentagem de LP, com um estado de combate ou com uma condição selecionada. Efeitos que alteram atributos base ou recursos continuam disponíveis em Sempre.
+
 ## [1.0.12-rules093-alpha.5] — Custom Buffs
 
 - Bônus de técnicas passam a afetar fórmulas, dados extras, CT e TP por Skill Improvement. Categoria de dano e dados de Energy Charge chegam às rolagens.

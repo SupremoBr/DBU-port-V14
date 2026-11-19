@@ -1,4 +1,4 @@
-import { attackKiWithBuffs, greaterDiceCategoryBonus, manualBuffEffect } from "../../helpers/custom-buffs.mjs";
+import { attackKiWithBuffs, greaterDiceCategoryBonus, customBuffState, linkedCatalogBuffs } from "../../helpers/custom-buffs.mjs";
 import { signatureEnergyCharges093 } from "../../rules/techniques-v093.mjs";
 import { PROFILES_093 } from "../../rules/profiles-v093.mjs";
 import { uses093 } from "../../rules/v093.mjs";
@@ -284,8 +284,8 @@ export const combatDataMethods = {
     const baseTierForTip = system.baseTier || tierForTip;
     const peScore = system.attributes?.pe?.score ?? 0;
     const scScore = system.attributes?.sc?.score ?? 0;
-    for (const cb of (system.customBuffs || [])) {
-      if (!cb.active || !cb.effect || manualBuffEffect(cb.effect)) continue;
+        for (const cb of [...(system.customBuffs || []), ...linkedCatalogBuffs(this.actor, system)]) {
+      if (customBuffState(cb, system) !== "active") continue;
       const parts = [];
       if (cb.flat) parts.push(`${cb.flat >= 0 ? "+" : ""}${cb.flat}`);
       if (cb.bT) parts.push(`${cb.bT >= 0 ? "+" : ""}${cb.bT}(bT=${cb.bT * baseTierForTip})`);

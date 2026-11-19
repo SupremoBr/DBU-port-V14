@@ -71,3 +71,133 @@ export function energyChargeDie(aptitudes = {}, { signature = false, maximumChar
   }
   return chain[Math.max(0, Math.min(chain.length - 1, Math.trunc(index)))];
 }
+
+// Conditional modifiers run after max LP is finalized. These destinations
+// can change at that point without changing the resource used by the trigger.
+const conditionalAptitudes = new Map([
+  ['Strike', ['strikeBuffTotal']],
+  ['Dodge', ['dodgeBuffTotal']],
+  ['Wound', ['woundBuffTotal']],
+  ['Combat Rolls', ['strikeBuffTotal', 'dodgeBuffTotal', 'woundBuffTotal']],
+  ['Strike (Physical)', ['strikePhysical']],
+  ['Strike (Energy)', ['strikeEnergy']],
+  ['Strike (Magic)', ['strikeMagic']],
+  ['Wound (Physical)', ['woundPhysical']],
+  ['Wound (Energy)', ['woundEnergy']],
+  ['Wound (Magic)', ['woundMagic']],
+  ['Strike CT (All)', ['strikeCTBonus']],
+  ['Wound CT (All)', ['woundCTBonus']],
+  ['Dodge CT', ['dodgeCTBonus']],
+  ['Strike CT (Physical)', ['strikeCTPhysical']],
+  ['Strike CT (Energy)', ['strikeCTEnergy']],
+  ['Strike CT (Magic)', ['strikeCTMagic']],
+  ['Wound CT (Physical)', ['woundCTPhysical']],
+  ['Wound CT (Energy)', ['woundCTEnergy']],
+  ['Wound CT (Magic)', ['woundCTMagic']],
+  ['Defense Value', ['defenseValue']],
+  ['Haste', ['haste']],
+  ['Awareness', ['awareness']],
+  ['Initiative', ['initiative']],
+  ['Stress Bonus', ['stressBonus']],
+  ['Might for Clashes', ['mightForClashes']],
+  ['Attacking Damage Category', ['attackingDamageCategory']],
+  ['Ki Point Cost Attacks', ['kiCostAttacks']],
+  ['Ki Point Cost Attacks (no cap)', ['kiCostAttacksNoCap']],
+].map(([effect, fields]) => [buffEffectKey(effect), fields]));
+const conditionalStatus = new Map([
+  ['soak', 'soak'], ['damage reduction', 'damageReduction'], ['might', 'might'],
+]);
+const conditionalSaves = new Map([
+  ['all saves', ['impulsive', 'corporeal', 'cognitive', 'morale']],
+  ...['impulsive', 'corporeal', 'cognitive', 'morale'].map(save => [`${save} saves`, [save]]),
+]);
+
+export const catalogBuffFlag = 'catalogBuffs';
+export const catalogBuffSystem = 'DBU-MRR-OLD';
+export const catalogBuffGroups = Object.freeze({ traits: 'racialTraits', talents: 'talents' });
+export const buffTriggers = Object.freeze({
+  always: 'Sempre',
+  lpBelow: 'LP abaixo de (%)',
+  raging: 'Em Raging',
+  superior: 'Em Superior',
+  surging: 'Em Surging',
+  mindful: 'Em Mindful',
+  undying: 'Em Undying',
+  fatigued: 'Com Fatigued',
+  slowed: 'Com Slowed',
+  impaired: 'Com Impaired',
+});
+
+export function linkedCatalogBuffs(actor, system = actor.system) {
+  const out = [];
+  const saved = actor.getFlag?.(catalogBuffSystem, catalogBuffFlag);
+  for (const [group, list] of Object.entries(catalogBuffGroups)) {
+    for (const id of new Set(system[list] || [])) {
+      if (Array.isArray(saved?.[group]?.[id])) out.push(...saved[group][id]);
+    }
+  }
+  return out;
+}
+
+export function conditionalBuff(buff) {
+  return !!buff.trigger && buff.trigger !== 'always';
+}
+
+export function supportsBuffTrigger(effect) {
+  const key = buffEffectKey(effect);
+  return conditionalAptitudes.has(key) || conditionalStatus.has(key) || conditionalSaves.has(key);
+}
+
+export function customBuffState(buff, system) {
+  if (!buff.active) return 'disabled';
+  if (manualBuffEffect(buff.effect)) return 'manual';
+  if (!buffEffectKey(buff.effect)) return 'missing';
+  if (!conditionalBuff(buff)) return 'active';
+  if (!supportsBuffTrigger(buff.effect) || !Object.hasOwn(buffTriggers, buff.trigger)) return 'unsupported';
+  if (buff.trigger === 'lpBelow') {
+    const { value, max } = system.lifePoints || {};
+    const limit = Number(buff.triggerPercent ?? 50);
+    return Number.isFinite(value) && max > 0 && limit >= 0 && limit <= 100 && value * 100 < max * limit
+      ? 'active' : 'waiting';
+  }
+  return (system.combatStates?.[buff.trigger] || system.conditions?.some(c => c.id === buff.trigger && c.active))
+    ? 'active' : 'waiting';
+}
+
+export const buffStateLabels = Object.freeze({
+  active: 'Ativo', waiting: 'Aguardando condição', disabled: 'Desativado',
+  manual: 'Aplicação manual', unsupported: 'Efeito incompatível com condição', missing: 'Escolha um efeito',
+});
+
+export function applyConditionalCustomBuffs(system, buffs) {
+  const statusDeltas = {};
+  const aptDeltas = {};
+  for (const buff of buffs) {
+    if (!conditionalBuff(buff) || customBuffState(buff, system) !== 'active') continue;
+    const key = buffEffectKey(buff.effect);
+    const amount = buffAmount(buff, system.tier || 1, system.baseTier || 1);
+    for (const field of conditionalAptitudes.get(key) || []) {
+      aptDeltas[field] = (aptDeltas[field] || 0) + amount;
+    }
+    const field = conditionalStatus.get(key);
+    if (field) statusDeltas[field] = (statusDeltas[field] || 0) + amount;
+    for (const save of conditionalSaves.get(key) || []) {
+      if (system.savingThrows?.[save]) system.savingThrows[save].bonus += amount;
+    }
+  }
+  for (const [field, amount] of Object.entries(aptDeltas)) {
+    const total = (system.aptitudes[field] || 0) + amount;
+    system.aptitudes[field] = field === 'defenseValue' ? Math.max(0, total) : total;
+  }
+  for (const [field, amount] of Object.entries(statusDeltas)) {
+    if (field === 'soak' && system.status.rawSoak != null) {
+      const minimum = system.tier || 1;
+      const before = Math.max(minimum, system.status.rawSoak);
+      system.status.rawSoak += amount;
+      const after = Math.max(minimum, system.status.rawSoak);
+      system.status.soak = Math.max(0, system.status.soak + after - before);
+    } else {
+      system.status[field] = Math.max(0, (system.status[field] || 0) + amount);
+    }
+  }
+}

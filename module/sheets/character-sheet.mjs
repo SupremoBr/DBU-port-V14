@@ -1,4 +1,4 @@
-import { buffAmount, buffEffectKey, manualBuffEffect } from "../helpers/custom-buffs.mjs";
+import { buffAmount, buffEffectKey, buffStateLabels, buffTriggers, conditionalBuff, customBuffState, manualBuffEffect, supportsBuffTrigger } from "../helpers/custom-buffs.mjs";
 import { uses093 } from "../rules/v093.mjs";
 import { RACES_093 } from "../rules/races-v093.mjs";
 import { ActorSheet, Dialog } from "../helpers/foundry-compat.mjs";
@@ -260,9 +260,15 @@ export class DBUCharacterSheet extends ActorSheet {
     const _baseTier = system.baseTier || 1;
     const buffOptions = CONFIG.DBU?.customBuffOptions || [];
     const knownBuffs = new Set(buffOptions.map(buffEffectKey));
+    context.buffTriggers = buffTriggers;
     context.automaticBuffOptions = buffOptions.filter(effect => !manualBuffEffect(effect));
+    context.conditionalBuffOptions = context.automaticBuffOptions.filter(supportsBuffTrigger);
     for (const buff of (system.customBuffs || [])) {
       buff.buffTotal = buffAmount(buff, _tier, _baseTier);
+      const state = customBuffState(buff, system);
+      buff.buffState = buffStateLabels[state];
+      buff.hasBuffTrigger = conditionalBuff(buff);
+      buff.showTriggerPercent = buff.trigger === "lpBelow";
       buff.buffWarning = "";
       if (buff.active && buff.effect) {
         if (manualBuffEffect(buff.effect)) buff.buffWarning = "Aplicação manual";

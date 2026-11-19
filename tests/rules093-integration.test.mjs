@@ -270,3 +270,37 @@ test('basic attacks use charged dice and damage category buffs, and the techniqu
   assert.equal(context.attackRefs[0].damageCat, 'Standard');
   assert.equal(context.tpTotal, 30);
 });
+
+test('owned linked buffs stack and a 50% LP trigger switches off on healing to the threshold', async () => {
+  const { applyConditionalCustomBuffs, customBuffState, linkedCatalogBuffs } = await import('../module/helpers/custom-buffs.mjs');
+  const conditional = { active: true, effect: 'Strike (All)', flat: 2, T: 1, trigger: 'lpBelow', triggerPercent: 50 };
+  const system = {
+    racialTraits: ['trait-a'], talents: ['talent-a', 'talent-a'],
+    tier: 2, baseTier: 1, lifePoints: { value: 49, max: 100 },
+    aptitudes: { strikeBuffTotal: 10 },
+    customBuffs: [{ active: true, effect: 'Strike', flat: 1 }],
+  };
+  const actor = new DBUActor(system);
+  const always = { active: true, effect: 'Strike', flat: 3 };
+  const inactive = { ...conditional, active: false };
+  actor.getFlag = () => ({
+    traits: { 'trait-a': [always, inactive], 'removed-trait': [always] },
+    talents: { 'talent-a': [conditional], 'removed-talent': [always] },
+  });
+  const linked = linkedCatalogBuffs(actor);
+  assert.equal(linked.length, 3);
+  assert.equal(actor._getBuffTotal(system, 'Strike'), 4); // Early calculation excludes triggers.
+  applyConditionalCustomBuffs(system, linked);
+  assert.equal(system.aptitudes.strikeBuffTotal, 14);
+  assert.equal(customBuffState(conditional, system), 'active');
+
+  // A new preparation cycle starts from rebuilt attributes.
+  system.lifePoints.value = 50;
+  system.aptitudes.strikeBuffTotal = 10;
+  applyConditionalCustomBuffs(system, linked);
+  assert.equal(system.aptitudes.strikeBuffTotal, 10);
+  assert.equal(customBuffState(conditional, system), 'waiting');
+  assert.equal(customBuffState(inactive, system), 'disabled');
+  assert.equal(customBuffState({ ...conditional, effect: 'Max Life Points' }, system), 'unsupported');
+  assert.equal(customBuffState({ ...conditional, trigger: 'raging' }, { combatStates: { raging: true } }), 'active');
+});

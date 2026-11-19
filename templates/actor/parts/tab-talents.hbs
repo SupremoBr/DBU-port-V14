@@ -38,7 +38,7 @@
             <span class="talent-name">{{name}}</span>
             {{#if @root.rules093}}
             {{#if @root.editable}}
-            <button type="button" class="dbu-edit-catalog-description" data-dbu-edit-description="talents" data-entry-id="{{id}}" title="Editar descrição" aria-label="Editar descrição de {{name}}">
+            <button type="button" class="dbu-edit-catalog-description" data-dbu-edit-description="talents" data-entry-id="{{id}}" title="Editar descrição e buffs" aria-label="Editar descrição e buffs de {{name}}">
               <i class="fas fa-pen" aria-hidden="true"></i>
             </button>
             {{/if}}
@@ -54,6 +54,11 @@
           <div class="talent-description dbu-catalog-description">{{description}}</div>
           {{/if}}
           {{#if source}}<a class="dbu-catalog-source" href="{{source}}" target="_blank" rel="noopener noreferrer">Regra completa no site</a>{{/if}}
+          {{#if linkedBuffs.length}}
+          <ul class="dbu-linked-buffs" aria-label="Custom Buffs">
+            {{#each linkedBuffs}}<li>{{effect}} · {{state}}</li>{{/each}}
+          </ul>
+          {{/if}}
           <div class="talent-effects-list">
             {{#each effects}}
             <div class="talent-effect {{activationType}}">

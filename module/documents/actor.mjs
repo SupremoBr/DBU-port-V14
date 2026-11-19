@@ -1,4 +1,4 @@
-import { buffAmount, buffEffectKey } from "../helpers/custom-buffs.mjs";
+import { applyConditionalCustomBuffs, buffAmount, buffEffectKey, conditionalBuff, linkedCatalogBuffs } from "../helpers/custom-buffs.mjs";
 import { uses093 } from "../rules/v093.mjs";
 import { racialSaves093, racialLife093, applyRacial093, applyCatalogPassives093, applyRacialAttribute093, ignoresSaiyanPenalties093 } from "../rules/runtime-v093.mjs";
 import { getDisabledRacialPassives, getRacialStressBonus } from "../helpers/catalog-index.mjs";
@@ -57,6 +57,7 @@ export class DBUActor extends Actor {
   // =============================================================
 
   _prepareCharacterData(system) {
+    system._linkedCustomBuffs = linkedCatalogBuffs(this, system);
     let tier = system.tier;
     let baseTier = system.baseTier;
     const level = system.level || 1;
@@ -488,11 +489,14 @@ export class DBUActor extends Actor {
     if (bb.dodgeBonus) system.aptitudes.dodgeBuffTotal = (system.aptitudes.dodgeBuffTotal || 0) + bb.dodgeBonus;
     if (bb.woundBonus) system.aptitudes.woundBuffTotal = (system.aptitudes.woundBuffTotal || 0) + bb.woundBonus;
 
-    // ---- Damage Calculator derived values ----
-    this._calculateDamageCalc(system, tier, baseTier);
-
     // ---- Adversary stat modifications ----
     this._calculateAdversaryStats(system, level, tier, baseTier);
+
+    // Health triggers read the final maximum LP, including adversary modifiers.
+    applyConditionalCustomBuffs(system, [...(system.customBuffs || []), ...system._linkedCustomBuffs]);
+
+    // ---- Damage Calculator derived values ----
+    this._calculateDamageCalc(system, tier, baseTier);
 
     // ---- Battle Jacket piloting overrides (must be last) ----
     this._applyBattleJacketPiloting(system);
@@ -3498,9 +3502,9 @@ export class DBUActor extends Actor {
     const key = buffEffectKey(effectName);
     if (!key) return 0;
     let total = 0;
-    for (const buffs of [system.customBuffs, system._derivedBuffs]) {
+    for (const buffs of [system.customBuffs, system._linkedCustomBuffs ?? linkedCatalogBuffs(this, system), system._derivedBuffs]) {
       for (const buff of buffs || []) {
-        if (buff.active && buffEffectKey(buff.effect) === key) {
+        if (buff.active && !conditionalBuff(buff) && buffEffectKey(buff.effect) === key) {
           total += buffAmount(buff, tier, baseTier);
         }
       }
