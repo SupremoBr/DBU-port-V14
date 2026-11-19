@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.0.12-rules093-alpha.7] — resumos por nível
+
+- Cada nível dos traços raciais e talentos descreve seu efeito na ficha. Os links para as regras completas e as descrições personalizadas continuam disponíveis.
+
 ## [1.0.12-rules093-alpha.6] — buffs por traço e talento
 
 - O lápis de cada traço e talento permite configurar buffs próprios do personagem. A ficha mostra o estado de cada buff.

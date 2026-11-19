@@ -19,14 +19,38 @@ globalThis.foundry = {
 };
 const { applyCatalogDescriptions, editCatalogDescription } = await import('../module/rules/catalog-descriptions.mjs');
 
-test('all catalog entries have their own summary and official source', () => {
+test('all catalog entries have a summary, an official source and individual level summaries', () => {
   for (const entries of [Object.values(CATALOGS_093.racialTraits).flat(), CATALOGS_093.talents]) {
     assert.equal(new Set(entries.map(entry => entry.id)).size, entries.length);
     for (const entry of entries) {
       assert.ok(entry.description.trim(), entry.name);
       assert.equal(new URL(entry.source).hostname, 'dbu-rpg.com', entry.name);
+      assert.ok(entry.effects.length, entry.name);
+      for (const effect of entry.effects) {
+        const label = `${entry.name}, Lv.${effect.level}`;
+        assert.ok(effect.summary.trim(), label);
+        assert.doesNotMatch(effect.summary, /Referência 0\.9\.3|resolver este efeito/i, label);
+      }
     }
   }
+});
+
+test('Divine Magic and Alert describe the corresponding effect at each level', () => {
+  const divineMagic = Object.values(CATALOGS_093.racialTraits).flat().find(entry => entry.name === 'Divine Magic');
+  const alert = CATALOGS_093.talents.find(entry => entry.name === 'Alert');
+  const [abilities, skills, domains] = divineMagic.effects;
+  const [initiative, surprise, wound, counter] = alert.effects;
+
+  assert.deepEqual(divineMagic.effects.map(effect => effect.level), [1, 2, 3]);
+  assert.match(abilities.summary, /Magical Materialization.*Telepathy.*Telekinesis.*Second Sight/);
+  assert.match(skills.summary, /1 rank.*Knowledge.*Investigation/);
+  assert.match(domains.summary, /escolha um domínio.*Peace:.*Element:/);
+
+  assert.deepEqual(alert.effects.map(effect => effect.level), [1, 2, 3, 4]);
+  assert.match(initiative.summary, /Initiative Value \+1\(bT\)/);
+  assert.match(surprise.summary, /Ignore.*Surprise Rounds/);
+  assert.match(wound.summary, /Initiative Advantage.*\+1\(T\).*Wound/);
+  assert.match(counter.summary, /Uma vez por encontro.*início da rodada.*1 Counter Action.*Initiative Advantage/);
 });
 
 test('the editor saves and restores an individual entry without modifying the catalog', async () => {

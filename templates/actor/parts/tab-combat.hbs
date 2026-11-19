@@ -142,7 +142,7 @@
               <button type="button" class="rt-activable-btn {{#if isMaxed}}maxed{{/if}}" data-action="rt-activable-use"
                 data-effect-id="{{id}}" data-action-type="{{actionType}}" data-trigger-id="{{triggerId}}"
                 data-stance="{{stanceId}}" data-limit="{{usageLimit}}" data-max-uses="{{maxUses}}"
-                data-source-name="{{sourceName}}" title="{{sourceLabel}} — {{sourceName}}{{#if text}}&#10;{{text}}{{/if}}" {{#if isMaxed}}disabled{{/if}}>
+                data-source-name="{{sourceName}}" title="{{sourceLabel}} — {{sourceName}}{{#if summary}}&#10;{{summary}}{{else if text}}&#10;{{text}}{{/if}}" {{#if isMaxed}}disabled{{/if}}>
                 <span class="rt-activable-status"></span>
                 <span class="rt-activable-name">{{sourceName}}</span>
                 {{#if usageLabel}}<span class="rt-activable-limit">{{usageLabel}}</span>{{/if}}
@@ -632,7 +632,7 @@
               </div>
               <div class="effect-info">
                 <span class="effect-name">{{name}} (L{{level}})</span>
-                <span class="effect-text" title="{{text}}">{{text}}</span>
+                <span class="effect-text" title="{{#if summary}}{{summary}}{{else}}{{text}}{{/if}}">{{#if summary}}{{summary}}{{else}}{{text}}{{/if}}</span>
               </div>
             </div>
             {{/each}}
@@ -659,7 +659,7 @@
                   {{#if sourceLabel}}<span class="resource-source-label">({{sourceLabel}})</span>{{/if}}
                   {{#if level}}<span class="resource-level">Lv{{level}}</span>{{/if}}
                   <span class="resource-keyword">[{{keyword}}]</span>
-                  <div class="resource-text">{{{text}}}</div>
+                  <div class="resource-text">{{#if summary}}{{summary}}{{else}}{{{text}}}{{/if}}</div>
                 </div>
                 {{#if hasAction}}
                 <div class="resource-controls">

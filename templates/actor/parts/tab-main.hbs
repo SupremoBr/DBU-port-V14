@@ -595,7 +595,7 @@
                 </div>
                 <div class="effect-info">
                   <span class="effect-name">{{name}} (L{{level}})</span>
-                  <span class="effect-text" title="{{text}}">{{text}}</span>
+                  <span class="effect-text" title="{{#if summary}}{{summary}}{{else}}{{text}}{{/if}}">{{#if summary}}{{summary}}{{else}}{{text}}{{/if}}</span>
                 </div>
               </div>
               {{/each}}

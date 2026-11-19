@@ -132,6 +132,7 @@ export function prepareCombatResources(system) {
         maxUses: eff.maxUses || (eff.activationType === "limited" ? 1 : 0),
         keyword: eff.keyword || eff.activationType || "",
         text: eff.text || "",
+        ...(eff.summary ? { summary: eff.summary } : {}),
         isTrackable
       });
     }
@@ -158,6 +159,7 @@ export function prepareCombatResources(system) {
         maxUses: eff.maxUses || (eff.activationType === "limited" ? 1 : 0),
         keyword: eff.keyword || eff.activationType || "",
         text: eff.text || "",
+        ...(eff.summary ? { summary: eff.summary } : {}),
         isTrackable
       });
     }
@@ -423,6 +425,7 @@ export function prepareActiveEffects(context, system) {
         type: effectType,
         keyword: keyword,
         text: eff.text || "",
+        ...(eff.summary ? { summary: eff.summary } : {}),
         maxUses,
         usageLimit,
         usedCount,
@@ -561,6 +564,7 @@ export function prepareActiveEffects(context, system) {
         type: effectType,
         keyword: keyword,
         text: eff.text || "",
+        ...(eff.summary ? { summary: eff.summary } : {}),
         maxUses,
         usageLimit,
         usedCount,

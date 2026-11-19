@@ -4,7 +4,7 @@ Usage: python3 scripts/build-rules093.py /path/to/rules093
 The research HTML and rule prose are deliberately not distributed.
 """
 import json, re, sys
-from rules093_reference import mechanic_summary, talent_categories
+from rules093_reference import level_summary, mechanic_summary, reference_effects, talent_categories
 from pathlib import Path
 root = Path(sys.argv[1]); target = Path(__file__).resolve().parents[1] / 'module/rules/catalogs-v093.mjs'
 read = lambda name: json.loads((root / name).read_text())
@@ -30,6 +30,20 @@ def effect(e, source):
  rule=mechanic(e)
  summary=(str(rule['target'])+': '+str(rule['amount'])+' × '+rule['scale']+'.') if rule else 'Referência 0.9.3: resolver este efeito na fonte oficial; sem automação herdada.'
  return dict(level=e['level'], keyword=kw, activationType='limited' if match else 'option' if 'Option' in kw else 'triggered' if 'Triggered' in kw else 'passive', usageLimit=match[2].lower() if match else None, maxUses=int(match[1]) if match else None, text=summary, source=source, mechanic=rule)
+def catalog_effects(row, source, legacy_effects=None):
+ effects = reference_effects(row)
+ if legacy_effects is not None:
+  return [dict(legacy, summary=level_summary(row, current)) for legacy,current in zip(legacy_effects,effects,strict=True)]
+ result = []
+ for current in effects:
+  entry = effect(current, source)
+  if not row['effects']:
+   # Recover display blocks without opting the previously unparsed row into automation.
+   entry['mechanic'] = None
+  entry['summary'] = level_summary(row, current)
+  result.append(entry)
+ return result
+
 race_slugs = {'android':'androids','angel':'angels','arcosian':'arcosians','bioAndroid':'bio-android','cerealian':'cerealians','demon':'demons','earthling':'earthlings','glassTribe':'glass-tribe','heran':'herans','konatsian':'konatsians','majin':'majins','namekian':'namekians','nekoMajin':'neko-majins','neoTuffle':'neo-tuffles','saiyan':'saiyans','shadowDragon':'shadow-dragons','shinjin':'shinjin','yardrat':'yardrats','customSpecies':'custom-species'}
 by_title = {next(e['title'] for e in nav['Races'] if e['slug']==slug):race for race,slug in race_slugs.items()}
 old_traits = [t for ts in old['races'].values() for t in ts]
@@ -44,7 +58,7 @@ for slug, rows in read('parsed-racial.json').items():
   same = [t for t in candidates if equivalent(t.get('effects',[]),row['effects'])]
   reviewed = False
   ident = same[0]['id'] if reviewed else 'r093_'+key(slug+'_'+row['name'])
-  item = dict(id=ident, name=row['name'], race=race, category=row['category'], traitCategory=row['traitCategory'], subrace=slug if len(path)>2 else '', source=url(slug), rulesVersion='0.9.3', automation='legacy-reviewed' if reviewed else 'manual', description=mechanic_summary(row), effects=same[0]['effects'] if reviewed else [effect(e,url(slug)) for e in row['effects']], isSelectable=True)
+  item = dict(id=ident, name=row['name'], race=race, category=row['category'], traitCategory=row['traitCategory'], subrace=slug if len(path)>2 else '', source=url(slug), rulesVersion='0.9.3', automation='legacy-reviewed' if reviewed else 'manual', description=mechanic_summary(row), effects=catalog_effects(row,url(slug),same[0]['effects'] if reviewed else None), isSelectable=True)
   traits.setdefault(race, []).append(item)
   for t in candidates: racial_map.setdefault(t['id'],[]).append(ident)
 # Explicit rename verified on the Saiyan page. No approximate-name matching.
@@ -53,11 +67,14 @@ racial_map['908d85ede236e3ce'] = [born['id']]
 heritage = next(t for t in traits['saiyan'] if t['name']=='Saiyan Heritage')
 heritage['effects'][-1]['options']=[dict(name='Tailed',activationType='passive',keyword='Passive',text='Cauda: Stress +1; +2 a partir de bT 5.'),dict(name='Tailless',activationType='passive',keyword='Passive',text='Em Form ou Enhancement: Wound e Soak +1(T).')]
 heritage['effects'][-1]['text']='Escolha a opção racial de cauda.'
+heritage['effects'][-1]['summary']=heritage['effects'][-1]['text']
 heritage['effects'][-1]['activationType']='option'
 summaries={'Born for Battle':['Rodadas pares: 1 Battle Born; escolha Strike, Dodge ou Wound. Limite 2 por rolagem; bônus +1(T) por stack.','Ao cruzar limiar de vida: Ki Surge OoS; se usada, ganhe 1 Battle Born.','Após Heritage 2: pelo menos 3 Battle Born em cada rolagem, uma vez por encontro.','Critical ou Triggered/Defeated: Zenkai temporário de nível 1, uma vez por encontro.'], 'Warrior’s Pride':['Proficiência racial também em Cognitive.','Superior: ignorar penalidades de limiar, Impaired e Fatigued.','Raging/Power: Superior até o fim do próximo turno; uma vez por encontro.','Início do encontro: 1 Battle Born.'], 'Blood of the Warrior':['Cada limiar cruzado: Wound, Soak e Surgency +1(T).','Uma Healing Surge por encontro recebe o dobro de Surgency.','Início do turno: com 6 Battle Born ou abaixo de Injured, Breakthrough +1 T até o fim do turno; uma vez por encontro.'], 'Powerful Physique':['Soak adicional: teto(Force Modifier ÷ 4).','Com Power 2+: Force Modifier +1(T).','Uma Defend por rodada: dobre o bônus de Soak deste traço.','Após sofrer um acerto: Basic Attack OoS com Force adicional em Wound; uma vez por encontro.']}
 for t in traits['saiyan']:
  if t['name'] in summaries:
-  for e,text in zip(t['effects'],summaries[t['name']]):e['text']=text
+  for e,text in zip(t['effects'],summaries[t['name']]):
+   e['text']=text
+   e['summary']=text
 talents=[]; talent_map={}
 talent_groups = talent_categories((root / 'sources/talents.html').read_text())
 for row in read('parsed-talents.json'):
@@ -65,7 +82,7 @@ for row in read('parsed-talents.json'):
  reviewed=len(candidates)==1 and equivalent(candidates[0].get('effects',[]),row['effects'])
  ident=candidates[0]['id'] if reviewed else 'r093_'+key(row['name'])
  category = talent_groups[row['name']]
- t=dict(id=ident,name=row['name'],category=category,prerequisites='Ver fonte oficial.',source=url('talents'),rulesVersion='0.9.3',automation='legacy-reviewed' if reviewed else 'manual',description=mechanic_summary(row),effects=candidates[0]['effects'] if reviewed else [effect(e,url('talents')) for e in row['effects']])
+ t=dict(id=ident,name=row['name'],category=category,prerequisites='Ver fonte oficial.',source=url('talents'),rulesVersion='0.9.3',automation='legacy-reviewed' if reviewed else 'manual',description=mechanic_summary(row),effects=catalog_effects(row,url('talents'),candidates[0]['effects'] if reviewed else None))
  talents.append(t)
  for c in candidates: talent_map[c['id']]=ident
 transforms={}; trans_map={}

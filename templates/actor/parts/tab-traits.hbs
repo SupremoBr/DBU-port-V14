@@ -70,7 +70,7 @@
           <div class="trait-effect {{activationType}}">
             <span class="effect-level">Lv.{{level}}</span>
             <span class="effect-keyword {{activationType}}">[{{keyword}}]</span>
-            <span class="effect-text">{{{text}}}</span>
+            <span class="effect-text">{{#if summary}}{{summary}}{{else}}{{{text}}}{{/if}}</span>
             {{#if options}}
             <div class="effect-options">
               {{#if (eq activationType "option")}}
