@@ -30,7 +30,7 @@ test('385 prototype methods retain their contract, with reviewed 0.9.3 rule chan
     assert.equal(d.writable, true, name);
     assert.equal(d.value.length, expected.length, name);
     assert.equal(d.value.constructor.name === 'AsyncFunction', expected.async, name);
-    // Original hashes are retained; ten intentional rule/UI changes have separate reviewed hashes.
+    // Original hashes are retained; intentional rule/UI changes have separate reviewed hashes.
     // Their 0.9.3 behavior is exercised in rules093-integration.test.mjs.
     if (name !== 'activateListeners') assert.equal(hash(d.value), expected.rules093Hash ?? expected.relocatedHash ?? expected.hash, name);
   }

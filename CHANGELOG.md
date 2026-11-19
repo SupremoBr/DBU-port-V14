@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.0.12-rules093-alpha.5] — Custom Buffs
+
+- Bônus de técnicas passam a afetar fórmulas, dados extras, CT e TP por Skill Improvement. Categoria de dano e dados de Energy Charge chegam às rolagens.
+- O modificador de custo de Ki “no cap” passa a ser aplicado após o piso. Resultados continuam limitados a zero ou mais.
+- A aba reconhece variações de maiúsculas e espaços, usa uma única lista de sugestões e identifica efeitos antigos cuja aplicação é manual.
+
 ## [1.0.12-rules093-alpha.4] — descrições de traços e talentos
 
 - Os cartões mostram resumos e mantêm o link para a regra completa. O botão de lápis permite personalizar a descrição por personagem e restaurar o resumo original.

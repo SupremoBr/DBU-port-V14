@@ -1,3 +1,4 @@
+import { energyChargeDie, greaterDiceCategoryBonus, shiftAttackDamageCategory } from "../../helpers/custom-buffs.mjs";
 import { PROFILES_093 } from "../../rules/profiles-v093.mjs";
 import { uses093 } from "../../rules/v093.mjs";
 
@@ -86,7 +87,7 @@ export const combatMathMethods = {
    * profile only sets base Damage Category to Lethal and modifies the Strike
    * (attacking.txt:181); it never touches the Critical Target.
    */
-  _calcCombatCTs(system, { isWeapon = false, foundation = "", profile = "" } = {}) {
+  _calcCombatCTs(system, { isWeapon = false, foundation = "", profile = "", isSignature = false } = {}) {
     const talents = system.talents || [];
     const apt = system.aptitudes || {};
     const mindful = system.combatStates?.mindful ? 1 : 0;
@@ -120,6 +121,10 @@ export const combatMathMethods = {
       - (Number(system._bestialDodgeCritReduction) || 0);
     if (talents.includes("instinctual_evasion")) dodgeCT -= 1;
 
+    if (isSignature) {
+      strikeCT -= system.dicePools?.signature?.ctStrike || 0;
+      woundCT -= system.dicePools?.signature?.ctWound || 0;
+    }
     strikeCT = clamp(strikeCT);
     woundCT = uses093(system) && profile === "Cutting" ? 5 : clamp(woundCT);
     dodgeCT = clamp(dodgeCT);
@@ -142,7 +147,6 @@ export const combatMathMethods = {
     // Dice pool category bonuses
     const dp = system.dicePools || {};
     const topCat = dp.topCatBonus || {};
-    const grCat = dp.greaterCatBonus || {};
     // topApplyCount: Phase 2 — "apply additional times" effects
     const grApply = dp.greaterApplyCount || {};
 
@@ -159,7 +163,7 @@ export const combatMathMethods = {
       if (isImpediment) return "";
       const hasGreater = combatStates.superior || (grApply.global || 0) > 0 || (grApply[rollType] || 0) > 0;
       if (!hasGreater) return "";
-      const catBonus = (grCat.global || 0) + (grCat[rollType] || 0);
+      const catBonus = greaterDiceCategoryBonus(system, rollType);
       return this._resolveExtraDice(tier, 1, catBonus);
     };
 
@@ -382,7 +386,7 @@ export const combatMathMethods = {
       // Attack Refs are Basic Attacking Maneuvers (not Signature Techniques),
       // so per attacking.txt:31 each Energy Charge adds 1d6(T) to the Wound Roll
       // (Sig Techs use d8 — handled separately in _calcTechWound).
-      const chargesStr = (charges > 0 ? `+${charges * tier}d6` : "") + (uses093(system) && ref.profile === "Mega Flare" && charges > 0 ? `+${charges * tier}` : "");
+      const chargesStr = (charges > 0 ? `+${charges * tier}${energyChargeDie(system.aptitudes)}` : "") + (uses093(system) && ref.profile === "Mega Flare" && charges > 0 ? `+${charges * tier}` : "");
       // Super Stack Extra Dice: "+1d4(T), increasing dice category per stack after first" (attributes.txt)
       const ssWoundDice = system.aptitudes?.superStackWoundDice || "";
       const ssWoundExtra = (ssWoundDice && (ref.foundation === "Physical" || ref.foundation === "Energy"))
@@ -397,11 +401,8 @@ export const combatMathMethods = {
         if (damageCat === "Standard") damageCat = "Direct";
         else if (damageCat === "Direct") damageCat = "Lethal";
       }
-      // Dimension Blade weapon quality: +1 Damage Category
-      for (let dc = 0; dc < weaponDamageCatBonus; dc++) {
-        if (damageCat === "Standard") damageCat = "Direct";
-        else if (damageCat === "Direct") damageCat = "Lethal";
-      }
+      damageCat = shiftAttackDamageCategory(damageCat,
+        weaponDamageCatBonus + (system.aptitudes?.attackingDamageCategory || 0));
 
       // --- DODGE ---
       // Rule: "Add your Defense Value to all Dodge Rolls" (attributes.txt)
@@ -503,10 +504,10 @@ export const combatMathMethods = {
    * Extra Dice pool additional times (topApplyCount was written but never
    * consumed; global already includes the base 1).
    */
-  _applyTopCount(system, rollType, topDice) {
+  _applyTopCount(system, rollType, topDice, signatureBonus = 0) {
     const ta = system.dicePools?.topApplyCount || {};
-    const applies = Math.max(1, (ta.global || 1) + (ta[rollType] || 0));
-    return (topDice && applies > 1) ? Array(applies).fill(topDice).join("+") : topDice;
+    const applies = Math.max(0, Math.trunc((ta.global ?? 1) + (ta[rollType] || 0) + signatureBonus));
+    return topDice && applies > 0 ? Array(applies).fill(topDice).join("+") : "";
   },
 
   _buildFormula(topDice, greaterDice, mod, extra = "") {

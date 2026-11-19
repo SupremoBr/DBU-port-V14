@@ -1,5 +1,4 @@
-
-
+import { energyChargeDie, greaterDiceCategoryBonus, shiftAttackDamageCategory, signatureBuffDice } from "../../helpers/custom-buffs.mjs";
 import { techniqueKiCost093, signatureEnergyCharges093 } from "../../rules/techniques-v093.mjs";
 import { uses093, techniquePointCost } from "../../rules/v093.mjs";
 
@@ -106,7 +105,8 @@ export const techniquesMethods = {
     // Improvement automatically drops its TP (no stale awards).
     const gsTPBonus = ((system.aptitudes?.giftedStudentTPPerSI || 0)
       + (system.aptitudes?.rapidLearnerTPPerSI || 0)) * siCount;
-    const tpTotal = 25 + tpFromProgression + gsTPBonus + (system.downtime?.gains?.tp || 0);
+    const customTPBonus = (this.actor._getBuffTotal?.(system, "TP per Skill Improvement") || 0) * siCount;
+    const tpTotal = 25 + tpFromProgression + gsTPBonus + customTPBonus + (system.downtime?.gains?.tp || 0);
     const tpSpentSignatures = preparedTechniques.reduce((sum, t) => sum + t.tpCost, 0);
     const tpSpentAuras = this._calcAurasTotalTP(system);
     const tpSpentUnique = this._calcUniqueTotalTP(system);
@@ -412,14 +412,16 @@ export const techniquesMethods = {
     const isImpediment = (system.conditions || []).some(c => c.id === "impediment" && c.active);
     const dp = system.dicePools || {};
     const topCat = dp.topCatBonus || {};
-    const grCat = dp.greaterCatBonus || {};
     const grApply = dp.greaterApplyCount || {};
     const topCatBonus = (topCat.global || 0) + (topCat.strike || 0);
-    const topDice = this._applyTopCount(system, "strike", this._resolveExtraDice(tier, 0, topCatBonus));
+    const sig = dp.signature;
+    const topDice = this._applyTopCount(system, "strike", this._resolveExtraDice(tier, 0, topCatBonus),
+      (sig?.topAll || 0) + (sig?.topStrike || 0));
     const hasGreater = !isImpediment && (combatStates.superior || (grApply.global || 0) > 0 || (grApply.strike || 0) > 0);
-    const grCatBonus = (grCat.global || 0) + (grCat.strike || 0);
+    const grCatBonus = greaterDiceCategoryBonus(system, "strike");
     const greaterDice = hasGreater ? this._resolveExtraDice(tier, 1, grCatBonus) : "";
-    const formula = this._buildFormula(topDice, greaterDice, totalMod, this._extraDicePool(system, "strike"));
+    totalMod += sig?.strikeBonus || 0;
+    const formula = this._buildFormula(topDice, greaterDice, totalMod, this._extraDicePool(system, "strike") + signatureBuffDice(system, "strike"));
 
     return { formula };
   },
@@ -483,12 +485,13 @@ export const techniquesMethods = {
     const isImpediment = (system.conditions || []).some(c => c.id === "impediment" && c.active);
     const dp = system.dicePools || {};
     const topCat = dp.topCatBonus || {};
-    const grCat = dp.greaterCatBonus || {};
     const grApply = dp.greaterApplyCount || {};
     const topCatBonus = (topCat.global || 0) + (topCat.wound || 0);
-    const topDice = this._applyTopCount(system, "wound", this._resolveExtraDice(tier, 0, topCatBonus));
+    const sig = dp.signature;
+    const topDice = this._applyTopCount(system, "wound", this._resolveExtraDice(tier, 0, topCatBonus),
+      (sig?.topAll || 0) + (sig?.topWound || 0));
     const hasGreater = !isImpediment && (combatStates.superior || (grApply.global || 0) > 0 || (grApply.wound || 0) > 0);
-    const grCatBonus = (grCat.global || 0) + (grCat.wound || 0);
+    const grCatBonus = greaterDiceCategoryBonus(system, "wound");
     const greaterDice = hasGreater ? this._resolveExtraDice(tier, 1, grCatBonus) : "";
     // Sig Techs use d8 for energy charges: "1d8(T) if that Attacking Maneuver is a
     // Signature Technique" (attacking.txt). Maximum Charge (signature.txt:765,
@@ -496,11 +499,7 @@ export const techniquesMethods = {
     const hasMaxCharge = (tech.advantages || []).some(a => a.name === "Maximum Charge");
     // Charge die chain with the "Energy Charge Dice Category" and "Signature
     // Energy Charge Dice Category" buffs (previously dead aptitudes)
-    const chargeChain = ["d4", "d6", "d8", "d10", "d12"];
-    const chargeCatIdx = 2 + (hasMaxCharge ? 1 : 0)
-      + (system.aptitudes?.energyChargeDiceCategory || 0)
-      + (system.aptitudes?.signatureEnergyChargeDiceCategory || 0);
-    const chargeDie = chargeChain[Math.max(0, Math.min(chargeCatIdx, chargeChain.length - 1))];
+    const chargeDie = energyChargeDie(system.aptitudes, { signature: true, maximumCharge: hasMaxCharge });
     let chargesExtra = charges > 0 ? `+${charges * tier}${chargeDie}` : "";
     if (tech.profile === "Mega Flare" && charges > 0) chargesExtra += `+${charges * tier}`;
     // Super Stack wound extra dice (Physical/Energy foundations only)
@@ -515,19 +514,21 @@ export const techniquesMethods = {
     // Synthetic Muscle (cybernetic trait): +1d4(T) Wound on Physical/Energy attacks
     const synthExtra = (system._cyberSynthWoundDice && (tech.foundation === "Physical" || tech.foundation === "Energy"))
       ? `+${this._scaleDiceByTier("1d4", tier)}` : "";
-    const formula = this._buildFormula(topDice, greaterDice, totalMod, chargesExtra + ssExtra + ragingExtra + surgingExtra + synthExtra + this._extraDicePool(system, "wound"));
+    totalMod += sig?.woundBonus || 0;
+    const formula = this._buildFormula(topDice, greaterDice, totalMod, chargesExtra + ssExtra + ragingExtra + surgingExtra + synthExtra + this._extraDicePool(system, "wound") + signatureBuffDice(system, "wound"));
 
     let damageCat = profileInfo.damageCat || "Standard";
     if (tech.profile === "Mega Flare" && charges >= 7) damageCat = "Direct";
 
-    return { formula, damageCat };
+    return { formula, damageCat: shiftAttackDamageCategory(damageCat, system.aptitudes?.attackingDamageCategory) };
   },
 
   _calcTechCT(tech, system) {
     const { strikeCT, woundCT, dodgeCT } = this._calcCombatCTs(system, {
       isWeapon: !!tech.isWeapon,
       foundation: tech.foundation || "",
-      profile: tech.profile || ""
+      profile: tech.profile || "",
+      isSignature: true
     });
     const notes = [];
     const talents = system.talents || [];

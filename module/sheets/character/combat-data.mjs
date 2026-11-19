@@ -1,3 +1,4 @@
+import { attackKiWithBuffs, greaterDiceCategoryBonus, manualBuffEffect } from "../../helpers/custom-buffs.mjs";
 import { signatureEnergyCharges093 } from "../../rules/techniques-v093.mjs";
 import { PROFILES_093 } from "../../rules/profiles-v093.mjs";
 import { uses093 } from "../../rules/v093.mjs";
@@ -284,7 +285,7 @@ export const combatDataMethods = {
     const peScore = system.attributes?.pe?.score ?? 0;
     const scScore = system.attributes?.sc?.score ?? 0;
     for (const cb of (system.customBuffs || [])) {
-      if (!cb.active || !cb.effect) continue;
+      if (!cb.active || !cb.effect || manualBuffEffect(cb.effect)) continue;
       const parts = [];
       if (cb.flat) parts.push(`${cb.flat >= 0 ? "+" : ""}${cb.flat}`);
       if (cb.bT) parts.push(`${cb.bT >= 0 ? "+" : ""}${cb.bT}(bT=${cb.bT * baseTierForTip})`);
@@ -351,11 +352,8 @@ export const combatDataMethods = {
       }
       // "Ki Point Cost Attacks" buffs (delta; negative = discount) and Deep
       // Control's all-maneuver reduction — previously dead aptitudes.
-      kiCost = Math.max(0, kiCost
-        + (system.aptitudes?.kiCostAttacks || 0)
-        + (system.aptitudes?.kiCostAttacksNoCap || 0)
-        - (system.aptitudes?.allManeuverKiReduction || 0));
-      if (uses093(system)) kiCost = Math.floor(Math.max((profile.kpCost || 0) * trackerTier / 2, kiCost));
+      const minimum = uses093(system) ? (profile.kpCost || 0) * trackerTier / 2 : 0;
+      kiCost = attackKiWithBuffs(kiCost, minimum, system.aptitudes);
       const prep = prepRefs[i] || {};
       // Unified CTs — includes talents (Focused Strike, Critical Specialist for
       // armed attacks), Mindful state, and CT buffs. Fixes the old fallback that
@@ -402,10 +400,8 @@ export const combatDataMethods = {
         name: tech.name,
         // finalKP×tier plus the "Ki Point Cost Attacks" buff deltas and Deep
         // Control's all-maneuver reduction (previously dead aptitudes)
-        kiCost: Math.floor(Math.max(uses093(system) ? (tech.profileBaseKP || 0) * trackerTier / 2 : 0, (tech.finalKP || 0) * trackerTier
-          + (system.aptitudes?.kiCostAttacks || 0)
-          + (system.aptitudes?.kiCostAttacksNoCap || 0)
-          - (system.aptitudes?.allManeuverKiReduction || 0))),
+        kiCost: attackKiWithBuffs((tech.finalKP || 0) * trackerTier,
+          uses093(system) ? (tech.profileBaseKP || 0) * trackerTier / 2 : 0, system.aptitudes),
         strikeFormula: tech.strikeFormula || "",
         woundFormula: tech.woundFormula || "",
         strikeCT: tech.strikeCT || 10,
@@ -787,7 +783,6 @@ export const combatDataMethods = {
     const tier = system.tier || 1;
     const dp = system.dicePools || {};
     const topCat = dp.topCatBonus || {};
-    const grCat = dp.greaterCatBonus || {};
     const grApply = dp.greaterApplyCount || {};
     const combatStates = system.combatStates || {};
 
@@ -800,7 +795,7 @@ export const combatDataMethods = {
       if (isImpediment) return "";
       const hasGreater = combatStates.superior || (grApply.global || 0) > 0 || (grApply[rollType] || 0) > 0;
       if (!hasGreater) return "";
-      const catBonus = (grCat.global || 0) + (grCat[rollType] || 0);
+      const catBonus = greaterDiceCategoryBonus(system, rollType);
       return this._resolveExtraDice(tier, 1, catBonus);
     };
 

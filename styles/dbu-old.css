@@ -15217,3 +15217,8 @@
   width: 100%;
   resize: vertical;
 }
+
+.dbu-old.sheet .buff-effect-warning {
+  display: block;
+  color: #ffda94;
+}

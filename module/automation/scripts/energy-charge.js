@@ -1,3 +1,4 @@
+import { energyChargeDie } from "../../helpers/custom-buffs.mjs";
 import { unsetAutomationFlag } from "../migration.mjs";
 import { renderActionWindow, ACTION_WINDOW_DIALOG_OPTIONS } from "./ui/action-windows.js";
 import { getEnergyChargeVisualSettings } from "./visual-config.js";
@@ -487,32 +488,15 @@ function dbuGetMandatoryChargeInfo(actor, sourceKey) {
 }
 
 function dbuGetChargeDie(actor, sourceKey) {
-  // Basic Attacks: 1d6(T) por EC.
-  if (!String(sourceKey).startsWith("tech_")) {
-    return "d6";
-  }
+  const key = String(sourceKey);
+  if (!key.startsWith("tech_")) return energyChargeDie(actor.system.aptitudes);
 
-  // Signature: base d8; Maximum Charge aumenta uma categoria.
-  const techId = String(sourceKey).slice(5);
-  const tech = (actor.system.signatureTechniques || []).find(t =>
-    String(t.id ?? t._id ?? "") === techId
-  );
-
-  const hasMaxCharge = (tech?.advantages || []).some(a =>
+  const techId = key.slice(5);
+  const tech = (actor.system.signatureTechniques || []).find(t => String(t.id ?? t._id ?? "") === techId);
+  const maximumCharge = (tech?.advantages || []).some(a =>
     String(a.name || "").trim().toLowerCase() === "maximum charge"
   );
-
-  const chain = ["d4", "d6", "d8", "d10", "d12"];
-
-  let index = 2;
-  if (hasMaxCharge) index += 1;
-
-  // Mesma lógica que o DBU usa para Signature Energy Charge Dice Category.
-  index += Number(actor.system.aptitudes?.energyChargeDiceCategory || 0);
-  index += Number(actor.system.aptitudes?.signatureEnergyChargeDiceCategory || 0);
-
-  index = Math.max(0, Math.min(chain.length - 1, index));
-  return chain[index];
+  return energyChargeDie(actor.system.aptitudes, { signature: true, maximumCharge });
 }
 
 function dbuGetProjectedChargeFormula(actor, sourceKey, totalCharges) {

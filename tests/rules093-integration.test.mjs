@@ -193,3 +193,80 @@ test('Dramatic Finisher includes the additional Super Profile cost and validates
   assert.equal(superProfileKiUnits093({superProfile:'Multi-Profile',profile:'Beam',secondaryProfile:'Blitz'}),1);
   assert.equal(superProfileKiUnits093({superProfile:'Multi-Profile',profile:'Beam',secondaryProfile:'Beam'}),null);
 });
+
+test('custom buffs accept saved aliases and combine active signed values using base and current Tier', () => {
+  const system = {
+    baseTier: 2,
+    tier: 3,
+    customBuffs: [
+      { effect: '  strike   (ALL) ', active: true, flat: '5', bT: -2, T: 1 },
+      { effect: 'Strike', active: false, flat: 100 },
+      { effect: '', active: true, flat: 100 },
+    ],
+    _derivedBuffs: [{ effect: 'Strike', active: true, flat: 3 }],
+  };
+  const actor = new DBUActor(system);
+  assert.equal(actor._getBuffTotal(system, 'Strike'), 7);
+  assert.equal(actor._getBuffTotal(system, ''), 0);
+});
+
+test('Signature-only custom buffs reach Strike and Wound formulas and their Critical Targets', () => {
+  const system = {
+    rulesVersion: '0.9.3', baseTier: 2, tier: 2,
+    combatStates: { superior: true },
+    aptitudes: { superiorDiceSize: 1, attackingDamageCategory: 1, strikeCTBonus: -1 },
+    dicePools: {
+      signature: {
+        strikeBonus: 5, woundBonus: 7, ctStrike: 2, ctWound: 1,
+        topAll: 1, topWound: 1,
+        diceAll: { d6: 1 }, diceWound: { d6: 2 },
+      },
+    },
+  };
+  const actor = new ActorStub(system);
+  actor._getActiveAura = () => null;
+  actor._getSelfBenefitAura = () => null;
+  const sheet = new DBUCharacterSheet(actor);
+  const tech = technique({ foundation: 'Physical', profile: 'Simple' });
+  const strike = sheet._calcTechStrike(tech, system, 2).formula;
+  const wound = sheet._calcTechWound(tech, system, 2);
+  assert.equal(strike, '1d10+1d4+1d4+1d8+5+1d6');
+  assert.equal(wound.formula, '1d10+1d4+1d4+1d4+1d8+7+3d6');
+  assert.equal(wound.damageCat, 'Direct');
+  assert.equal(sheet._calcTechCT(tech, system).strikeCT, 9);
+  assert.equal(sheet._calcTechCT(tech, system).woundCT, 9);
+  assert.equal(sheet._calcTechCT({ ...tech, profile: 'Cutting' }, system).woundCT, 5);
+  assert.equal(sheet._calcCombatCTs(system).woundCT, 10);
+});
+
+test('attack Ki regular discounts respect the floor and no-cap discounts apply after it', async () => {
+  const { attackKiWithBuffs, energyChargeDie, manualBuffEffect } = await import('../module/helpers/custom-buffs.mjs');
+  assert.equal(attackKiWithBuffs(8, 4, { kiCostAttacks: -7 }), 4);
+  assert.equal(attackKiWithBuffs(8, 4, { kiCostAttacks: -7, kiCostAttacksNoCap: -2 }), 2);
+  assert.equal(attackKiWithBuffs(8, 4, { kiCostAttacksNoCap: -99 }), 0);
+  assert.equal(energyChargeDie({ energyChargeDiceCategory: 1 }), 'd8');
+  assert.equal(energyChargeDie({ energyChargeDiceCategory: 1, signatureEnergyChargeDiceCategory: 1 }, { signature: true }), 'd12');
+  assert.equal(manualBuffEffect(' I’m being Bludgeoned '), true);
+});
+
+test('basic attacks use charged dice and damage category buffs, and the technique tab includes earned bonus TP', () => {
+  const system = {
+    rulesVersion: '0.9.3', level: 5, tier: 1, baseTier: 1,
+    aptitudes: { energyChargeDiceCategory: 1, attackingDamageCategory: -1 },
+    customBuffs: [{ effect: 'TP per Skill Improvement', active: true, flat: 3 }],
+    attackRefs: [{ name: 'Beam test', profile: 'Beam', foundation: 'Energy', energyCharges: 1 }],
+    progressionRows: [
+      { level: 3, perkType: 'skill_improvement', tp: 2 },
+      { level: 7, perkType: 'skill_improvement', tp: 2 },
+    ],
+  };
+  const actor = new DBUActor(system);
+  actor._getSelfBenefitAura = () => null;
+  const sheet = new DBUCharacterSheet(actor);
+  const context = {};
+  sheet._prepareAttackRefData(context, system);
+  sheet._prepareTechniquesData(context, system);
+  assert.match(context.attackRefs[0].woundFormula, /\+2d8\b/);
+  assert.equal(context.attackRefs[0].damageCat, 'Standard');
+  assert.equal(context.tpTotal, 30);
+});

@@ -1,3 +1,4 @@
+import { buffAmount, buffEffectKey, manualBuffEffect } from "../helpers/custom-buffs.mjs";
 import { uses093 } from "../rules/v093.mjs";
 import { RACES_093 } from "../rules/races-v093.mjs";
 import { ActorSheet, Dialog } from "../helpers/foundry-compat.mjs";
@@ -256,9 +257,17 @@ export class DBUCharacterSheet extends ActorSheet {
     // Compute buffTotal for display — buffTotal is a transient display field, safe to set on live data
     // since TypeDataModel strips unknown fields on save and prepareDerivedData recomputes each cycle
     const _tier = system.tier || 1;
-    const _baseTier = system.baseTier || _tier;
+    const _baseTier = system.baseTier || 1;
+    const buffOptions = CONFIG.DBU?.customBuffOptions || [];
+    const knownBuffs = new Set(buffOptions.map(buffEffectKey));
+    context.automaticBuffOptions = buffOptions.filter(effect => !manualBuffEffect(effect));
     for (const buff of (system.customBuffs || [])) {
-      buff.buffTotal = (buff.flat || 0) + (buff.bT || 0) * _baseTier + (buff.T || 0) * _tier;
+      buff.buffTotal = buffAmount(buff, _tier, _baseTier);
+      buff.buffWarning = "";
+      if (buff.active && buff.effect) {
+        if (manualBuffEffect(buff.effect)) buff.buffWarning = "Aplicação manual";
+        else if (!knownBuffs.has(buffEffectKey(buff.effect))) buff.buffWarning = "Efeito fora da lista de sugestões";
+      }
     }
 
     // System config (for drop-down options, labels, etc.)
