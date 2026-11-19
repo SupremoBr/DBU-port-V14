@@ -4,7 +4,7 @@ Usage: python3 scripts/build-rules093.py /path/to/rules093
 The research HTML and rule prose are deliberately not distributed.
 """
 import json, re, sys
-from rules093_reference import talent_categories
+from rules093_reference import mechanic_summary, talent_categories
 from pathlib import Path
 root = Path(sys.argv[1]); target = Path(__file__).resolve().parents[1] / 'module/rules/catalogs-v093.mjs'
 read = lambda name: json.loads((root / name).read_text())
@@ -44,7 +44,7 @@ for slug, rows in read('parsed-racial.json').items():
   same = [t for t in candidates if equivalent(t.get('effects',[]),row['effects'])]
   reviewed = False
   ident = same[0]['id'] if reviewed else 'r093_'+key(slug+'_'+row['name'])
-  item = dict(id=ident, name=row['name'], race=race, category=row['category'], traitCategory=row['traitCategory'], subrace=slug if len(path)>2 else '', source=url(slug), rulesVersion='0.9.3', automation='legacy-reviewed' if reviewed else 'manual', description='Regras atuais na fonte oficial. Efeitos marcados como manuais exigem resolução pelo mestre.', effects=same[0]['effects'] if reviewed else [effect(e,url(slug)) for e in row['effects']], isSelectable=True)
+  item = dict(id=ident, name=row['name'], race=race, category=row['category'], traitCategory=row['traitCategory'], subrace=slug if len(path)>2 else '', source=url(slug), rulesVersion='0.9.3', automation='legacy-reviewed' if reviewed else 'manual', description=mechanic_summary(row), effects=same[0]['effects'] if reviewed else [effect(e,url(slug)) for e in row['effects']], isSelectable=True)
   traits.setdefault(race, []).append(item)
   for t in candidates: racial_map.setdefault(t['id'],[]).append(ident)
 # Explicit rename verified on the Saiyan page. No approximate-name matching.
@@ -65,7 +65,7 @@ for row in read('parsed-talents.json'):
  reviewed=len(candidates)==1 and equivalent(candidates[0].get('effects',[]),row['effects'])
  ident=candidates[0]['id'] if reviewed else 'r093_'+key(row['name'])
  category = talent_groups[row['name']]
- t=dict(id=ident,name=row['name'],category=category,prerequisites='Ver fonte oficial.',source=url('talents'),rulesVersion='0.9.3',automation='legacy-reviewed' if reviewed else 'manual',description='Consulte requisitos e efeitos atuais na fonte oficial.',effects=candidates[0]['effects'] if reviewed else [effect(e,url('talents')) for e in row['effects']])
+ t=dict(id=ident,name=row['name'],category=category,prerequisites='Ver fonte oficial.',source=url('talents'),rulesVersion='0.9.3',automation='legacy-reviewed' if reviewed else 'manual',description=mechanic_summary(row),effects=candidates[0]['effects'] if reviewed else [effect(e,url('talents')) for e in row['effects']])
  talents.append(t)
  for c in candidates: talent_map[c['id']]=ident
 transforms={}; trans_map={}

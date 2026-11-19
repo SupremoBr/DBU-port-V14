@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.0.12-rules093-alpha.4] — descrições de traços e talentos
+
+- Os cartões mostram resumos e mantêm o link para a regra completa. O botão de lápis permite personalizar a descrição por personagem e restaurar o resumo original.
+
 ## [1.0.12-rules093-alpha.3] — categorias de talentos
 
 - Os 275 talentos usam as 33 categorias oficiais nos filtros e grupos da ficha e do seletor.

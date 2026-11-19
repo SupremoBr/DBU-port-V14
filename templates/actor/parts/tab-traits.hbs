@@ -37,6 +37,13 @@
           <button type="button" class="trait-expand" data-action="toggle-trait" title="Expand/Collapse">
             <i class="fas fa-chevron-down"></i>
           </button>
+          {{#if @root.rules093}}
+          {{#if @root.editable}}
+          <button type="button" class="dbu-edit-catalog-description" data-dbu-edit-description="traits" data-entry-id="{{id}}" title="Editar descrição" aria-label="Editar descrição de {{name}}">
+            <i class="fas fa-pen" aria-hidden="true"></i>
+          </button>
+          {{/if}}
+          {{/if}}
           <button type="button" class="delete-btn item-delete" data-action="delete-trait" data-trait-id="{{id}}" title="Remove Trait">
             <i class="fas fa-trash"></i>
           </button>
@@ -50,9 +57,9 @@
           </div>
           {{/if}}
         {{#if description}}
-        <div class="trait-description">{{description}}</div>
-          {{#if source}}<a href="{{source}}" target="_blank" rel="noopener noreferrer">Fonte oficial 0.9.3 — revisar efeitos manuais</a>{{/if}}
+        <div class="trait-description dbu-catalog-description">{{description}}</div>
         {{/if}}
+        {{#if source}}<a class="dbu-catalog-source" href="{{source}}" target="_blank" rel="noopener noreferrer">Regra completa no site</a>{{/if}}
         <div class="trait-effects-list">
           {{#each effects}}
           <div class="trait-effect {{activationType}}">

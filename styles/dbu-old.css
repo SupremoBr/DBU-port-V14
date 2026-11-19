@@ -15197,3 +15197,23 @@
 .dbu-old .dbu-rules-review button:is(:hover, :focus, :active, :disabled) {
   color: #fff !important;
 }
+
+.dbu-old .dbu-catalog-description {
+  white-space: pre-wrap;
+}
+
+.dbu-old .dbu-edit-catalog-description {
+  width: auto;
+  flex: 0 0 auto;
+  color: #fff;
+}
+
+.dbu-old .dbu-catalog-source {
+  display: inline-block;
+  margin: 0.25rem 0;
+}
+
+.dbu-catalog-description-editor textarea {
+  width: 100%;
+  resize: vertical;
+}

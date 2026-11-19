@@ -1,3 +1,4 @@
+import { applyCatalogDescriptions, editCatalogDescription } from './catalog-descriptions.mjs';
 import { SUPER_PROFILES_093 } from "./super-profiles-v093.mjs";
 import { defendKiCost093 } from "./defenses-v093.mjs";
 import { applyLegendRealized093, newLevelOfPower093, requiresTransformationReview093 } from "./transformations-v093.mjs";
@@ -49,8 +50,19 @@ export function installRulesSheet093(Sheet) {
       return uses093(this.actor.system) ? fn.call(this, original.bind(this), ...args) : original.apply(this, args);
     } });
   };
+  wrap('_getCharacterTraits', function(original, system) {
+    return applyCatalogDescriptions(this.actor, 'traits', original(system));
+  });
+  wrap('_getCharacterTalents', function(original, system) {
+    return applyCatalogDescriptions(this.actor, 'talents', original(system));
+  });
   wrap('activateListeners', function(original, html) {
     original(html); if (!this.isEditable) return;
+    html.on('click', '[data-dbu-edit-description]', async event => {
+      event.preventDefault();
+      const { dbuEditDescription, entryId } = event.currentTarget.dataset;
+      await editCatalogDescription(this, dbuEditDescription, entryId);
+    });
     html.on('click', '[data-rules093-convert]', async event => { event.preventDefault(); const result = await convertStandardToCounter093(this.actor); if (!result.ok) warn(result.reason); });
     html.on('click', '[data-rules093-backup]', event => { event.preventDefault(); game.dbu.exportRulesBackup(); });
     html.on('click', '[data-rules093-source]', event => {

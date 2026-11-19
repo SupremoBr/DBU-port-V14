@@ -36,6 +36,13 @@
           <div class="talent-header">
             <span class="talent-category-badge">{{category}}</span>
             <span class="talent-name">{{name}}</span>
+            {{#if @root.rules093}}
+            {{#if @root.editable}}
+            <button type="button" class="dbu-edit-catalog-description" data-dbu-edit-description="talents" data-entry-id="{{id}}" title="Editar descrição" aria-label="Editar descrição de {{name}}">
+              <i class="fas fa-pen" aria-hidden="true"></i>
+            </button>
+            {{/if}}
+            {{/if}}
             <button type="button" class="delete-btn item-delete" data-action="delete-talent" data-talent-id="{{id}}" title="Remove Talent">
               <i class="fas fa-trash"></i>
             </button>
@@ -44,9 +51,9 @@
           <div class="talent-prerequisites"><strong>Prerequisites:</strong> {{prerequisites}}</div>
           {{/if}}
           {{#if description}}
-          <div class="talent-description">{{description}}</div>
-          {{#if source}}<a href="{{source}}" target="_blank" rel="noopener noreferrer">Fonte oficial 0.9.3 — revisar efeitos manuais</a>{{/if}}
+          <div class="talent-description dbu-catalog-description">{{description}}</div>
           {{/if}}
+          {{#if source}}<a class="dbu-catalog-source" href="{{source}}" target="_blank" rel="noopener noreferrer">Regra completa no site</a>{{/if}}
           <div class="talent-effects-list">
             {{#each effects}}
             <div class="talent-effect {{activationType}}">
