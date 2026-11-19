@@ -6,7 +6,10 @@ export function installRules093(config) {
   config.rulesVersion = '0.9.3';
   config.racialTraitsCatalog = CATALOGS_093.racialTraits;
   config.talentsCatalog = CATALOGS_093.talents;
-  config.talentCategories = { '0.9.3': CATALOGS_093.talents.map(t => t.id) };
+  config.talentCategories = {};
+  for (const { category, id } of config.talentsCatalog) {
+    (config.talentCategories[category] ??= []).push(id);
+  }
   config.transformationsCatalog = CATALOGS_093.transformations;
   config.techniqueAdvantagesData = CATALOGS_093.advantages;
   config.techniqueDisadvantagesData = CATALOGS_093.disadvantages;

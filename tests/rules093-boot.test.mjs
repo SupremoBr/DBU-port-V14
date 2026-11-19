@@ -18,6 +18,21 @@ test('the real system init installs the current catalogs, schema, sheet adapter 
   await hooks.get('init')();
   assert.equal(CONFIG.DBU.rulesVersion,'0.9.3');
   assert.equal(CONFIG.DBU.talentsCatalog.length,275);
+  const { talentCategories, talentsCatalog } = CONFIG.DBU;
+  assert.equal(Object.keys(talentCategories).length, 33);
+  assert.deepEqual(
+    Object.values(talentCategories).flat().sort(),
+    talentsCatalog.map(talent => talent.id).sort(),
+  );
+  for (const [name, category] of [
+    ['Artful Strike', 'Attacking'],
+    ['Wild Counter', 'Counter'],
+    ['Angry Warrior', 'Raging'],
+  ]) {
+    const talent = talentsCatalog.find(entry => entry.name === name);
+    assert.equal(talent.category, category);
+    assert.ok(talentCategories[category].includes(talent.id));
+  }
   assert.equal(Object.keys(CONFIG.DBU.transformationsCatalog).length,464);
   assert.equal(CONFIG.DBU.profileKpCosts.Beam,8);
   assert.equal(CONFIG.DBU.racialSkillRanks.yardrat,3);

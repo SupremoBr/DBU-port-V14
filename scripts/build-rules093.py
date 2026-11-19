@@ -3,7 +3,8 @@
 Usage: python3 scripts/build-rules093.py /path/to/rules093
 The research HTML and rule prose are deliberately not distributed.
 """
-import json, re, sys, hashlib
+import json, re, sys
+from rules093_reference import talent_categories
 from pathlib import Path
 root = Path(sys.argv[1]); target = Path(__file__).resolve().parents[1] / 'module/rules/catalogs-v093.mjs'
 read = lambda name: json.loads((root / name).read_text())
@@ -58,11 +59,13 @@ for t in traits['saiyan']:
  if t['name'] in summaries:
   for e,text in zip(t['effects'],summaries[t['name']]):e['text']=text
 talents=[]; talent_map={}
+talent_groups = talent_categories((root / 'sources/talents.html').read_text())
 for row in read('parsed-talents.json'):
  candidates=[t for t in old['talents'] if norm(t['name'])==norm(row['name'])]
  reviewed=len(candidates)==1 and equivalent(candidates[0].get('effects',[]),row['effects'])
  ident=candidates[0]['id'] if reviewed else 'r093_'+key(row['name'])
- t=dict(id=ident,name=row['name'],category='0.9.3',prerequisites='Ver fonte oficial.',source=url('talents'),rulesVersion='0.9.3',automation='legacy-reviewed' if reviewed else 'manual',description='Consulte requisitos e efeitos atuais na fonte oficial.',effects=candidates[0]['effects'] if reviewed else [effect(e,url('talents')) for e in row['effects']])
+ category = talent_groups[row['name']]
+ t=dict(id=ident,name=row['name'],category=category,prerequisites='Ver fonte oficial.',source=url('talents'),rulesVersion='0.9.3',automation='legacy-reviewed' if reviewed else 'manual',description='Consulte requisitos e efeitos atuais na fonte oficial.',effects=candidates[0]['effects'] if reviewed else [effect(e,url('talents')) for e in row['effects']])
  talents.append(t)
  for c in candidates: talent_map[c['id']]=ident
 transforms={}; trans_map={}
