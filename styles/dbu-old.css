@@ -15187,3 +15187,13 @@
 .dbu-old .dbu-rules-actions { display:flex; gap:.5rem; align-items:center; flex-wrap:wrap; padding:.5rem; }
 .dbu-old .dbu-rules-actions button, .dbu-old .dbu-rules-review button { width:auto; }
 .dbu-old .dbu-rules-review { padding:.5rem; border:1px solid #b68b38; margin:.25rem; max-height:18rem; overflow:auto; }
+
+/* Keep these controls readable on the sheet's dark background in every theme. */
+.dbu-old .dbu-rules-actions,
+.dbu-old .dbu-rules-actions *,
+.dbu-old .dbu-rules-review,
+.dbu-old .dbu-rules-review *,
+.dbu-old .dbu-rules-actions button:is(:hover, :focus, :active, :disabled),
+.dbu-old .dbu-rules-review button:is(:hover, :focus, :active, :disabled) {
+  color: #fff !important;
+}

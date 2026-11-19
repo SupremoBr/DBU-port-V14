@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.0.12-rules093-alpha.2] — legibilidade dos controles
+
+- Texto fixo em branco nos controles de Actions e no painel de fontes/revisão, incluindo botões e seus estados de interação, sem depender do tema do Foundry.
+
 ## [1.0.12-rules093-alpha.1] — prévia de regras 0.9.3
 
 - Catálogos atuais de raças/traços, talentos e transformações, com fontes oficiais; tabelas de criação e passivos básicos de Saiyan revistos.
