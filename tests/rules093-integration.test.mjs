@@ -292,7 +292,53 @@ test('basic attacks use charged dice and damage category buffs, and the techniqu
   sheet._prepareTechniquesData(context, system);
   assert.match(context.attackRefs[0].woundFormula, /\+2d8\b/);
   assert.equal(context.attackRefs[0].damageCat, 'Standard');
-  assert.equal(context.tpTotal, 30);
+  assert.equal(context.tpTotal, 5);
+});
+
+test('PL1 awards six slots and 25 TP once and both tabs count earned TP identically', () => {
+  const rows = structuredClone(CONFIG.DBU.progressionRows);
+  const converted = rows.find(row => row.level === 1 && row.convertible);
+  converted.perkType = 'skill_improvement';
+  converted.tp = 25; // An old form could save this default on the converted row.
+  const system = { rulesVersion: '0.9.3', level: 1, progressionRows: rows };
+  const sheet = new DBUCharacterSheet(new ActorStub(system));
+  sheet.actor._getBuffTotal = () => 0;
+  sheet._calcAurasTotalTP = () => 0;
+  sheet._calcUniqueTotalTP = () => 0;
+  for (const [level, total] of [[1, 40], [5, 55], [10, 70]]) {
+    system.level = level;
+    const context = {};
+    sheet._prepareProgressionData(context, system);
+    sheet._prepareTechniquesData(context, system);
+    const improvements = context.progressionRows.filter(row => row.perkType === 'skill_improvement');
+    assert.deepEqual(improvements.slice(0, 2).map(row => [row.maxSkillSlots, row.tp]), [[4, 15], [6, 25]]);
+    assert.equal(context.totalTP, total);
+    assert.equal(context.tpTotal, total);
+    assert.equal(context.progressionPreview[0].tp, total);
+    assert.equal(converted.tp, 25);
+  }
+});
+
+test('the starting technique exempts one eligible technique without changing its Ki cost', async () => {
+  const system = { rulesVersion: '0.9.3', level: 1, signatureTechniques: [
+    technique({ id: 1, type: 'signature', startingTechnique: true }),
+    technique({ id: 2, type: 'signature' }),
+    technique({ id: 3, type: 'dramatic_finisher' }),
+  ] };
+  const sheet = new DBUCharacterSheet(new ActorStub(system));
+  sheet.actor._getSelfBenefitAura = () => null;
+  sheet._calcAurasTotalTP = () => 0;
+  sheet._calcUniqueTotalTP = () => 0;
+  const context = {};
+  sheet._prepareTechniquesData(context, system);
+  assert.equal(context.signatureTechniques[0].tpCost, 0);
+  assert.equal(context.signatureTechniques[0].finalKP, context.signatureTechniques[1].finalKP);
+  const checkbox = id => ({ currentTarget: { closest: () => null, dataset: { techId: String(id), field: 'startingTechnique' }, type: 'checkbox', checked: true } });
+  const blocked = checkbox(3);
+  await sheet._onTechniqueFieldChange(blocked);
+  assert.equal(blocked.currentTarget.checked, false);
+  await sheet._onTechniqueFieldChange(checkbox(2));
+  assert.deepEqual(system.signatureTechniques.map(entry => Boolean(entry.startingTechnique)), [false, true, false]);
 });
 
 test('owned linked buffs stack and a 50% LP trigger switches off on healing to the threshold', async () => {

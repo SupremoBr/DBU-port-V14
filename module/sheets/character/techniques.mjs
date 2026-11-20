@@ -1,6 +1,7 @@
 import { energyChargeDie, greaterDiceCategoryBonus, shiftAttackDamageCategory, signatureBuffDice } from "../../helpers/custom-buffs.mjs";
-import { techniqueKiCost093, signatureEnergyCharges093 } from "../../rules/techniques-v093.mjs";
+import { techniqueKiCost093, signatureEnergyCharges093, startingTechniqueEligible093 } from "../../rules/techniques-v093.mjs";
 import { uses093, techniquePointCost } from "../../rules/v093.mjs";
+import { progression093 } from "../../rules/progression-v093.mjs";
 
 /** Character sheet domain: techniques. Methods run with the sheet as this. */
 export const techniquesMethods = {
@@ -15,13 +16,16 @@ export const techniquesMethods = {
     const profileKpCosts = config.profileKpCosts || {};
     const advData = config.techniqueAdvantagesData || {};
     const disadvData = config.techniqueDisadvantagesData || {};
+    const currentRules = uses093(system);
+    const startingTechnique = currentRules && techniques.find(tech => tech.startingTechnique);
 
     // Helper: get attribute modifier
     const getAttrMod = (key) => system.attributes?.[key]?.modifier ?? 0;
 
     // Calculate enriched data for each technique
     const preparedTechniques = techniques.map(t => {
-      const tpCost = this._calcTechTPCost(t);
+      const isFreeStarter = t === startingTechnique && startingTechniqueEligible093(t);
+      const tpCost = isFreeStarter ? 0 : this._calcTechTPCost(t);
 
       // Magical Flavor: the ST is treated as the chosen Energy Profile for
       // effects/formulas while remaining a Magic ST (uses MA, Magic buffs).
@@ -66,6 +70,7 @@ export const techniquesMethods = {
         tpCost,
         tpMax: tpLimit,
         tpOverLimit: tpCost > tpLimit,
+        ...(currentRules && t.startingTechnique ? { startingTechniqueNeedsReview: !isFreeStarter } : {}),
         tpFull,
         mfProfile,
         kpCost,
@@ -105,8 +110,10 @@ export const techniquesMethods = {
     // Improvement automatically drops its TP (no stale awards).
     const gsTPBonus = ((system.aptitudes?.giftedStudentTPPerSI || 0)
       + (system.aptitudes?.rapidLearnerTPPerSI || 0)) * siCount;
-    const customTPBonus = (this.actor._getBuffTotal?.(system, "TP per Skill Improvement") || 0) * siCount;
-    const tpTotal = 25 + tpFromProgression + gsTPBonus + customTPBonus + (system.downtime?.gains?.tp || 0);
+    const tpPerSIBuff = this.actor._getBuffTotal?.(system, "TP per Skill Improvement") || 0;
+    const tpTotal = currentRules
+      ? progression093(system, progRows.length ? progRows : (config.progressionRows || []), tpPerSIBuff).totalTP
+      : 25 + tpFromProgression + gsTPBonus + tpPerSIBuff * siCount + (system.downtime?.gains?.tp || 0);
     const tpSpentSignatures = preparedTechniques.reduce((sum, t) => sum + t.tpCost, 0);
     const tpSpentAuras = this._calcAurasTotalTP(system);
     const tpSpentUnique = this._calcUniqueTotalTP(system);
@@ -584,6 +591,14 @@ export const techniquesMethods = {
     const techs = foundry.utils.deepClone(this.actor.system.signatureTechniques || []);
     const tech = techs.find(t => t.id === techId);
     if (!tech) return;
+    if (uses093(this.actor.system) && field === "startingTechnique" && el.checked) {
+      if (!startingTechniqueEligible093(tech)) {
+        el.checked = false;
+        ui.notifications.warn("A técnica inicial deve ser válida, custar até 20 TP e não pode ser Dramatic Finisher.");
+        return;
+      }
+      for (const entry of techs) entry.startingTechnique = entry === tech;
+    }
     if (el.type === "checkbox") tech[field] = el.checked;
     else if (el.type === "number") tech[field] = Number(el.value) || 0;
     else tech[field] = el.value;

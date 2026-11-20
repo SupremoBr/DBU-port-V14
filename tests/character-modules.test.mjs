@@ -73,6 +73,29 @@ test('read-only sheet calls the base lifecycle without installing edit handlers'
   assert.equal(registrations.length, 0);
 });
 
+test('PL1 progression rejects a new talent category conflict while preserving saved selections', async () => {
+  const [one, two] = CATALOGS_093.talents.filter(talent => talent.category === 'Attacking');
+  const system = { rulesVersion: '0.9.3', progressionRows: [
+    { level: 1, perkType: 'talent_addition', talent: one.name },
+    { level: 1, perkType: 'talent_addition', talent: '' },
+  ] };
+  const sheet = new DBUCharacterSheet({ system });
+  sheet.render = () => {};
+  const warnings = [];
+  const previousUI = globalThis.ui;
+  globalThis.ui = { notifications: { warn: message => warnings.push(message) } };
+  try {
+    await sheet._updateObject({}, { 'system.progressionRows.0.level': 1, 'system.progressionRows.1.talent': two.name });
+    assert.equal(sheet.baseUpdateCalls, undefined);
+    assert.match(warnings.pop(), /Attacking/);
+    system.progressionRows[1].talent = two.name;
+    await sheet._updateObject({}, { 'system.progressionRows.0.level': 1, 'system.progressionRows.1.level': 1 });
+    assert.equal(sheet.baseUpdateCalls, 1);
+  } finally {
+    globalThis.ui = previousUI;
+  }
+});
+
 test('0.9.3 racial choices bind to the sheet, persist by effect, and resolve linked choices', async () => {
   const catalog = CATALOGS_093.racialTraits;
   CONFIG.DBU.racialTraitsCatalog = catalog;

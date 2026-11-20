@@ -32,6 +32,12 @@ export function validateTechnique093(technique) {
   }
   return { ok: issues.length === 0, issues };
 }
+
+export function startingTechniqueEligible093(technique) {
+  return !/dramatic[ _-]*finisher/i.test(String(technique.type ?? technique.techType))
+    && techniquePointCost(technique, { includeFreeTP: false }) <= 20
+    && validateTechnique093(technique).ok;
+}
 /** Creation reductions stop at the full Profile floor. Usage reductions have a half-Profile floor. */
 export function techniqueKiCost093(technique, { usageDiscount = 0, usageSurcharge = 0 } = {}) {
   const validation = validateTechnique093(technique);

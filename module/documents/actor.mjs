@@ -1834,13 +1834,14 @@ export class DBUActor extends Actor {
       // Unification: "+1 Stress Test Dice Score" per Secondary Character
       + DBUActor.getUnificationSecondaries(system).length;
 
-    // Gifted Student: "If SC Score 4+, +2 Dice Score on Skill Checks, +3 TP per Skill Improvement. Double if SC 8+."
+    // Gifted Student starts at SC 4 and doubles at SC 8. In 0.9.3 the base check bonus is +1.
     const scScoreGS = system.attributes.sc?.score ?? 0;
+    const giftedStudentCheckBonus = uses093(system) ? 1 : 2;
     if (scScoreGS >= 8) {
-      system.aptitudes.giftedStudentSkillBonus = 4;
+      system.aptitudes.giftedStudentSkillBonus = 2 * giftedStudentCheckBonus;
       system.aptitudes.giftedStudentTPPerSI = 6;
     } else if (scScoreGS >= 4) {
-      system.aptitudes.giftedStudentSkillBonus = 2;
+      system.aptitudes.giftedStudentSkillBonus = giftedStudentCheckBonus;
       system.aptitudes.giftedStudentTPPerSI = 3;
     } else {
       system.aptitudes.giftedStudentSkillBonus = 0;

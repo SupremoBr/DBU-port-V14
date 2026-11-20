@@ -1,4 +1,5 @@
-
+import { uses093 } from "../../rules/v093.mjs";
+import { initialProgressionWarnings093, progression093 } from "../../rules/progression-v093.mjs";
 
 /** Character sheet domain: progression-skills. Methods run with the sheet as this. */
 export const progressionSkillsMethods = {
@@ -12,6 +13,9 @@ export const progressionSkillsMethods = {
     const rows = (system.progressionRows && system.progressionRows.length > 0)
       ? system.progressionRows
       : fallbackRows;
+    const tpPerSIBuff = this.actor._getBuffTotal(system, "TP per Skill Improvement");
+    const currentRules = uses093(system) && progression093(system, rows, tpPerSIBuff);
+    if (currentRules) context.initialProgressionWarnings = initialProgressionWarnings093(rows);
 
     const racialSkillRanks = CONFIG.DBU?.racialSkillRanks || {};
     const availableSkills = CONFIG.DBU?.availableSkills || [];
@@ -43,7 +47,7 @@ export const progressionSkillsMethods = {
       const perk = row.perkType || "";
       const showSkills = perk === "skill_improvement" || perk === "starting_stats";
       const racialSkillCount = perk === "starting_stats" ? (racialSkillRanks[system.race] || 2) : 0;
-      const maxSkillSlots = perk === "starting_stats" ? racialSkillCount : 4;
+      const maxSkillSlots = perk === "starting_stats" ? racialSkillCount : (currentRules ? currentRules.skillRankSlots[idx] : 4);
 
       // Build skill slots array (6 columns, some active, some dim)
       const skillSlots = [0, 1, 2, 3, 4, 5].map(i => ({
@@ -65,7 +69,8 @@ export const progressionSkillsMethods = {
 
       return {
         ...row,
-        tp: displayTP,
+        tp: currentRules ? currentRules.tpRows[idx].tp : displayTP,
+        ...(currentRules ? { storedTP: currentRules.tpRows[idx].savedTP } : {}),
         showAttrs: perk === "attribute_addition" || perk === "starting_stats",
         showTalent: perk === "talent_addition" || perk === "character_perk",
         showTP: perk === "skill_improvement",
@@ -111,17 +116,16 @@ export const progressionSkillsMethods = {
     const giftedStudentTP = gsTPPerSI * skillImprovementCount;
 
     // Custom buff: +X TP per Skill Improvement (multiplied by SI count)
-    const tpPerSIBuff = this.actor._getBuffTotal(system, "TP per Skill Improvement");
     const tpPerSIBuffTotal = tpPerSIBuff * skillImprovementCount;
 
     context.totalAttrPoints = totalAttrPoints;
     context.totalSkillRanks = totalSkillRanks;
     // L1 SI already includes the 25 TP (15 base + 10 PL1 bonus per character-creation.txt:71)
     // Downtime gains: Technique Training / Training Partner / Strenuous grant flat TP
-    context.totalTP = totalTP + giftedStudentTP + tpPerSIBuffTotal + (system.downtime?.gains?.tp || 0);
+    context.totalTP = currentRules ? currentRules.totalTP : totalTP + giftedStudentTP + tpPerSIBuffTotal + (system.downtime?.gains?.tp || 0);
     // Expose for testability and other consumers
     system.totalTP = context.totalTP;
-    system.skillImprovementCount = skillImprovementCount;
+    system.skillImprovementCount = currentRules ? currentRules.skillImprovementCount : skillImprovementCount;
 
     // Perk type options for select
     const perkTypes = CONFIG.DBU?.perkTypes || [];
@@ -188,7 +192,7 @@ export const progressionSkillsMethods = {
       in: summary.in,
       ma: summary.ma,
       pe: summary.pe,
-      tp: summary.tp,
+      tp: currentRules ? currentRules.totalTP : summary.tp,
       skillRanks: summary.skills.join(", ") || "-",
       isCurrent: true
     }];

@@ -125,6 +125,19 @@
 
         {{!-- Right: Cost Display --}}
         <div class="tech-info-right">
+          {{#if ../rules093}}
+          {{#unless isGained}}
+          <div class="tech-cost-row check-field">
+            <label>
+              <input type="checkbox" class="tech-input" data-tech-id="{{id}}" data-field="startingTechnique" {{#if startingTechnique}}checked{{/if}} />
+              Técnica inicial gratuita (até 20 TP)
+            </label>
+          </div>
+          {{#if startingTechniqueNeedsReview}}
+          <p>O desconto inicial está suspenso. Revise os requisitos e o limite de 20 TP.</p>
+          {{/if}}
+          {{/unless}}
+          {{/if}}
           <div class="tech-cost-row">
             <label>TP Cost</label>
             <span class="cost-value">{{tpCost}}</span>

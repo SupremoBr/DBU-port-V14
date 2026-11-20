@@ -24,6 +24,12 @@
     </div>
   </div>
 
+  {{#if initialProgressionWarnings.length}}
+  <ul class="dbu-catalog-description" aria-label="Revisão da progressão inicial">
+    {{#each initialProgressionWarnings}}<li>{{this}}</li>{{/each}}
+  </ul>
+  {{/if}}
+
   {{#if minionProgression}}
   {{!-- Minion Creation budgets (minions.txt) --}}
   <div class="minion-rules-note minion-progression-note">
@@ -188,7 +194,10 @@
           {{/if}}
           {{!-- TP: visible for skill_improvement --}}
           {{#if showTP}}
-          <td class="col-tp"><input type="number" name="system.progressionRows.{{@index}}.tp" value="{{tp}}" /></td>
+          <td class="col-tp">
+            <input type="number" name="system.progressionRows.{{@index}}.tp"
+              {{#if ../rules093}}value="{{storedTP}}" placeholder="{{tp}}"{{else}}value="{{tp}}"{{/if}} />
+          </td>
           {{else}}
           <td class="col-tp dim">—</td>
           {{/if}}

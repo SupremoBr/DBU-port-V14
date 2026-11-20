@@ -1,5 +1,6 @@
 import { buffAmount, buffEffectKey, buffStateLabels, buffTriggers, conditionalBuff, customBuffState, manualBuffEffect, supportsBuffTrigger } from "../helpers/custom-buffs.mjs";
 import { uses093 } from "../rules/v093.mjs";
+import { initialProgressionWarnings093 } from "../rules/progression-v093.mjs";
 import { RACES_093 } from "../rules/races-v093.mjs";
 import { ActorSheet, Dialog } from "../helpers/foundry-compat.mjs";
 import { installCharacterMethods } from "./character/install-methods.mjs";
@@ -115,11 +116,19 @@ export class DBUCharacterSheet extends ActorSheet {
       };
 
       const progRows = formData["system.progressionRows"];
+      const oldProgRows = this.actor.system.progressionRows || [];
+      if (uses093(this.actor.system)) {
+        const previousWarnings = new Set(initialProgressionWarnings093(oldProgRows));
+        const newWarnings = initialProgressionWarnings093(progRows).filter(warning => !previousWarnings.has(warning));
+        if (newWarnings.length) {
+          ui.notifications.warn(newWarnings.join(" "));
+          return this.render(false);
+        }
+      }
       const progTalentIds = progRows.map(r => nameToId(r.talent)).filter(Boolean);
 
       // Determine which IDs came from old progression rows (to identify manual adds)
       const existingTalents = this.actor.system.talents || [];
-      const oldProgRows = this.actor.system.progressionRows || [];
       const oldProgTalentIds = new Set(
         oldProgRows.map(r => nameToId(r.talent)).filter(Boolean)
       );

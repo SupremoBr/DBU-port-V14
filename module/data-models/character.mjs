@@ -154,6 +154,7 @@ function signatureTechniqueField() {
     secondaryProfile: new StringField({ initial: "" }),
     superProfileActions: new NumberField({ initial: 0, integer: true, min: 0, max: 2 }),
     superProfileGranted: new BooleanField({ initial: false }),
+    startingTechnique: new BooleanField({ initial: false }),
     description: new StringField({ initial: "" }),
     tpMax: new NumberField({ required: true, nullable: false, initial: 10, integer: true }),
     freeTP: new NumberField({ required: true, nullable: false, initial: 0, integer: true }),

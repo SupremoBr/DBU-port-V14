@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.0.12-rules093-alpha.10] — progressão inicial
+
+- O Skill Improvement inicial oferece seis ranks e 25 TP. Converter o Character Perk oferece quatro ranks e 15 TP.
+- Progressão e Técnicas calculam os TP ganhos pela mesma regra. Gifted Student concede +1/+2 em Skill Checks e mantém +3/+6 TP.
+- A ficha valida as novas escolhas de talentos e perícias iniciais. Em Técnicas, uma assinatura elegível de até 20 TP pode ser marcada como gratuita.
+
 ## [1.0.12-rules093-alpha.9] — referência de transformações
 
 - Os traços de transformação exibem o resumo de cada nível e as opções descritas pela regra 0.9.3 em uma janela com o tema escuro do sistema.

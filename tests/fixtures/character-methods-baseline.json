@@ -4,7 +4,8 @@
     "_updateObject": {
       "hash": "dd62143dd920712e9004745794d241b0360b737d083d0fe2c87a351c801835eb",
       "length": 2,
-      "async": true
+      "async": true,
+      "rules093Hash": "80f8b4ff24fc2c4664a32b2dd4041c5b1425cd976c21da12404d9be21cf485de"
     },
     "_normalizeTransformationRows": {
       "hash": "b3990046802b616cab6467f109ebbe7c76a7d8648de3368cd4097f2d44446814",
@@ -20,7 +21,8 @@
     "_prepareProgressionData": {
       "hash": "6cf2b995786a1a995689e856ad51c39298cb301a546f86f4cdc3789198e6f1eb",
       "length": 2,
-      "async": false
+      "async": false,
+      "rules093Hash": "571f121d259f9706ede23471f0599f0af1a8cf196a9bd74af0be94c7de5e9936"
     },
     "_tpLimitByBaseTier": {
       "hash": "5f34547969caa92186c6f9edab128b7b206b7ded1cc57e10b84ae36dffdc2232",
@@ -31,7 +33,7 @@
       "hash": "17ada8954086af70c1b8a9345e7f44290840c1cbcda347381dee3831835d5b4b",
       "length": 2,
       "async": false,
-      "rules093Hash": "e948730aa99ed886cd89e35a57d5b61916e417190bcc8fc2ce6d0effeb191bb9"
+      "rules093Hash": "d5b62d7c1498421c2315a0c0500bfc9ee2db1005412b32124adc6bccd4197d3a"
     },
     "_techMagicalFlavor": {
       "hash": "72986b04c47c5c6704e65e42dec7e7e9acabf0db1ce20ba3cf2d3bfd43919efc",
@@ -667,7 +669,8 @@
     "_onTechniqueFieldChange": {
       "hash": "9994df52ff51dd96eb146d8cda6841a2a17841fa11e6863a2288b7c73eb95a51",
       "length": 1,
-      "async": true
+      "async": true,
+      "rules093Hash": "ac1e07787baf508c17a76cf1cb25b03b9e92252ae54d659b5db4580ed5740023"
     },
     "_onTechStyleToggle": {
       "hash": "b4f6ee85af9c7b8d12c9c5108ebe56ae5425f70be19f7360765c1309ed979d2c",
