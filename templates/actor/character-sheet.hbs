@@ -98,7 +98,9 @@
       <a class="tab-item" data-tab="transformations"><i class="fas fa-dragon"></i> Transformations</a>
       <a class="tab-item" data-tab="trait"><i class="fas fa-dna"></i> Traits</a>
       <a class="tab-item" data-tab="talent"><i class="fas fa-star"></i> Talents</a>
+      {{#unless rules093}}
       <a class="tab-item" data-tab="aura"><i class="fas fa-fire"></i> Auras</a>
+      {{/unless}}
       <a class="tab-item" data-tab="unique"><i class="fas fa-gem"></i> Unique Abilities</a>
       <a class="tab-item" data-tab="equipment"><i class="fas fa-shield-alt"></i> Equipment</a>
       <a class="tab-item" data-tab="attackRef"><i class="fas fa-fist-raised"></i> Attack Ref</a>
@@ -147,9 +149,11 @@
       </div>
 
       {{!-- AURAS TAB --}}
+      {{#unless rules093}}
       <div class="tab" data-group="primary" data-tab="aura">
         {{> "systems/DBU-MRR-OLD/templates/actor/parts/tab-auras.hbs"}}
       </div>
+      {{/unless}}
 
       {{!-- UNIQUE ABILITIES TAB --}}
       <div class="tab" data-group="primary" data-tab="unique">

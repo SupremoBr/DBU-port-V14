@@ -287,12 +287,15 @@ test('basic attacks use charged dice and damage category buffs, and the techniqu
   const actor = new DBUActor(system);
   actor._getSelfBenefitAura = () => null;
   const sheet = new DBUCharacterSheet(actor);
+  sheet._calcAurasTotalTP = () => 8;
   const context = {};
   sheet._prepareAttackRefData(context, system);
   sheet._prepareTechniquesData(context, system);
   assert.match(context.attackRefs[0].woundFormula, /\+2d8\b/);
   assert.equal(context.attackRefs[0].damageCat, 'Standard');
   assert.equal(context.tpTotal, 5);
+  assert.equal(context.tpSpentAuras, 0);
+  assert.equal(context.tpRemaining, 5);
 });
 
 test('PL1 awards six slots and 25 TP once and both tabs count earned TP identically', () => {

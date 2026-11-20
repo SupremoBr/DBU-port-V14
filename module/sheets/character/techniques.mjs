@@ -115,7 +115,7 @@ export const techniquesMethods = {
       ? progression093(system, progRows.length ? progRows : (config.progressionRows || []), tpPerSIBuff).totalTP
       : 25 + tpFromProgression + gsTPBonus + tpPerSIBuff * siCount + (system.downtime?.gains?.tp || 0);
     const tpSpentSignatures = preparedTechniques.reduce((sum, t) => sum + t.tpCost, 0);
-    const tpSpentAuras = this._calcAurasTotalTP(system);
+    const tpSpentAuras = currentRules ? 0 : this._calcAurasTotalTP(system);
     const tpSpentUnique = this._calcUniqueTotalTP(system);
 
     context.tpTotal = tpTotal;

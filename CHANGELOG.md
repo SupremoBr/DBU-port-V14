@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.0.12-rules093-alpha.11] — Auras na ficha
+
+- As fichas 0.9.3 ocultam o editor de Signature Auras e excluem auras legadas do saldo de TP. As auras salvas foram preservadas.
+
 ## [1.0.12-rules093-alpha.10] — progressão inicial
 
 - O Skill Improvement inicial oferece seis ranks e 25 TP. Converter o Character Perk oferece quatro ranks e 15 TP.

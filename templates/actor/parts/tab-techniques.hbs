@@ -28,10 +28,12 @@
       <label>Spent on Signatures</label>
       <span class="tp-value tp-spent">{{tpSpentSignatures}}</span>
     </div>
+    {{#unless rules093}}
     <div class="tp-item">
       <label>Spent on Auras</label>
       <span class="tp-value tp-spent">{{tpSpentAuras}}</span>
     </div>
+    {{/unless}}
     <div class="tp-item">
       <label>Spent on Unique</label>
       <span class="tp-value tp-spent">{{tpSpentUnique}}</span>
