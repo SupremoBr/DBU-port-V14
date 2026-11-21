@@ -110,7 +110,7 @@ export function prepareCharacterTraits(system) {
 }
 
 export function prepareCharacterTalents(system) {
-  const selectedIds = system.talents || [];
+  const selectedIds = system._martialTalents ?? system.talents ?? [];
   const catalog = CONFIG.DBU?.talentsCatalog || [];
   const results = [];
   for (const id of selectedIds) {
@@ -163,7 +163,7 @@ export function prepareCombatResources(system) {
   }
 
   // 2. Talents
-  const talentIds = system.talents || [];
+  const talentIds = system._martialTalents ?? system.talents ?? [];
   const talentCatalog = catalog.talentsCatalog || [];
   for (const id of talentIds) {
     const talent = getCatalogById(talentCatalog).get(id);
@@ -545,7 +545,7 @@ export function prepareActiveEffects(context, system) {
   }
 
   // 2. Talents
-  const talentIds = system.talents || [];
+  const talentIds = system._martialTalents ?? system.talents ?? [];
   const talentCatalog = catalog.talentsCatalog || [];
   for (const id of talentIds) {
     const talent = getCatalogById(talentCatalog).get(id);

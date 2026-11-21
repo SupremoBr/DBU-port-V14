@@ -1,3 +1,4 @@
+import { limitedMartialPower } from "../../rules/path-to-power-v093.mjs";
 import { uses093 } from "../../rules/v093.mjs";
 import { applyLegendRealized093 } from "../../rules/transformations-v093.mjs";
 import { unsetAutomationFlag } from "../migration.mjs";
@@ -672,7 +673,7 @@ function kiMultiplierTypeKey(trans) {
 function kiMultiplierEntryState(actor, trans) {
   const type = kiMultiplierTypeKey(trans);
   const combatId = encounterKey();
-  const eligible = !!type && String(trans?.catalogKey || "") !== "full_suppression" && !!combatId;
+  const eligible = !!type && String(trans?.catalogKey || "") !== "full_suppression" && !!combatId && !limitedMartialPower(actor.system);
   const data = readAutomationFlag(actor, KI_MULT_ENCOUNTER_FLAG) || {};
   const used = !!(eligible && data.combatId === combatId && data.types?.[type]);
   return { eligible, type, used, available: eligible && !used };

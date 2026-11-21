@@ -5,7 +5,7 @@
       "hash": "dd62143dd920712e9004745794d241b0360b737d083d0fe2c87a351c801835eb",
       "length": 2,
       "async": true,
-      "rules093Hash": "80f8b4ff24fc2c4664a32b2dd4041c5b1425cd976c21da12404d9be21cf485de"
+      "rules093Hash": "e1f9a4ec83bfafed5d1ff804c49b13f3862e438c54c4c148c41f49979bbcb224"
     },
     "_normalizeTransformationRows": {
       "hash": "b3990046802b616cab6467f109ebbe7c76a7d8648de3368cd4097f2d44446814",
@@ -16,13 +16,13 @@
       "hash": "3526627ce6f3856e36b3595385220fd7a5d1b02ef6180adca6e0a1f3feb13981",
       "length": 0,
       "async": true,
-      "rules093Hash": "0a5327919b708ec0e7c30fd185c00327566cea10b112fe9a499b88607493bb87"
+      "rules093Hash": "2413eb4bb759c45231c1f1b2d7194eb67dff96edb6423b0080c302604796328d"
     },
     "_prepareProgressionData": {
       "hash": "6cf2b995786a1a995689e856ad51c39298cb301a546f86f4cdc3789198e6f1eb",
       "length": 2,
       "async": false,
-      "rules093Hash": "571f121d259f9706ede23471f0599f0af1a8cf196a9bd74af0be94c7de5e9936"
+      "rules093Hash": "3ef1a745e50f1fc08d48199d2b392529ecee86e908ca3a20b764ef3d5758d93c"
     },
     "_tpLimitByBaseTier": {
       "hash": "5f34547969caa92186c6f9edab128b7b206b7ded1cc57e10b84ae36dffdc2232",
@@ -33,7 +33,7 @@
       "hash": "17ada8954086af70c1b8a9345e7f44290840c1cbcda347381dee3831835d5b4b",
       "length": 2,
       "async": false,
-      "rules093Hash": "906ab8cf8f7c57f5567171b2a512a912ed0d7e52e2fcd0a2afe1977af21cbb16"
+      "rules093Hash": "ae91620c85027ff0e44ff67e64049fdda47e6c7a96aa9380df327c3e2187ea62"
     },
     "_techMagicalFlavor": {
       "hash": "72986b04c47c5c6704e65e42dec7e7e9acabf0db1ce20ba3cf2d3bfd43919efc",
@@ -44,13 +44,13 @@
       "hash": "5af3763a522ad282703a3342121cef69c8d427f537049a5dbd8a221e128a8685",
       "length": 1,
       "async": false,
-      "rules093Hash": "42c6ea7b8307de293010c4b681e1b6b27a3e563e22429bfae3d39ab582e83593"
+      "rules093Hash": "071a331f023046fd8f4beb72448f6e9ab98a573d5d2ed2b93f6b74b7a3af841d"
     },
     "_calcTechTPCost": {
       "hash": "2fd792e0ac1472275e861678f6ec634068c8f9c2cc4a40610f059033c5ee099c",
       "length": 1,
       "async": false,
-      "rules093Hash": "f6f7c07593b46702af179b9481ac83415ec3308f9732abac5b77ef23e48e58a0"
+      "rules093Hash": "62cbf6bed1c5bebf2e1f6c74e5b4689e0e70df3c94508116009a61113a4e4f53"
     },
     "_calcTechStrike": {
       "hash": "06ab9c03615bc27cdfa4c3b05034697622c20c0be61879199a5a23a3bbd8802b",
@@ -119,7 +119,8 @@
     "_preparePlayerMinionData": {
       "hash": "399aaf904d431a0d6831b36fb607a91725ab6560638fe5b3a93b95107169f61d",
       "length": 2,
-      "async": false
+      "async": false,
+      "rules093Hash": "492017706faadc6c12ce0ffb7284f912f4e7fc410da761d65d6c83a08d1f359c"
     },
     "_calcAuraKPCharge": {
       "hash": "39cac982e4c1d2d0fa356d92825af735bccd8b35b3989b1dabcdf48ef4ed1ca4",
@@ -260,7 +261,7 @@
       "hash": "89a3fcc378f5d72b1e0236f0297e33d53a27477fa663eafc312b38a9c5849c47",
       "length": 2,
       "async": false,
-      "rules093Hash": "67e0616e89a822df4870a743fffce84f5c42b5bdbdb0df90e373ce275d095bdc"
+      "rules093Hash": "e33c3b2798c28d1d15bc64f7e95a232f6a7327db5ab8849b1f085dd728901972"
     },
     "_resolveExtraDice": {
       "hash": "49fedc480071c6fdf0676894e505a0a70a194ba5df7bdcca8f256e2ba01ea58d",
@@ -270,7 +271,8 @@
     "_extraDicePool": {
       "hash": "1a1c59ef19f1f99735cd5be01f07372d8de02dcc48059d8b207de9585f794652",
       "length": 2,
-      "async": false
+      "async": false,
+      "rules093Hash": "705536aded53a4f58714c097c7211b0e1f160c2ff631ab8fb3d38c9d198c5741"
     },
     "_applyTopCount": {
       "hash": "a99f80dd85734ea21ff61a8e937c07ac44986a8de3f6aecd9f5dc9e2b179495c",
@@ -297,7 +299,7 @@
       "hash": "0d9ef838c77a8a873e804dc48b0865c0129730a5abf3ec4375ca86f32129d3d8",
       "length": 2,
       "async": false,
-      "rules093Hash": "62b1a5b842907a3e10bf67b8abcbf04d8c493347808b5935f39edf71e5fa1b14"
+      "rules093Hash": "b341338de89f8fe74982a3fac8f632ad21db6782a73e0d96f2f851a0853f5525"
     },
     "_prepareFusionData": {
       "hash": "90a362f26626f6c73eca74a9bef323a326206b9c3f3efe2f35b8fdc29e8ef330",
@@ -347,7 +349,8 @@
     "_prepareTalentBonusData": {
       "hash": "9bd3fc47dc4224285ab11f381c33daf6aa6302820772548b848c56b6a5514d7a",
       "length": 2,
-      "async": false
+      "async": false,
+      "rules093Hash": "ceb661c52193f765524b52400bf6d5abf978a1fd58407c7247da354b02f2a292"
     },
     "_prepareEnhancementPowerData": {
       "hash": "50cb34af62f69be4c4e380aeae5230904baa3d8c7c089a3228ac9b43a78b5265",
@@ -538,7 +541,7 @@
       "hash": "edba07dbc54e010eac57a258dabe1629ff97f1235ae3b309cde6a6bdd1116e7f",
       "length": 1,
       "async": true,
-      "rules093Hash": "ef7e38e2b1184509d0b0bfcc016726ba1c5a0340b726258ec6565229b2631457"
+      "rules093Hash": "3a609992929ec4ddd47537ad263824cac8c664197633daba91f5be7d24abe87a"
     },
     "_confirmDelete": {
       "hash": "e658480f20619fb52a8e2ed6534139c9ee7b48ec9b1aec8c4a38d9ae88e49002",
@@ -671,7 +674,7 @@
       "hash": "9994df52ff51dd96eb146d8cda6841a2a17841fa11e6863a2288b7c73eb95a51",
       "length": 1,
       "async": true,
-      "rules093Hash": "ac1e07787baf508c17a76cf1cb25b03b9e92252ae54d659b5db4580ed5740023"
+      "rules093Hash": "0565aad075b72ac9c79c18e25bd22fb31e4f482de97d07b4095bcb639e794bba"
     },
     "_onTechStyleToggle": {
       "hash": "b4f6ee85af9c7b8d12c9c5108ebe56ae5425f70be19f7360765c1309ed979d2c",
@@ -986,12 +989,14 @@
     "_onAddProgressionRow": {
       "hash": "8586046b0bdfbd11d14f64e3e9e5014b01dfd73f9952f132223428a26dfb51fe",
       "length": 1,
-      "async": true
+      "async": true,
+      "rules093Hash": "2a9ffd988f7116b952eba5ca5db8477c0860fc5193704582fdf9fd91be62125a"
     },
     "_onDeleteProgressionRow": {
       "hash": "c72e63f62dd8908147d651dccb551563aba3ab68d2eacd20335f66bd7246cf2b",
       "length": 1,
-      "async": true
+      "async": true,
+      "rules093Hash": "ef1c163a9f582f454896ef1fce3f72f62e9e640c5afff8dbd5a2eca3b50ce7bb"
     },
     "_onEquipmentWornToggle": {
       "hash": "d74759b332ed443690cafa31f255420ff9be51d624381ec5a69bb951295fdfc1",
@@ -1211,7 +1216,8 @@
     "_onTfBurstLimit": {
       "hash": "9de4ae50bb125b13340c4770b956472a6f94a01ae8296abc24e6008423a28b7e",
       "length": 1,
-      "async": true
+      "async": true,
+      "rules093Hash": "009869c76282aab490d932f49ca0321bed4882605c7c250715fec5b6019b1826"
     },
     "_getTransformationOptions": {
       "hash": "fea94aa6a777d1b3cd97c23c9e626082ba0b58eb42ca76629242d9874ef713f1",

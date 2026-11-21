@@ -1,3 +1,4 @@
+import { martialAttributeBudget, martialAttributeWarnings, martialDie, martialLevel, martialProgressionRows, martialResourcePenalty, martialRowLevel, martialSkillSlots, progressionRowIsEarned, usesPathToPower, validMartialAttributes } from "../../rules/path-to-power-v093.mjs";
 import { uses093 } from "../../rules/v093.mjs";
 import { initialProgressionWarnings093, progression093 } from "../../rules/progression-v093.mjs";
 
@@ -10,12 +11,27 @@ export const progressionSkillsMethods = {
 
   _prepareProgressionData(context, system) {
     const fallbackRows = foundry.utils.deepClone(CONFIG.DBU?.progressionRows || []);
-    const rows = (system.progressionRows && system.progressionRows.length > 0)
-      ? system.progressionRows
-      : fallbackRows;
+    const rows = martialProgressionRows(system, system.progressionRows?.length ? system.progressionRows : fallbackRows);
+    const martial = usesPathToPower(system);
+    const level = martialLevel(system);
+    if (uses093(system) && !system.minion?.enabled) {
+      const die = martialDie(system);
+      const penalty = martialResourcePenalty(system);
+      context.pathToPowerAvailable = true;
+      context.pathToPowerEnabled = martial;
+      context.martialLevel = level;
+      context.martialLevels = [1, 2, 3, 4, 5].map(value => ({ value, selected: value === level }));
+      context.martialDie = die ? `1d${die}` : "—";
+      context.martialBaseLife = 60 - penalty;
+      context.martialBaseKi = 50 - penalty;
+    }
     const tpPerSIBuff = this.actor._getBuffTotal(system, "TP per Skill Improvement");
     const currentRules = uses093(system) && progression093(system, rows, tpPerSIBuff);
-    if (currentRules) context.initialProgressionWarnings = initialProgressionWarnings093(rows);
+    const earnedRows = rows.filter(row => progressionRowIsEarned(system, row));
+    if (currentRules) context.initialProgressionWarnings = [
+      ...initialProgressionWarnings093(martial ? earnedRows : rows, martial),
+      ...martialAttributeWarnings(system, rows)
+    ];
 
     const racialSkillRanks = CONFIG.DBU?.racialSkillRanks || {};
     const availableSkills = CONFIG.DBU?.availableSkills || [];
@@ -45,9 +61,10 @@ export const progressionSkillsMethods = {
     // Enrich rows with conditional visibility flags + skill slots (matching MVP behavior)
     const enrichedRows = rows.map((row, idx) => {
       const perk = row.perkType || "";
-      const showSkills = perk === "skill_improvement" || perk === "starting_stats";
+      const showSkills = perk === "skill_improvement" || perk === "starting_stats" || perk === "martial_rank";
       const racialSkillCount = perk === "starting_stats" ? (racialSkillRanks[system.race] || 2) : 0;
-      const maxSkillSlots = perk === "starting_stats" ? racialSkillCount : (currentRules ? currentRules.skillRankSlots[idx] : 4);
+      const maxSkillSlots = martial ? martialSkillSlots(row, racialSkillCount)
+        : perk === "starting_stats" ? racialSkillCount : currentRules ? currentRules.skillRankSlots[idx] : 4;
 
       // Build skill slots array (6 columns, some active, some dim)
       const skillSlots = [0, 1, 2, 3, 4, 5].map(i => ({
@@ -69,6 +86,14 @@ export const progressionSkillsMethods = {
 
       return {
         ...row,
+        formIndex: idx,
+        ...(martial ? {
+          martialRowLevel: row.level === 1 ? martialRowLevel(row) : 0,
+          martialEarned: progressionRowIsEarned(system, row),
+          martialBudget: martialAttributeBudget(system, row),
+          martialLockedPerk: !row.convertible && row.level === 1 && martialRowLevel(row) > 0,
+          martialPerkLabel: perk === "martial_rank" ? "Skill Rank" : CONFIG.DBU?.perkTypes?.find(type => type.id === perk)?.name
+        } : row.id < 0 ? { martialHidden: true } : {}),
         tp: currentRules ? currentRules.tpRows[idx].tp : displayTP,
         ...(currentRules ? { storedTP: currentRules.tpRows[idx].savedTP } : {}),
         showAttrs: perk === "attribute_addition" || perk === "starting_stats",
@@ -80,19 +105,20 @@ export const progressionSkillsMethods = {
         skillSlots
       };
     });
-    context.progressionRows = enrichedRows;
+    context.progressionRows = martial
+      ? [...enrichedRows].sort((a, b) => a.level - b.level || a.martialRowLevel - b.martialRowLevel)
+      : enrichedRows;
 
     let totalAttrPoints = 0;
     let totalSkillRanks = 0;
     let totalTP = 0;
     let skillImprovementCount = 0;
 
-    const currentLevel = system.level || 1;
-    for (const row of rows) {
-      if (row.perkType === "racial_stats") continue; // Racial stats are not progression points
-      if ((row.level || 0) > currentLevel) continue; // Skip future-level rows
-      for (const key of ["ag", "fo", "te", "sc", "in", "ma", "pe"]) {
-        if (row[key] != null) totalAttrPoints += Number(row[key]) || 0;
+    for (const row of earnedRows) {
+      if (validMartialAttributes(system, row)) {
+        for (const key of ["ag", "fo", "te", "sc", "in", "ma", "pe"]) {
+          if (row[key] != null) totalAttrPoints += Number(row[key]) || 0;
+        }
       }
       // Skill Improvement defaults per character-creation.txt:
       //   PL 1 SI = 15 + 10 bonus = 25 TP, other SIs = 15 TP each
@@ -103,7 +129,8 @@ export const progressionSkillsMethods = {
       } else if (row.tp != null) {
         totalTP += Number(row.tp) || 0;
       }
-      for (let i = 0; i < 6; i++) {
+      const skillSlots = martial ? martialSkillSlots(row, racialSkillRanks[system.race] || 2) : 6;
+      for (let i = 0; i < skillSlots; i++) {
         const val = row[`skill${i}`];
         if (val && String(val).trim()) totalSkillRanks++;
       }
@@ -151,15 +178,18 @@ export const progressionSkillsMethods = {
       tp: 25,
       skills: []
     };
-    for (const row of rows) {
-      for (const key of ["ag", "fo", "te", "sc", "in", "ma", "pe"]) {
-        summary[key] += Number(row[key]) || 0;
+    for (const row of martial ? earnedRows : rows.filter(row => !(row.id < 0))) {
+      if (validMartialAttributes(system, row)) {
+        for (const key of ["ag", "fo", "te", "sc", "in", "ma", "pe"]) {
+          summary[key] += Number(row[key]) || 0;
+        }
       }
       summary.tp += Number(row.tp) || 0;
       if (row.talent && String(row.talent).trim()) {
         summary.talents.push(row.talent);
       }
-      for (let i = 0; i < 6; i++) {
+      const skillSlots = martial ? martialSkillSlots(row, racialSkillRanks[system.race] || 2) : 6;
+      for (let i = 0; i < skillSlots; i++) {
         const val = row[`skill${i}`];
         if (val && String(val).trim()) summary.skills.push(val);
       }
@@ -406,7 +436,7 @@ export const progressionSkillsMethods = {
     const baseRows = (this.actor.system.progressionRows && this.actor.system.progressionRows.length > 0)
       ? this.actor.system.progressionRows
       : (CONFIG.DBU?.progressionRows || []);
-    const rows = foundry.utils.deepClone(baseRows);
+    const rows = foundry.utils.deepClone(martialProgressionRows(this.actor.system, baseRows));
     const nextId = rows.length > 0 ? Math.max(...rows.map(r => r.id || 0)) + 1 : 1;
     const lastLevel = rows.length > 0 ? rows[rows.length - 1].level || 1 : 1;
     rows.push({
@@ -426,8 +456,9 @@ export const progressionSkillsMethods = {
     const baseRows = (this.actor.system.progressionRows && this.actor.system.progressionRows.length > 0)
       ? this.actor.system.progressionRows
       : (CONFIG.DBU?.progressionRows || []);
-    const rows = foundry.utils.deepClone(baseRows);
+    const rows = foundry.utils.deepClone(martialProgressionRows(this.actor.system, baseRows));
     if (index >= 0 && index < rows.length) {
+      if (usesPathToPower(this.actor.system) && rows[index].level === 1 && martialRowLevel(rows[index])) return;
       if (!(await this._confirmDelete("Progression Row", `Level ${rows[index].level ?? "?"} row`))) return;
       rows.splice(index, 1);
       await this.actor.update({ "system.progressionRows": rows });

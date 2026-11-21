@@ -1,3 +1,4 @@
+import { limitedMartialPower } from "../../rules/path-to-power-v093.mjs";
 import { Dialog } from "../../helpers/foundry-compat.mjs";
 
 /** Character sheet domain: transformation-actions. Methods run with the sheet as this. */
@@ -324,7 +325,7 @@ export const transformationActionsMethods = {
     const resolvedAspects = aspects.length > 0 ? aspects : (catalogEntry?.aspects || []);
     const isTranscendent = resolvedAspects.some(a => a.toLowerCase().includes("transcendent"));
     const isSpecial = resolvedAspects.some(a => a.toLowerCase().includes("special"));
-    const qualifiesForBurstRecovery = isTranscendent || isSpecial;
+    const qualifiesForBurstRecovery = (isTranscendent || isSpecial) && !limitedMartialPower(system);
 
     let recoveryMsg = "";
     const updates = {

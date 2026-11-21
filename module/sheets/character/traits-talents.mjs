@@ -19,7 +19,7 @@ export const traitsTalentsMethods = {
     // Control + talent L3s). Base 1 in combat; Master of Minions / Minion
     // Coordinator / Minion Mark each +2; Minion Army → 10 in combat, no
     // outside limit. Outside of combat: combat max + base ToP.
-    const talents = system.talents || [];
+    const talents = system._martialTalents ?? system.talents ?? [];
     const plusCount = ["master_of_minions", "minion_coordinator", "minion_mark"]
       .filter(t => talents.includes(t)).length;
     const hasArmy = talents.includes("minion_army");
@@ -289,7 +289,7 @@ export const traitsTalentsMethods = {
     context.talentPerRoundEffects = (tbData.entries || []).flatMap(e =>
       (e.perRound || []).map(pr => ({ ...pr, sourceName: e.name, catalogKey: e.catalogKey }))
     );
-    const talentIds = new Set(system.talents || []);
+    const talentIds = new Set(system._martialTalents ?? system.talents ?? []);
     context.talentStanceButtons = [
       {
         id: "combat_expertise",
@@ -550,6 +550,7 @@ export const traitsTalentsMethods = {
     const allTraits = [];
     for (const [traitRace, traits] of Object.entries(catalog)) {
       for (const trait of traits) {
+        if (uses093(this.actor.system) && trait.factor) continue;
         allTraits.push({ ...trait, race: traitRace, isSelected: selectedIds.includes(trait.id) });
       }
     }

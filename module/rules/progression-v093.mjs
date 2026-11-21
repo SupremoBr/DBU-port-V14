@@ -1,3 +1,4 @@
+import { progressionRowIsEarned, usesPathToPower } from './path-to-power-v093.mjs';
 import { CATALOGS_093 } from './catalogs-v093.mjs';
 
 const talentsByName = new Map(CATALOGS_093.talents.map(talent => [talent.name, talent]));
@@ -11,17 +12,20 @@ export function progression093(system, rows, tpPerSkillImprovement = 0) {
   const initialSkillIndex = rows.findIndex(row =>
     Number(row.level) === 1 && row.perkType === 'skill_improvement' && !row.convertible
   );
-  const skillRankSlots = rows.map((_, index) => index === initialSkillIndex ? 6 : 4);
+  const martial = usesPathToPower(system);
+  const skillRankSlots = rows.map((row, index) =>
+    row.perkType === 'martial_rank' ? 1 : index === initialSkillIndex && !martial ? 6 : 4
+  );
   let totalTP = Number(system.downtime?.gains?.tp) || 0;
   let skillImprovementCount = 0;
   const tpRows = rows.map((row, index) => {
     const isSkillImprovement = row.perkType === 'skill_improvement';
-    const defaultTP = index === initialSkillIndex ? 25 : 15;
+    const defaultTP = index === initialSkillIndex && !martial ? 25 : 15;
     // Older sheets could save the displayed 25 TP on a converted PL1 perk.
-    const savedTP = isSkillImprovement && Number(row.level) === 1 && row.convertible && Number(row.tp) === 25
+    const savedTP = isSkillImprovement && Number(row.level) === 1 && (row.convertible || (martial && index === initialSkillIndex)) && Number(row.tp) === 25
       ? null : row.tp;
     const tp = isSkillImprovement && (savedTP == null || savedTP === '') ? defaultTP : Number(savedTP) || 0;
-    if (row.perkType !== 'racial_stats' && Number(row.level || 1) <= (system.level || 1)) {
+    if (progressionRowIsEarned(system, row)) {
       totalTP += tp;
       if (isSkillImprovement) skillImprovementCount++;
     }
@@ -33,7 +37,7 @@ export function progression093(system, rows, tpPerSkillImprovement = 0) {
   return { skillRankSlots, tpRows, skillImprovementCount, totalTP: totalTP + bonus * skillImprovementCount };
 }
 
-export function initialProgressionWarnings093(rows) {
+export function initialProgressionWarnings093(rows, martial = false) {
   const selected = rows
     .filter(row => Number(row.level) === 1 && row.perkType === 'talent_addition' && !row.convertible)
     .map(row => talentsByName.get(row.talent))
@@ -62,7 +66,8 @@ export function initialProgressionWarnings093(rows) {
     if (new Set(ranks).size !== ranks.length) {
       warnings.push(row.convertible
         ? 'O Skill Improvement do perk convertido precisa de quatro perícias diferentes.'
-        : 'Escolha quatro perícias diferentes nos primeiros campos do Skill Improvement inicial. Os dois ranks extras podem repetir uma perícia.');
+        : martial ? 'Escolha quatro perícias diferentes no Skill Improvement do ML 1.'
+          : 'Escolha quatro perícias diferentes nos primeiros campos do Skill Improvement inicial. Os dois ranks extras podem repetir uma perícia.');
     }
   }
   return warnings;

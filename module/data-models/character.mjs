@@ -3,6 +3,8 @@
  * Mirrors CHARACTER_DATA + app.js state from the web version.
  */
 
+import { progressionRowIsEarned, validMartialAttributes } from "../rules/path-to-power-v093.mjs";
+
 const { SchemaField, StringField, NumberField, BooleanField, ArrayField, ObjectField, HTMLField } = foundry.data.fields;
 
 /**
@@ -252,6 +254,11 @@ export default class DBUCharacterData extends foundry.abstract.TypeDataModel {
       // ---- Core identity ----
       rules093State: new ObjectField(),
       rulesVersion: new StringField({ initial: "0.9.2" }),
+      pathToPower: new SchemaField({
+        enabled: new BooleanField({ initial: false }),
+        martialLevel: new NumberField({ initial: 1, integer: true, min: 1, max: 5 }),
+        remnant: new BooleanField({ initial: false })
+      }),
       level: new NumberField({ required: true, nullable: false, initial: 1, integer: true, min: 1, max: 30 }),
       race: new StringField({ initial: "saiyan" }),
       subrace: new StringField({ initial: "" }),
@@ -512,6 +519,7 @@ export default class DBUCharacterData extends foundry.abstract.TypeDataModel {
 
       // ---- Racial Traits (selected IDs reference compendium items) ----
       racialTraits: new ArrayField(new StringField()),
+      subraceTraits: new ArrayField(new StringField()),
 
       // ---- Racial option selections (traitId -> { effectLevel: selectedOptionName }) ----
       racialOptionSelections: new ObjectField(),
@@ -876,8 +884,7 @@ export default class DBUCharacterData extends foundry.abstract.TypeDataModel {
     // Compute progression totals (skip racial_stats — those go into attr.racial, not progression)
     const progressionTotals = Object.fromEntries(attrKeys.map(k => [k, 0]));
     for (const row of rows) {
-      if (row.perkType === "racial_stats") continue;
-      if ((row.level || 1) > lvl) continue;
+      if (!progressionRowIsEarned(this, row) || !validMartialAttributes(this, row)) continue;
       for (const key of attrKeys) {
         if (row[key] !== null && row[key] !== undefined) {
           progressionTotals[key] += Number(row[key]) || 0;

@@ -1,3 +1,4 @@
+import { martialAttributeWarnings, martialProgressionRows, progressionRowIsEarned, usesPathToPower } from "../rules/path-to-power-v093.mjs";
 import { buffAmount, buffEffectKey, buffStateLabels, buffTriggers, conditionalBuff, customBuffState, manualBuffEffect, supportsBuffTrigger } from "../helpers/custom-buffs.mjs";
 import { uses093 } from "../rules/v093.mjs";
 import { initialProgressionWarnings093 } from "../rules/progression-v093.mjs";
@@ -91,10 +92,14 @@ export class DBUCharacterSheet extends ActorSheet {
       // Get existing stored data (with fallback for progression rows from CONFIG)
       const stored = this.actor.system[key] || [];
       const fallback = fallbackKey ? (CONFIG.DBU?.[fallbackKey] || []) : [];
-      const existing = stored.length > 0 ? stored : fallback;
+      const baseRows = stored.length > 0 ? stored : fallback;
+      const existing = key === "progressionRows" ? martialProgressionRows(this.actor.system, baseRows) : baseRows;
 
       // Merge form data onto existing rows
-      const formIndices = Object.keys(formRows).map(Number).sort((a, b) => a - b);
+      const submittedIndices = Object.keys(formRows).map(Number);
+      const formIndices = key === "progressionRows" && (usesPathToPower(this.actor.system) || existing.some(row => row.id < 0))
+        ? [...new Set([...existing.keys(), ...submittedIndices])].sort((a, b) => a - b)
+        : submittedIndices.sort((a, b) => a - b);
       let mergedRows = formIndices.map(idx => {
         const base = foundry.utils.deepClone(existing[idx] || { id: idx });
         const overlay = formRows[String(idx)];
@@ -118,8 +123,13 @@ export class DBUCharacterSheet extends ActorSheet {
       const progRows = formData["system.progressionRows"];
       const oldProgRows = this.actor.system.progressionRows || [];
       if (uses093(this.actor.system)) {
-        const previousWarnings = new Set(initialProgressionWarnings093(oldProgRows));
-        const newWarnings = initialProgressionWarnings093(progRows).filter(warning => !previousWarnings.has(warning));
+        const martial = usesPathToPower(this.actor.system);
+        const warnings = rows => [
+          ...initialProgressionWarnings093(martial ? rows.filter(row => progressionRowIsEarned(this.actor.system, row)) : rows, martial),
+          ...martialAttributeWarnings(this.actor.system, rows)
+        ];
+        const previousWarnings = new Set(warnings(oldProgRows));
+        const newWarnings = warnings(progRows).filter(warning => !previousWarnings.has(warning));
         if (newWarnings.length) {
           ui.notifications.warn(newWarnings.join(" "));
           return this.render(false);
@@ -338,7 +348,7 @@ export class DBUCharacterSheet extends ActorSheet {
       crafting: ["Basic Item", "Apparel", "Weapons", "Vehicles"],
       science: ["Science", "Profession", "History"]
     };
-    const hasGeniusDesigner = (system.talents || []).includes("genius_designer");
+    const hasGeniusDesigner = (system._martialTalents ?? system.talents ?? []).includes("genius_designer");
     for (const s of context.skills) {
       if (!(s.key in ENCOMPASSING)) continue;
       s.isEncompassing = true;
@@ -404,7 +414,8 @@ export class DBUCharacterSheet extends ActorSheet {
     context.subspeciesLabel = this._getSubspeciesLabel(system) || "—";
     const subraceList = CONFIG.DBU?.racialSubraces?.[system.race] || [];
     const matchedSubrace = subraceList.find(sr => sr.id === system.subrace);
-    context.subraceLabel = matchedSubrace?.name || "—";
+    const customSubrace = context.rules093 && system.subrace !== "none" ? system.subrace : "";
+    context.subraceLabel = matchedSubrace?.name || customSubrace || "—";
     context.characterTraits = this._getCharacterTraits(system);
     context.isCustomSpecies = system.race === "customSpecies";
 

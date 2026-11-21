@@ -1,3 +1,4 @@
+import { martialEnergyCharges } from "../../rules/path-to-power-v093.mjs";
 import { attackKiWithBuffs, greaterDiceCategoryBonus, customBuffState, linkedCatalogBuffs } from "../../helpers/custom-buffs.mjs";
 import { signatureEnergyCharges093 } from "../../rules/techniques-v093.mjs";
 import { PROFILES_093 } from "../../rules/profiles-v093.mjs";
@@ -370,7 +371,7 @@ export const combatDataMethods = {
         damageCat: prep.damageCat || "Standard",
         foundation: ref.foundation || "",
         profile: ref.profile || "",
-        energyCharges: (ref.energyCharges || 0) + (uses093(system) ? ((PROFILES_093[ref.profile]?.freeCharges || 0) + (PROFILES_093[ref.profile]?.freeChargesOutsideLimit || 0)) : 0),
+        energyCharges: martialEnergyCharges(system, (ref.energyCharges || 0) + (uses093(system) ? ((PROFILES_093[ref.profile]?.freeCharges || 0) + (PROFILES_093[ref.profile]?.freeChargesOutsideLimit || 0)) : 0)),
         powerShot: ref.powerShot || 0,
         defaultWager: prep.maxWager || 0,
         activeBuffs

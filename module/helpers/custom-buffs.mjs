@@ -132,7 +132,8 @@ export function linkedCatalogBuffs(actor, system = actor.system) {
   const out = [];
   const saved = actor.getFlag?.(catalogBuffSystem, catalogBuffFlag);
   for (const [group, list] of Object.entries(catalogBuffGroups)) {
-    for (const id of new Set(system[list] || [])) {
+    const selected = list === 'talents' ? system._martialTalents ?? system.talents : system[list];
+    for (const id of new Set(selected || [])) {
       if (Array.isArray(saved?.[group]?.[id])) out.push(...saved[group][id]);
     }
   }

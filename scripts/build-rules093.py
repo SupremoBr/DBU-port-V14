@@ -64,14 +64,15 @@ for slug, rows in read('parsed-racial.json').items():
  rows.extend(row for row in recovered if row['name'] not in existing_names)
  extra_choices = continued_choices(html, rows) if rows else {}
  path = entry['path']; race = by_title.get(path[1] if len(path)>1 else '', 'factors')
- if race != 'factors' and len(path)>2:
+ is_subrace = race != 'factors' and len(path)>2 and any(row['traitCategory'] == 'subrace' for row in rows)
+ if is_subrace:
   subrace_options.setdefault(race, []).append(dict(id=slug, name=entry['title']))
  for row in rows:
   candidates = [t for t in old_traits if norm(t['name'])==norm(row['name']) and (t['race']==race or race=='factors')]
   same = [t for t in candidates if equivalent(t.get('effects',[]),row['effects'])]
   reviewed = False
   ident = same[0]['id'] if reviewed else 'r093_'+key(slug+'_'+row['name'])
-  item = dict(id=ident, name=row['name'], race=race, category=row['category'], traitCategory=row['traitCategory'], subrace=slug if len(path)>2 else '', source=url(slug), rulesVersion='0.9.3', automation='legacy-reviewed' if reviewed else 'manual', description=mechanic_summary(row), effects=catalog_effects(row,url(slug),same[0]['effects'] if reviewed else None, extra_choices.get(row['name'], [])), isSelectable=True)
+  item = dict(id=ident, name=row['name'], race=race, category=row['category'], traitCategory='primary' if row['traitCategory'] == 'subrace' else row['traitCategory'], subrace=slug if is_subrace and row['traitCategory'] == 'subrace' else '', source=url(slug), rulesVersion='0.9.3', automation='legacy-reviewed' if reviewed else 'manual', description=mechanic_summary(row), effects=catalog_effects(row,url(slug),same[0]['effects'] if reviewed else None, extra_choices.get(row['name'], [])), isSelectable=True)
   if row['name'] in trait_factors:
    item['factor'] = trait_factors[row['name']]
   traits.setdefault(race, []).append(item)

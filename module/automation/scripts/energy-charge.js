@@ -1,3 +1,4 @@
+import { limitedMartialPower, martialEnergyCharges } from "../../rules/path-to-power-v093.mjs";
 import { energyChargeDie } from "../../helpers/custom-buffs.mjs";
 import { unsetAutomationFlag } from "../migration.mjs";
 import { renderActionWindow, ACTION_WINDOW_DIALOG_OPTIONS } from "./ui/action-windows.js";
@@ -595,19 +596,21 @@ function dbuChargeWindow(actor, {
   const capacitySpent = Math.max(0, Number(actor.system.status?.capacitySpent || 0));
   const capacityLeft = Math.max(0, maxCapacity - capacitySpent);
   const total = baseCharges + gatheredCharges;
-  const formula = sourceKey ? dbuGetProjectedChargeFormula(actor, sourceKey, total + 1) : "Selecione o ataque";
+  const martial = limitedMartialPower(actor.system);
+  const limit = martialEnergyCharges(actor.system, DBU_MAX_ENERGY_CHARGES);
+  const formula = sourceKey ? dbuGetProjectedChargeFormula(actor, sourceKey, martialEnergyCharges(actor.system, total + 1)) : "Selecione o ataque";
   return renderActionWindow({
     actorName:actor.name, actionName:"ENERGY CHARGE", icon:"fas fa-bolt",
     portrait:actor.img, type:"STANDARD MANEUVER · variantes conforme Traits",
     description:"Concentre Energy Charges em um ataque declarado. Cada uso pode modificar o custo, os EC ganhos e o tipo permitido pela ficha.",
     status:attackName === "Selecionar ataque" ? "Declarar ataque" : "Carregando: " + attackName,
     statusTone:"green",cost:defaultCost + " Ki + Capacity",
-    usage:requiredUses ? maneuverUses+"/"+requiredUses+" Mandatory" : "Máximo normal: "+DBU_MAX_ENERGY_CHARGES+" EC",
+    usage:requiredUses ? maneuverUses+"/"+requiredUses+" Mandatory" : "Máximo: "+limit+" EC",
     conditions:hasPowerOfMovement?"Power of Movement ativo":"Guard Down enquanto carregar",
     current:[
       {label:"Ki atual",value:ki,icon:"fas fa-bolt"},
       {label:"Capacity restante",value:capacityLeft+"/"+maxCapacity,icon:"fas fa-shield-alt"},
-      {label:"EC acumulados",value:total+"/"+DBU_MAX_ENERGY_CHARGES,icon:"fas fa-layer-group"}
+      {label:"EC acumulados",value:total+"/"+limit,icon:"fas fa-layer-group"}
     ],
     effects:[
       {label:"EC ganhos neste uso",value:"Configurável (padrão +1)",icon:"fas fa-plus"},
@@ -624,7 +627,8 @@ function dbuChargeWindow(actor, {
     extra,
     notes:[
       "Custo base: 2(bT) Ki e Capacity; Practiced Charger pode reduzir para 1(bT).",
-      "O limite normal é 7 EC. Ignorá-lo exige permissão aplicável na mesa.",
+      martial ? "Path to Power limita cada ataque a 3 EC."
+        : "O limite normal é 7 EC. Ignorá-lo exige permissão aplicável na mesa.",
       "Mandatory Charge exige 2 usos por rank; o progresso considera os usos contados.",
       hasPowerOfMovement ? "Power of Movement evita Guard Down." : "Guard Down permanece ativo até liberar ou cancelar o Charge.",
       "Cancelar o Charge não devolve Ki ou Capacity pagos anteriormente."
@@ -646,8 +650,9 @@ function dbuBindChargeWindowPreview(html, actor, { sources = null, activeState =
     const left = Math.max(0, Number(actor.system.status?.maxCapacity || 0)-Number(actor.system.status?.capacitySpent || 0));
     const required = Number(current?.mandatory?.requiredUses ?? activeState?.requiredUses ?? 0);
     const uses = Number(activeState?.maneuverUses ?? 0)+count;
-    const formula = sourceKey ? dbuGetProjectedChargeFormula(actor,sourceKey,total) : "Selecione o ataque";
-    html.find("[data-dbua-charge-preview-ec]").text(total+"/"+DBU_MAX_ENERGY_CHARGES + (total>DBU_MAX_ENERGY_CHARGES?" · acima do limite":""));
+    const limit = martialEnergyCharges(actor.system, DBU_MAX_ENERGY_CHARGES);
+    const formula = sourceKey ? dbuGetProjectedChargeFormula(actor, sourceKey, martialEnergyCharges(actor.system, total)) : "Selecione o ataque";
+    html.find("[data-dbua-charge-preview-ec]").text(total+"/"+limit + (total>limit?" · acima do limite":""));
     html.find("[data-dbua-charge-preview-ki]").text(Math.max(0,ki-cost)+(cost>ki?" · Ki insuficiente":""));
     html.find("[data-dbua-charge-preview-cap]").text(Math.max(0,left-cost)+(cost>left?" · Capacity insuficiente":""));
     html.find("[data-dbua-charge-preview-wound]").text(formula);
@@ -1161,8 +1166,8 @@ if (state?.active) {
           <label>EC ganhos neste uso<input id="dbu-charge-gain" type="number" min="0" step="1" value="1"></label>
           <label>Conta como quantos usos?<input id="dbu-charge-count" type="number" min="0" step="1" value="1"></label>
         </div>
-        <label class="dbua-aw-checkbox"><input id="dbu-charge-ignore-max" type="checkbox">
-          Ignorar limite normal de 7 EC (somente quando permitido)</label>
+        ${limitedMartialPower(actor.system) ? '' : `<label class="dbua-aw-checkbox"><input id="dbu-charge-ignore-max" type="checkbox">
+          Ignorar limite normal de 7 EC (somente quando permitido)</label>`}
         <p class="dbua-aw-help">Wound atual ao liberar: ${dbuEsc(dbuGetProjectedChargeFormula(actor,state.sourceKey,totalCharges))}.
           ${mandatory.requiredUses>0?`Mandatory Charge: ${state.maneuverUses||0}/${mandatory.requiredUses} usos registrados.`:""}</p>
       </section>`
@@ -1235,6 +1240,9 @@ if (state?.active) {
   if (!actionValidation.ok) return null;
   const newTotal = totalCharges + gain;
 
+  if (newTotal > martialEnergyCharges(actor.system, newTotal)) {
+    return ui.notifications.warn("Path to Power: cada ataque pode ter até 3 Energy Charges.");
+  }
   if (!ignoreMax && newTotal > DBU_MAX_ENERGY_CHARGES) {
     return ui.notifications.warn(
       `${state.attackName}: o máximo normal é ${DBU_MAX_ENERGY_CHARGES} Energy Charges. Atual ${totalCharges}, este uso adicionaria ${gain}.`
@@ -1393,8 +1401,8 @@ const declaration = await Dialog.wait({
         <label>EC ganhos neste uso<input id="dbu-charge-gain" type="number" min="0" step="1" value="1"></label>
         <label>Conta como quantos usos?<input id="dbu-charge-count" type="number" min="0" step="1" value="1"></label>
       </div>
-      <label class="dbua-aw-checkbox"><input id="dbu-charge-ignore-max" type="checkbox">
-        Ignorar limite normal de 7 EC (somente quando permitido)</label>
+      ${limitedMartialPower(actor.system) ? '' : `<label class="dbua-aw-checkbox"><input id="dbu-charge-ignore-max" type="checkbox">
+        Ignorar limite normal de 7 EC (somente quando permitido)</label>`}
       <p class="dbua-aw-help">${hasPracticedCharger?"Practiced Charger aplicado: 1(bT) Ki.":"Custo base: 2(bT) Ki."}
       ${hasPowerOfMovement?"Power of Movement: não aplica Guard Down.":"Guard Down permanece até liberar/cancelar."}
       Os visuais existentes continuam selecionados por estágio.</p>
@@ -1453,6 +1461,9 @@ const actionValidation = validateActionUse(actor, {
 });
 if (!actionValidation.ok) return null;
 
+if (totalAfter > martialEnergyCharges(actor.system, totalAfter)) {
+  return ui.notifications.warn("Path to Power: cada ataque pode ter até 3 Energy Charges.");
+}
 if (!declaration.ignoreMax && totalAfter > DBU_MAX_ENERGY_CHARGES) {
   return ui.notifications.warn(
     `${source.name}: já possui ${baseCharges} EC e este uso adicionaria ${gain}. Máximo normal: ${DBU_MAX_ENERGY_CHARGES}.`

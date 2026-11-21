@@ -19,8 +19,7 @@ export function installRules093(config) {
   config.racesWithFixedAttributes = Object.keys(RACES_093).filter(r => !RACES_093[r].attributes.choices.length);
   config.racialAttributeBonuses = Object.fromEntries(Object.entries(RACES_093).map(([id, r]) => [id, r.attributes.fixed]));
   config.racialSkillRanks = Object.fromEntries(Object.entries(RACES_093).map(([id, r]) => [id, r.skills]));
-  // Old subrace choices no longer describe the current racial factors.
-  config.racialSubraces = Object.fromEntries(Object.entries(CATALOGS_093.subraceOptions).map(([race, rows]) => [race, [{ id: "", name: "Nenhum" }, ...rows]]));
+  config.racialSubraces = Object.fromEntries(Object.entries(CATALOGS_093.subraceOptions).map(([race, rows]) => [race, rows]));
   config.racialFactors = {};
   config.transformationTypes = config.transformationTypes.map(t => t.id === 'manifested_power' ? { ...t, name: 'Awakening' } : t);
   config.transformationCategories = config.transformationCategories.map(t => t.id === 'manifested_power' ? { ...t, name: 'Awakenings' } : t);

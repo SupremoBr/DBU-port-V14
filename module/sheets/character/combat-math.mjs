@@ -1,3 +1,4 @@
+import { martialDie, martialEnergyCharges } from "../../rules/path-to-power-v093.mjs";
 import { energyChargeDie, greaterDiceCategoryBonus, shiftAttackDamageCategory } from "../../helpers/custom-buffs.mjs";
 import { PROFILES_093 } from "../../rules/profiles-v093.mjs";
 import { uses093 } from "../../rules/v093.mjs";
@@ -258,7 +259,7 @@ export const combatMathMethods = {
     const refs = system.attackRefs || [];
     context.attackRefs = refs.map((ref, idx) => {
       const profile = profileData[ref.profile] || {};
-      const charges = (ref.energyCharges || 0) + (uses093(system) ? ((PROFILES_093[ref.profile]?.freeCharges || 0) + (PROFILES_093[ref.profile]?.freeChargesOutsideLimit || 0)) : 0);
+      const charges = martialEnergyCharges(system, (ref.energyCharges || 0) + (uses093(system) ? ((PROFILES_093[ref.profile]?.freeCharges || 0) + (PROFILES_093[ref.profile]?.freeChargesOutsideLimit || 0)) : 0));
       const wager = ref.kiWager || 0;
       const ps = ref.powerShot || 0;
       const targetRange = ref.targetRange || 0;
@@ -494,7 +495,8 @@ export const combatMathMethods = {
    */
   _extraDicePool(system, rollType) {
     const ed = system.dicePools?.extraDice || {};
-    let out = "";
+    const martial = martialDie(system);
+    let out = martial ? `+1d${martial}` : "";
     for (const die of ["d4", "d6", "d8", "d10"]) {
       const n = (ed.combatRolls?.[die] || 0) + (ed[rollType]?.[die] || 0);
       if (n > 0) out += `+${n}${die}`;

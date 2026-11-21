@@ -58,7 +58,7 @@ export function applyCatalogPassives093(system, tier, baseTier) {
   if (!uses093(system)) return;
   const selected = [
     ...(system.racialTraits || []).map(id => racialById.get(id)),
-    ...(system.talents || []).map(id => talentById.get(id))
+    ...(system._martialTalents ?? system.talents ?? []).map(id => talentById.get(id))
   ];
   for (const entry of selected.filter(t => t && t.automation !== "legacy-reviewed")) for (const effect of entry.effects) {
     const rule = effect.mechanic;

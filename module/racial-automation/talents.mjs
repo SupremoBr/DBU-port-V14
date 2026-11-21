@@ -48,7 +48,7 @@ function _restoreSnapshot(system, snap) {
  * @param {number} baseTier - ceil(tier/2)
  */
 export function applyTalentBonuses(system, tier, baseTier) {
-  const talents = system.talents || [];
+  const talents = system._martialTalents ?? system.talents ?? [];
   if (talents.length === 0) return;
 
   const result = { entries: [], hasBonuses: false };

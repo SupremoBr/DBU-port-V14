@@ -57,7 +57,7 @@
       <div class="tech-header">
         <span class="tech-name-display">{{name}}</span>
         {{#if isGained}}<span class="gained-badge"><i class="fas fa-link"></i> Gained from: {{gainedFrom}}</span>{{/if}}
-        <span class="tech-type-badge">{{type}}</span>
+        <span class="tech-type-badge">{{#if ../limitedMartialPower}}Super{{else}}{{type}}{{/if}}</span>
         <span class="tech-tp-badge {{#if tpOverLimit}}tp-badge-over{{/if}}" title="Max TP per Signature Technique at your base Tier of Power (25/30/40/50)">TP: {{tpCost}}/{{tpMax}}</span>
         {{#unless isGained}}
         <button type="button" class="delete-btn" data-action="delete-technique" data-technique-id="{{id}}">
@@ -76,7 +76,9 @@
           <div class="tech-row">
             <label>Type</label>
             <select class="tech-input" data-tech-id="{{id}}" data-field="type">
+              {{#if ../limitedMartialPower}}<option value="signature" selected>Super</option>{{else}}
               {{selectOptions ../techniqueTypeOptions selected=type}}
+              {{/if}}
             </select>
           </div>
           <div class="tech-row">
@@ -129,12 +131,17 @@
         <div class="tech-info-right">
           {{#if ../rules093}}
           {{#unless isGained}}
+          {{#if ../startingTechniqueAvailable}}
           <div class="tech-cost-row check-field">
             <label>
               <input type="checkbox" class="tech-input" data-tech-id="{{id}}" data-field="startingTechnique" {{#if startingTechnique}}checked{{/if}} />
               Técnica inicial gratuita (até 20 TP)
             </label>
           </div>
+          {{/if}}
+          {{#if ../limitedMartialPower}}
+          <p>Path to Power · Super Signature · 1 uso por encontro</p>
+          {{/if}}
           {{#if startingTechniqueNeedsReview}}
           <p>O desconto inicial está suspenso. Revise os requisitos e o limite de 20 TP.</p>
           {{/if}}

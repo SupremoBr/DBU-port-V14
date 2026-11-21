@@ -4,7 +4,8 @@ import { CATALOGS_093 } from '../module/rules/catalogs-v093.mjs';
 import { registerConfig } from '../module/helpers/config.mjs';
 import { installRules093 } from '../module/rules/config-v093.mjs';
 import { roundPools093, convertStandardToCounter093 } from '../module/rules/actions-v093.mjs';
-import { techniqueKiCost093 } from '../module/rules/techniques-v093.mjs';
+import { awakeningAMB, martialDie } from '../module/rules/path-to-power-v093.mjs';
+import { signatureEnergyCharges093, validateTechnique093, validateTechniqueUsage093, techniqueKiCost093 } from '../module/rules/techniques-v093.mjs';
 import { applyRacial093, applyRacialAttribute093, applyCatalogPassives093 } from '../module/rules/runtime-v093.mjs';
 import { applyLegendRealized093, newLevelOfPower093 } from '../module/rules/transformations-v093.mjs';
 
@@ -16,7 +17,11 @@ function applyUpdate(object, updates) {
   }
 }
 class ActorStub { constructor(system) { this.system=system; this.uuid='Actor.a'; this.items=[]; } async update(updates) { applyUpdate(this,updates); } }
-class SheetStub { constructor(actor) { this.actor=actor; this.isEditable=true; } activateListeners() {} }
+class SheetStub {
+  constructor(actor) { this.actor=actor; this.isEditable=true; }
+  activateListeners() {}
+  async _updateObject(event, formData) { return this.actor.update(formData); }
+}
 class DialogStub {
   static lastRendered;
   static async wait() { return 'strike'; }
@@ -30,6 +35,7 @@ globalThis.foundry={ utils:{deepClone:structuredClone} };
 globalThis.CONFIG={DBU:{}}; registerConfig(); installRules093(CONFIG.DBU);
 globalThis.ui={notifications:{warn:()=>{},info:()=>{}}};
 globalThis.game={user:{isGM:true},combat:null,actors:new Map()};
+const { applyCatalogDescriptions }=await import('../module/rules/catalog-descriptions.mjs');
 const { DBUActor }=await import('../module/documents/actor.mjs');
 const { DBUCharacterSheet }=await import('../module/sheets/character-sheet.mjs');
 const { installRulesSheet093, transformationCanActivate093 }=await import('../module/rules/sheet-v093.mjs');
@@ -424,4 +430,112 @@ test('owned linked buffs stack and a 50% LP trigger switches off on healing to t
   assert.equal(customBuffState(inactive, system), 'disabled');
   assert.equal(customBuffState({ ...conditional, effect: 'Max Life Points' }, system), 'unsupported');
   assert.equal(customBuffState({ ...conditional, trigger: 'raging' }, { combatStates: { raging: true } }), 'active');
+});
+
+test('Path to Power unlocks the initial progression in order and keeps martial rows when disabled', async () => {
+  const rows = structuredClone(CONFIG.DBU.progressionRows);
+  rows.push({ id: -5, level: 1, perkType: 'attribute_addition', ag: 1 });
+  for (const id of [6, 7, 8, 9, 10]) rows.find(row => row.id === id).ag = id === 9 ? 1 : 2;
+  Object.assign(rows.find(row => row.id === 11), { skill0: 'Athletics', skill4: 'Perception', tp: 25 });
+  const system = { rulesVersion: '0.9.3', level: 1, progressionRows: rows };
+  const sheet = new DBUCharacterSheet(new ActorStub(system));
+  sheet.actor._getBuffTotal = () => 0;
+  sheet._calcUniqueTotalTP = () => 0;
+  const ordinary = {};
+  sheet._prepareProgressionData(ordinary, system);
+  assert.equal(ordinary.pathToPowerAvailable, true);
+  assert.equal(ordinary.totalTP, 25);
+  system.pathToPower = { enabled: true, martialLevel: 1 };
+  for (const [ml, points, die, lp, kp] of [[1, 6, 0, 40, 30], [2, 7, 4, 45, 35], [3, 9, 6, 50, 40], [4, 10, 8, 55, 45], [5, 10, 10, 60, 50]]) {
+    system.pathToPower.martialLevel = ml;
+    const context = {};
+    sheet._prepareProgressionData(context, system);
+    sheet._prepareTechniquesData(context, system);
+    const earned = context.progressionRows.filter(row => row.martialEarned && row.level === 1);
+    assert.equal(earned.filter(row => row.perkType === 'talent_addition').length, ml >= 4 ? 4 : ml >= 2 ? 3 : 2);
+    assert.equal(earned.filter(row => row.convertible).length, ml >= 5 ? 1 : 0);
+    assert.equal(earned.filter(row => row.perkType === 'martial_rank').length, ml >= 4 ? 2 : ml >= 2 ? 1 : 0);
+    assert.equal(context.totalAttrPoints, points);
+    assert.equal(context.totalSkillRanks, 1);
+    assert.equal(earned.find(row => row.id === 11).maxSkillSlots, 4);
+    assert.equal(context.totalTP, 15);
+    assert.equal(context.tpTotal, 15);
+    assert.equal(context.startingTechniqueAvailable, ml >= 3);
+    assert.deepEqual([martialDie(system), context.martialBaseLife, context.martialBaseKi], [die, lp, kp]);
+  }
+  const context = {};
+  sheet._prepareProgressionData(context, system);
+  const martialRank = context.progressionRows.find(row => row.id === -2);
+  await sheet._updateObject(null, { [martialRank.skillSlots[0].fieldName]: 'Perception' });
+  assert.equal(system.progressionRows.find(row => row.id === -2).skill0, 'Perception');
+  await sheet._updateObject(null, { 'system.pathToPower.enabled': false, 'system.progressionRows.6.ag': 2 });
+  const disabled = {};
+  sheet._prepareProgressionData(disabled, system);
+  assert.equal(disabled.totalTP, 25);
+  assert.equal(disabled.progressionRows.find(row => row.id === -2).martialHidden, true);
+  assert.equal(system.progressionRows.find(row => row.id === -2).skill0, 'Perception');
+  system.pathToPower.enabled = true;
+  system.level = 2;
+  assert.equal(martialDie(system), 0);
+  system.pathToPower.remnant = true;
+  assert.equal(martialDie(system), 10);
+});
+
+test('martial combat formulas and resources include the die and only the allowed charges', () => {
+  const system = {
+    rulesVersion: '0.9.3', level: 1, tier: 1, baseTier: 1, race: 'earthling',
+    pathToPower: { enabled: true, martialLevel: 3 }, attributes: { te: { score: 2 } },
+    lifePoints: {}, kiPool: {}, capacity: {}, status: {}, godKi: {}, divineKiPoints: {}, aptitudes: {},
+    attackRefs: [{ name: 'Beam', foundation: 'Energy', profile: 'Beam', energyCharges: 5 }],
+  };
+  const actor = new DBUActor(system);
+  actor._getBuffTotal = () => 0;
+  actor._getActiveAura = () => null;
+  actor._getSelfBenefitAura = () => null;
+  actor._calculateResources(system, 1, 1, 1);
+  assert.equal(system.lifePoints.max, 50 + 4 + 4);
+  assert.equal(system.kiPool.max, 40);
+  const sheet = new DBUCharacterSheet(actor);
+  const context = {};
+  sheet._prepareAttackRefData(context, system);
+  const ref = context.attackRefs[0];
+  for (const formula of [ref.strikeFormula, ref.woundFormula, ref.dodgeFormula]) assert.match(formula, /\+1d6\b/);
+  assert.doesNotMatch(ref.woundFormula, /\+5d\d+/);
+  const awakening = { transformationType: 'manifested_power' };
+  assert.deepEqual([awakeningAMB(system, awakening, 2), awakeningAMB(system, awakening, 0)], [1, 0]);
+  assert.equal(awakeningAMB(system, { transformationType: 'form_alternate' }, 2), 2);
+});
+
+test('limited martial techniques use Super costs and once-per-encounter usage', () => {
+  const system = { rulesVersion: '0.9.3', level: 1, pathToPower: { enabled: true, martialLevel: 3 },
+    thresholds: { crossedCount: 2 }, combatTabState: { rounds: [{ actions: [{ source: 'tech_1' }] }, { actions: [] }] } };
+  const plain = technique({ id: 1, type: 'signature', extraEnergyCharges: 6 });
+  const ultimate = { ...plain, type: 'ultimate' };
+  assert.equal(techniqueKiCost093(ultimate, { system }).tpFull, techniqueKiCost093(plain).tpFull);
+  assert.equal(signatureEnergyCharges093(ultimate, system), 3);
+  assert.equal(validateTechniqueUsage093({ system }, ultimate).ok, false);
+  assert.equal(validateTechniqueUsage093({ system }, { ...plain, id: 2 }).ok, true);
+  const expensive = { ...plain, advantages: [{ name: 'Widespread Assault', ranks: 1, tpCost: 8 }] };
+  assert.equal(validateTechnique093(expensive, system).ok, false);
+  assert.equal(validateTechnique093({ ...expensive, startingTechnique: true }, system).ok, true);
+  system.pathToPower.martialLevel = 2;
+  assert.equal(validateTechnique093({ ...expensive, startingTechnique: true }, system).ok, false);
+  system.pathToPower.martialLevel = 5;
+  assert.equal(signatureEnergyCharges093(ultimate, system), 9);
+});
+
+test('factor entries stay out of the official subrace index', () => {
+  const trait = CATALOGS_093.racialTraits.saiyan.find(t => t.factor?.id === 'ancient-saiyan');
+  assert.ok(trait);
+  assert.equal(trait.subrace, '');
+  assert.ok(!new DBUCharacterSheet(new ActorStub({ race: 'saiyan' }))._getSubraceOptions({ race: 'saiyan' })
+    .some(option => option.value === trait.factor.id));
+  const additional = CATALOGS_093.racialTraits.saiyan.find(t => t.traitCategory === 'secondary');
+  const actor = new ActorStub({ subrace: 'Saiyan da Terra', subraceTraits: [additional.id, trait.id],
+    racialTraits: [additional.id, trait.id] });
+  const [subrace, factor] = applyCatalogDescriptions(actor, 'traits', [additional, trait]);
+  assert.equal(subrace.isSubraceTrait, true);
+  assert.equal(subrace.traitCategory, 'secondary');
+  assert.equal(factor.isSubraceTrait, undefined);
+  assert.deepEqual(actor.system.racialTraits, [additional.id, trait.id]);
 });

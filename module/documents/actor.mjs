@@ -1,3 +1,4 @@
+import { awakeningAMB, limitedMartialPower, martialDie, martialLevel, martialResourcePenalty, martialSkillSlots, progressionRowIsEarned, usesPathToPower } from "../rules/path-to-power-v093.mjs";
 import { applyConditionalCustomBuffs, buffAmount, buffEffectKey, conditionalBuff, linkedCatalogBuffs } from "../helpers/custom-buffs.mjs";
 import { uses093 } from "../rules/v093.mjs";
 import { racialSaves093, racialLife093, applyRacial093, applyCatalogPassives093, applyRacialAttribute093, ignoresSaiyanPenalties093 } from "../rules/runtime-v093.mjs";
@@ -57,6 +58,26 @@ export class DBUActor extends Actor {
   // =============================================================
 
   _prepareCharacterData(system) {
+    system._masterMartialLevel = 0;
+    system._masterMartialRemnant = false;
+    if (uses093(system) && system.minion?.enabled && system.minion.masterName) {
+      const master = globalThis.game?.actors?.getName?.(system.minion.masterName.trim());
+      if (master?.system) {
+        system._masterMartialLevel = martialLevel(master.system);
+        system._masterMartialRemnant = !system._masterMartialLevel && usesPathToPower(master.system) && martialDie(master.system) === 10;
+      }
+    }
+    system._martialTalents = undefined;
+    if (usesPathToPower(system)) {
+      const rows = system.progressionRows || [];
+      const ids = new Map((CONFIG.DBU?.talentsCatalog || []).map(talent => [talent.name, talent.id]));
+      const selectedIds = new Set(rows.map(row => ids.get(row.talent)).filter(Boolean));
+      const manualIds = (system.talents || []).filter(id => !selectedIds.has(id));
+      const earnedIds = rows.filter(row => progressionRowIsEarned(system, row))
+        .filter(row => row.perkType === "talent_addition" || row.perkType === "character_perk")
+        .map(row => ids.get(row.talent)).filter(Boolean);
+      system._martialTalents = [...new Set([...manualIds, ...earnedIds])];
+    }
     system._linkedCustomBuffs = linkedCatalogBuffs(this, system);
     let tier = system.tier;
     let baseTier = system.baseTier;
@@ -181,9 +202,10 @@ export class DBUActor extends Actor {
     const skillRanks = {};
     const progRows = system.progressionRows || [];
     for (const row of progRows) {
-      if (row.perkType === "racial_stats") continue;
-      if ((row.level || 0) > level) continue;
-      for (let i = 0; i < 6; i++) {
+      if (!progressionRowIsEarned(system, row)) continue;
+      const skillSlots = usesPathToPower(system)
+        ? martialSkillSlots(row, CONFIG.DBU?.racialSkillRanks?.[system.race] || 2) : 6;
+      for (let i = 0; i < skillSlots; i++) {
         const val = row[`skill${i}`];
         if (val && String(val).trim()) {
           const skillId = skillNameToId[val] || val.toLowerCase();
@@ -242,6 +264,10 @@ export class DBUActor extends Actor {
 
     // ---- Resources ----
     this._calculateResources(system, level, tier, baseTier);
+    if (martialLevel(system) || system._masterMartialLevel) {
+      system.lifePoints.value = Math.min(system.lifePoints.value, system.lifePoints.max);
+      system.kiPool.value = Math.min(system.kiPool.value, system.kiPool.max);
+    }
 
     // ---- Saving Throws ----
     this._calculateSavingThrows(system, tier);
@@ -393,7 +419,7 @@ export class DBUActor extends Actor {
       const _ssStacks = system.status?.superStacks || 0;
       if (_ssStacks > 0) {
         const _ssSizes = ["d4", "d6", "d8", "d10"];
-        const _heftyOn = (system.talents || []).includes("hefty_muscle")
+        const _heftyOn = (system._martialTalents ?? system.talents ?? []).includes("hefty_muscle")
           && system.effectTracking?.enabledPassives?.["talent_hefty_muscle_1"] !== false;
         const _ssCat = (system.aptitudes.superStackDiceCategoryBonus || 0)
           + (system.aptitudes.superStackExtraDiceCategoryBonus || 0)
@@ -613,7 +639,7 @@ export class DBUActor extends Actor {
             if (preludeApplies && amb > 0) {
               amb = Math.max(tier, amb - tier); // reduce by 1(T), floor at 1(T)
             }
-            modifier += amb;
+            modifier += awakeningAMB(system, trans, amb);
           }
         }
 
@@ -700,7 +726,8 @@ export class DBUActor extends Actor {
           // Normal transformation attribute bonuses (Grade feeds "G(T)" AMBs)
           if (gainedTrans.attrBonuses?.[key]) {
             const _gGrade = parseInt(String(gainedTrans.gradeOrStacks || "").match(/(\d+)/)?.[1] || "0");
-            modifier += DBUActor.parseAttrBonus(gainedTrans.attrBonuses[key], tier, system.baseTier, _gGrade);
+            const amb = DBUActor.parseAttrBonus(gainedTrans.attrBonuses[key], tier, system.baseTier, _gGrade);
+            modifier += awakeningAMB(system, gainedTrans, amb);
           }
           // Mastery attribute bonuses
           if (gainedTrans.mastered && gainedTrans.catalogKey) {
@@ -868,6 +895,7 @@ export class DBUActor extends Actor {
     // effective PL for those three formulas ONLY (not for other level-scaled effects).
     const _unifyLevels = DBUActor.getUnificationSecondaries(system).length;
     const resLevel = level + _unifyLevels;
+    const martialPenalty = martialResourcePenalty(system);
 
     // --- Max Life Points ---
     // Formula: 48 + PL × (12 + RLM + 2×TE score) + modifyLife
@@ -884,7 +912,7 @@ export class DBUActor extends Actor {
     const modifyLife = system.lifePoints?.modify || 0;
     // Custom buff "Racial Life Modifier" — added to rlm before the formula uses it (scales by level)
     rlm += this._getBuffTotal(system, "Racial Life Modifier");
-    system.lifePoints.max = 48 + (resLevel * (12 + rlm + (2 * teScore))) + modifyLife;
+    system.lifePoints.max = 48 + (resLevel * (12 + rlm + (2 * teScore))) + modifyLife - martialPenalty;
     // Custom buff "Max Life Points" (unified: flat + bT×baseTier + T×tier)
     system.lifePoints.max += this._getBuffTotal(system, "Max Life Points");
     // Custom buff "Max Life Points ±1/4" — each unit adds 1/4 of base max (pre-buff)
@@ -965,7 +993,7 @@ export class DBUActor extends Actor {
     // --- Max Ki Pool ---
     // Formula: 50 + (PL - 1) × 12 + modifyKi
     const modifyKi = system.kiPool?.modify || 0;
-    system.kiPool.max = 50 + ((resLevel - 1) * 12) + modifyKi;
+    system.kiPool.max = 50 + ((resLevel - 1) * 12) + modifyKi - martialPenalty;
     // Custom buff "Max Ki Points" / "Max Ki Pool" (unified: flat + bT×baseTier + T×tier)
     // Accept both names — the catalog dropdown offers "Max Ki Pool" while
     // older data may use "Max Ki Points" (previously only the latter worked)
@@ -1072,7 +1100,7 @@ export class DBUActor extends Actor {
     }
 
     // Allow user override (e.g., "off" disables Ki Multiplier, or via Surging Strength)
-    if (meta.kiMultOverride === "off" || meta.kiMultOverride === "0") kiMultActive = false;
+    if (meta.kiMultOverride === "off" || meta.kiMultOverride === "0" || limitedMartialPower(system)) kiMultActive = false;
 
     // Store base KP max before Ki Multiplier (for DKP calculation)
     const baseKiMax = system.kiPool.max;
@@ -1172,7 +1200,7 @@ export class DBUActor extends Actor {
     // --- Application of Skill talent: +ceil(IN_Mod/4) to Might ---
     // "While 3+ Attributes (including Insight) have a higher Score than FO and MA,
     //  increase Might Checks by 1/4 (rounded up) of your Insight Modifier." (talents.txt)
-    const talents0 = system.talents || [];
+    const talents0 = system._martialTalents ?? system.talents ?? [];
     if (talents0.includes("application_of_skill")) {
       const scores = ["ag", "fo", "te", "sc", "in", "ma", "pe"].map(k => ({
         key: k, score: system.attributes[k]?.score ?? 0
@@ -1197,12 +1225,12 @@ export class DBUActor extends Actor {
     // Custom buff "Might for Clashes" — separate stat used in Might Clashes only.
     // Penetrating Fist L1: +1(T) Might Clash Dice Score (clashes ONLY, not Might).
     system.status.mightForClashes = might + this._getBuffTotal(system, "Might for Clashes")
-      + ((system.talents || []).includes("penetrating_fist") ? tier : 0);
+      + ((system._martialTalents ?? system.talents ?? []).includes("penetrating_fist") ? tier : 0);
     // Custom buff "Threshold Breaker" — bonus when crossing health thresholds (stored for downstream)
     system.aptitudes.thresholdBreaker = this._getBuffTotal(system, "Threshold Breaker");
 
     // --- Surgency = Force total (+2(T) with Archetype Focus L2) ---
-    const talents = system.talents || [];
+    const talents = system._martialTalents ?? system.talents ?? [];
     const surgency = foTotal + (talents.includes("archetype_focus") ? 2 * tier : 0);
 
     // --- Healing Surge ---
@@ -1295,7 +1323,7 @@ export class DBUActor extends Actor {
       }
     }
     const drunkPenalty = system.combatStates?.drunk ? tier : 0;
-    const talents = system.talents || [];
+    const talents = system._martialTalents ?? system.talents ?? [];
     const isBelowBruised = system.status?.healthStatus && system.status.healthStatus !== "healthy";
     const valorBonus = (talents.includes("valor_of_the_dragon_team") && isBelowBruised) ? tier : 0;
     const allSavesBuff = this._getBuffTotal(system, "All Saves");
@@ -1391,7 +1419,7 @@ export class DBUActor extends Actor {
     system.thresholds.penalties = penaltyCount * baseTier * poisonMult;
     system.thresholds.stressPenalty = penaltyCount * poisonMult;
     // Transformation Stressor: do not reduce Stress Bonus from Health Threshold penalties.
-    if ((system.talents || []).includes("transformation_stressor")) {
+    if ((system._martialTalents ?? system.talents ?? []).includes("transformation_stressor")) {
       system.thresholds.stressPenalty = 0;
     }
 
@@ -1597,7 +1625,7 @@ export class DBUActor extends Actor {
     // previously computed but never consumed here — dead field revived).
     if (superStacks > 0) {
       const ssDieSizes = ["d4", "d6", "d8", "d10"];
-      const heftyOn = (system.talents || []).includes("hefty_muscle")
+      const heftyOn = (system._martialTalents ?? system.talents ?? []).includes("hefty_muscle")
         && system.effectTracking?.enabledPassives?.["talent_hefty_muscle_1"] !== false;
       const ssCatBonus = (system.aptitudes.superStackDiceCategoryBonus || 0) + (heftyOn ? 1 : 0);
       const ssDie = ssDieSizes[Math.max(0, Math.min(superStacks - 1 + ssCatBonus, 3))];
@@ -1728,7 +1756,7 @@ export class DBUActor extends Actor {
     system.status.boostedSpeed = Math.max(0, boostedSpeed);
 
     // Lightning Initiative L1: +1(T) Speed while Initiative Advantage
-    if ((system.talents || []).includes("lightning_initiative") && system._hasInitiativeAdvantage) {
+    if ((system._martialTalents ?? system.talents ?? []).includes("lightning_initiative") && system._hasInitiativeAdvantage) {
       system.status.normalSpeed += tier;
       system.status.boostedSpeed += tier;
     }
@@ -1828,7 +1856,8 @@ export class DBUActor extends Actor {
     // (capped — it does NOT keep scaling past 8).
     const peScore = system.attributes.pe?.score ?? 0;
     const determination = peScore >= 8 ? 2 : (peScore >= 4 ? 1 : 0);
-    system.aptitudes.stressBonus = (system.level || 1) + determination
+    const ml = martialLevel(system);
+    system.aptitudes.stressBonus = (system.level || 1) + determination - (ml === 1 || ml === 2 ? 1 : 0)
       + (system.downtime?.gains?.stressBonus || 0)
       - (system.thresholds?.stressPenalty || 0)
       // Unification: "+1 Stress Test Dice Score" per Secondary Character
@@ -1852,7 +1881,7 @@ export class DBUActor extends Actor {
     // "Reduce your Awareness or Defense Value by up to 2(bT) to increase the other.
     //  You cannot reduce an Aptitude to any value less than 2(bT)." (talents.txt)
     const bT = system.baseTier || 1;
-    const talents = system.talents || [];
+    const talents = system._martialTalents ?? system.talents ?? [];
     if (talents.includes("combat_expertise")) {
       let ceShift = system.combatStates?.combatExpertiseShift ?? 0;
       const ceMax = 2 * bT;
@@ -3527,7 +3556,7 @@ export class DBUActor extends Actor {
    */
   _generateDerivedBuffs(system) {
     const buffs = [];
-    const talents = system.talents || [];
+    const talents = system._martialTalents ?? system.talents ?? [];
 
     // --- Combat State Buffs ---
 
@@ -3573,6 +3602,11 @@ export class DBUActor extends Actor {
     // Minion Traits (Trained +1/copy, No-Good −2(bT))
     if (system.minion?.enabled) {
       const mTraits = system.minion.traits || [];
+      if (system._masterMartialLevel === 1 || system._masterMartialLevel === 2) {
+        for (const effect of ["Strike", "Wound", "Dodge", "Soak"]) {
+          buffs.push({ active: true, effect, flat: -1, bT: 0, T: 0, source: "Path to Power" });
+        }
+      }
       if (system._minionWeakPenalty) {
         for (const eff of ["Strike", "Dodge", "Wound"]) {
           buffs.push({ active: true, effect: eff, flat: -system._minionWeakPenalty, bT: 0, T: 0, source: "Minion Weakness (bT 1)" });
@@ -3899,7 +3933,7 @@ export class DBUActor extends Actor {
     system.tier = bjSys.jacketTier ?? system.tier;
 
     // Battle Jacket Penalty: -2(JT) to Combat Rolls
-    const hasExpertPilot = (system.talents || []).includes("expertPilot");
+    const hasExpertPilot = (system._martialTalents ?? system.talents ?? []).includes("expertPilot");
     if (!hasExpertPilot) {
       system._bjPenalty = 2 * (bjSys.jacketTier ?? 1);
       system._bjPenaltyApplied = true;

@@ -1,5 +1,6 @@
+import { limitedMartialPower } from "../../rules/path-to-power-v093.mjs";
 import { energyChargeDie, greaterDiceCategoryBonus, shiftAttackDamageCategory, signatureBuffDice } from "../../helpers/custom-buffs.mjs";
-import { techniqueKiCost093, signatureEnergyCharges093, startingTechniqueEligible093 } from "../../rules/techniques-v093.mjs";
+import { techniqueKiCost093, signatureEnergyCharges093, martialTechnique, martialTechniqueTPCap, startingTechniqueAvailable093, startingTechniqueEligible093 } from "../../rules/techniques-v093.mjs";
 import { uses093, techniquePointCost } from "../../rules/v093.mjs";
 import { progression093 } from "../../rules/progression-v093.mjs";
 
@@ -18,13 +19,18 @@ export const techniquesMethods = {
     const disadvData = config.techniqueDisadvantagesData || {};
     const currentRules = uses093(system);
     const startingTechnique = currentRules && techniques.find(tech => tech.startingTechnique);
+    if (currentRules) {
+      context.startingTechniqueAvailable = startingTechniqueAvailable093(system);
+      context.limitedMartialPower = limitedMartialPower(system);
+    }
 
     // Helper: get attribute modifier
     const getAttrMod = (key) => system.attributes?.[key]?.modifier ?? 0;
 
     // Calculate enriched data for each technique
     const preparedTechniques = techniques.map(t => {
-      const isFreeStarter = t === startingTechnique && startingTechniqueEligible093(t);
+      const isFreeStarter = t === startingTechnique && startingTechniqueEligible093(t, system);
+      const techniqueCap = martialTechniqueTPCap(t, system, tpLimit);
       const tpCost = isFreeStarter ? 0 : this._calcTechTPCost(t);
 
       // Magical Flavor: the ST is treated as the chosen Energy Profile for
@@ -68,8 +74,8 @@ export const techniquesMethods = {
       return {
         ...t,
         tpCost,
-        tpMax: tpLimit,
-        tpOverLimit: tpCost > tpLimit,
+        tpMax: techniqueCap,
+        tpOverLimit: tpCost > techniqueCap,
         ...(currentRules && t.startingTechnique ? { startingTechniqueNeedsReview: !isFreeStarter } : {}),
         tpFull,
         mfProfile,
@@ -288,7 +294,7 @@ export const techniquesMethods = {
    * Magical Flavor swaps in the chosen Energy Profile's KP cost/minimum.
    */
   _calcTechKP(tech) {
-    if (uses093(this.actor.system)) return techniqueKiCost093(tech);
+    if (uses093(this.actor.system)) return techniqueKiCost093(tech, { system: this.actor.system });
     const profileKpCosts = CONFIG.DBU?.profileKpCosts || {};
     const mfProfile = this._techMagicalFlavor(tech);
     const profileBaseKP = profileKpCosts[mfProfile || tech.profile] || 0;
@@ -336,7 +342,7 @@ export const techniquesMethods = {
   },
 
   _calcTechTPCost(tech) {
-    if (uses093(this.actor.system)) return techniquePointCost(tech);
+    if (uses093(this.actor.system)) return techniquePointCost(martialTechnique(tech, this.actor.system));
     // Base: 8 TP for all Signature Techniques
     let total = 8;
     // Sum advantages TP (positive)
@@ -592,7 +598,12 @@ export const techniquesMethods = {
     const tech = techs.find(t => t.id === techId);
     if (!tech) return;
     if (uses093(this.actor.system) && field === "startingTechnique" && el.checked) {
-      if (!startingTechniqueEligible093(tech)) {
+      if (!startingTechniqueAvailable093(this.actor.system)) {
+        el.checked = false;
+        ui.notifications.warn("A técnica inicial é liberada no Martial Level 3.");
+        return;
+      }
+      if (!startingTechniqueEligible093(tech, this.actor.system)) {
         el.checked = false;
         ui.notifications.warn("A técnica inicial deve ser válida, custar até 20 TP e não pode ser Dramatic Finisher.");
         return;

@@ -1227,7 +1227,7 @@ const source = selected.source;
 if (uses093(actor.system) && source.key?.startsWith("tech_")) {
   const technique = (actor.system.signatureTechniques || []).find(t => "tech_"+t.id === source.key);
   if (technique) {
-    const validation = validateTechnique093(technique);
+    const validation = validateTechnique093(technique, actor.system);
     if (!validation.ok) return ui.notifications.warn(validation.issues.join("; "));
     if (inCombat093(actor)) {
       const usage = validateTechniqueUsage093(actor, technique);

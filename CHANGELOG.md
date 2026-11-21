@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.0.12-rules093-alpha.14] — Path to Power e sub-raças
+
+- A aba Progression oferece Path to Power por personagem, desativado inicialmente. Os níveis marciais liberam a progressão do PL 1, ajustam LP e Ki e incluem o dado marcial nas rolagens de combate. A partir do PL 2, Martial Remnant mantém o d10 se marcado.
+- Até ML 4, aplica os limites de Energy Charges e Signature Techniques, além das restrições de Stress, Ki Multiplier, Burst Recovery e Awakenings. Efeitos de traços que tratam Supers como Ultimates são decididos na mesa.
+- Basic Information registra a sub-raça. Na aba Traits, o lápis marca um traço adicional da sub-raça e Racial Factors abre o seletor de substituições. As escolhas continuam manuais.
+
 ## [1.0.12-rules093-alpha.13] — prévia de ataque e compêndio racial
 
 - Attack Ref usa o Critical Target do perfil em Strike e Wound. Cutting mostra Wound CT 5+ tanto na fórmula quanto na célula.

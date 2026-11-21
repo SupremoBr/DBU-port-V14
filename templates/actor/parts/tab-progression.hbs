@@ -24,6 +24,26 @@
     </div>
   </div>
 
+  {{#if pathToPowerAvailable}}
+  <div class="dbu-catalog-description">
+    <label><input type="checkbox" name="system.pathToPower.enabled" {{checked system.pathToPower.enabled}}> Path to Power</label>
+    {{#if pathToPowerEnabled}}
+      {{#if martialLevel}}
+      <label>Martial Level
+        <select name="system.pathToPower.martialLevel">
+          {{#each martialLevels}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{value}}</option>{{/each}}
+        </select>
+      </label>
+      <p>PL 1 · Tier 1 · Vida base {{martialBaseLife}} · Ki base {{martialBaseKi}} · Dado marcial {{martialDie}}</p>
+      <p>A partir do ML 3, escolha uma Signature Technique de até 20 TP na aba Techniques.</p>
+      {{else}}
+      <label><input type="checkbox" name="system.pathToPower.remnant" {{checked system.pathToPower.remnant}}> Martial Remnant (manter 1d10)</label>
+      {{/if}}
+      <a href="https://dbu-rpg.com/path-to-power/" target="_blank" rel="noopener noreferrer">Regra completa</a>
+    {{/if}}
+  </div>
+  {{/if}}
+
   {{#if initialProgressionWarnings.length}}
   <ul class="dbu-catalog-description" aria-label="Revisão da progressão inicial">
     {{#each initialProgressionWarnings}}<li>{{this}}</li>{{/each}}
@@ -126,9 +146,10 @@
         </tr>
         {{/if}}
         {{#each progressionRows}}
+        {{#unless martialHidden}}
         {{#if (eq perkType "starting_stats")}}
         {{!-- Locked row: only racial skill slots, no attrs/perkType/delete --}}
-        <tr class="progression-row current-level" data-row-index="{{@index}}" data-perk="starting_stats">
+        <tr class="progression-row current-level" data-row-index="{{formIndex}}" data-perk="starting_stats">
           <td class="col-level">1</td>
           <td class="col-perk"><span style="opacity:0.6;">Racial Skills</span></td>
           <td class="col-talent dim">—</td>
@@ -157,32 +178,39 @@
           <td class="col-del"></td>
         </tr>
         {{else}}
-        <tr class="progression-row {{#if (lte level ../system.level)}}current-level{{else}}future-level{{/if}}" data-row-index="{{@index}}" data-perk="{{perkType}}">
+        <tr class="progression-row {{#if martialRowLevel}}{{#if martialEarned}}current-level{{else}}future-level{{/if}}{{else}}{{#if (lte level ../system.level)}}current-level{{else}}future-level{{/if}}{{/if}}" data-row-index="{{formIndex}}" data-perk="{{perkType}}">
           <td class="col-level">
-            <input type="number" name="system.progressionRows.{{@index}}.level" value="{{level}}" min="1" max="30" />
+            {{#if martialRowLevel}}ML {{martialRowLevel}}{{else}}
+            <input type="number" name="system.progressionRows.{{formIndex}}.level" value="{{level}}" min="1" max="30" />
+            {{/if}}
           </td>
           <td class="col-perk">
-            <select name="system.progressionRows.{{@index}}.perkType">
+            {{#if martialLockedPerk}}
+            {{martialPerkLabel}}
+            {{#if martialBudget}}<span title="Pontos de atributo nesta linha">({{martialBudget}} AP)</span>{{/if}}
+            {{else}}
+            <select name="system.progressionRows.{{formIndex}}.perkType">
               {{selectOptions ../perkTypeOptions selected=perkType}}
             </select>
+            {{/if}}
           </td>
           {{!-- Talent: autocomplete input with datalist --}}
           {{#if showTalent}}
           <td class="col-talent">
-            <input type="text" name="system.progressionRows.{{@index}}.talent" value="{{talent}}" list="talent-datalist" class="talent-select" placeholder="Type to search..." autocomplete="off" />
+            <input type="text" name="system.progressionRows.{{formIndex}}.talent" value="{{talent}}" list="talent-datalist" class="talent-select" placeholder="Type to search..." autocomplete="off" />
           </td>
           {{else}}
           <td class="col-talent dim">—</td>
           {{/if}}
           {{!-- Attributes: visible for attribute_addition --}}
           {{#if showAttrs}}
-          <td class="col-attr"><input type="number" name="system.progressionRows.{{@index}}.ag" value="{{ag}}" /></td>
-          <td class="col-attr"><input type="number" name="system.progressionRows.{{@index}}.fo" value="{{fo}}" /></td>
-          <td class="col-attr"><input type="number" name="system.progressionRows.{{@index}}.te" value="{{te}}" /></td>
-          <td class="col-attr"><input type="number" name="system.progressionRows.{{@index}}.sc" value="{{sc}}" /></td>
-          <td class="col-attr"><input type="number" name="system.progressionRows.{{@index}}.in" value="{{in}}" /></td>
-          <td class="col-attr"><input type="number" name="system.progressionRows.{{@index}}.ma" value="{{ma}}" /></td>
-          <td class="col-attr"><input type="number" name="system.progressionRows.{{@index}}.pe" value="{{pe}}" /></td>
+          <td class="col-attr"><input type="number" name="system.progressionRows.{{formIndex}}.ag" value="{{ag}}" /></td>
+          <td class="col-attr"><input type="number" name="system.progressionRows.{{formIndex}}.fo" value="{{fo}}" /></td>
+          <td class="col-attr"><input type="number" name="system.progressionRows.{{formIndex}}.te" value="{{te}}" /></td>
+          <td class="col-attr"><input type="number" name="system.progressionRows.{{formIndex}}.sc" value="{{sc}}" /></td>
+          <td class="col-attr"><input type="number" name="system.progressionRows.{{formIndex}}.in" value="{{in}}" /></td>
+          <td class="col-attr"><input type="number" name="system.progressionRows.{{formIndex}}.ma" value="{{ma}}" /></td>
+          <td class="col-attr"><input type="number" name="system.progressionRows.{{formIndex}}.pe" value="{{pe}}" /></td>
           {{else}}
           <td class="col-attr dim">—</td>
           <td class="col-attr dim">—</td>
@@ -195,7 +223,7 @@
           {{!-- TP: visible for skill_improvement --}}
           {{#if showTP}}
           <td class="col-tp">
-            <input type="number" name="system.progressionRows.{{@index}}.tp"
+            <input type="number" name="system.progressionRows.{{formIndex}}.tp"
               {{#if ../rules093}}value="{{storedTP}}" placeholder="{{tp}}"{{else}}value="{{tp}}"{{/if}} />
           </td>
           {{else}}
@@ -221,12 +249,15 @@
           <td class="col-skill dim" colspan="6">—</td>
           {{/if}}
           <td class="col-del">
-            <button type="button" class="delete-btn" data-action="delete-progression-row" data-index="{{@index}}">
+            {{#unless martialRowLevel}}
+            <button type="button" class="delete-btn" data-action="delete-progression-row" data-index="{{formIndex}}">
               <i class="fas fa-trash"></i>
             </button>
+            {{/unless}}
           </td>
         </tr>
         {{/if}}
+        {{/unless}}
         {{/each}}
       </tbody>
     </table>

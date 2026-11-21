@@ -134,7 +134,7 @@ export function installRulesSheet093(Sheet) {
         const tech = this.actor.system.signatureTechniques?.find(t => 'tech_'+t.id === row.source);
         if (tech) {
           if (this.actor.system.minion?.enabled && /ultimate|dramatic[ _-]*finisher/i.test(tech.type || '')) return warn('Minions não podem usar Ultimates ou Dramatic Finishers.');
-          const result = validateTechnique093(tech); if (!result.ok) return warn(result.issues.join('; '));
+          const result = validateTechnique093(tech, this.actor.system); if (!result.ok) return warn(result.issues.join('; '));
           if (inCombat093(this.actor)) { const usage = validateTechniqueUsage093(this.actor, tech, { excludeIndex: index }); if (!usage.ok) return warn(usage.reason); }
         }
       }

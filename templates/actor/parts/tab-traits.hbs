@@ -28,6 +28,7 @@
   <div class="dbu-factor-toolbar">
     <button type="button" data-action="add-trait" data-racial-factors><i class="fas fa-dna" aria-hidden="true"></i> Racial Factors</button>
   </div>
+  <p class="dbu-catalog-description">Adicione o traço da sub-raça com o botão + e marque-o pelo lápis. Racial Factors normalmente trocam um traço secundário, conforme a regra de cada fator.</p>
   {{/if}}
 
   {{!-- Traits List --}}
@@ -42,7 +43,7 @@
           <span class="trait-category-badge {{traitCategory}}">{{traitCategory}}</span>
           {{/if}}
           <span class="trait-name">{{name}}</span>
-          <span class="trait-race-tag">{{#if factor}}{{factor.name}}{{else}}{{race}}{{/if}}</span>
+          <span class="trait-race-tag">{{#if factor}}{{factor.name}}{{else}}{{#if isSubraceTrait}}Subrace{{else}}{{race}}{{/if}}{{/if}}</span>
           <button type="button" class="trait-expand" data-action="toggle-trait" title="Expand/Collapse">
             <i class="fas fa-chevron-down"></i>
           </button>
