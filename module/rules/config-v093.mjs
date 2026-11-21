@@ -19,11 +19,7 @@ export function installRules093(config) {
   config.racesWithFixedAttributes = Object.keys(RACES_093).filter(r => !RACES_093[r].attributes.choices.length);
   config.racialAttributeBonuses = Object.fromEntries(Object.entries(RACES_093).map(([id, r]) => [id, r.attributes.fixed]));
   config.racialSkillRanks = Object.fromEntries(Object.entries(RACES_093).map(([id, r]) => [id, r.skills]));
-  config.racialSubraces = {
-    // Keep the legacy label for the base Saiyan lineage as a sheet identifier.
-    saiyan: (config.racialSubraces?.saiyan || []).filter(row => row.id === 'fullBlooded'),
-    ...CATALOGS_093.subraceOptions
-  };
+  config.racialSubraces = { ...CATALOGS_093.subraceOptions };
   config.racialFactors = {};
   config.transformationTypes = config.transformationTypes.map(t => t.id === 'manifested_power' ? { ...t, name: 'Awakening' } : t);
   config.transformationCategories = config.transformationCategories.map(t => t.id === 'manifested_power' ? { ...t, name: 'Awakenings' } : t);

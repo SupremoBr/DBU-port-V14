@@ -529,7 +529,10 @@ test('the subrace selector lists real choices for the chosen race and leaves fac
     const system = { rulesVersion: '0.9.3', race, subrace };
     return new DBUCharacterSheet(new ActorStub(system))._getSubraceOptions(system);
   };
-  assert.deepEqual(options('saiyan').map(option => option.value), ['fullBlooded']);
+  assert.deepEqual(options('saiyan'), []);
+  for (const saved of ['fullBlooded', 'Full-Blooded', 'Full-Blooded Saiyan']) {
+    assert.deepEqual(options('saiyan', saved), []);
+  }
   assert.deepEqual(options('namekian', 'dragonClan'), [
     { value: 'warriorClan', label: 'Warrior Clan', selected: false },
     { value: 'dragonClan', label: 'Dragon Clan', selected: true },

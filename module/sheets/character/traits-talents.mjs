@@ -523,6 +523,7 @@ export const traitsTalentsMethods = {
 
     const normalize = value => value.toLowerCase().replace(/[^a-z0-9]/g, "");
     const savedKey = normalize(saved);
+    if (race === "saiyan" && ["fullblooded", "fullbloodedsaiyan"].includes(savedKey)) return options;
     const matchingLabel = options.find(option => normalize(option.label) === savedKey);
     if (matchingLabel) {
       matchingLabel.selected = true;

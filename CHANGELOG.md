@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.0.12-rules093-alpha.16] — opção de sub-raça Saiyan
+
+- O seletor Subrace usa as sub-raças da 0.9.3. Full-Blooded integra a descrição da raça Saiyan, e as variantes de Racial Factors continuam na aba Traits.
+
 ## [1.0.12-rules093-alpha.15] — seletor de sub-raças
 
 - Basic Information volta a usar um menu para Subrace. O menu inclui as sub-raças das páginas das raças e mantém Full-Blooded para Saiyan como identificação. Racial Factors são escolhidos na aba Traits.
