@@ -194,6 +194,18 @@ test('current Crushing and Cutting formulas preserve Force and use the reviewed 
   assert.match(sheet._calcTechWound({foundation:'Energy',profile:'Beam'},actor.system,1).formula,/1d8/);
 });
 
+test('Attack Ref uses per-profile Wound CT in the preview', () => {
+  const system = {
+    rulesVersion: '0.9.3', level: 1, tier: 1, baseTier: 1,
+    attackRefs: [{ foundation: 'Energy', profile: 'Cutting' }, { foundation: 'Energy', profile: 'Beam' }],
+  };
+  const sheet = new DBUCharacterSheet(new DBUActor(system));
+  sheet.actor._getSelfBenefitAura = () => null;
+  const context = {};
+  sheet._prepareAttackRefData(context, system);
+  assert.deepEqual(context.attackRefs.map(attack => [attack.strikeCT, attack.woundCT]), [[10, 5], [10, 10]]);
+});
+
 test('actual native roll applies Clearing natural minimum and records the executed action once',async()=>{
   const messages=[];
   globalThis.ChatMessage={getSpeaker:()=>({}),create:async data=>{messages.push(data);return data;}};

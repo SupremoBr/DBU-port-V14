@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.0.12-rules093-alpha.13] — prévia de ataque e compêndio racial
+
+- Attack Ref usa o Critical Target do perfil em Strike e Wound. Cutting mostra Wound CT 5+ tanto na fórmula quanto na célula.
+- O compêndio racial legado inclui os 177 itens do catálogo 0.9.2 fornecido com o sistema.
+
 ## [1.0.12-rules093-alpha.12] — seletor de Racial Factors
 
 - A aba Traits tem um botão Racial Factors, com busca por nome e grupos para os fatores da raça e os fatores gerais compatíveis.

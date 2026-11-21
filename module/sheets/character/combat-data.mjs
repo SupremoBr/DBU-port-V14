@@ -355,11 +355,8 @@ export const combatDataMethods = {
       const minimum = uses093(system) ? (profile.kpCost || 0) * trackerTier / 2 : 0;
       kiCost = attackKiWithBuffs(kiCost, minimum, system.aptitudes);
       const prep = prepRefs[i] || {};
-      // Unified CTs — includes talents (Focused Strike, Critical Specialist for
-      // armed attacks), Mindful state, and CT buffs. Fixes the old fallback that
-      // always landed on 10 because prep.strikeCT/combatCT never existed here.
       const isArmed = !!ref.weaponEquipped && String(ref.weaponEquipped).toLowerCase() !== "unarmed";
-      const refCTs = this._calcCombatCTs(system, {
+      const refCTs = prep.woundCT != null ? prep : this._calcCombatCTs(system, {
         isWeapon: isArmed, foundation: ref.foundation || "", profile: ref.profile || ""
       });
       arSources.push({

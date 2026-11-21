@@ -426,6 +426,9 @@ export const combatMathMethods = {
 
       // Available profiles for this foundation
       const availableProfiles = foundationProfiles[ref.foundation] || Object.keys(profileData);
+      const { strikeCT, woundCT } = this._calcCombatCTs(system, {
+        isWeapon: !!wKey && wKey !== "unarmed", foundation: ref.foundation, profile: ref.profile
+      });
 
       return {
         ...ref,
@@ -437,8 +440,8 @@ export const combatMathMethods = {
         profileKP: profile.kpCost != null ? `${profile.kpCost}(T)` : "—",
         damageCat,
         damageCatClass: `dmg-cat-${damageCat.toLowerCase()}`,
-        strikeFormula, strikeMod, haste, awareness,
-        woundFormula, woundMod, damageAttr,
+        strikeFormula, strikeCT, strikeMod, haste, awareness,
+        woundFormula, woundCT, woundMod, damageAttr,
         dodgeFormula, dodgeMod,
         clashFormula, clashMod,
         strikeTopDice,

@@ -50,7 +50,7 @@
                                     </select>
                                 </td>
                                 <td class="ar-lbl">Strike CT</td>
-                                <td class="ar-val ar-strike">{{../combatCT}}</td>
+                                <td class="ar-val ar-strike">{{strikeCT}}+</td>
                                 <td class="ar-lbl">Target Range</td>
                                 <td class="ar-val">
                                     <input type="number" class="ar-input-sm" name="system.attackRefs.{{_idx}}.targetRange" value="{{targetRange}}" min="0" />
@@ -59,7 +59,7 @@
                             {{!-- Row 3: Strike formula and strike dice --}}
                             <tr>
                                 <td class="ar-lbl">Strike</td>
-                                <td class="ar-val ar-formula ar-strike" colspan="3">{{strikeFormula}} ({{../combatCT}})</td>
+                                <td class="ar-val ar-formula ar-strike" colspan="3">{{strikeFormula}} ({{strikeCT}}+)</td>
                                 <td class="ar-lbl">Strike Crit</td>
                                 <td class="ar-val">{{#if strikeCritical}}{{strikeCritical}}{{else}}-{{/if}}</td>
                                 <td class="ar-lbl">In Melee?</td>
@@ -83,7 +83,7 @@
                             {{!-- Row 5: Wound formula, wound crit, damage category --}}
                             <tr>
                                 <td class="ar-lbl">Wound</td>
-                                <td class="ar-val ar-formula ar-wound" colspan="3">{{woundFormula}} ({{../combatCT}})</td>
+                                <td class="ar-val ar-formula ar-wound" colspan="3">{{woundFormula}} ({{woundCT}}+)</td>
                                 <td class="ar-lbl">Wound Crit</td>
                                 <td class="ar-val ar-wound">{{#if woundCritical}}{{woundCritical}}{{else}}-{{/if}}</td>
                                 <td class="ar-lbl">Dmg Cat.</td>
@@ -184,7 +184,7 @@
                                     <input type="number" class="ar-input-sm" name="system.attackRefs.{{_idx}}.powerShot" value="{{powerShot}}" min="0" />
                                 </td>
                                 <td class="ar-lbl">Wound CT</td>
-                                <td class="ar-val ar-wound">{{../combatCT}}</td>
+                                <td class="ar-val ar-wound">{{woundCT}}+</td>
                                 <td class="ar-lbl">Clash CT</td>
                                 <td class="ar-val">{{../combatCT}}</td>
                                 <td class="ar-lbl">Misc Dodge</td>
