@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.0.12-rules093-alpha.15] — seletor de sub-raças
+
+- Basic Information volta a usar um menu para Subrace. O menu inclui as sub-raças das páginas das raças e mantém Full-Blooded para Saiyan como identificação. Racial Factors são escolhidos na aba Traits.
+
 ## [1.0.12-rules093-alpha.14] — Path to Power e sub-raças
 
 - A aba Progression oferece Path to Power por personagem, desativado inicialmente. Os níveis marciais liberam a progressão do PL 1, ajustam LP e Ki e incluem o dado marcial nas rolagens de combate. A partir do PL 2, Martial Remnant mantém o d10 se marcado.

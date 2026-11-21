@@ -16,7 +16,7 @@
       "hash": "3526627ce6f3856e36b3595385220fd7a5d1b02ef6180adca6e0a1f3feb13981",
       "length": 0,
       "async": true,
-      "rules093Hash": "2413eb4bb759c45231c1f1b2d7194eb67dff96edb6423b0080c302604796328d"
+      "rules093Hash": "3af9e52237618c7e14170b66ef1d74bec2a988fe70f9236095802a441a07d690"
     },
     "_prepareProgressionData": {
       "hash": "6cf2b995786a1a995689e856ad51c39298cb301a546f86f4cdc3789198e6f1eb",
@@ -440,7 +440,8 @@
     "_getSubraceOptions": {
       "hash": "b3634ed7f7ef67ca037944057ba46724f735fc3a10c40c72dd2d84b36339dbf5",
       "length": 1,
-      "async": false
+      "async": false,
+      "rules093Hash": "85469b81bf655833bda41d51a52213b82598eded9e80a14b8ccac28fe997c792"
     },
     "_prepareItems": {
       "hash": "b007fd86e2042831d4a1c8e79f37259f49f9b20585b7d6841f43621ad7ad922f",

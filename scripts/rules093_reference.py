@@ -2,6 +2,24 @@
 import re
 
 
+def racial_subrace_options(html):
+    from bs4 import BeautifulSoup
+
+    page = BeautifulSoup(html, 'html.parser').select_one('.entry-content')
+    if page is None:
+        return []
+    options = []
+    for heading in page.find_all(['h1', 'h2', 'h3', 'h4', 'h5', 'h6']):
+        title = heading.get_text(' ', strip=True)
+        if not title.endswith(' Subrace'):
+            continue
+        name = title.removesuffix(' Subrace')
+        words = name.split()
+        ident = words[0].lower() + ''.join(word.capitalize() for word in words[1:])
+        options.append(dict(id=ident, name=name))
+    return options
+
+
 def talent_categories(html):
     from bs4 import BeautifulSoup
 

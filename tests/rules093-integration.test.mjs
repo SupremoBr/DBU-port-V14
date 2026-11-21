@@ -524,12 +524,30 @@ test('limited martial techniques use Super costs and once-per-encounter usage', 
   assert.equal(signatureEnergyCharges093(ultimate, system), 9);
 });
 
-test('factor entries stay out of the official subrace index', () => {
+test('the subrace selector lists real choices for the chosen race and leaves factors in Traits', () => {
+  const options = (race, subrace = '') => {
+    const system = { rulesVersion: '0.9.3', race, subrace };
+    return new DBUCharacterSheet(new ActorStub(system))._getSubraceOptions(system);
+  };
+  assert.deepEqual(options('saiyan').map(option => option.value), ['fullBlooded']);
+  assert.deepEqual(options('namekian', 'dragonClan'), [
+    { value: 'warriorClan', label: 'Warrior Clan', selected: false },
+    { value: 'dragonClan', label: 'Dragon Clan', selected: true },
+  ]);
+  assert.deepEqual(options('neoTuffle').map(option => option.value), ['hatredEmbodiment', 'parasite']);
+  assert.deepEqual(options('yardrat').map(option => option.value), ['tallYardrat', 'bulbousYardrat']);
+  assert.deepEqual(options('glassTribe').map(option => option.value), ['glassUser', 'glassWarrior']);
+  assert.deepEqual(options('demon').map(option => option.value), ['demonPerson', 'makyan', 'phantom']);
+  assert.deepEqual(options('android'), []);
+  assert.deepEqual(options('saiyan', 'ancient-saiyan'), options('saiyan'));
+  assert.deepEqual(options('earthling', 'Saiyan Ancestry'), []);
+  assert.ok(options('namekian', 'Dragon Clan').find(option => option.value === 'dragonClan').selected);
+  assert.deepEqual(options('saiyan', 'Saiyan da Terra').find(option => option.selected),
+    { value: 'Saiyan da Terra', label: 'Saiyan da Terra', selected: true });
+
   const trait = CATALOGS_093.racialTraits.saiyan.find(t => t.factor?.id === 'ancient-saiyan');
   assert.ok(trait);
   assert.equal(trait.subrace, '');
-  assert.ok(!new DBUCharacterSheet(new ActorStub({ race: 'saiyan' }))._getSubraceOptions({ race: 'saiyan' })
-    .some(option => option.value === trait.factor.id));
   const additional = CATALOGS_093.racialTraits.saiyan.find(t => t.traitCategory === 'secondary');
   const actor = new ActorStub({ subrace: 'Saiyan da Terra', subraceTraits: [additional.id, trait.id],
     racialTraits: [additional.id, trait.id] });

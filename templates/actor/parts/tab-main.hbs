@@ -26,22 +26,12 @@
             </td>
             <td class="info-label">Subrace</td>
             <td class="info-value">
-              {{#if rules093}}
-              <input name="system.subrace" type="text" value="{{system.subrace}}" placeholder="Nome da sub-raça"
-                {{#if showSubrace}}list="dbu-subrace-{{actor.id}}"{{/if}} title="A sub-raça acrescenta seus traços. Adicione-os na aba Traits." />
-              {{#if showSubrace}}
-              <datalist id="dbu-subrace-{{actor.id}}">
-                {{#each subraceOptions}}<option value="{{value}}">{{label}}</option>{{/each}}
-              </datalist>
-              {{/if}}
-              {{else}}
-              <select name="system.subrace">
+              <select name="system.subrace" aria-label="Subrace">
                 <option value="none">None</option>
                 {{#each subraceOptions}}
                 <option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>
                 {{/each}}
               </select>
-              {{/if}}
             </td>
           </tr>
           <tr>

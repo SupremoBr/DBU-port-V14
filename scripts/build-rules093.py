@@ -4,7 +4,7 @@ Usage: python3 scripts/build-rules093.py /path/to/rules093
 The research HTML and rule prose are deliberately not distributed.
 """
 import json, re, sys
-from rules093_reference import continued_choices, factor_source_data, level_summary, mechanic_summary, racial_choice, reference_effects, talent_categories, transformation_reference
+from rules093_reference import continued_choices, factor_source_data, level_summary, mechanic_summary, racial_choice, racial_subrace_options, reference_effects, talent_categories, transformation_reference
 from pathlib import Path
 root = Path(sys.argv[1]); target = Path(__file__).resolve().parents[1] / 'module/rules/catalogs-v093.mjs'
 read = lambda name: json.loads((root / name).read_text())
@@ -64,6 +64,9 @@ for slug, rows in read('parsed-racial.json').items():
  rows.extend(row for row in recovered if row['name'] not in existing_names)
  extra_choices = continued_choices(html, rows) if rows else {}
  path = entry['path']; race = by_title.get(path[1] if len(path)>1 else '', 'factors')
+ if race_slugs.get(race) == slug:
+  options = racial_subrace_options(html)
+  if options: subrace_options.setdefault(race, []).extend(options)
  is_subrace = race != 'factors' and len(path)>2 and any(row['traitCategory'] == 'subrace' for row in rows)
  if is_subrace:
   subrace_options.setdefault(race, []).append(dict(id=slug, name=entry['title']))

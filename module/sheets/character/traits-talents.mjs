@@ -516,7 +516,24 @@ export const traitsTalentsMethods = {
   _getSubraceOptions(system) {
     const race = system.race || "saiyan";
     const subraces = CONFIG.DBU?.racialSubraces?.[race] || [];
-    return subraces.map(sr => ({ value: sr.id, label: sr.name, selected: sr.id === system.subrace }));
+    const options = subraces.filter(sr => sr.id && sr.id !== "none")
+      .map(sr => ({ value: sr.id, label: sr.name, selected: sr.id === system.subrace }));
+    const saved = system.subrace;
+    if (!uses093(system) || !saved || saved === "none" || options.some(option => option.selected)) return options;
+
+    const normalize = value => value.toLowerCase().replace(/[^a-z0-9]/g, "");
+    const savedKey = normalize(saved);
+    const matchingLabel = options.find(option => normalize(option.label) === savedKey);
+    if (matchingLabel) {
+      matchingLabel.selected = true;
+      return options;
+    }
+    // Preserve custom labels entered in alpha.14 while excluding old factor selections.
+    const isFactor = Object.values(CONFIG.DBU?.racialTraitsCatalog || {}).some(rows =>
+      rows.some(({ factor }) => factor && [factor.id, factor.name].some(value => normalize(value) === savedKey))
+    );
+    if (!isFactor) options.push({ value: saved, label: saved, selected: true });
+    return options;
   },
 
   // -------------------------------------------------------

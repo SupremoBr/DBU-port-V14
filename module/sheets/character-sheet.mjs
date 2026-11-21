@@ -378,7 +378,6 @@ export class DBUCharacterSheet extends ActorSheet {
     // Subspecies options based on selected race
     context.subspeciesOptions = this._getSubspeciesOptions(system);
     context.subraceOptions = this._getSubraceOptions(system);
-    context.showSubrace = (context.subraceOptions.length > 0);
 
     // Select options for dropdowns
     context.raceOptions = {
@@ -412,10 +411,7 @@ export class DBUCharacterSheet extends ActorSheet {
     // ---- Traits tab data ----
     context.raceLabel = context.raceOptions[system.race] || system.race;
     context.subspeciesLabel = this._getSubspeciesLabel(system) || "—";
-    const subraceList = CONFIG.DBU?.racialSubraces?.[system.race] || [];
-    const matchedSubrace = subraceList.find(sr => sr.id === system.subrace);
-    const customSubrace = context.rules093 && system.subrace !== "none" ? system.subrace : "";
-    context.subraceLabel = matchedSubrace?.name || customSubrace || "—";
+    context.subraceLabel = context.subraceOptions.find(option => option.selected)?.label || "—";
     context.characterTraits = this._getCharacterTraits(system);
     context.isCustomSpecies = system.race === "customSpecies";
 
