@@ -181,7 +181,58 @@ CHOICE_SOURCES = {
     'Arcosian Genes [Any – you decide]': ('r093_bio_android_artificial_warrior', 4, 'Artificial Warrior'),
     'Eye of the Dragon': ('r093_earthlings_quick_to_master', 3, 'Quick to Master'),
     'Draconic Physique': ('r093_shadow_dragons_personified_dragon_ball', 6, 'Personified Dragon Ball'),
+    'Disguised Shadow': ('r093_shadow_dragons_personified_dragon_ball', 6, 'Personified Dragon Ball'),
+    'Genetic Focus: Neo-Tuffle': ('r093_genetic_splicing_neo_tuffle_genes_cognitive', 3, 'Neo-Tuffle Genes'),
+    'Genetic Focus: Yardrat': ('r093_genetic_splicing_yardrat_genes_cognitive_or_impulsive', 5, 'Yardrat Genes'),
 }
+
+FACTOR_TRAIT_HEADING = re.compile(r'^(.+?)\s+\((Body|Mind)\)(?:\s+\[([^]]+)\])?$', re.I)
+
+
+def factor_source_data(html, slug, title):
+    """Read the factor rules and recover traits with bracketed replacements."""
+    from bs4 import BeautifulSoup
+
+    page = BeautifulSoup(html, 'html.parser').select_one('.entry-content')
+    fields = {}
+    for li in page.find_all('li'):
+        label, _, value = li.get_text(' ', strip=True).partition(':')
+        if label in ['Racial Requirement', 'Maximum Factor', 'Prerequisite(s)']:
+            fields.setdefault(label, value.strip())
+    if not fields.get('Maximum Factor', '').isdigit():
+        return {}, []
+    base = dict(id=slug, name=title, limit=int(fields['Maximum Factor']),
+                raceRequirement=fields['Racial Requirement'])
+    if fields.get('Prerequisite(s)', 'N/A') != 'N/A':
+        base['prerequisites'] = fields['Prerequisite(s)']
+    if slug == 'unstable-clone':
+        base['replacementCategory'] = 'mind'
+    trait_factors, recovered = {}, []
+    race = None
+    for node in page.find_all(['h1','h2','h3','h4','p']):
+        if node.name.startswith('h'):
+            section = re.fullmatch(r'(.+?) Factor Traits?', node.get_text(' ', strip=True))
+            race = section[1] if section else None
+            continue
+        heading = FACTOR_TRAIT_HEADING.fullmatch(node.strong.get_text(' ', strip=True)) if node.strong else None
+        if not heading:
+            continue
+        name, category, replacement = heading.groups()
+        trait_factors[name] = {**base, **({'traitRace': race} if race else {}),
+                               **({'replaces': replacement} if replacement else {})}
+        if not replacement:
+            continue
+        extra = []
+        for sibling in node.find_next_siblings():
+            if sibling.name != 'ul':
+                break
+            extra.append(sibling.get_text(' ', strip=True))
+        text = ' '.join([node.get_text(' ', strip=True), *extra])
+        effects = list(re.finditer(r'\(\s*(\d+)\s*\)\s*-\s*\[\s*([^]]+?)\s*\]\s*:', text))
+        recovered.append(dict(name=name, category=category.lower(), traitCategory='factor', source=slug, text=text,
+                              effects=[dict(level=int(m[1]), keyword=m[2], text=text[m.end():end].strip())
+                                       for m, end in zip(effects, [*(n.start() for n in effects[1:]), len(text)], strict=True)]))
+    return trait_factors, recovered
 
 
 def continued_choices(html, rows):
@@ -196,7 +247,8 @@ def continued_choices(html, rows):
     for paragraph in page.find_all('p'):
         if not paragraph.strong:
             continue
-        name = headings.get(paragraph.strong.get_text(' ', strip=True).casefold())
+        title = paragraph.strong.get_text(' ', strip=True)
+        name = headings.get(re.sub(r'(?<=\))\s+\[[^]]+\]$', '', title).casefold())
         if not name:
             continue
         for sibling in paragraph.next_siblings:

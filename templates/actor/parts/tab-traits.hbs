@@ -24,6 +24,11 @@
     Racial Traits
     <button type="button" class="add-btn" data-action="add-trait" title="Add Racial Trait"><i class="fas fa-plus"></i></button>
   </div>
+  {{#if @root.rules093}}
+  <div class="dbu-factor-toolbar">
+    <button type="button" data-action="add-trait" data-racial-factors><i class="fas fa-dna" aria-hidden="true"></i> Racial Factors</button>
+  </div>
+  {{/if}}
 
   {{!-- Traits List --}}
   <div class="traits-list">
@@ -31,9 +36,13 @@
       {{#each characterTraits}}
       <div class="trait-card" data-trait-id="{{id}}">
         <div class="trait-header">
+          {{#if factor}}
+          <span class="trait-category-badge factor">Factor</span>
+          {{else}}
           <span class="trait-category-badge {{traitCategory}}">{{traitCategory}}</span>
+          {{/if}}
           <span class="trait-name">{{name}}</span>
-          <span class="trait-race-tag">{{race}}</span>
+          <span class="trait-race-tag">{{#if factor}}{{factor.name}}{{else}}{{race}}{{/if}}</span>
           <button type="button" class="trait-expand" data-action="toggle-trait" title="Expand/Collapse">
             <i class="fas fa-chevron-down"></i>
           </button>

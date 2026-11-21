@@ -537,7 +537,8 @@
     "_onAddTrait": {
       "hash": "edba07dbc54e010eac57a258dabe1629ff97f1235ae3b309cde6a6bdd1116e7f",
       "length": 1,
-      "async": true
+      "async": true,
+      "rules093Hash": "ef7e38e2b1184509d0b0bfcc016726ba1c5a0340b726258ec6565229b2631457"
     },
     "_confirmDelete": {
       "hash": "e658480f20619fb52a8e2ed6534139c9ee7b48ec9b1aec8c4a38d9ae88e49002",

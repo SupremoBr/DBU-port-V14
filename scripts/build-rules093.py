@@ -4,7 +4,7 @@ Usage: python3 scripts/build-rules093.py /path/to/rules093
 The research HTML and rule prose are deliberately not distributed.
 """
 import json, re, sys
-from rules093_reference import continued_choices, level_summary, mechanic_summary, racial_choice, reference_effects, talent_categories, transformation_reference
+from rules093_reference import continued_choices, factor_source_data, level_summary, mechanic_summary, racial_choice, reference_effects, talent_categories, transformation_reference
 from pathlib import Path
 root = Path(sys.argv[1]); target = Path(__file__).resolve().parents[1] / 'module/rules/catalogs-v093.mjs'
 read = lambda name: json.loads((root / name).read_text())
@@ -54,10 +54,15 @@ def catalog_effects(row, source, legacy_effects=None, continuations=()):
 race_slugs = {'android':'androids','angel':'angels','arcosian':'arcosians','bioAndroid':'bio-android','cerealian':'cerealians','demon':'demons','earthling':'earthlings','glassTribe':'glass-tribe','heran':'herans','konatsian':'konatsians','majin':'majins','namekian':'namekians','nekoMajin':'neko-majins','neoTuffle':'neo-tuffles','saiyan':'saiyans','shadowDragon':'shadow-dragons','shinjin':'shinjin','yardrat':'yardrats','customSpecies':'custom-species'}
 by_title = {next(e['title'] for e in nav['Races'] if e['slug']==slug):race for race,slug in race_slugs.items()}
 old_traits = [t for ts in old['races'].values() for t in ts]
-traits = {}; racial_map = {}; factor_options = {}; subrace_options = {}
+traits = {}; racial_map = {}; subrace_options = {}
 for slug, rows in read('parsed-racial.json').items():
- extra_choices = continued_choices((root / 'sources' / f'{slug}.html').read_text(), rows) if rows else {}
  entry = next(e for e in nav['Races'] if e['slug']==slug)
+ source_file = root / 'sources' / f'{slug}.html'
+ html = source_file.read_text() if source_file.exists() else ''
+ trait_factors, recovered = factor_source_data(html, slug, entry['title']) if html and 'Maximum Factor' in html else ({}, [])
+ existing_names = {row['name'] for row in rows}
+ rows.extend(row for row in recovered if row['name'] not in existing_names)
+ extra_choices = continued_choices(html, rows) if rows else {}
  path = entry['path']; race = by_title.get(path[1] if len(path)>1 else '', 'factors')
  if race != 'factors' and len(path)>2:
   subrace_options.setdefault(race, []).append(dict(id=slug, name=entry['title']))
@@ -67,6 +72,8 @@ for slug, rows in read('parsed-racial.json').items():
   reviewed = False
   ident = same[0]['id'] if reviewed else 'r093_'+key(slug+'_'+row['name'])
   item = dict(id=ident, name=row['name'], race=race, category=row['category'], traitCategory=row['traitCategory'], subrace=slug if len(path)>2 else '', source=url(slug), rulesVersion='0.9.3', automation='legacy-reviewed' if reviewed else 'manual', description=mechanic_summary(row), effects=catalog_effects(row,url(slug),same[0]['effects'] if reviewed else None, extra_choices.get(row['name'], [])), isSelectable=True)
+  if row['name'] in trait_factors:
+   item['factor'] = trait_factors[row['name']]
   traits.setdefault(race, []).append(item)
   for t in candidates: racial_map.setdefault(t['id'],[]).append(ident)
 # Explicit rename verified on the Saiyan page. No approximate-name matching.

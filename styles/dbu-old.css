@@ -2246,6 +2246,52 @@
   font-size: 12px;
 }
 
+.dbu-factor-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-block: 8px;
+}
+
+.dbu-factor-toolbar button,
+.dbu-factor-dialog .dbu-factor-add {
+  width: auto;
+  padding: 4px 12px;
+  min-height: 30px;
+  color: #fff;
+  background: #263849;
+  border: 1px solid #385671;
+}
+
+.dbu-factor-dialog .window-content {
+  background: #0b0f19;
+  color: #e8ecf1;
+}
+
+.dbu-factor-dialog .trait-selector-list h3 {
+  color: #7bdefb;
+  margin: 8px 0 2px;
+}
+
+.dbu-factor-dialog .dbu-factor-entry {
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 8px 10px;
+  border: 1px solid #385671;
+  border-radius: 4px;
+  background: #151f2d;
+}
+
+.dbu-factor-dialog .dbu-factor-entry a {
+  color: #ffb270;
+}
+
+.dbu-factor-dialog .dbu-factor-search {
+  background: #1e2a38;
+  color: #fff;
+}
+
 /* Option limit display */
 .dbu-old.sheet .option-limit {
   font-size: 10px;

@@ -41,6 +41,42 @@ function activeCombat(actor) {
 }
 const technique=(extra={})=>({foundation:'Energy',profile:'Beam',advantages:[],disadvantages:[],...extra});
 
+test('the racial factor picker shows race and general options and adds the selected trait manually', async () => {
+  const original = globalThis.Handlebars;
+  globalThis.Handlebars = { escapeExpression: value => value.replaceAll('&', '&amp;').replaceAll('<', '&lt;') };
+  try {
+    const actor = new ActorStub({ rulesVersion: '0.9.3', race: 'majin', racialTraits: ['existing-trait'] });
+    const sheet = new DBUCharacterSheet(actor);
+    await sheet._onAddTrait({ preventDefault() {}, currentTarget: { dataset: { racialFactors: '' } } });
+    const { data } = DialogStub.lastRendered;
+    assert.match(data.title, /Racial Factors — Majin/);
+    assert.match(data.content, /Fatores da sua raça.*Assimilation.*Fatores gerais.*Armor Plating/s);
+    assert.match(data.content, /Traces of Majin.*Troca Majin Regeneration/s);
+    assert.doesNotMatch(data.content, /Mutant Core|Uncanny Monster/);
+    const handlers = {};
+    let search = '', listing = '';
+    data.render({
+      find(selector) {
+        return selector === '.dbu-factor-search'
+          ? { val: () => search, on: (event, callback) => handlers[event] = callback }
+          : { html: value => listing = value };
+      },
+      on(event, selector, callback) { handlers[event] = callback; },
+    });
+    search = 'diluted';
+    handlers.input();
+    assert.match(listing, /Traces of Majin/);
+    assert.doesNotMatch(listing, /Assimilation/);
+    const selected = { currentTarget: { dataset: { traitId: 'r093_diluted_majin_traces_of_majin' } } };
+    await handlers.click(selected);
+    await handlers.click(selected);
+    assert.deepEqual(actor.system.racialTraits, ['existing-trait', 'r093_diluted_majin_traces_of_majin']);
+    assert.match(listing, /Na ficha/);
+  } finally {
+    globalThis.Handlebars = original;
+  }
+});
+
 test('transformation details show current summaries and named options for previously saved forms', () => {
   const entry = Object.values(CATALOGS_093.transformations).find(form => form.name === 'Super Saiyan 1');
   const actor = new ActorStub({

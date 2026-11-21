@@ -2,6 +2,8 @@ import { prepareCharacterTraits, prepareCharacterTalents } from "../character-da
 import { getCatalogById, getRacialCatalogIndex } from "../../helpers/catalog-index.mjs";
 import { Dialog } from "../../helpers/foundry-compat.mjs";
 import { ELEMENTAL_PROFILES_093 } from "../../rules/profiles-v093.mjs";
+import { uses093 } from "../../rules/v093.mjs";
+import { openRacialFactorSelector } from "./racial-factors.mjs";
 
 /** Character sheet domain: traits-talents. Methods run with the sheet as this. */
 export const traitsTalentsMethods = {
@@ -540,6 +542,9 @@ export const traitsTalentsMethods = {
     event.preventDefault();
     const race = this.actor.system.race || "saiyan";
     const catalog = CONFIG.DBU?.racialTraitsCatalog || {};
+    if (uses093(this.actor.system) && event.currentTarget?.dataset?.racialFactors !== undefined) {
+      return openRacialFactorSelector(this.actor, catalog);
+    }
     const selectedIds = this.actor.system.racialTraits || [];
 
     const allTraits = [];

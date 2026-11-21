@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.0.12-rules093-alpha.12] — seletor de Racial Factors
+
+- A aba Traits tem um botão Racial Factors, com busca por nome e grupos para os fatores da raça e os fatores gerais compatíveis.
+- O seletor mostra pré-requisitos, o limite e o traço a substituir quando a regra indica um nome específico. A adição e a remoção continuam manuais.
+- Inclui 26 Factor Traits que estavam ausentes do catálogo, entre eles entradas com substituições indicadas entre colchetes na fonte.
+
 ## [1.0.12-rules093-alpha.11] — Auras na ficha
 
 - As fichas 0.9.3 ocultam o editor de Signature Auras e excluem auras legadas do saldo de TP. As auras salvas foram preservadas.
