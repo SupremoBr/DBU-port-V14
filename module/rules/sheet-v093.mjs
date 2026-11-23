@@ -8,9 +8,9 @@ import { RACES_093 } from './races-v093.mjs';
 import { uses093, awakeningLimits, validateTransformationStack, fullAwakeningRecovery, stackedStressRequirement } from './v093.mjs';
 import { roundPools093, convertStandardToCounter093, isOwnTurn093, inCombat093, rowActionType093, rowCost093 } from './actions-v093.mjs';
 import { validateTechnique093, validateTechniqueUsage093, maximumWager093 } from './techniques-v093.mjs';
-import { racialEffectEnabled093 } from './runtime-v093.mjs';
-import { adjustRacialResource093, racialEncounterReset093, racialResourceView093, racialTurnReset093, rollPressure093, useMakyanPower093 } from './racial-resources-v093.mjs';
+import { adjustRacialResource093, racialEncounterReset093, racialResourceView093, racialTurnReset093, promptPressureCheck093, useMakyanPower093 } from './racial-resources-v093.mjs';
 import { editAttackGrant093 } from './attack-grants-v093.mjs';
+import { racialTrackerTraits093 } from './racial-tracker-v093.mjs';
 const installed = new WeakSet();
 const warn = message => { ui.notifications.warn(message); return false; };
 const escape = text => String(text ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -85,26 +85,7 @@ export function installRulesSheet093(Sheet) {
       const button = event.currentTarget;
       button.disabled = true;
       try {
-        const { system } = this.actor;
-        const view = racialResourceView093(this.actor);
-        const choices = [
-          [racialEffectEnabled093(system, 'Denizen of the Demon Realm'), 'denizen', '+1 se você impôs uma condição a um oponente'],
-          [view.canUseCreativity, 'creative', 'Demonic Creativity · 2d10, use o maior'],
-          [racialEffectEnabled093(system, 'Demons of the Makyo Star', 4), 'makyan', 'Makyan · −2 no teste, +1 Power se passar']
-        ].filter(([available]) => available);
-        const options = choices.length ? await Dialog.wait({
-          title: 'Pressure Check',
-          content: choices.map(([, name, label]) => `<div><label><input type="checkbox" name="${name}"> ${label}</label></div>`).join(''),
-          default: 'roll',
-          buttons: {
-            roll: { label: 'Rolar', callback: root => Object.fromEntries(choices.map(([, name]) =>
-              [name, !!root.find(`[name="${name}"]`).prop('checked')])) },
-            cancel: { label: 'Cancelar' }
-          }
-        }) : {};
-        if (!options) return;
-        const result = await rollPressure093(this.actor, button.dataset.rules093Pressure, options);
-        if (!result) warn('Pressure Check indisponível neste turno ou rodada.');
+        await promptPressureCheck093(this.actor, button.dataset.rules093Pressure);
       } finally { button.disabled = false; }
     });
     html.on('change', '[data-dbu-unique-type]', async event => {
@@ -164,6 +145,7 @@ export function installRulesSheet093(Sheet) {
   wrap('getData', async function(original, ...args) {
     const context = await original(...args);
     context.racialResources093 = racialResourceView093(this.actor);
+    context.racialTrackerTraits = racialTrackerTraits093(this.actor.system, context.characterTraits);
     context.canEditAttackVisual = context.editable && !!game.dbu?.automation?.editAttackVisual;
     context.canEditTransformationToken = context.editable && !!game.dbu?.automation?.editTransformationToken;
     context.rules093Pools = roundPools093(this.actor);

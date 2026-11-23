@@ -7256,9 +7256,24 @@
 /* Tracker Controls */
 .dbu-old.sheet .tracker-controls {
   display: flex;
+  flex-wrap: wrap;
   gap: 6px;
   padding: 8px 10px;
   border-top: 1px solid var(--border-color);
+}
+
+.dbu-old.sheet .tracker-controls .action-btn {
+  flex: 1 0 auto;
+  min-height: 32px;
+  white-space: nowrap;
+  color: #fff;
+  font-size: 12px;
+}
+
+.dbu-old.sheet .tracker-controls .action-btn:focus-visible,
+.dbu-old.sheet .rt-racial-traits summary:focus-visible {
+  outline: 2px solid var(--accent-gold);
+  outline-offset: 1px;
 }
 
 .dbu-old.sheet .action-btn {
@@ -13664,6 +13679,30 @@
   padding-bottom: 4px;
   border-bottom: 1px solid var(--border-color);
   margin-bottom: 4px;
+}
+
+.dbu-old.sheet .rt-racial-traits {
+  padding: 6px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-size: 11px;
+}
+
+.dbu-old.sheet .rt-racial-traits summary {
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+.dbu-old.sheet .rt-racial-traits summary b {
+  margin-left: 4px;
+  color: var(--accent-gold);
+}
+
+.dbu-old.sheet .rt-racial-trait {
+  overflow-wrap: anywhere;
+  margin-top: 6px;
+  border-top: 1px solid var(--border-color);
+  padding-top: 5px;
 }
 
 .dbu-old.sheet .rt-activable {

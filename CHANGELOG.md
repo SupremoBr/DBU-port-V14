@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.12-rules093-alpha.24] — HUD, traços no tracker e passivas de armas
+
+- Os botões inferiores do HUD têm textos e ícones maiores e se reorganizam em telas estreitas.
+- O HUD mostra Pressure Check, Demonic Power e Demonic Fatigue.
+- O tracker exibe a contagem e os resumos dos traços raciais acionáveis selecionados.
+- O cálculo de combate aplica oito passivas de talentos de armas, incluindo o bônus de Strike de Dual Wielding Specialist com duas armas equipadas.
+
 ## [1.0.12-rules093-alpha.23] — recursos raciais, passivas e TP
 
 - Demonic Pressure acompanha Power e Fatigue na ficha, com Pressure Checks, bônus e limpeza no início do turno. Arcosian usa Overwhelm na 0.9.3.

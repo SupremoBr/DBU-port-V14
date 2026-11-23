@@ -1,6 +1,7 @@
 import { inCombat093, isOwnTurn093 } from './actions-v093.mjs';
 import { racialEffectEnabled093 } from './runtime-v093.mjs';
 import { uses093 } from './v093.mjs';
+import { Dialog } from '../helpers/foundry-compat.mjs';
 
 const resourcePath = 'system.rules093State.racialResources';
 const pending = new WeakSet();
@@ -98,6 +99,48 @@ function pressureAvailable(actor, source, combat) {
   if (source === 'attack') return has(actor.system, 'Demonic Pressure') && view.canAttack;
   if (source === 'defense') return view.hasDefenseCheck && view.canDefend;
   return source === 'steadfast' && view.hasSteadfastCheck && view.canSteadfast;
+}
+
+export async function promptPressureCheck093(actor, source, combat = globalThis.game?.combat) {
+  if (!actor?.isOwner && !globalThis.game?.user?.isGM) return;
+  const triggers = [
+    ['attack', 'Após atacar no próprio turno'],
+    ['defense', 'Ao ser alvo de um ataque'],
+    ['steadfast', 'Após falhar Steadfast']
+  ].filter(([key]) => (!source || key === source) && pressureAvailable(actor, key, combat));
+  if (!triggers.length) {
+    ui.notifications.warn('Pressure Check indisponível neste turno ou rodada.');
+    return;
+  }
+  const { system } = actor;
+  const view = racialResourceView093(actor, combat);
+  const modifiers = [
+    [has(system, 'Denizen of the Demon Realm'), 'denizen', '+1 se você impôs uma condição a um oponente'],
+    [view.canUseCreativity, 'creative', 'Demonic Creativity · 2d10, use o maior'],
+    [has(system, 'Demons of the Makyo Star', 4), 'makyan', 'Makyan · −2 no teste, +1 Power se passar']
+  ].filter(([enabled]) => enabled);
+  const chooseTrigger = !source;
+  const selection = chooseTrigger || modifiers.length ? await Dialog.wait({
+    title: 'Pressure Check',
+    content: [
+      ...(chooseTrigger ? [`<label>Gatilho <select name="trigger">${triggers.map(([key, label]) =>
+        `<option value="${key}">${label}</option>`).join('')}</select></label>`] : []),
+      ...modifiers.map(([, name, label]) => `<div><label><input type="checkbox" name="${name}"> ${label}</label></div>`)
+    ].join(''),
+    buttons: {
+      roll: { label: 'Rolar', callback: root => ({
+        trigger: source || root.find('[name="trigger"]').val(),
+        options: Object.fromEntries(modifiers.map(([, name]) => [name, !!root.find(`[name="${name}"]`).prop('checked')]))
+      }) },
+      cancel: { label: 'Cancelar', callback: () => null }
+    },
+    default: 'roll',
+    close: () => null
+  }) : { trigger: source, options: {} };
+  if (!selection) return;
+  const result = await rollPressure093(actor, selection.trigger, selection.options, combat);
+  if (!result) ui.notifications.warn('Pressure Check indisponível neste turno ou rodada.');
+  return result;
 }
 
 function makyanRegen(system, before, gained) {

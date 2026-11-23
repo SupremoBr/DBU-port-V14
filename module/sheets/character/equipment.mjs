@@ -1,4 +1,5 @@
 import { Dialog } from "../../helpers/foundry-compat.mjs";
+import { weaponLifeMax } from "../../helpers/weapon-state.mjs";
 
 /** Character sheet domain: equipment. Methods run with the sheet as this. */
 export const equipmentMethods = {
@@ -315,9 +316,7 @@ export const equipmentMethods = {
 
   /** Weapon LP max (weapons.txt): 32 + 8 per Power Level beyond the 1st; Durable adds +2×PL. */
   _calcWeaponLPMax(item) {
-    const level = this.actor.system.level || 1;
-    const hasDurable = (item.system.qualities || []).some(q => q.qualityKey === "durable");
-    return 32 + 8 * (level - 1) + (hasDurable ? 2 * level : 0);
+    return weaponLifeMax(this.actor.system.level, item.system);
   },
 
   /** Edit a weapon's current LP (stored as damage taken so max can scale with PL). */

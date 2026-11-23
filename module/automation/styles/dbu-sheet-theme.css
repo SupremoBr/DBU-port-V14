@@ -238,7 +238,7 @@
 }
 
 .dbua-hud-v2 :is(.dbua-v2-tab, .dbua-v2-clash, .dbua-v2-utility, .dbua-v2-execute) {
-  min-height: 38px;
+  min-height: 44px;
   clip-path: none;
   border: 1px solid var(--border-color);
   border-radius: 4px;
@@ -246,6 +246,77 @@
   color: var(--text-primary);
   font-family: var(--dbua-menu-font);
 }
+
+.dbua-hud-v2 .dbua-v2-dock-row {
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+}
+
+.dbua-hud-v2 .dbua-v2-dock-tabs,
+.dbua-hud-v2 .dbua-v2-dock-tools {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+}
+
+.dbua-hud-v2 .dbua-v2-dock-tabs {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.dbua-hud-v2 .dbua-v2-dock-tools {
+  grid-template-columns: minmax(64px, auto) repeat(4, 36px);
+}
+
+.dbua-hud-v2 .dbua-v2-dock-row button {
+  min-width: 0;
+  padding: 4px 3px;
+  color: var(--text-primary);
+  font: 700 12px/1.2 system-ui, sans-serif;
+  letter-spacing: 0;
+}
+
+.dbua-hud-v2 .dbua-v2-dock-row button i {
+  flex: 0 0 auto;
+  font-size: 15px;
+}
+
+.dbua-hud-v2 .dbua-v2-dock-row button.active {
+  color: var(--dbua-menu-ink);
+}
+
+.dbua-hud-v2 .dbua-v2-dock-tabs button { position: relative; }
+
+.dbua-hud-v2 .dbua-v2-dock-tabs button > b {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+}
+
+.dbua-hud-v2 .dbua-v2-pressure {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+  align-items: center;
+  margin: 6px 12px;
+  color: var(--text-primary);
+  font: 600 11px/1.3 system-ui, sans-serif;
+}
+
+.dbua-hud-v2 .dbua-v2-pressure i { color: var(--accent-gold); }
+
+.dbua-hud-v2 .dbua-v2-pressure button {
+  width: auto;
+  min-height: 28px;
+  padding: 3px 6px;
+  border: 1px solid var(--border-color);
+  background: var(--dbua-menu-field);
+  color: var(--text-primary);
+  font: inherit;
+}
+
+.dbua-hud-v2 .dbua-v2-pressure button:disabled { opacity: .55; }
 
 .dbua-hud-v2 .dbua-v2-tab.active,
 .dbua-hud-v2 .dbua-v2-execute {
@@ -303,16 +374,24 @@
   outline-offset: 1px;
 }
 
-@media (max-width: 540px) {
+@media (max-width: 620px) {
   .dbua-hud-v2 .dbua-v2-dock-row {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: minmax(0, 1fr);
   }
 
-  .dbua-hud-v2 .dbua-v2-dock-row button {
-    min-width: 0;
+  .dbua-hud-v2 .dbua-v2-dock-tools {
+    grid-template-columns: minmax(64px, 1.5fr) repeat(4, minmax(0, 1fr));
   }
+}
 
+@media (max-width: 400px) {
+  .dbua-hud-v2 .dbua-v2-tab {
+    flex-direction: column;
+    gap: 2px;
+  }
+}
+
+@media (max-width: 540px) {
   .dbua-hud-v2 .dbua-v2-panel-body {
     grid-template-columns: 1fr;
     max-height: min(42dvh, 310px);

@@ -399,8 +399,8 @@ export const techniquesMethods = {
     }[tech.foundation]) || 0;
     // Unarmed Physical Attack (Physical ST without the Weapon flag):
     // Rapid Fist +1(T) Strike and "Unarmed Strike" custom buffs.
-    const unarmedStrikeBuff = (tech.foundation === "Physical" && !tech.isWeapon)
-      ? (system.aptitudes?.unarmedStrike || 0) : 0;
+    const unarmedStrikeBuff = ((tech.foundation === "Physical" && !tech.isWeapon)
+      ? (system.aptitudes?.unarmedStrike || 0) : 0) + (!tech.isWeapon ? (system.aptitudes?.unarmedAttackStrike || 0) : 0);
     // "Armed Strike" custom buff — weapon-based STs (mirror of unarmed)
     const armedStrikeBuff = tech.isWeapon ? (system.aptitudes?.armedStrike || 0) : 0;
     let totalMod = haste + awareness + accurateBonus - inaccuratePenalty - ssPenStrike + strikeBuffTotal + foundationStrikeBuff + unarmedStrikeBuff + armedStrikeBuff;

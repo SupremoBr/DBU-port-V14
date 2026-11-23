@@ -11,6 +11,7 @@ import { getTerrainLiftState } from "./maneuvers.js";
 import { getStandardFavorites, resolveManeuverAction, StandardActions, openManeuverCategoryPreview } from "./standard-actions.js";
 import { areAllies as areTeamAllies, combatantForActor, getCombatantTeam } from "./combat-teams.js";
 import { MODULE_ID } from "./core/module-id.js";
+import { promptPressureCheck093, racialResourceView093 } from "../../rules/racial-resources-v093.mjs";
 import { actorIdentity, combatantForIdentity, resolveSceneToken, sameToken, tokenForActor, tokenIdentity, tokenSceneId } from "./core/token-identity.js";
 
 const VERSION = "1.9.18 DEV";
@@ -419,6 +420,9 @@ function hudContent(actor, token) {
   const terrainShield = terrain ? Math.max(0, number(terrain.shieldReduction, 5 * Math.max(1, number(terrain.hardness, 1)))) : 0;
   const grapple = safeCall(() => StandardActions.getGrappleState(actor), null, "Grapple state");
   const powerStacks = Math.max(0, number(actor.system?.tracking?.powerStacks, 0));
+  const pressure = racialResourceView093(actor);
+  const pressureAvailable = pressure.canAttack ||
+    (pressure.hasDefenseCheck && pressure.canDefend) || (pressure.hasSteadfastCheck && pressure.canSteadfast);
   const pending = safeCall(() => getPendingActions(actor).length, 0, "pending actions");
   const targets = game.user?.targets?.size || 0;
   const turn = combatLabel(actor, token);
@@ -466,6 +470,11 @@ function hudContent(actor, token) {
         ${resource("KI",ki.value,ki.max,"ki")}
         ${resource("CAPACITY",capacity.left,capacity.max,"capacity",`${capacity.spent} gastos`)}
       </div>
+      ${pressure.demon ? `<div class="dbua-v2-pressure" aria-label="Demonic Pressure">
+        ${pressure.pressure ? `<span title="Demonic Power"><i class="fas fa-fire" aria-hidden="true"></i> Power <b>${pressure.power}</b></span>
+        <span title="Demonic Fatigue"><i class="fas fa-hourglass-half" aria-hidden="true"></i> Fatigue <b>${pressure.fatigue}</b></span>` : ""}
+        <button type="button" data-dbu-hud-action="hud-pressure" ${pressureAvailable ? "" : "disabled"}>Pressure Check</button>
+      </div>` : ""}
       <div class="dbua-v2-vital-tags">
         <span title="Transformation"><i class="fas fa-dragon"></i>${esc(activeForm)}</span>
         <span title="Signature Aura"><i class="fas fa-sun"></i>${esc(aura)}</span>
@@ -502,19 +511,21 @@ function hudContent(actor, token) {
     <div class="dbu-hud-dock">
       ${!state.collapsed?hudV2Panel({tab:state.hudTab,selected:state.hudSelected,favorites:favoriteIds,pending}):""}
       <div class="dbua-v2-dock-row" role="navigation" aria-label="Menu de combate DBU">
-        ${hudV2Tabs(state.collapsed?null:state.hudTab,pending)}
+        <div class="dbua-v2-dock-tabs">${hudV2Tabs(state.collapsed?null:state.hudTab,pending)}</div>
+        <div class="dbua-v2-dock-tools">
         <button type="button" class="dbua-v2-clash" data-dbu-hud-action="hud-clash" title="Clash com bônus manual">
-          <i class="fas fa-dice-d10"></i> CLASH
+          <i class="fas fa-dice-d10" aria-hidden="true"></i> Clash
         </button>
-        <button type="button" class="dbua-v2-utility" data-dbu-hud-action="panel" title="Pendências e reações">
+        <button type="button" class="dbua-v2-utility" data-dbu-hud-action="panel" title="Pendências e reações" aria-label="Pendências e reações">
           <i class="fas fa-shield-alt"></i>${pending?`<sup>${pending}</sup>`:""}
         </button>
         <button type="button" class="dbua-v2-utility" data-dbu-hud-action="visualConfig"
           title="Configurar macros visuais, animações e efeitos do personagem" aria-label="Macros visuais">
           <i class="fas fa-palette"></i>
         </button>
-        <button type="button" class="dbua-v2-utility" data-dbu-hud-action="settings" title="Configurar HUD"><i class="fas fa-cog"></i></button>
-        <button type="button" class="dbua-v2-utility" data-dbu-hud-action="close" title="Fechar HUD"><i class="fas fa-times"></i></button>
+        <button type="button" class="dbua-v2-utility" data-dbu-hud-action="settings" title="Configurar HUD" aria-label="Configurar HUD"><i class="fas fa-cog"></i></button>
+        <button type="button" class="dbua-v2-utility" data-dbu-hud-action="close" title="Fechar HUD" aria-label="Fechar HUD"><i class="fas fa-times"></i></button>
+        </div>
       </div>
     </div>
   </section>`;
@@ -562,6 +573,7 @@ async function dispatchHudAction(button, actor, token) {
   if (action === "hud-favorite")return toggleHudFavorite(actor,token,button.dataset.hudId);
   if (action === "hud-run")return runV2Action(button.dataset.hudId,actor,token);
   if (action === "hud-clash")return rollHudClash(actor,token);
+  if (action === "hud-pressure") return promptPressureCheck093(actor);
   if (action === "hud-allies-detach" || action === "hud-allies-attach") {
     await game.settings.set(MODULE_ID,"combatHudAlliesIndependent",action === "hud-allies-detach");
     return renderCombatHud();

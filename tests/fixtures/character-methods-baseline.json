@@ -56,7 +56,7 @@
       "hash": "06ab9c03615bc27cdfa4c3b05034697622c20c0be61879199a5a23a3bbd8802b",
       "length": 3,
       "async": false,
-      "rules093Hash": "bbea0e20782523a02ac11112f6079a9a51fb6abdc3f3887de44adef0110ff072"
+      "rules093Hash": "d7bb069e1ecabac9c7ed5c43c4e5b9db035aae7ed8eabcfb3e12be8964c488e5"
     },
     "_calcTechWound": {
       "hash": "e308a52e83f36bdb9b183a9b5664da04a72ca64bd60e99d890f907d08136fb91",
@@ -98,7 +98,7 @@
       "hash": "fe857a20cc6e3184b4731d1e06bab94895d75d9be7f496f9a66bc3b79c59ef38",
       "length": 1,
       "async": false,
-      "rules093Hash": "fbd7f3418bf5c938a2b83feb85bfe8832bab73af06da1a08c6350cf6086d9fb3"
+      "rules093Hash": "198f43d9c428867eaaa9e98547e0324e47422d05ff0cd6bfcd2d73d35b025157"
     },
     "_calcTechCT": {
       "hash": "65cef488dfce543add4d94fd082c5fe707a1b54663f9502bea45947dcafaf814",
@@ -266,7 +266,7 @@
       "hash": "89a3fcc378f5d72b1e0236f0297e33d53a27477fa663eafc312b38a9c5849c47",
       "length": 2,
       "async": false,
-      "rules093Hash": "6d2e200e0091aba2a3252e7dfc3dcb83991827c195c8829bc007c01996206358"
+      "rules093Hash": "ade4dc41b313f4e9778d02bb853606c461449a2af9a3a270f85efd700d1a2fc9"
     },
     "_resolveExtraDice": {
       "hash": "49fedc480071c6fdf0676894e505a0a70a194ba5df7bdcca8f256e2ba01ea58d",
@@ -1024,7 +1024,8 @@
     "_calcWeaponLPMax": {
       "hash": "d4814b301c35b9129102f934ce2b0a57848321d34b45930e3db0a841ae67d7b5",
       "length": 1,
-      "async": false
+      "async": false,
+      "rules093Hash": "e6cd2d79b78c33dfd0a80d27a4916db1ed917fca8eda8c9193ac291636f7accb"
     },
     "_onWeaponLPChange": {
       "hash": "451c85a42d71926594ddca09bea6ed488de0ea72dd5f6f71cea1761f889ae227",

@@ -1,6 +1,14 @@
 # Auditoria de recursos raciais e passivas DBU 0.9.3
 
-Referência da implementação anterior: alpha.22. Esta auditoria compara os traços, as fichas e o runtime com as fontes arquivadas no ambiente e as páginas oficiais. [Regras centrais](https://dbu-rpg.com/core-rules/) · [Índice de fontes](rules093-sources.json)
+Auditoria iniciada na alpha.23 e ampliada na alpha.24. Esta auditoria compara os traços, as fichas e o runtime com as fontes arquivadas no ambiente e as páginas oficiais. [Regras centrais](https://dbu-rpg.com/core-rules/) · [Índice de fontes](rules093-sources.json)
+
+## Como as automações se conectam
+
+O Actor recalcula atributos, condições e passivas a partir dos dados da ficha. Attack References e Signature Techniques usam esses atributos nas fórmulas que alimentam as rolagens. A automação integrada consulta as fontes preparadas pela ficha. O HUD encaminha ações para os mesmos manipuladores e lê os recursos diretamente do Actor. O documento de combate atualiza os recursos quando o turno muda, e o tracker organiza manobras e recursos com os dados preparados pela ficha.
+
+Na alpha.24, **Pressure Check** e os contadores de **Demonic Power** e **Demonic Fatigue** aparecem abaixo das barras vitais do HUD. O mesmo diálogo da ficha valida os gatilhos e grava o resultado no Actor. Os botões inferiores usam a paleta da ficha, com rótulos maiores e duas fileiras em telas estreitas.
+
+Em **Combat → tracker → Activables**, o contador soma uma vez cada traço selecionado da raça atual com gatilho ou limite de combate, incluindo opções escolhidas e traços da sub-raça aplicável. Abra o contador para consultar os efeitos. Fatores raciais ligados à própria raça podem entrar na contagem. Fatores gerais, efeitos exclusivamente passivos e traços de outra raça ficam fora.
 
 ## Recursos raciais
 
@@ -29,7 +37,7 @@ Demais raças do catálogo foram conferidas quanto a recursos raciais próprios 
 
 ## Passivas de talentos
 
-A revisão percorreu o catálogo compartilhado de 275 talentos, incluindo a categoria Racial, com 342 efeitos classificados como passivos. 27 passaram a ser aplicados nesta atualização. Outros 27 têm implementação já registrada no catálogo. As descrições abreviadas abaixo identificam cada nível ainda manual. [Talentos oficiais](https://dbu-rpg.com/talents/)
+A revisão percorreu o catálogo compartilhado de 275 talentos, incluindo a categoria Racial, com 342 efeitos classificados como passivos. A alpha.23 acrescentou 27 efeitos e a alpha.24 acrescentou outros oito. O catálogo registra também efeitos vinculados à automação anterior. As descrições abreviadas abaixo identificam cada nível ainda manual. [Talentos oficiais](https://dbu-rpg.com/talents/)
 
 ### Efeitos novos na ficha
 
@@ -62,6 +70,21 @@ A revisão percorreu o catálogo compartilhado de 275 talentos, incluindo a cate
 | Desperate Transformation | 1 | While below the Injured Health Threshold, your Stress Bonus +1. |
 | Forceful Transformation | 1 | While in an Enhancement or Form, your Might +1(T). |
 | Weapon Specialist | 1 | Ignore the Weapon Penalty. |
+
+### Passivas de armas na alpha.24
+
+| Talento | Nível | Efeito |
+| --- | ---: | --- |
+| Light Weapons Specialist | 1 | While you are only wielding a single Weapon of the Small Size, your Wound Rolls +2(T). |
+| Heavy Weapons Specialist | 1 | While you are only wielding a single Weapon of the Big Size, your Strike Rolls +1(T). |
+| Iaijutsu Specialist | 1 | While you are not wielding any Weapon, your Dodge Rolls +1(T). |
+| Dual Wielding Specialist | 1 | While you are wielding 2+ Weapons, your Strike Rolls +1(T). |
+| Twin Weapon Specialist | 1 | While you are wielding 2+ Weapons of the same Weapon Category, your Wound Rolls +1(T). |
+| Critical Specialist | 1 | Decrease the CT of your Strike Rolls when making an Armed Attack by 1. |
+| Variable Fighter | 1 | While you are wielding a Weapon, the Strike Rolls of your Unarmed Attacks +1(T). |
+| Variable Champion | 1 | While you are only wielding 1 Weapon, the Strike Rolls of your Armed Attacks +1(T). |
+
+O estado **Equipped** na aba Equipment indica quais armas o personagem empunha. Armas quebradas saem da contagem. O campo de arma no ataque identifica se aquela rolagem é armada. **Dual Wielding Specialist** exige **Weapon Specialist** e concede **+1(T)** em Strike enquanto o personagem empunha duas ou mais armas. Com Agility e Insight modificados em 3, some Haste (agilidade dividida por dois, arredondada para baixo) e Awareness (Insight). O modificador inicial é **+4** e chega a **+5** no Tier 1 com duas armas utilizáveis equipadas. O dado base, os dados de Tier e os demais modificadores do ataque entram na rolagem. **Dueling Specialist** ainda depende de identificar a arma usada quando o ataque é armado. [Talentos oficiais](https://dbu-rpg.com/talents/) · [Regras centrais](https://dbu-rpg.com/core-rules/)
 
 ### Efeitos ainda manuais
 
@@ -328,16 +351,8 @@ A revisão percorreu o catálogo compartilhado de 275 talentos, incluindo a cate
 | Weapon Specialist | 2 | Your Dice Score for a Clash made through the Disarm Maneuver +1(bT). | O efeito ainda carece de um ponto de aplicação verificado na ficha ou na rolagem. |
 | Category Specialist | 1 | Select a Weapon Category. That Weapon Category becomes known as your Preferred Category. | Exige uma escolha registrada ou contextual da mesa. |
 | Category Specialist | 2 | Your Strike Rolls with your Preferred Category +1(T). | Exige uma escolha registrada ou contextual da mesa. |
-| Light Weapons Specialist | 1 | While you are only wielding a single Weapon of the Small Size, your Wound Rolls +2(T). | O estado ou a interação exigida precisa de um fluxo de regras específico. |
-| Heavy Weapons Specialist | 1 | While you are only wielding a single Weapon of the Big Size, your Strike Rolls +1(T). | O estado ou a interação exigida precisa de um fluxo de regras específico. |
-| Iaijutsu Specialist | 1 | While you are not wielding any Weapon, your Dodge Rolls +1(T). | O estado ou a interação exigida precisa de um fluxo de regras específico. |
-| Dual Wielding Specialist | 1 | While you are wielding 2+ Weapons, your Strike Rolls +1(T). | O estado ou a interação exigida precisa de um fluxo de regras específico. |
-| Twin Weapon Specialist | 1 | While you are wielding 2+ Weapons of the same Weapon Category, your Wound Rolls +1(T). | O estado ou a interação exigida precisa de um fluxo de regras específico. |
-| Critical Specialist | 1 | Decrease the CT of your Strike Rolls when making an Armed Attack by 1. | O efeito ainda carece de um ponto de aplicação verificado na ficha ou na rolagem. |
 | Variety Specialist | 1 | All of your Weapons gain 1 additional Quality Slot. | O estado ou a interação exigida precisa de um fluxo de regras específico. |
 | Weapon Master | 1 | The Dice Category of your Energy Charges +1 Category for your Armed Attacks. | O efeito ainda carece de um ponto de aplicação verificado na ficha ou na rolagem. |
-| Variable Fighter | 1 | While you are wielding a Weapon, the Strike Rolls of your Unarmed Attacks +1(T). | O estado ou a interação exigida precisa de um fluxo de regras específico. |
-| Variable Champion | 1 | While you are only wielding 1 Weapon, the Strike Rolls of your Armed Attacks +1(T). | O estado ou a interação exigida precisa de um fluxo de regras específico. |
 | Concentrated Energy | 2 | Your Wound Rolls +1(bT) for every 2 stacks of Concentrated Ki you possess. | O estado ou a interação exigida precisa de um fluxo de regras específico. |
 | Concentrated Energy | 4 | Lose all stacks of Concentrated Ki after concluding the Attacking Maneuver declared by the Energy Charge Maneuver, or if you use either the… | O estado ou a interação exigida precisa de um fluxo de regras específico. |
 | Experienced Drunk | 1 | While in the Drunk State, the Dice Category of your Extra Dice gained from scoring a Critical Result +1 Category. Double this bonus… | O efeito ainda carece de um ponto de aplicação verificado na ficha ou na rolagem. |

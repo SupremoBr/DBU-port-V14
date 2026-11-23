@@ -212,6 +212,77 @@ test('Attack Ref uses per-profile Wound CT in the preview', () => {
   assert.deepEqual(context.attackRefs.map(attack => [attack.strikeCT, attack.woundCT]), [[10, 5], [10, 10]]);
 });
 
+test('Dual Wielding Specialist adds current Tier to sheet, Basic Attack and Signature Strike with two usable equipped weapons', () => {
+  const system = {
+    rulesVersion: '0.9.3', level: 1, tier: 1, baseTier: 1,
+    talents: ['r093_weapon_specialist', 'r093_dual_wielding_specialist'],
+    aptitudes: { haste: Math.floor(3 / 2), awareness: 3 },
+    attackRefs: [{ name: 'Simple', foundation: 'Physical', profile: 'Simple' }],
+  };
+  const actor = new DBUActor(system);
+  actor._getSelfBenefitAura = () => null;
+  const weapon = (name, worn) => ({ name, type: 'equipment', system: { equipmentType: 'weapon', weaponSize: 'standard', worn } });
+  actor.items = [weapon('Sword', true), weapon('Spear', false)];
+  const sheet = new DBUCharacterSheet(actor);
+  const verifyStrike = expected => {
+    system.aptitudes.strikeBuffTotal = 0;
+    applyCatalogPassives093(system, system.tier, system.baseTier, actor.items);
+    const context = {};
+    sheet._prepareCombatRollsData(context, system);
+    sheet._prepareAttackRefData(context, system);
+    assert.equal(context.combatRolls.strike.total, `+${expected}`);
+    assert.equal(context.attackRefs[0].strikeMod, expected);
+    assert.ok(context.attackRefs[0].strikeFormula.endsWith(`+${expected}`));
+    assert.ok(sheet._calcTechStrike(technique(), system, system.tier).formula.endsWith(`+${expected}`));
+  };
+  verifyStrike(4);
+  actor.items[1].system.worn = true;
+  verifyStrike(5);
+  system.tier = 2;
+  verifyStrike(6);
+  actor.items[1].system.weaponLPDamage = 32;
+  verifyStrike(4);
+  system.talents = ['r093_weapon_specialist'];
+  actor.items[1].system.weaponLPDamage = 0;
+  verifyStrike(4);
+});
+
+test('Weapon talent passives respect size, count, Weapon Category and armed attack context', () => {
+  const system = {
+    rulesVersion: '0.9.3', level: 1, tier: 2, baseTier: 1,
+    talents: ['r093_twin_weapon_specialist', 'r093_light_weapons_specialist', 'r093_heavy_weapons_specialist',
+      'r093_iaijutsu_specialist', 'r093_critical_specialist', 'r093_variable_fighter', 'r093_variable_champion'],
+    attackRefs: [{ foundation: 'Energy', profile: 'Beam' }, { foundation: 'Physical', profile: 'Simple', weaponEquipped: 'Sword' }],
+  };
+  const weapon = (name, weaponSize, weaponCategory) => ({ name, type: 'equipment',
+    system: { equipmentType: 'weapon', worn: true, weaponSize, weaponCategory } });
+  const sword = weapon('Sword', 'small', 'Sword');
+  const dagger = weapon('Dagger', 'small', 'Sword');
+  const bow = weapon('Bow', 'big', 'Bow');
+  const actor = new DBUActor(system);
+  actor._getSelfBenefitAura = () => null;
+  const sheet = new DBUCharacterSheet(actor);
+  const bonuses = items => {
+    actor.items = items;
+    system.aptitudes = {};
+    applyCatalogPassives093(system, 2, 1, items);
+    const apt = system.aptitudes;
+    return [apt.strikeBuffTotal || 0, apt.woundBuffTotal || 0, apt.dodgeBuffTotal || 0,
+      apt.unarmedAttackStrike || 0, apt.armedStrike || 0];
+  };
+  assert.deepEqual(bonuses([]), [0, 0, 2, 0, 0]);
+  assert.deepEqual(bonuses([bow]), [2, 0, 0, 2, 2]);
+  assert.deepEqual(bonuses([sword, dagger]), [0, 2, 0, 2, 0]);
+  assert.deepEqual(bonuses([sword, bow]), [0, 0, 0, 2, 0]);
+  assert.deepEqual(bonuses([sword]), [0, 4, 0, 2, 2]);
+  const context = {};
+  sheet._prepareAttackRefData(context, system);
+  assert.deepEqual(context.attackRefs.map(attack => attack.strikeCT), [10, 9]);
+  assert.equal(context.attackRefs[0].strikeMod, 2);
+  assert.match(sheet._calcTechStrike(technique(), system, 2).formula, /\+2$/);
+  assert.equal(sheet._calcCombatCTs(system, { isWeapon: true }).strikeCT, 9);
+});
+
 test('actual native roll applies Clearing natural minimum and records the executed action once',async()=>{
   const messages=[];
   globalThis.ChatMessage={getSpeaker:()=>({}),create:async data=>{messages.push(data);return data;}};

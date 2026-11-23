@@ -4,6 +4,7 @@ import { adjustRacialResource093, applyRacialResources093, clearCombatRacialReso
 import { applyCatalogPassives093, racialLife093 } from '../module/rules/runtime-v093.mjs';
 import { talentPassiveBonus093, TALENT_PASSIVES_093 } from '../module/rules/talent-passives-v093.mjs';
 import { CATALOGS_093 } from '../module/rules/catalogs-v093.mjs';
+import { racialTrackerTraits093 } from '../module/rules/racial-tracker-v093.mjs';
 
 const source = 'system.rules093State.racialResources.';
 function actor(race, selected, resources = {}) {
@@ -23,6 +24,35 @@ function actor(race, selected, resources = {}) {
     }
   };
 }
+
+test('tracker counts each selected combat trait once for the current race and subrace', () => {
+  const catalog = CATALOGS_093.racialTraits;
+  const demon = name => catalog.demon.find(trait => trait.name === name);
+  const pressure = demon('Demonic Pressure');
+  const makyan = demon('Demons of the Makyo Star');
+  const phantom = demon('Fallen Idol');
+  const refinedCombat = structuredClone(catalog.namekian.find(trait => trait.name === 'Refined Combat'));
+  const combatOptions = refinedCombat.effects.find(effect => effect.options).options.slice(0, 2);
+  const traits = [pressure, pressure, makyan, phantom, refinedCombat, catalog.saiyan[0], catalog.factors[0]];
+  const system = { race: 'demon', subrace: 'Demon Person', racialTraits: traits.map(trait => trait.id) };
+  const names = () => racialTrackerTraits093(system, traits).map(trait => trait.name);
+  assert.deepEqual(names(), ['Demonic Pressure']);
+  system.subrace = 'Makyan';
+  assert.deepEqual(names(), ['Demonic Pressure', 'Demons of the Makyo Star']);
+  system.racialTraits = system.racialTraits.filter(id => id !== pressure.id);
+  assert.deepEqual(names(), ['Demons of the Makyo Star']);
+  system.subrace = 'Phantom';
+  assert.deepEqual(names(), ['Fallen Idol']);
+  system.race = 'namekian';
+  system.subrace = 'Warrior Clan';
+  assert.deepEqual(names(), []);
+  for (const option of combatOptions) option.selected = true;
+  assert.deepEqual(names(), ['Refined Combat']);
+  assert.deepEqual(racialTrackerTraits093(system, traits)[0].effects.map(effect => effect.name),
+    combatOptions.map(option => option.name));
+  system.subrace = 'Dragon Clan';
+  assert.deepEqual(names(), []);
+});
 
 test('Demonic Power, Fatigue and Phantom bonuses apply to the actual derived statistics', () => {
   const demon = actor('demon', ['Demonic Pressure', 'Demonic Resilience', 'Fallen Idol'],

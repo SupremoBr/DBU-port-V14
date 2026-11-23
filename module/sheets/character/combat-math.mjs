@@ -97,7 +97,7 @@ export const combatMathMethods = {
 
     let strikeCT = 10 - mindful - (Number(apt.strikeCTBonus) || 0);
     if (talents.includes("focused_strike")) strikeCT -= 1;
-    if (talents.includes("critical_specialist") && isWeapon) strikeCT -= 1;
+    if (isWeapon) strikeCT -= (talents.includes("critical_specialist") ? 1 : 0) + (apt.armedStrikeCT || 0);
     // Per-foundation Strike CT buffs ("Strike CT (Physical/Energy/Magic)") —
     // previously computed but never applied (the wound mirror below was).
     const perFoundationStrike = {
@@ -346,7 +346,8 @@ export const combatMathMethods = {
       // Rapid Fist (+1(T) Strike) / Iron Fist (+2(T) Wound) and "Unarmed
       // Strike/Wound" custom buffs (aptitudes.unarmedStrike/unarmedWound).
       const isUnarmed = ref.foundation === "Physical" && !wItem;
-      const unarmedStrikeBuff = isUnarmed ? (system.aptitudes?.unarmedStrike || 0) : 0;
+      const unarmedStrikeBuff = (isUnarmed ? (system.aptitudes?.unarmedStrike || 0) : 0)
+        + (!wItem ? (system.aptitudes?.unarmedAttackStrike || 0) : 0);
       let unarmedWoundBuff = isUnarmed ? (system.aptitudes?.unarmedWound || 0) : 0;
       // "Armed Strike/Wound" custom buffs — apply when a weapon IS selected
       // (mirror of the unarmed pair; aptitudes were written but never read).

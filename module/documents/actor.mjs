@@ -344,6 +344,8 @@ export class DBUActor extends Actor {
     // Misc late-stage buffs (#157-174)
     system.aptitudes.duelClashBonus = this._getBuffTotal(system, "Duel Clash Bonus");
     system.aptitudes.armedStrike = this._getBuffTotal(system, "Armed Strike");
+    system.aptitudes.armedStrikeCT = 0;
+    system.aptitudes.unarmedAttackStrike = 0;
     system.aptitudes.armedWound = this._getBuffTotal(system, "Armed Wound");
     system.aptitudes.unarmedStrike = this._getBuffTotal(system, "Unarmed Strike");
     system.aptitudes.unarmedWound = this._getBuffTotal(system, "Unarmed Wound");
@@ -401,7 +403,7 @@ export class DBUActor extends Actor {
 
     // ---- Talent Automation ----
     applyTalentBonuses(system, tier, baseTier);
-    applyCatalogPassives093(system, tier, baseTier);
+    applyCatalogPassives093(system, tier, baseTier, this.items);
     applyRacialResources093(system, tier);
 
     // ---- Damage Reduction Finalizer ----

@@ -57,7 +57,7 @@ export function applyRacial093(system, tier, baseTier) {
   }
 }
 
-export function applyCatalogPassives093(system, tier, baseTier) {
+export function applyCatalogPassives093(system, tier, baseTier, items) {
   if (!uses093(system)) return;
   const selected = [
     ...(system.racialTraits || []).map(id => racialById.get(id)),
@@ -73,7 +73,7 @@ export function applyCatalogPassives093(system, tier, baseTier) {
     else if (rule.target === 'allSaves') for (const save of Object.values(system.savingThrows || {})) save.bonus += amount;
     else system.aptitudes[rule.target] = (system.aptitudes[rule.target] || 0) + amount;
   }
-  applyTalentPassives093(system, tier, baseTier);
+  applyTalentPassives093(system, tier, baseTier, items);
 }
 
 export function applyRacialAttribute093(system, tier) {

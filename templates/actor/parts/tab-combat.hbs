@@ -128,6 +128,19 @@
         <div class="rt-activables-header">
           <i class="fas fa-bolt"></i> Activables
         </div>
+        {{#if rules093}}
+        <details class="rt-racial-traits">
+          <summary>Traços raciais acionáveis <b>{{racialTrackerTraits.length}}</b></summary>
+          {{#each racialTrackerTraits}}
+          <div class="rt-racial-trait">
+            {{#if source}}<a href="{{source}}" target="_blank" rel="noopener noreferrer">{{name}}</a>{{else}}<strong>{{name}}</strong>{{/if}}
+            {{#each effects}}<p><b>{{#if name}}{{name}}{{else}}Lv.{{level}}{{/if}}</b> · {{#if summary}}{{summary}}{{else}}{{text}}{{/if}}</p>{{/each}}
+          </div>
+          {{else}}
+          <p>Nenhum traço acionável da raça.</p>
+          {{/each}}
+        </details>
+        {{/if}}
         <div class="rt-activables-list">
           {{#if combatResourceGroups.length}}
           <div class="resource-filter-controls">
