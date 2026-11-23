@@ -12,6 +12,9 @@
                 <div class="attack-ref-card" data-ref-index="{{_idx}}">
                     <div class="ar-title-bar">
                         <input type="text" class="ar-input ar-name-input" name="system.attackRefs.{{_idx}}.name" value="{{attackName}}" placeholder="Attack Reference" />
+                        {{#if ../canEditAttackVisual}}
+                        <button type="button" class="tf-expand-traits-btn dbu-edit-visual-btn" data-dbu-edit-attack-visual="ref_{{_idx}}"><i class="fas fa-image" aria-hidden="true"></i> Visuais</button>
+                        {{/if}}
                         <button type="button" class="attack-ref-remove" data-action="remove-attack-ref" data-index="{{_idx}}" title="Remove"><i class="fas fa-trash"></i></button>
                     </div>
                     <table class="ar-table">

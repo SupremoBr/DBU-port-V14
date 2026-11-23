@@ -60,6 +60,9 @@
         <span class="tech-type-badge">{{#if ../limitedMartialPower}}Super{{else}}{{type}}{{/if}}</span>
         <span class="tech-tp-badge {{#if tpOverLimit}}tp-badge-over{{/if}}" title="Max TP per Signature Technique at your base Tier of Power (25/30/40/50)">TP: {{tpCost}}/{{tpMax}}</span>
         {{#unless isGained}}
+        {{#if ../canEditAttackVisual}}
+        <button type="button" class="tf-expand-traits-btn dbu-edit-visual-btn" data-dbu-edit-attack-visual="tech_{{id}}"><i class="fas fa-image" aria-hidden="true"></i> Visuais</button>
+        {{/if}}
         <button type="button" class="delete-btn" data-action="delete-technique" data-technique-id="{{id}}">
           <i class="fas fa-trash"></i>
         </button>

@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.0.12-rules093-alpha.20] — visuais de ataques e técnicas na ficha
+
+- Attack References e Signature Techniques têm um botão Visuais que edita a mesma configuração do menu Configurar Visuais.
+- Sem mídia e Sem macro desativam também os visuais herdados. Os controles de transformação oferecem Sem trocar token e os menus exibem menos notas.
+
 ## [1.0.12-rules093-alpha.19] — imagens de token por transformação
 
 - A aba Transformations permite vincular uma imagem do álbum Token Images ou escolher um arquivo para cada transformação. O Configurar Visuais usa a mesma configuração e continua oferecendo os controles de macro e tamanho no grid.

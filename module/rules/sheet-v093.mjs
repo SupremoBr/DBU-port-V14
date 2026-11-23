@@ -58,6 +58,10 @@ export function installRulesSheet093(Sheet) {
   });
   wrap('activateListeners', function(original, html) {
     original(html); if (!this.isEditable) return;
+    html.on('click', '[data-dbu-edit-attack-visual]', async event => {
+      event.preventDefault();
+      await game.dbu?.automation?.editAttackVisual?.(this.actor, event.currentTarget.dataset.dbuEditAttackVisual);
+    });
     html.on('click', '[data-dbu-edit-transformation-token]', async event => {
       event.preventDefault();
       const index = Number(event.currentTarget.dataset.dbuEditTransformationToken);
@@ -100,6 +104,7 @@ export function installRulesSheet093(Sheet) {
   });
   wrap('getData', async function(original, ...args) {
     const context = await original(...args);
+    context.canEditAttackVisual = context.editable && !!game.dbu?.automation?.editAttackVisual;
     context.canEditTransformationToken = context.editable && !!game.dbu?.automation?.editTransformationToken;
     context.rules093Pools = roundPools093(this.actor);
     context.rules093Race = RACES_093[this.actor.system.race];

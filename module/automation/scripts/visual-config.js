@@ -230,16 +230,16 @@ async function saveCategoryEntry(actor, category, key, value) {
   return cfg;
 }
 
-async function saveTransformationVisual(actor, key, fields) {
+async function saveVisualFields(actor, category, key, fields) {
   if (!canControl(actor)) throw new Error(`Você não controla ${actor?.name || "este Actor"}.`);
   if (actor.getFlag(MODULE_ID, FLAG_KEY) === undefined && readAutomationFlag(actor, FLAG_KEY)) {
     const config = cloneConfig(actor);
-    config.transformations[key] = { ...config.transformations[key], ...fields };
+    config[category][key] = { ...config[category][key], ...fields };
     return actor.setFlag(MODULE_ID, FLAG_KEY, config);
   }
   return actor.setFlag(MODULE_ID, FLAG_KEY, {
     version: CONFIG_VERSION,
-    transformations: { [key]: fields }
+    [category]: { [key]: fields }
   });
 }
 
@@ -432,6 +432,7 @@ function macroNames() {
 
 function macroOptions(selected = "") {
   const names = macroNames();
+  if (selected && !names.includes(selected)) names.push(selected);
   const options = [
     `<option value="">— selecione —</option>`
   ];
@@ -485,11 +486,11 @@ async function executeMacroPreview(actor, token, macroName, payload = {}) {
   });
 }
 
-function modeOptions(selected = "inherit", customLabel = "Personalizado") {
+function modeOptions(selected = "inherit", customLabel = "Personalizado", noneLabel = "Nenhum / desativar") {
   return `
-    <option value="inherit" ${selected === "inherit" ? "selected" : ""}>Usar configuração antiga/padrão</option>
+    <option value="inherit" ${selected === "inherit" ? "selected" : ""}>Usar padrão</option>
     <option value="custom" ${selected === "custom" ? "selected" : ""}>${esc(customLabel)}</option>
-    <option value="none" ${selected === "none" ? "selected" : ""}>Nenhum / desativar</option>
+    <option value="none" ${selected === "none" ? "selected" : ""}>${esc(noneLabel)}</option>
   `;
 }
 
@@ -497,33 +498,38 @@ function getRoot(html) {
   return html instanceof HTMLElement ? html : (html?.[0] || null);
 }
 
-async function openAttackConfigurator(actor, token) {
+export function editAttackVisual(actor, sourceKey) {
+  if (!canControl(actor)) return;
+  return openAttackConfigurator(actor, tokenForActor(actor), sourceKey);
+}
+
+async function openAttackConfigurator(actor, token, sourceKey) {
   const rows = attackEntries(actor);
   if (!rows.length) return ui.notifications.warn(`${actor.name} não possui Attack References ou Signature Techniques.`);
 
-  const cfg = cloneConfig(actor);
-  const selectRows = rows.map((row, index) => `<option value="${index}">${esc(row.group)} — ${esc(row.name)}</option>`).join("");
+  const focused = sourceKey ? rows.find(row => row.key === sourceKey) : null;
+  if (sourceKey && !focused) return ui.notifications.warn("Ataque não encontrado.");
+  const getRow = root => focused ?? rows[root.querySelector("[data-vc-attack]").selectedIndex];
+  const selectRows = focused ? "" : rows.map(row => `<option>${esc(row.group)} — ${esc(row.name)}</option>`).join("");
+  let loaded;
 
-  let dialog;
-  dialog = new Dialog({
-    title: `${actor.name} — Visuais de Ataque`,
+  const dialog = new SheetDialog({
+    title: focused ? `Visuais — ${focused.name}` : `${actor.name} — Visuais de Ataque`,
     content: `
       <div class="dbu-visual-config" style="display:grid;gap:9px;">
-        <label><b>Ataque</b><select data-vc-attack style="width:100%">${selectRows}</select></label>
-        <div data-vc-inherited style="font-size:11px;opacity:.75;padding:6px;border:1px solid rgba(255,255,255,.12);border-radius:4px;"></div>
-        <label><b>GIF da carta</b><select data-vc-gif-mode style="width:100%"></select></label>
+        ${focused ? "" : `<label><b>Ataque</b><select data-vc-attack style="width:100%">${selectRows}</select></label>`}
+        <label><b>Mídia do card</b><select data-vc-gif-mode style="width:100%"></select></label>
         <div style="display:flex;gap:5px;align-items:center;">
-          <input data-vc-gif type="text" style="flex:1" placeholder="worlds/.../ataque.gif ou https://...">
-          <button type="button" data-vc-browse-gif title="Procurar arquivo"><i class="fas fa-folder-open"></i></button>
+          <input data-vc-gif type="text" style="flex:1;min-width:0" aria-label="Arquivo ou URL da mídia">
+          <button type="button" data-vc-browse-gif title="Procurar arquivo" aria-label="Procurar arquivo"><i class="fas fa-folder-open"></i></button>
         </div>
         <div data-vc-gif-preview style="min-height:0"></div>
         <label><b>Macro visual</b><select data-vc-visual-mode style="width:100%"></select></label>
-        <select data-vc-macro style="width:100%"></select>
+        <select data-vc-macro aria-label="Selecionar macro visual" style="width:100%"></select>
         <div style="display:flex;gap:6px;">
           <button type="button" data-vc-test-macro style="flex:1"><i class="fas fa-play"></i> Testar macro visual</button>
           <button type="button" data-vc-clear style="flex:1"><i class="fas fa-undo"></i> Voltar ao padrão</button>
         </div>
-        <p style="font-size:11px;opacity:.7;margin:0;">O jogador escolhe um macro já existente; o código JavaScript do macro não é editado por este painel.</p>
       </div>
     `,
     buttons: {
@@ -532,8 +538,8 @@ async function openAttackConfigurator(actor, token) {
         label: "Salvar",
         callback: async html => {
           const root = getRoot(html);
-          const row = rows[number(root.querySelector("[data-vc-attack]")?.value, 0)];
-          if (!row) return;
+          const row = attackEntries(actor).find(entry => entry.key === getRow(root).key);
+          if (!row) return ui.notifications.warn("Ataque não encontrado.");
           const value = {
             name: row.name,
             gifMode: normalizeMode(root.querySelector("[data-vc-gif-mode]")?.value),
@@ -549,7 +555,8 @@ async function openAttackConfigurator(actor, token) {
             ui.notifications.warn("Selecione um macro visual ou escolha outro modo.");
             return false;
           }
-          await saveCategoryEntry(actor, "attacks", row.key, value);
+          const fields = Object.fromEntries(Object.entries(value).filter(([key, value]) => loaded[key] !== value));
+          if (Object.keys(fields).length) await saveVisualFields(actor, "attacks", row.key, fields);
           ui.notifications.info(`${actor.name}: visual de ${row.name} salvo.`);
         }
       },
@@ -563,34 +570,31 @@ async function openAttackConfigurator(actor, token) {
       const gifInput = root.querySelector("[data-vc-gif]");
       const visualMode = root.querySelector("[data-vc-visual-mode]");
       const macroSelect = root.querySelector("[data-vc-macro]");
-      const inherited = root.querySelector("[data-vc-inherited]");
       const preview = root.querySelector("[data-vc-gif-preview]");
 
       const load = () => {
-        const row = rows[number(attackSelect.value, 0)];
-        const stored = cfg.attacks?.[row.key] || {};
-        const legacyGif = extractLegacyGif(row.description);
-        const legacyVisual = extractLegacyVisual(row.description);
+        const row = getRow(root);
+        const stored = getAttackVisualSettings(actor, row.key) || {};
         const gMode = normalizeMode(stored.gifMode);
         const vMode = normalizeMode(stored.visualMode);
-        gifMode.innerHTML = modeOptions(gMode, "Usar este GIF/arquivo");
+        gifMode.innerHTML = modeOptions(gMode, "Usar arquivo ou URL", "Sem mídia");
         gifInput.value = String(stored.gif || "");
-        visualMode.innerHTML = modeOptions(vMode, "Usar este macro");
+        visualMode.innerHTML = modeOptions(vMode, "Usar este macro", "Sem macro");
         macroSelect.innerHTML = macroOptions(String(stored.visualMacro || ""));
-        inherited.innerHTML = `<b>Configuração antiga:</b> GIF ${legacyGif ? esc(legacyGif) : "—"} · Visual ${legacyVisual ? esc(legacyVisual) : "—"}`;
+        loaded = { name: row.name, gifMode: gMode, gif: gifInput.value.trim(), visualMode: vMode, visualMacro: macroSelect.value.trim() };
         updatePreview();
       };
 
       const updatePreview = () => {
         const mode = gifMode.value;
-        const row = rows[number(attackSelect.value, 0)];
+        const row = getRow(root);
         const src = mode === "custom" ? gifInput.value.trim() : (mode === "inherit" ? extractLegacyGif(row.description) : "");
         preview.innerHTML = src ? `<img src="${esc(src)}" style="display:block;max-width:100%;max-height:150px;margin:4px auto;border-radius:5px;object-fit:contain;">` : "";
         gifInput.disabled = mode !== "custom";
         macroSelect.disabled = visualMode.value !== "custom";
       };
 
-      attackSelect.addEventListener("change", load);
+      attackSelect?.addEventListener("change", load);
       gifMode.addEventListener("change", updatePreview);
       visualMode.addEventListener("change", updatePreview);
       gifInput.addEventListener("input", updatePreview);
@@ -602,7 +606,7 @@ async function openAttackConfigurator(actor, token) {
       });
       root.querySelector("[data-vc-test-macro]")?.addEventListener("click", async e => {
         e.preventDefault();
-        const row = rows[number(attackSelect.value, 0)];
+        const row = getRow(root);
         let name = "";
         if (visualMode.value === "custom") name = macroSelect.value;
         else if (visualMode.value === "inherit") name = extractLegacyVisual(row.description);
@@ -615,9 +619,9 @@ async function openAttackConfigurator(actor, token) {
       });
       root.querySelector("[data-vc-clear]")?.addEventListener("click", async e => {
         e.preventDefault();
-        const row = rows[number(attackSelect.value, 0)];
-        await clearCategoryEntry(actor, "attacks", row.key);
-        delete cfg.attacks[row.key];
+        if (!canControl(actor)) return;
+        const row = getRow(root);
+        await unsetAutomationFlag(actor, MODULE_ID, `${FLAG_KEY}.attacks.${row.key}`);
         load();
         ui.notifications.info(`${row.name}: configuração personalizada removida.`);
       });
@@ -799,14 +803,14 @@ export async function editTransformationToken(actor, index) {
     title: `Imagem do token — ${row.name}`,
     content: `
       <div class="dbu-visual-config" style="display:grid;gap:9px">
-        <label>Ao ativar a transformação
+        <label>Imagem ao transformar
           <select data-vc-token-mode style="width:100%">
-            ${modeOptions(settings?.tokenMode, "Usar imagem personalizada")}
+            ${modeOptions(settings?.tokenMode, "Usar imagem personalizada", "Sem trocar token")}
           </select>
         </label>
         <label>Álbum Token Images
           <select data-vc-album style="width:100%">
-            <option value="">${album.length ? "Escolha uma imagem do álbum" : "Nenhuma imagem no álbum"}</option>
+            <option value="">${album.length ? "Selecione" : "Álbum vazio"}</option>
             ${options}
           </select>
         </label>
@@ -860,7 +864,7 @@ export async function editTransformationToken(actor, index) {
   if (result.tokenMode === "custom" && !result.token) return ui.notifications.warn("Escolha a imagem do token.");
   const current = transformationRows(actor).find(entry => entry.key === row.key);
   if (!current) return ui.notifications.warn("A transformação não está mais disponível.");
-  await saveTransformationVisual(actor, row.key, { name: current.name, ...result });
+  await saveVisualFields(actor, "transformations", row.key, { name: current.name, ...result });
   ui.notifications.info(`Imagem do token de ${current.name} salva.`);
 }
 
@@ -875,13 +879,12 @@ async function openTransformationConfigurator(actor, token) {
     content: `
       <div class="dbu-visual-config" style="display:grid;gap:9px;">
         <label><b>Transformation</b><select data-vc-transform style="width:100%">${options}</select></label>
-        <div data-vc-inherited style="font-size:11px;opacity:.75;padding:6px;border:1px solid rgba(255,255,255,.12);border-radius:4px;"></div>
-        <label><b>Troca de imagem do token</b><select data-vc-token-mode style="width:100%"></select></label>
+        <label><b>Imagem do token</b><select data-vc-token-mode style="width:100%"></select></label>
         <div style="display:flex;gap:5px;align-items:center;">
           <input data-vc-token type="text" style="flex:1" placeholder="worlds/.../ssj.webp">
           <button type="button" data-vc-browse-token><i class="fas fa-folder-open"></i></button>
         </div>
-        <label><b>Tamanho no grid</b> <input data-vc-token-scale type="number" min="0" step="0.25" value="0" style="width:90px"> <span style="font-size:11px;opacity:.7">0 = padrão · 1 = tamanho base · 2 = dobro do espaço no grid</span></label>
+        <label><b>Escala no grid</b> <input data-vc-token-scale type="number" min="0" step="0.25" value="0" style="width:90px" title="0 = padrão · 1 = tamanho base · 2 = dobro do tamanho base"></label>
         <label><b>Macro visual da transformação</b><select data-vc-visual-mode style="width:100%"></select></label>
         <select data-vc-macro style="width:100%"></select>
         <div style="display:flex;gap:6px;flex-wrap:wrap;">
@@ -889,7 +892,6 @@ async function openTransformationConfigurator(actor, token) {
           <button type="button" data-vc-test-macro style="flex:1"><i class="fas fa-play"></i> Testar macro</button>
           <button type="button" data-vc-clear style="flex:1"><i class="fas fa-undo"></i> Voltar ao padrão</button>
         </div>
-        <p style="font-size:11px;opacity:.7;margin:0;">Isto altera apenas aparência. Os bônus, Traits, custos e limites da Transformation continuam vindo da ficha/DBU.</p>
       </div>
     `,
     buttons: {
@@ -910,7 +912,7 @@ async function openTransformationConfigurator(actor, token) {
           };
           if (value.tokenMode === "custom" && !value.token) return ui.notifications.warn("Escolha a imagem do token.");
           if (value.visualMode === "custom" && !value.visualMacro) return ui.notifications.warn("Selecione o macro visual.");
-          await saveTransformationVisual(actor, row.key, value);
+          await saveVisualFields(actor, "transformations", row.key, value);
           ui.notifications.info(`${actor.name}: visual de ${row.name} salvo.`);
         }
       },
@@ -925,18 +927,15 @@ async function openTransformationConfigurator(actor, token) {
       const tokenScale = root.querySelector("[data-vc-token-scale]");
       const visualMode = root.querySelector("[data-vc-visual-mode]");
       const macroSelect = root.querySelector("[data-vc-macro]");
-      const inherited = root.querySelector("[data-vc-inherited]");
 
       const load = () => {
         const row = rows[number(transSelect.value, 0)];
         const stored = cfg.transformations?.[row.key] || {};
-        const legacy = legacyTransformation(actor, row.trans);
-        tokenMode.innerHTML = modeOptions(normalizeMode(stored.tokenMode), "Usar esta imagem");
+        tokenMode.innerHTML = modeOptions(normalizeMode(stored.tokenMode), "Usar esta imagem", "Sem trocar token");
         tokenInput.value = String(stored.token || "");
         tokenScale.value = Math.max(0, number(stored.gridScale ?? stored.tokenScale, 0));
         visualMode.innerHTML = modeOptions(normalizeMode(stored.visualMode), "Usar este macro");
         macroSelect.innerHTML = macroOptions(String(stored.visualMacro || ""));
-        inherited.innerHTML = `<b>Configuração antiga:</b> Token ${legacy.token ? esc(legacy.token) : "—"} · escala visual antiga ${legacy.tokenScale || "—"} · Visual ${legacy.visualMacro ? esc(legacy.visualMacro) : "—"}<br><b>v1.5.3:</b> o novo tamanho configurado altera width/height e ocupa o espaço real no grid.`;
         update();
       };
 
@@ -1388,7 +1387,6 @@ export async function openVisualConfigurator(context = {}) {
           <button type="button" data-choice="energyCharge"><i class="fas fa-bolt" aria-hidden="true"></i><span><strong>Energy Charge</strong><small>Macro por estágio</small></span></button>
           <button type="button" data-choice="combatReactions"><i class="fas fa-magic" aria-hidden="true"></i><span><strong>Reações de combate</strong><small>Intervene, Deflect, Reflect e Duel</small></span></button>
         </div>
-        <small>As escolhas são salvas neste personagem.</small>
       </div>
     `,
     buttons: { close: { label: "Fechar", callback: () => null } },

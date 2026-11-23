@@ -3604,6 +3604,14 @@
   line-height: 1.2;
 }
 
+.dbu-old.sheet .dbu-edit-visual-btn {
+  background: var(--bg-darker);
+  flex: none;
+  width: auto;
+  min-height: 24px;
+  line-height: 1.2;
+}
+
 .dbu-old.sheet .tf-catalog-item {
   display: flex;
   justify-content: space-between;

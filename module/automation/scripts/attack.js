@@ -1302,8 +1302,8 @@ if (!affordability?.ok) {
   return null;
 }
 
-const attackGif = selected.gif || dbuExtractGif(selected.description);
-const visualMacroName = selected.visual || dbuGetVisualMacroName(actor, source);
+const attackGif = selected.gif;
+const visualMacroName = selected.visual;
 const attackGifHTML = dbuAttackGifHTML(attackGif);
 
 // Valida as fórmulas ANTES de registrar o ataque.
