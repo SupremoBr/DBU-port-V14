@@ -3596,6 +3596,14 @@
   background: var(--bg-input);
 }
 
+.dbu-old.sheet .tf-edit-token-btn {
+  display: block;
+  width: fit-content;
+  min-height: 24px;
+  margin-top: 4px;
+  line-height: 1.2;
+}
+
 .dbu-old.sheet .tf-catalog-item {
   display: flex;
   justify-content: space-between;

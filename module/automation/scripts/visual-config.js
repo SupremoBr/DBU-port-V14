@@ -1,4 +1,6 @@
 import { SYSTEM_ID as MODULE_ID, readAutomationFlag } from "../package.mjs";
+import { unsetAutomationFlag } from "../migration.mjs";
+import { Dialog as SheetDialog } from "../../helpers/foundry-compat.mjs";
 // ============================================================
 // DBU Automation v1.8.1 — Configurador Visual por personagem
 // ============================================================
@@ -228,6 +230,19 @@ async function saveCategoryEntry(actor, category, key, value) {
   return cfg;
 }
 
+async function saveTransformationVisual(actor, key, fields) {
+  if (!canControl(actor)) throw new Error(`Você não controla ${actor?.name || "este Actor"}.`);
+  if (actor.getFlag(MODULE_ID, FLAG_KEY) === undefined && readAutomationFlag(actor, FLAG_KEY)) {
+    const config = cloneConfig(actor);
+    config.transformations[key] = { ...config.transformations[key], ...fields };
+    return actor.setFlag(MODULE_ID, FLAG_KEY, config);
+  }
+  return actor.setFlag(MODULE_ID, FLAG_KEY, {
+    version: CONFIG_VERSION,
+    transformations: { [key]: fields }
+  });
+}
+
 async function clearCategoryEntry(actor, category, key) {
   if (!canControl(actor)) throw new Error(`Você não controla ${actor?.name || "este Actor"}.`);
   const cfg = cloneConfig(actor);
@@ -383,7 +398,8 @@ function transformationRows(actor) {
       trans: { ...trans, transIndex: index },
       name: trans?.name || `Transformation ${index + 1}`
     }))
-    .filter(row => !String(row.name).toLowerCase().includes("manifested power"));
+    .filter(row => row.trans.transformationType !== "manifested_power"
+      && !String(row.name).toLowerCase().includes("manifested power"));
 }
 
 function legacyTransformation(actor, trans) {
@@ -427,7 +443,7 @@ function macroOptions(selected = "") {
 
 function filePicker(input, type = "imagevideo") {
   try {
-    const Picker = globalThis.FilePicker;
+    const Picker = globalThis.foundry?.applications?.apps?.FilePicker?.implementation ?? globalThis.FilePicker;
     if (!Picker) throw new Error("FilePicker não está disponível nesta versão do Foundry.");
     const fp = new Picker({
       type,
@@ -767,6 +783,87 @@ async function previewToken(actor, token, src, gridScale = 0) {
   }, 3000);
 }
 
+export async function editTransformationToken(actor, index) {
+  if (!canControl(actor)) return;
+  const row = transformationRows(actor).find(entry => entry.index === index);
+  if (!row) return;
+
+  const settings = getTransformationVisualSettings(actor, row.key);
+  const album = (actor.system.tokenAlbum || []).filter(entry => entry?.image);
+  const image = settings?.token || "";
+  const options = album.map(({ name, image }, index) =>
+    `<option value="${index}">${esc(name?.trim() || image.split("/").pop() || image)}</option>`
+  ).join("");
+
+  const result = await SheetDialog.wait({
+    title: `Imagem do token — ${row.name}`,
+    content: `
+      <div class="dbu-visual-config" style="display:grid;gap:9px">
+        <label>Ao ativar a transformação
+          <select data-vc-token-mode style="width:100%">
+            ${modeOptions(settings?.tokenMode, "Usar imagem personalizada")}
+          </select>
+        </label>
+        <label>Álbum Token Images
+          <select data-vc-album style="width:100%">
+            <option value="">${album.length ? "Escolha uma imagem do álbum" : "Nenhuma imagem no álbum"}</option>
+            ${options}
+          </select>
+        </label>
+        <label>Arquivo da imagem
+          <span style="display:flex;gap:5px">
+            <input data-vc-token type="text" value="${esc(image)}" style="flex:1;min-width:0">
+            <button type="button" data-vc-browse-token aria-label="Procurar imagem" title="Procurar imagem" style="width:auto"><i class="fas fa-folder-open"></i></button>
+          </span>
+        </label>
+      </div>`,
+    buttons: {
+      save: { label: "Salvar", callback: html => {
+        const root = getRoot(html);
+        return {
+          tokenMode: normalizeMode(root.querySelector("[data-vc-token-mode]").value),
+          token: root.querySelector("[data-vc-token]").value.trim()
+        };
+      } },
+      cancel: { label: "Cancelar" }
+    },
+    default: "save",
+    render: html => {
+      const root = getRoot(html);
+      const mode = root.querySelector("[data-vc-token-mode]");
+      const albumSelect = root.querySelector("[data-vc-album]");
+      const input = root.querySelector("[data-vc-token]");
+      const browse = root.querySelector("[data-vc-browse-token]");
+      const update = () => {
+        const match = album.findIndex(entry => entry.image === input.value.trim());
+        albumSelect.value = mode.value === "custom" && match >= 0 ? String(match) : "";
+        input.disabled = mode.value !== "custom";
+      };
+      albumSelect.addEventListener("change", () => {
+        if (albumSelect.value === "") return;
+        mode.value = "custom";
+        input.value = album[Number(albumSelect.value)].image;
+        update();
+      });
+      mode.addEventListener("change", update);
+      input.addEventListener("input", update);
+      browse.addEventListener("click", () => {
+        mode.value = "custom";
+        update();
+        filePicker(input, "imagevideo");
+      });
+      update();
+    }
+  }, { width: 460 });
+
+  if (!result) return;
+  if (result.tokenMode === "custom" && !result.token) return ui.notifications.warn("Escolha a imagem do token.");
+  const current = transformationRows(actor).find(entry => entry.key === row.key);
+  if (!current) return ui.notifications.warn("A transformação não está mais disponível.");
+  await saveTransformationVisual(actor, row.key, { name: current.name, ...result });
+  ui.notifications.info(`Imagem do token de ${current.name} salva.`);
+}
+
 async function openTransformationConfigurator(actor, token) {
   const rows = transformationRows(actor);
   if (!rows.length) return ui.notifications.warn(`${actor.name} não possui Transformations.`);
@@ -813,7 +910,7 @@ async function openTransformationConfigurator(actor, token) {
           };
           if (value.tokenMode === "custom" && !value.token) return ui.notifications.warn("Escolha a imagem do token.");
           if (value.visualMode === "custom" && !value.visualMacro) return ui.notifications.warn("Selecione o macro visual.");
-          await saveCategoryEntry(actor, "transformations", row.key, value);
+          await saveTransformationVisual(actor, row.key, value);
           ui.notifications.info(`${actor.name}: visual de ${row.name} salvo.`);
         }
       },
@@ -884,7 +981,7 @@ async function openTransformationConfigurator(actor, token) {
       root.querySelector("[data-vc-clear]")?.addEventListener("click", async e => {
         e.preventDefault();
         const row = rows[number(transSelect.value, 0)];
-        await clearCategoryEntry(actor, "transformations", row.key);
+        await unsetAutomationFlag(actor, MODULE_ID, `${FLAG_KEY}.transformations.${row.key}`);
         delete cfg.transformations[row.key];
         load();
         ui.notifications.info(`${row.name}: configuração personalizada removida.`);

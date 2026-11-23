@@ -91,6 +91,7 @@ import {
 } from "./recovery.js";
 import {
   openVisualConfigurator as rawVisualConfigurator,
+  editTransformationToken,
   getVisualConfig,
   getAttackVisualSettings,
   getDefenseVisualSettings,
@@ -311,6 +312,7 @@ Object.assign(api, {
   visualConfig: visualConfigurator,
   visualConfigurator,
   configureVisuals: visualConfigurator,
+  editTransformationToken,
   getVisualConfig,
   getAttackVisualSettings,
   getDefenseVisualSettings,

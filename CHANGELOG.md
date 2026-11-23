@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.0.12-rules093-alpha.19] — imagens de token por transformação
+
+- A aba Transformations permite vincular uma imagem do álbum Token Images ou escolher um arquivo para cada transformação. O Configurar Visuais usa a mesma configuração e continua oferecendo os controles de macro e tamanho no grid.
+
 ## [1.0.12-rules093-alpha.18] — card de ataque integrado
 
 - Ataques da automação integrada publicam um card principal com os visuais, a rolagem nativa, as defesas e United Attack.

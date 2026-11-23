@@ -198,6 +198,13 @@
             {{#if hasCatalog}}<span class="tf-catalog-badge" title="From catalog: {{catalogKey}}"><i class="fas fa-book"></i></span>{{/if}}
             {{#if isGained}}<span class="gained-badge"><i class="fas fa-link"></i> {{gainedFrom}}</span>{{/if}}
             <input type="text" class="tf-input tf-name-input" data-trans-index="{{transIndex}}" data-field="name" value="{{name}}" />
+            {{#if ../canEditTransformationToken}}
+            {{#unless isGained}}
+            {{#unless (eq transformationType "manifested_power")}}
+            <button type="button" class="tf-expand-traits-btn tf-edit-token-btn" data-dbu-edit-transformation-token="{{transIndex}}"><i class="fas fa-image" aria-hidden="true"></i> Imagem do token</button>
+            {{/unless}}
+            {{/unless}}
+            {{/if}}
             {{#if gainedFoMaBonuses}}
             {{#each gainedFoMaBonuses}}
             <span class="tf-foma-badge" title="+1(T) FO/MA from {{fromName}}'s {{transName}}"><i class="fas fa-arrow-up"></i> +1(T)</span>
