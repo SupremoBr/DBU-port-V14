@@ -1,16 +1,32 @@
 import { SUPER_PROFILES_093, superProfileKiUnits093 } from "./super-profiles-v093.mjs";
 import { limitedMartialPower, martialEnergyCharges, martialLevel } from './path-to-power-v093.mjs';
-import { techniquePointCost, techniqueBaseKiUnits } from './v093.mjs';
+import { modifierPointCost, techniquePointCap, techniquePointCost, techniqueBaseKiUnits } from './v093.mjs';
 import { PROFILES_093, validFoundation } from './profiles-v093.mjs';
 import { CATALOGS_093 } from './catalogs-v093.mjs';
+import { talentPassiveBonus093 } from './talent-passives-v093.mjs';
+import { attackKiWithBuffs } from '../helpers/custom-buffs.mjs';
 
-export function modifierPointCost(definition, ranks = 1) {
-  if (!definition) return null;
-  const count = Math.trunc(Number(ranks));
-  if (count < 1 || count > definition.maxRanks) return null;
-  return Array.isArray(definition.tpPerRank)
-    ? definition.tpPerRank.slice(0, count).reduce((a, b) => a + b, 0)
-    : definition.tpPerRank * count;
+export { modifierPointCost };
+
+export function grantedAdvantageRanks093(attack, name) {
+  const row = (attack.grantedAdvantages || []).find(advantage => advantage.name === name);
+  return row ? Math.max(0, Math.min(CATALOGS_093.advantages[name]?.maxRanks || 0, Math.trunc(Number(row.ranks) || 1))) : 0;
+}
+
+export function attackPowerShot093(attack) {
+  return Math.max(Number(attack.powerShot) || 0, grantedAdvantageRanks093(attack, 'Power Shot'));
+}
+
+export function attackReferenceKiCost093(attack, system, aura) {
+  const tier = system.baseTier || 1;
+  const profileCost = (PROFILES_093[attack.profile]?.kpCost || 0) * tier;
+  const tiring = (aura?.disadvantages || []).filter(row => row.name === 'Tiring')
+    .reduce((total, row) => total + (row.ranks || 1), 0);
+  const efficiency = grantedAdvantageRanks093(attack, 'Efficiency');
+  const legacyFist = (system.talents || []).includes('supreme_fist') && attack.foundation === 'Physical'
+    && (!attack.weaponEquipped || String(attack.weaponEquipped).toLowerCase() === 'unarmed');
+  const base = legacyFist ? Math.max(0, profileCost - 2 * tier) : profileCost;
+  return attackKiWithBuffs(base + (tiring - 4 * efficiency) * tier, profileCost / 2, system.aptitudes);
 }
 export function martialTechnique(technique, system) {
   return limitedMartialPower(system) ? { ...technique, type: 'Super Signature' } : technique;
@@ -35,9 +51,9 @@ export function validateTechnique093(technique, system) {
     if (!dramatic && !technique.superProfileGranted) issues.push('Super Profile exige Dramatic Finisher ou um efeito que o conceda.');
     if (profile?.requiresProfile && technique.profile !== profile.requiresProfile) issues.push('Super Profile exige '+profile.requiresProfile+'.');
   }
-  if (limitedMartialPower(system)) {
-    const cap = martialTechniqueTPCap(technique, system);
-    if (techniquePointCost(technique) > cap) issues.push(`Path to Power: esta técnica pode gastar até ${cap} TP.`);
+  const cap = martialTechniqueTPCap(technique, system, techniquePointCap(system?.baseTier));
+  if (techniquePointCost(technique, { includeFreeTP: false }) > cap) {
+    issues.push(`${limitedMartialPower(system) ? "Path to Power: " : ""}esta técnica pode ter até ${cap} TP no total.`);
   }
   if (!validFoundation(technique.profile, technique.foundation)) issues.push('Perfil incompatível ou removido: ' + technique.profile);
   for (const [field, definitions] of [['advantages', CATALOGS_093.advantages], ['disadvantages', CATALOGS_093.disadvantages]]) {
@@ -69,7 +85,8 @@ export function techniqueKiCost093(technique, { usageDiscount = 0, usageSurcharg
   const efficiency = (technique.advantages || []).filter(a => a.name === 'Efficiency').reduce((n, a) => n + 4 * (a.ranks || 1), 0);
   const inefficiency = (technique.disadvantages || []).filter(a => a.name === 'Inefficiency').reduce((n, a) => n + 4 * (a.ranks || 1), 0);
   const creationKP = Math.max(profileBaseKP, kpCost - efficiency + inefficiency);
-  const discount = Math.max(0, Number(usageDiscount) || 0) + (profile.signatureKiDiscount || 0);
+  const physicalDiscount = technique.foundation === 'Physical' ? talentPassiveBonus093(system, 'physicalSignatureKiDiscount') : 0;
+  const discount = Math.max(0, Number(usageDiscount) || 0) + (profile.signatureKiDiscount || 0) + physicalDiscount;
   const surcharge = Math.max(0, Number(usageSurcharge) || 0);
   return { ...validation, profileBaseKP, tpFull, kpCost, creationKP, kpReduction: efficiency + discount, kpIncrease: inefficiency + surcharge, finalKP: Math.max(profileBaseKP / 2, creationKP - discount) + surcharge };
 }

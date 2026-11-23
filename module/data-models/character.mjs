@@ -74,6 +74,7 @@ function attackRefField() {
     energyCharges: new NumberField({ required: false, nullable: true, initial: 0, integer: true }),
     kiWager: new NumberField({ required: false, nullable: true, initial: 0, integer: true }),
     powerShot: new NumberField({ required: false, nullable: true, initial: 0, integer: true }),
+    grantedAdvantages: new ArrayField(advDisField()),
     miscStrike: new StringField({ initial: "" }),
     miscWound: new StringField({ initial: "" }),
     miscDodge: new StringField({ initial: "" }),
@@ -137,6 +138,8 @@ function advDisField() {
   return new SchemaField({
     name: new StringField({ initial: "" }),
     ranks: new NumberField({ required: true, nullable: false, initial: 1, integer: true }),
+    freeRanks: new NumberField({ required: true, nullable: false, initial: 0, integer: true, min: 0 }),
+    grantSource: new StringField({ initial: "", blank: true }),
     notes: new StringField({ initial: "" }),
     tpCost: new NumberField({ required: true, nullable: false, initial: 0, integer: true }),
     dynamicTP: new NumberField({ required: true, nullable: false, initial: 0, integer: true })

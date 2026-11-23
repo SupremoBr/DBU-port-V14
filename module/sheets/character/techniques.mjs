@@ -1,7 +1,7 @@
 import { limitedMartialPower } from "../../rules/path-to-power-v093.mjs";
 import { energyChargeDie, greaterDiceCategoryBonus, shiftAttackDamageCategory, signatureBuffDice } from "../../helpers/custom-buffs.mjs";
 import { techniqueKiCost093, signatureEnergyCharges093, martialTechnique, martialTechniqueTPCap, startingTechniqueAvailable093, startingTechniqueEligible093 } from "../../rules/techniques-v093.mjs";
-import { uses093, techniquePointCost } from "../../rules/v093.mjs";
+import { uses093, techniquePointCost, paidAdvantageTP093 } from "../../rules/v093.mjs";
 import { progression093 } from "../../rules/progression-v093.mjs";
 
 /** Character sheet domain: techniques. Methods run with the sheet as this. */
@@ -55,6 +55,7 @@ export const techniquesMethods = {
       // Enrich advantages with requirement field
       const enrichedAdvantages = (t.advantages || []).map(adv => ({
         ...adv,
+        paidTP: currentRules ? paidAdvantageTP093(adv) : adv.tpCost,
         requirement: advData[adv.name]?.requirement || ""
       }));
 
@@ -75,7 +76,8 @@ export const techniquesMethods = {
         ...t,
         tpCost,
         tpMax: techniqueCap,
-        tpOverLimit: tpCost > techniqueCap,
+        tpOverLimit: (currentRules ? tpFull : tpCost) > techniqueCap,
+        tpDiscounted: currentRules && tpFull !== tpCost,
         ...(currentRules && t.startingTechnique ? { startingTechniqueNeedsReview: !isFreeStarter } : {}),
         tpFull,
         mfProfile,
@@ -664,8 +666,16 @@ export const techniquesMethods = {
     const techs = foundry.utils.deepClone(this.actor.system.signatureTechniques || []);
     const tech = techs.find(t => t.id === techId);
     if (!tech?.advantages?.[advIndex]) return;
+    const advantage = tech.advantages[advIndex];
     if (field === "name") {
+      if (uses093(this.actor.system) && el.value && tech.advantages.some((row, index) => index !== advIndex && row.name === el.value)) {
+        el.value = advantage.name;
+        ui.notifications.warn("Ajuste os ranks na linha existente desta vantagem.");
+        return;
+      }
       tech.advantages[advIndex].name = el.value;
+      advantage.freeRanks = 0;
+      advantage.grantSource = "";
       // Keep ranks, but clamp them to the new advantage's maxRanks
       const maxR = CONFIG.DBU?.techniqueAdvantagesData?.[el.value]?.maxRanks || 99;
       tech.advantages[advIndex].ranks = Math.min(tech.advantages[advIndex].ranks || 1, maxR);
@@ -673,10 +683,13 @@ export const techniquesMethods = {
     } else if (field === "ranks") {
       const advName = tech.advantages[advIndex].name;
       const maxR = CONFIG.DBU?.techniqueAdvantagesData?.[advName]?.maxRanks || 99;
-      let r = Number(el.value) || 1;
+      let r = Math.max(1, Math.trunc(Number(el.value)) || 1);
       if (r > maxR) { ui.notifications.warn(`${advName} allows at most ${maxR} rank(s).`); r = maxR; }
       tech.advantages[advIndex].ranks = r;
       tech.advantages[advIndex].tpCost = this._lookupAdvTP(advName, r);
+      advantage.freeRanks = Math.min(r, advantage.freeRanks || 0);
+    } else if (field === "freeRanks") {
+      advantage.freeRanks = Math.max(0, Math.min(advantage.ranks || 1, Math.trunc(Number(el.value)) || 0));
     } else if (field === "dynamicTP") {
       tech.advantages[advIndex].dynamicTP = Number(el.value) || 0;
     } else {

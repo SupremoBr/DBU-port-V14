@@ -1,6 +1,6 @@
 # Dragon Universe RPG (DBU-MRR-OLD)
 
-**Prévia 0.9.3 — `1.0.12-rules093-alpha.22`.** Atualiza a base de regras e converte personagens com backup. Vários efeitos continuam manuais. Leia [escopo, migração e limites](RULES-0.9.3.md) antes de atualizar o mundo. Foundry v13 continua suportado; teste no aplicativo real ainda pendente.
+**Prévia 0.9.3 — `1.0.12-rules093-alpha.23`.** Atualiza a base de regras e converte personagens com backup. Vários efeitos continuam manuais. Leia [escopo, migração e limites](RULES-0.9.3.md) antes de atualizar o mundo. Foundry v13 continua suportado; teste no aplicativo real ainda pendente.
 
 Automatización para [Foundry VTT](https://foundryvtt.com/) de la versión clásica
 del juego de rol **Dragon Universe**, creado por el equipo de
@@ -15,7 +15,7 @@ contenido escaneado de los manuales — para eso, visita
 
 ## Adaptación de compatibilidad v14
 
-Este fork conserva la autoría original MRR / ArdillaTactica. Versión local `1.0.12-rules093-alpha.22`, con ajustes de API y chat para probar en Foundry v14. `verified` permanece en v13: falta validación funcional en v14. Consulte [COMPATIBILITY-V14.md](COMPATIBILITY-V14.md).
+Este fork conserva la autoría original MRR / ArdillaTactica. Versión local `1.0.12-rules093-alpha.23`, con ajustes de API y chat para probar en Foundry v14. `verified` permanece en v13: falta validación funcional en v14. Consulte [COMPATIBILITY-V14.md](COMPATIBILITY-V14.md).
 
 ## Instalación
 

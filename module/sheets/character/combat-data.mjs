@@ -1,9 +1,14 @@
 import { martialEnergyCharges } from "../../rules/path-to-power-v093.mjs";
 import { attackKiWithBuffs, greaterDiceCategoryBonus, customBuffState, linkedCatalogBuffs } from "../../helpers/custom-buffs.mjs";
-import { signatureEnergyCharges093 } from "../../rules/techniques-v093.mjs";
+import { attackPowerShot093, attackReferenceKiCost093, signatureEnergyCharges093 } from "../../rules/techniques-v093.mjs";
 import { PROFILES_093 } from "../../rules/profiles-v093.mjs";
 import { uses093 } from "../../rules/v093.mjs";
 import { prepareCombatResources, prepareActiveEffects } from "../character-data.mjs";
+
+function linkChoice(list, name) {
+  const notes = String((list || []).find(row => row.name === name)?.notes || "").trim().toLowerCase();
+  return notes.startsWith("s") ? "strike" : notes.startsWith("w") ? "wound" : "";
+}
 
 /** Character sheet domain: combat-data. Methods run with the sheet as this. */
 export const combatDataMethods = {
@@ -353,8 +358,8 @@ export const combatDataMethods = {
       }
       // "Ki Point Cost Attacks" buffs (delta; negative = discount) and Deep
       // Control's all-maneuver reduction — previously dead aptitudes.
-      const minimum = uses093(system) ? (profile.kpCost || 0) * trackerTier / 2 : 0;
-      kiCost = attackKiWithBuffs(kiCost, minimum, system.aptitudes);
+      kiCost = uses093(system) ? attackReferenceKiCost093(ref, system, this.actor._getActiveAura(system))
+        : attackKiWithBuffs(kiCost, 0, system.aptitudes);
       const prep = prepRefs[i] || {};
       const isArmed = !!ref.weaponEquipped && String(ref.weaponEquipped).toLowerCase() !== "unarmed";
       const refCTs = prep.woundCT != null ? prep : this._calcCombatCTs(system, {
@@ -372,7 +377,9 @@ export const combatDataMethods = {
         foundation: ref.foundation || "",
         profile: ref.profile || "",
         energyCharges: martialEnergyCharges(system, (ref.energyCharges || 0) + (uses093(system) ? ((PROFILES_093[ref.profile]?.freeCharges || 0) + (PROFILES_093[ref.profile]?.freeChargesOutsideLimit || 0)) : 0)),
-        powerShot: ref.powerShot || 0,
+        powerShot: uses093(system) ? attackPowerShot093(ref) : ref.powerShot || 0,
+        advantages: uses093(system) ? (ref.grantedAdvantages || []) : [],
+        twinLinked: uses093(system) ? linkChoice(ref.grantedAdvantages, "Twin-Linked") : undefined,
         defaultWager: prep.maxWager || 0,
         activeBuffs
       });
@@ -385,14 +392,8 @@ export const combatDataMethods = {
       if (!tech.name) continue;
       // Twin-Linked / Dead-Link: the chosen roll (Strike/Wound, stored in the
       // advancement's notes) is rolled twice keeping the highest/lowest.
-      const _linkChoice = (list, name) => {
-        const e = (list || []).find(x => x.name === name);
-        if (!e) return "";
-        const n = String(e.notes || "").trim().toLowerCase();
-        return n.startsWith("s") ? "strike" : n.startsWith("w") ? "wound" : "";
-      };
-      const twinLinked = _linkChoice(tech.advantages, "Twin-Linked");
-      const deadLinked = _linkChoice(tech.disadvantages, "Dead-Link");
+      const twinLinked = linkChoice(tech.advantages, "Twin-Linked");
+      const deadLinked = linkChoice(tech.disadvantages, "Dead-Link");
       stSources.push({
         key: `tech_${tech.id}`,
         name: tech.name,
@@ -409,6 +410,7 @@ export const combatDataMethods = {
         profile: tech.profile || "",
         energyCharges: uses093(system) ? signatureEnergyCharges093(tech, system) : (tech.baseEnergyCharges || 0) + (tech.extraEnergyCharges || 0),
         powerShot: (tech.advantages || []).find(a => a.name === "Power Shot")?.ranks || 0,
+        advantages: tech.advantages || [],
         defaultWager: 0,
         twinLinked,
         deadLinked,

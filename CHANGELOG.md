@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.0.12-rules093-alpha.23] — recursos raciais, passivas e TP
+
+- Demonic Pressure acompanha Power e Fatigue na ficha, com Pressure Checks, bônus e limpeza no início do turno. Arcosian usa Overwhelm na 0.9.3.
+- A ficha aplica 27 passivas de talentos adicionais. A auditoria lista os recursos e efeitos que ainda exigem resolução manual.
+- TP grátis e ranks concedidos reduzem o gasto da técnica. O valor total continua contando para Ki e limite. Uma Unique Ability gratuita continua cobrando os aprimoramentos comprados.
+
 ## [1.0.12-rules093-alpha.22] — correção no cadastro de Unique Abilities
 
 - A ficha aceita salvar habilidades únicas sem escolher um tipo. Habilidades de tipo duplo permitem escolher ou limpar Technical ou Magical.

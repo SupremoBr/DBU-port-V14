@@ -4,6 +4,7 @@ import { techniquePointCap, techniquePointCost, techniqueBaseKiUnits, awakeningL
 import { RACES_093, validateRacialAttributes } from '../module/rules/races-v093.mjs';
 import { PROFILES_093, profileKiUnits, minimumAttackKiUnits, validFoundation } from '../module/rules/profiles-v093.mjs';
 import { techniquesMethods } from '../module/sheets/character/techniques.mjs';
+import { attackPowerShot093, attackReferenceKiCost093, validateTechnique093, techniqueKiCost093 } from '../module/rules/techniques-v093.mjs';
 
 test('signature caps follow the official base-tier table', () => {
   assert.deepEqual([1, 2, 3, 4, 5, 6, 7].map(techniquePointCap), [25, 30, 40, 50, 50, 50, 50]);
@@ -24,6 +25,29 @@ test('the actual sheet selects the reviewed Ultimate cost only for migrated acto
   const old = { actor: { system: { rulesVersion: '0.9.2' } } };
   assert.equal(techniquesMethods._calcTechTPCost.call(migrated, { type: 'ultimate' }), 12);
   assert.equal(techniquesMethods._calcTechTPCost.call(old, { type: 'ultimate' }), 14);
+});
+
+test('TP credits and granted ranks affect the wallet only, with the full value used for Ki and caps', () => {
+  const system = { rulesVersion: '0.9.3', baseTier: 1 };
+  const beam = { foundation: 'Energy', profile: 'Beam', advantages: [
+    { name: 'Accurate', ranks: 2, freeRanks: 1, tpCost: 8 }
+  ], freeTP: 3 };
+  assert.equal(techniquePointCost(beam), 8);
+  assert.equal(techniquePointCost(beam, { includeFreeTP: false }), 16);
+  assert.equal(techniquePointCost({ ...beam, freeTP: 100 }), 0);
+  assert.equal(techniqueKiCost093(beam, { system }).finalKP, techniqueKiCost093({
+    ...beam, freeTP: 0, advantages: [{ ...beam.advantages[0], freeRanks: 0 }]
+  }, { system }).finalKP);
+  const oversized = { ...beam, freeTP: 25, advantages: [
+    { name: 'Accurate', ranks: 3, freeRanks: 3, tpCost: 15 },
+    { name: 'Power Shot', ranks: 3, freeRanks: 3, tpCost: 18 }
+  ] };
+  assert.equal(techniquePointCost(oversized), 0);
+  assert.ok(validateTechnique093(oversized, system).issues.some(issue => /25 TP/.test(issue)));
+  assert.equal(attackPowerShot093({ powerShot: 2, grantedAdvantages: [{ name: 'Power Shot', ranks: 2 }] }), 2);
+  assert.equal(attackReferenceKiCost093({ profile: 'Beam', grantedAdvantages: [
+    { name: 'Efficiency', ranks: 1 }
+  ] }, { ...system, tier: 3 }), 4);
 });
 test('racial creation facts include nineteen races, dual saves, new races and explicit attribute choices', () => {
   assert.equal(Object.keys(RACES_093).length, 19);

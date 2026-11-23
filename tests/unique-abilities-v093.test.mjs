@@ -48,6 +48,16 @@ test('sheet uses current costs, presents saved legacy advancements and filters l
   assert.equal(sheet._calcUniqueTotalTP(system), 21);
 });
 
+test('a free Unique Ability still charges for paid advancements', () => {
+  const sheet = { ...uniquePowersMethods };
+  const free = { abilityKey: 'binding', free: true,
+    advancements: [{ advancementId: 'psychic_grip' }, { advancementId: 'energy_web', free: true }],
+    restrictions: [{ restrictionId: 'gentle_hold' }] };
+  assert.equal(sheet._calcUniqueTPCost(free, catalog.binding), 5);
+  assert.equal(sheet._calcUniqueTotalTP({ uniqueAbilities: [free] }), 5);
+  assert.equal(sheet._calcUniqueTPCost({ ...free, free: false }, catalog.binding), 20);
+});
+
 test('Shapeshift uses base Tier for activation and recovery, and current Tier for the Diploma discount', () => {
   const system = { rulesVersion: '0.9.3', tier: 3, baseTier: 2,
     uniqueAbilities: [{ abilityKey: 'shapeshift', advancements: [] }] };

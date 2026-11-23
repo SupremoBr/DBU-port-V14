@@ -2,6 +2,7 @@ import { martialDie, martialEnergyCharges } from "../../rules/path-to-power-v093
 import { energyChargeDie, greaterDiceCategoryBonus, shiftAttackDamageCategory } from "../../helpers/custom-buffs.mjs";
 import { PROFILES_093 } from "../../rules/profiles-v093.mjs";
 import { uses093 } from "../../rules/v093.mjs";
+import { attackPowerShot093, attackReferenceKiCost093, grantedAdvantageRanks093 } from "../../rules/techniques-v093.mjs";
 
 
 /** Character sheet domain: combat-math. Methods run with the sheet as this. */
@@ -252,7 +253,7 @@ export const combatMathMethods = {
         weaponItemsByName.set(it.name.trim().toLowerCase(), it);
     }
     context.weaponOptions = [...weaponItemsByName.values()].map(it => it.name).sort((a, b) => a.localeCompare(b));
-    const hasWeaponSpecialist = (system.talents || []).includes("weapon_specialist");
+    const hasWeaponSpecialist = (system.talents || []).includes("weapon_specialist") || system.aptitudes?.ignoreWeaponPenalty;
     const eqFlags = system.equipmentFlags || {};
 
     // Prepare each attack ref card with calculated formulas
@@ -261,7 +262,8 @@ export const combatMathMethods = {
       const profile = profileData[ref.profile] || {};
       const charges = martialEnergyCharges(system, (ref.energyCharges || 0) + (uses093(system) ? ((PROFILES_093[ref.profile]?.freeCharges || 0) + (PROFILES_093[ref.profile]?.freeChargesOutsideLimit || 0)) : 0));
       const wager = ref.kiWager || 0;
-      const ps = ref.powerShot || 0;
+      const revised = uses093(system);
+      const ps = revised ? attackPowerShot093(ref) : ref.powerShot || 0;
       const targetRange = ref.targetRange || 0;
 
       // --- WEAPON (Armed Attack) ---
@@ -366,7 +368,9 @@ export const combatMathMethods = {
         }
       }
       const strikeMod = haste + awareness - strikePenShaken - strikePenLR - eqPenalty - ssPenStrike + strikeBuffTotal + stateAllMod + foundationStrikeBuff + weaponStrikeMod + unarmedStrikeBuff + armedStrikeBuff;
-      const strikeFormula = this._buildFormula(strikeTopDice, strikeGreaterDice, strikeMod, stateStrikeExtra + this._extraDicePool(system, "strike"));
+      const grantedAccurate = revised ? grantedAdvantageRanks093(ref, "Accurate") * tier : 0;
+      const grantedLongShot = revised && targetRange >= 9 ? grantedAdvantageRanks093(ref, "Long Shot") * tier : 0;
+      const strikeFormula = this._buildFormula(strikeTopDice, strikeGreaterDice, strikeMod + grantedAccurate + grantedLongShot, stateStrikeExtra + this._extraDicePool(system, "strike"));
 
       // --- WOUND ---
       const isMagic = ref.foundation === "Magic";
@@ -395,7 +399,7 @@ export const combatMathMethods = {
       // Synthetic Muscle (cybernetic trait): +1d4(T) Wound on Physical/Energy attacks
       const cyberSynthExtra = (system._cyberSynthWoundDice && (ref.foundation === "Physical" || ref.foundation === "Energy"))
         ? `+${this._scaleDiceByTier("1d4", tier)}` : "";
-      const woundFormula = this._buildFormula(woundTopDice, woundGreaterDice, woundMod, chargesStr + ssWoundExtra + stateWoundExtra + cyberSynthExtra + this._extraDicePool(system, "wound"));
+      const woundFormula = this._buildFormula(woundTopDice, woundGreaterDice, woundMod + grantedLongShot, chargesStr + ssWoundExtra + stateWoundExtra + cyberSynthExtra + this._extraDicePool(system, "wound"));
       let damageCat = profile.damageCat || "Standard";
       // Mega Flare: 7+ charges → upgrade damage category
       if (ref.profile === "Mega Flare" && charges >= 7) {
@@ -438,11 +442,12 @@ export const combatMathMethods = {
         extraProfile: ref.extraProfile || "",
         profileEffect: profile.effect || "—",
         profileRange: profile.range || "—",
-        profileKP: profile.kpCost != null ? `${profile.kpCost}(T)` : "—",
+        profileKP: revised ? `${attackReferenceKiCost093(ref, system, this.actor._getActiveAura?.(system))} KP`
+          : profile.kpCost != null ? `${profile.kpCost}(T)` : "—",
         damageCat,
         damageCatClass: `dmg-cat-${damageCat.toLowerCase()}`,
-        strikeFormula, strikeCT, strikeMod, haste, awareness,
-        woundFormula, woundCT, woundMod, damageAttr,
+        strikeFormula, strikeCT, strikeMod: strikeMod + grantedAccurate + grantedLongShot, haste, awareness,
+        woundFormula, woundCT, woundMod: woundMod + grantedLongShot, damageAttr,
         dodgeFormula, dodgeMod,
         clashFormula, clashMod,
         strikeTopDice,

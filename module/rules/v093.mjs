@@ -1,3 +1,5 @@
+import { SIGNATURE_MODIFIERS_093 } from './data/signature-modifiers-v093.mjs';
+
 /** Mechanical constants from the current DBU rules, not the Foundry version.
  * Sources: /signature/, /actions-maneuvers/, /transformation-rules/ on dbu-rpg.com.
  */
@@ -19,13 +21,34 @@ export function techniquePointCap(baseTier) {
   return tier === 1 ? 25 : tier === 2 ? 30 : tier === 3 ? 40 : 50;
 }
 
-/** Disadvantage rows already store their signed TP reduction. */
+export function modifierPointCost(definition, ranks = 1) {
+  if (!definition) return null;
+  const count = Math.trunc(Number(ranks));
+  if (!Number.isInteger(count) || count < 1 || count > definition.maxRanks) return null;
+  return Array.isArray(definition.tpPerRank)
+    ? definition.tpPerRank.slice(0, count).reduce((a, b) => a + b, 0)
+    : definition.tpPerRank * count;
+}
+
+export function paidAdvantageTP093(row) {
+  const cost = n(row.tpCost);
+  const freeRanks = Math.min(int(row.ranks ?? 1), int(row.freeRanks));
+  if (!freeRanks) return cost;
+  const paidRanks = int(row.ranks ?? 1) - freeRanks;
+  if (!paidRanks) return 0;
+  return modifierPointCost(SIGNATURE_MODIFIERS_093.Advantages[row.name], paidRanks) ?? cost;
+}
+
+/** Return the amount spent or, with credits excluded, the full value used for KP and caps. */
 export function techniquePointCost(technique, { includeFreeTP = true } = {}) {
-  const advantages = (technique.advantages || []).reduce((sum, row) => sum + n(row.tpCost), 0);
+  const advantages = (technique.advantages || []).reduce((sum, row) =>
+    sum + (includeFreeTP ? paidAdvantageTP093(row) : n(row.tpCost)), 0);
   const disadvantages = (technique.disadvantages || []).reduce((sum, row) => sum + n(row.tpCost), 0);
   const free = includeFreeTP ? Math.max(0, n(technique.freeTP)) : 0;
   const base = technique.profile === 'Simple' ? 4 : 8;
-  return Math.max(8, base + advantages + disadvantages - free) + (isUltimateTechnique(technique.type ?? technique.techType) ? 4 : 0);
+  const subtotal = Math.max(8, base + advantages + disadvantages);
+  const surcharge = isUltimateTechnique(technique.type ?? technique.techType) ? 4 : 0;
+  return Math.max(0, subtotal + surcharge - free);
 }
 
 /** Returned KP is in (T) units, matching the sheet's existing cost pipeline. */

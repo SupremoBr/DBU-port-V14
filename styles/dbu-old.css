@@ -10519,7 +10519,8 @@
 }
 
 .bb-decrement,
-.bb-increment {
+.bb-increment,
+.bb-resource-adjust {
   width: 24px;
   height: 24px;
   border: 1px solid #555;
@@ -10535,14 +10536,16 @@
 }
 
 .bb-decrement:hover:not([disabled]),
-.bb-increment:hover:not([disabled]) {
+.bb-increment:hover:not([disabled]),
+.bb-resource-adjust:hover:not([disabled]) {
   background: #e94560;
   color: #fff;
   border-color: #e94560;
 }
 
 .bb-decrement[disabled],
-.bb-increment[disabled] {
+.bb-increment[disabled],
+.bb-resource-adjust[disabled] {
   opacity: 0.3;
   cursor: not-allowed;
 }
@@ -15245,6 +15248,14 @@
   font-size: 9.5px;
   color: #8899aa;
   font-style: italic;
+}
+.dbu-old.sheet .dbu-racial-resource-actions {
+  flex-wrap: wrap;
+  margin-top: 6px;
+}
+.dbu-old.sheet .dbu-racial-resource-actions button {
+  width: auto;
+  min-height: 24px;
 }
 .de-meta-effects {
   margin: 4px 0 2px 6px;

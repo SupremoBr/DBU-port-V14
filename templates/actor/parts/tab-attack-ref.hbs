@@ -204,6 +204,19 @@
                             </tr>
                         </tbody>
                     </table>
+                    {{#if ../rules093}}
+                    <div class="ar-footer">
+                        <span class="ar-effect-label">Vantagens concedidas</span>
+                        {{#each grantedAdvantages}}
+                        {{#if @root.editable}}
+                        <button type="button" class="tf-expand-traits-btn dbu-edit-visual-btn" data-rules093-attack-grant="{{../_idx}}" data-grant-name="{{name}}">{{name}} ×{{ranks}}</button>
+                        {{else}}<span>{{name}} ×{{ranks}}</span>{{/if}}
+                        {{/each}}
+                        {{#if @root.editable}}
+                        <button type="button" class="tf-expand-traits-btn dbu-edit-visual-btn" data-rules093-attack-grant="{{_idx}}" aria-label="Adicionar vantagem concedida"><i class="fas fa-plus"></i></button>
+                        {{/if}}
+                    </div>
+                    {{/if}}
                     <div class="ar-footer">
                         <span class="ar-effect-label">Profile Effect:</span>
                         <span class="ar-effect-text">{{profileEffect}}</span>

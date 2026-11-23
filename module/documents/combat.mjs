@@ -1,3 +1,5 @@
+import { clearCombatRacialResources093, updateRacialTurn093 } from "../rules/racial-resources-v093.mjs";
+
 /**
  * Extend the base Combat document for DBU-OLD.
  * Handles Initiative Advantage detection after initiative rolls.
@@ -113,6 +115,15 @@ export class DBUCombat extends Combat {
    * when combatants change.
    */
   static registerHooks() {
+    const isPrimaryGM = () => game.user?.isGM && game.users?.activeGM?.id === game.user.id;
+    Hooks.on("updateCombat", async (combat, changes) => {
+      if (!isPrimaryGM() || !("turn" in changes || "round" in changes)) return;
+      if (combat.round > 0) await updateRacialTurn093(combat);
+      else if (changes.round === 0) await clearCombatRacialResources093(combat);
+    });
+    Hooks.on("deleteCombat", async combat => {
+      if (isPrimaryGM()) await clearCombatRacialResources093(combat);
+    });
     Hooks.on("updateCombatant", async (combatant, change, options, userId) => {
       if ("initiative" in change && combatant.combat) {
         await combatant.combat._evaluateInitiativeAdvantage();

@@ -1,0 +1,71 @@
+{{#with racialResources093}}
+{{#if show}}
+<div class="battle-born-tracker">
+  <div class="bb-header">
+    {{#if demon}}<i class="fas fa-fire-alt"></i> Demonic Pressure{{else}}<i class="fas fa-snowflake"></i> Overwhelm{{/if}}
+    {{#if arcosian}}<span class="bb-total">{{overwhelm}}/4</span>{{/if}}
+  </div>
+  <div class="bb-allocations">
+    {{#if pressure}}
+    <div class="bb-row">
+      <span class="bb-label">Demonic Power</span>
+      {{#if ../editable}}
+      <button type="button" class="bb-resource-adjust" data-rules093-resource="demonicPower" data-delta="-1" aria-label="Remover Demonic Power" {{#unless power}}disabled{{/unless}}><i class="fas fa-minus"></i></button>
+      {{/if}}
+      <b>{{power}}</b>
+      {{#if ../editable}}
+      <button type="button" class="bb-resource-adjust" data-rules093-resource="demonicPower" data-delta="1" aria-label="Adicionar Demonic Power"><i class="fas fa-plus"></i></button>
+      {{/if}}
+      <span class="bb-bonus">+{{demonicWound}} Wound{{#if might}} · +{{might}} Might{{/if}}</span>
+    </div>
+    <div class="bb-row">
+      <span class="bb-label">Demonic Fatigue</span>
+      {{#if ../editable}}
+      <button type="button" class="bb-resource-adjust" data-rules093-resource="demonicFatigue" data-delta="-1" aria-label="Remover Demonic Fatigue" {{#unless fatigue}}disabled{{/unless}}><i class="fas fa-minus"></i></button>
+      {{/if}}
+      <b>{{fatigue}}</b>
+      {{#if ../editable}}
+      <button type="button" class="bb-resource-adjust" data-rules093-resource="demonicFatigue" data-delta="1" aria-label="Adicionar Demonic Fatigue"><i class="fas fa-plus"></i></button>
+      {{/if}}
+      <span class="bb-bonus">−{{defensePenalty}} Defense · {{soak}} Soak (saldo){{#if steadfast}} · +{{steadfast}} Steadfast{{/if}}</span>
+    </div>
+    {{/if}}
+    {{#if arcosian}}
+    <div class="bb-row">
+      <span class="bb-label">Overwhelm</span>
+      {{#if ../editable}}
+      <button type="button" class="bb-resource-adjust" data-rules093-resource="overwhelm" data-delta="-1" aria-label="Remover Overwhelm" {{#unless overwhelm}}disabled{{/unless}}><i class="fas fa-minus"></i></button>
+      {{/if}}
+      <div class="bb-pips" aria-hidden="true">
+        {{#each overwhelmPips}}<span class="bb-pip {{#if this}}filled{{/if}}"></span>{{/each}}
+      </div>
+      {{#if ../editable}}
+      <button type="button" class="bb-resource-adjust" data-rules093-resource="overwhelm" data-delta="1" aria-label="Adicionar Overwhelm" {{#if overwhelmMaxed}}disabled{{/if}}><i class="fas fa-plus"></i></button>
+      {{/if}}
+      <span class="bb-bonus">+{{overwhelmWound}} Wound</span>
+    </div>
+    {{/if}}
+  </div>
+  {{#if dr}}<span class="bb-bonus">Demonic Resilience · +{{dr}} Damage Reduction</span>{{/if}}
+  {{#if ../editable}}
+  <div class="bb-row dbu-racial-resource-actions">
+    {{#if pressure}}
+    <button type="button" data-rules093-pressure="attack" {{#unless canAttack}}disabled{{/unless}}>Pressure Check · Após atacar {{attackChecks}}/3</button>
+    {{/if}}
+    {{#if hasDefenseCheck}}
+    <button type="button" data-rules093-pressure="defense" {{#unless canDefend}}disabled{{/unless}}>Pressure Check · Ao ser alvo {{defenseChecks}}/2</button>
+    {{/if}}
+    {{#if hasSteadfastCheck}}
+    <button type="button" data-rules093-pressure="steadfast" {{#unless canSteadfast}}disabled{{/unless}}>Pressure Check · Após falhar Steadfast</button>
+    {{/if}}
+    {{#if makyanPower}}
+    <button type="button" data-rules093-resource="makyanPower" {{#unless canUseMakyanPower}}disabled{{/unless}}>Makyan · Após Power Up</button>
+    {{/if}}
+    {{#unless inCombat}}
+    <button type="button" data-rules093-resource="turn">Novo turno</button>
+    {{/unless}}
+  </div>
+  {{/if}}
+</div>
+{{/if}}
+{{/with}}

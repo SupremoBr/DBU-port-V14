@@ -12,6 +12,8 @@ function advDisadvField() {
   return new SchemaField({
     name: new StringField({ required: true, blank: false }),
     ranks: new NumberField({ required: true, nullable: false, initial: 1, integer: true, min: 0 }),
+    freeRanks: new NumberField({ required: true, nullable: false, initial: 0, integer: true, min: 0 }),
+    grantSource: new StringField({ initial: "", blank: true }),
     notes: new StringField({ initial: "" }),
     tpCost: new NumberField({ required: true, nullable: false, initial: 0 }),
     dynamicTP: new NumberField({ required: true, nullable: false, initial: 0 })

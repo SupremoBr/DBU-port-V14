@@ -1,6 +1,7 @@
 import { RACES_093 } from './races-v093.mjs';
 import { CATALOGS_093 } from './catalogs-v093.mjs';
 import { uses093 } from './v093.mjs';
+import { applyTalentPassives093, talentPassiveBonus093 } from './talent-passives-v093.mjs';
 
 const racialById = new Map(Object.values(CATALOGS_093.racialTraits).flat().map(t => [t.id, t]));
 const talentById = new Map(CATALOGS_093.talents.map(t => [t.id, t]));
@@ -9,7 +10,9 @@ export function racialSaves093(system) {
   const race = system.fusion?._possessionRace || system.race;
   return race === 'customSpecies' ? [system.customSpeciesSave || 'corporeal'] : (RACES_093[race]?.saves || []);
 }
-export function racialLife093(system, race = system.race) { return RACES_093[race]?.life ?? 3; }
+export function racialLife093(system, race = system.race) {
+  return (RACES_093[race]?.life ?? 3) + talentPassiveBonus093(system, 'racialLife');
+}
 /** Only verified current passives belong here. Other changed traits remain manual. */
 export function applyRacial093(system, tier, baseTier) {
   if (!uses093(system)) return;
@@ -70,6 +73,7 @@ export function applyCatalogPassives093(system, tier, baseTier) {
     else if (rule.target === 'allSaves') for (const save of Object.values(system.savingThrows || {})) save.bonus += amount;
     else system.aptitudes[rule.target] = (system.aptitudes[rule.target] || 0) + amount;
   }
+  applyTalentPassives093(system, tier, baseTier);
 }
 
 export function applyRacialAttribute093(system, tier) {

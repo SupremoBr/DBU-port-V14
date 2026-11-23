@@ -8,6 +8,9 @@ import { RACES_093 } from './races-v093.mjs';
 import { uses093, awakeningLimits, validateTransformationStack, fullAwakeningRecovery, stackedStressRequirement } from './v093.mjs';
 import { roundPools093, convertStandardToCounter093, isOwnTurn093, inCombat093, rowActionType093, rowCost093 } from './actions-v093.mjs';
 import { validateTechnique093, validateTechniqueUsage093, maximumWager093 } from './techniques-v093.mjs';
+import { racialEffectEnabled093 } from './runtime-v093.mjs';
+import { adjustRacialResource093, racialEncounterReset093, racialResourceView093, racialTurnReset093, rollPressure093, useMakyanPower093 } from './racial-resources-v093.mjs';
+import { editAttackGrant093 } from './attack-grants-v093.mjs';
 const installed = new WeakSet();
 const warn = message => { ui.notifications.warn(message); return false; };
 const escape = text => String(text ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -58,6 +61,52 @@ export function installRulesSheet093(Sheet) {
   });
   wrap('activateListeners', function(original, html) {
     original(html); if (!this.isEditable) return;
+    html.on('click', '[data-rules093-attack-grant]', async event => {
+      const { rules093AttackGrant, grantName } = event.currentTarget.dataset;
+      await editAttackGrant093(this.actor, Number(rules093AttackGrant), grantName);
+    });
+    html.on('click', '[data-rules093-resource]', async event => {
+      const button = event.currentTarget;
+      button.disabled = true;
+      try {
+        if (button.dataset.rules093Resource === 'turn') {
+          if (inCombat093(this.actor)) return;
+          const { system } = this.actor;
+          const changes = { ...racialTurnReset093(system, 'start'), ...racialTurnReset093(system, 'end') };
+          if (Object.keys(changes).length) await this.actor.update(changes);
+        } else if (button.dataset.rules093Resource === 'makyanPower') {
+          if (!(await useMakyanPower093(this.actor))) warn('Power Up Makyan indisponível nesta rodada ou encontro.');
+        } else {
+          await adjustRacialResource093(this.actor, button.dataset.rules093Resource, Number(button.dataset.delta));
+        }
+      } finally { button.disabled = false; }
+    });
+    html.on('click', '[data-rules093-pressure]', async event => {
+      const button = event.currentTarget;
+      button.disabled = true;
+      try {
+        const { system } = this.actor;
+        const view = racialResourceView093(this.actor);
+        const choices = [
+          [racialEffectEnabled093(system, 'Denizen of the Demon Realm'), 'denizen', '+1 se você impôs uma condição a um oponente'],
+          [view.canUseCreativity, 'creative', 'Demonic Creativity · 2d10, use o maior'],
+          [racialEffectEnabled093(system, 'Demons of the Makyo Star', 4), 'makyan', 'Makyan · −2 no teste, +1 Power se passar']
+        ].filter(([available]) => available);
+        const options = choices.length ? await Dialog.wait({
+          title: 'Pressure Check',
+          content: choices.map(([, name, label]) => `<div><label><input type="checkbox" name="${name}"> ${label}</label></div>`).join(''),
+          default: 'roll',
+          buttons: {
+            roll: { label: 'Rolar', callback: root => Object.fromEntries(choices.map(([, name]) =>
+              [name, !!root.find(`[name="${name}"]`).prop('checked')])) },
+            cancel: { label: 'Cancelar' }
+          }
+        }) : {};
+        if (!options) return;
+        const result = await rollPressure093(this.actor, button.dataset.rules093Pressure, options);
+        if (!result) warn('Pressure Check indisponível neste turno ou rodada.');
+      } finally { button.disabled = false; }
+    });
     html.on('change', '[data-dbu-unique-type]', async event => {
       const { value, dataset } = event.currentTarget;
       const rows = structuredClone(this.actor.system.uniqueAbilities || []);
@@ -114,6 +163,7 @@ export function installRulesSheet093(Sheet) {
   });
   wrap('getData', async function(original, ...args) {
     const context = await original(...args);
+    context.racialResources093 = racialResourceView093(this.actor);
     context.canEditAttackVisual = context.editable && !!game.dbu?.automation?.editAttackVisual;
     context.canEditTransformationToken = context.editable && !!game.dbu?.automation?.editTransformationToken;
     context.rules093Pools = roundPools093(this.actor);
@@ -307,6 +357,6 @@ export function installRulesSheet093(Sheet) {
   });
   wrap('_onCombatNewEncounter', async function(original, event) {
     await original(event);
-    await this.actor.update({ 'system.rules093State': {}, 'system.transformationMeta.enteredViaManeuver093': [] });
+    await this.actor.update({ 'system.rules093State': {}, 'system.transformationMeta.enteredViaManeuver093': [], ...racialEncounterReset093(this.actor.system) });
   });
 }

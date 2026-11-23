@@ -366,8 +366,7 @@ export const uniquePowersMethods = {
   },
 
   _calcUniqueTPCost(ua, data) {
-    if (ua.free) return 0;
-    const baseCost = data.tpCost || 0;
+    const baseCost = ua.free ? 0 : data.tpCost || 0;
     let tp = baseCost;
 
     for (const sel of (ua.advancements || [])) {
@@ -377,9 +376,11 @@ export const uniquePowersMethods = {
       tp += (advData.tpCost || 0) * (sel.amount || 1);
     }
 
-    for (const sel of (ua.restrictions || [])) {
-      const resData = (data.restrictions || []).find(r => r.id === sel.restrictionId);
-      if (resData) tp += (resData.tpCost || 0); // negative values
+    if (!ua.free) {
+      for (const sel of (ua.restrictions || [])) {
+        const resData = (data.restrictions || []).find(r => r.id === sel.restrictionId);
+        if (resData) tp += (resData.tpCost || 0); // negative values
+      }
     }
 
     // Floor: can't go below ceil(baseCost/2)

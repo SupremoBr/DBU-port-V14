@@ -85,5 +85,12 @@ test('the real system init installs the current catalogs, schema, sheet adapter 
       await change({ currentTarget: { value, dataset: { dbuUniqueType: '0' } } });
       assert.equal(character.system.uniqueAbilities[0].abilityType, value);
     }
+    for (const ability of Object.values(CONFIG.DBU.uniqueAbilitiesCatalog).filter(row => !row.legacy)) {
+      selectedAbility = ability.id;
+      await add({ preventDefault() {} });
+      assert.ok(character.system.uniqueAbilities.some(row => row.abilityKey === ability.id), ability.name);
+    }
+    assert.equal(character.system.uniqueAbilities.length, 66);
+    assert.ok(character.system.uniqueAbilities.some(row => row.abilityKey === 'position_change'));
   });
 });

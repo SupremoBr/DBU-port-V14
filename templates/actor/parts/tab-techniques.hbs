@@ -58,7 +58,7 @@
         <span class="tech-name-display">{{name}}</span>
         {{#if isGained}}<span class="gained-badge"><i class="fas fa-link"></i> Gained from: {{gainedFrom}}</span>{{/if}}
         <span class="tech-type-badge">{{#if ../limitedMartialPower}}Super{{else}}{{type}}{{/if}}</span>
-        <span class="tech-tp-badge {{#if tpOverLimit}}tp-badge-over{{/if}}" title="Max TP per Signature Technique at your base Tier of Power (25/30/40/50)">TP: {{tpCost}}/{{tpMax}}</span>
+        <span class="tech-tp-badge {{#if tpOverLimit}}tp-badge-over{{/if}}" title="TP total / limite">TP: {{#if tpDiscounted}}{{tpFull}}{{else}}{{tpCost}}{{/if}}/{{tpMax}}</span>
         {{#unless isGained}}
         {{#if ../canEditAttackVisual}}
         <button type="button" class="tf-expand-traits-btn dbu-edit-visual-btn" data-dbu-edit-attack-visual="tech_{{id}}"><i class="fas fa-image" aria-hidden="true"></i> Visuais</button>
@@ -151,7 +151,7 @@
           {{/unless}}
           {{/if}}
           <div class="tech-cost-row">
-            <label>TP Cost</label>
+            <label>TP pago</label>
             <span class="cost-value">{{tpCost}}</span>
           </div>
           <div class="tech-cost-row">
@@ -237,7 +237,8 @@
               <th>Ranks</th>
               <th>Notes</th>
               <th>Req.</th>
-              <th>TP</th>
+              <th>TP pago</th>
+              {{#if ../rules093}}<th>Ranks grátis</th>{{/if}}
               <th>Dyn.</th>
               <th></th>
             </tr>
@@ -273,7 +274,13 @@
                 {{/if}}
               </td>
               <td class="adv-req">{{requirement}}</td>
-              <td class="adv-tp">{{tpCost}}</td>
+              <td class="adv-tp">{{#if freeRanks}}{{paidTP}}{{else}}{{tpCost}}{{/if}}</td>
+              {{#if @root.rules093}}
+              <td>
+                <input type="number" class="adv-input" data-tech-id="{{../id}}" data-adv-index="{{@index}}" data-field="freeRanks" value="{{freeRanks}}" min="0" max="{{ranks}}" aria-label="Ranks grátis" />
+                {{#if freeRanks}}<input type="text" class="adv-input" data-tech-id="{{../id}}" data-adv-index="{{@index}}" data-field="grantSource" value="{{grantSource}}" placeholder="Fonte da vantagem" aria-label="Fonte da vantagem" />{{/if}}
+              </td>
+              {{/if}}
               <td><input type="number" class="adv-input adv-dtp" data-tech-id="{{../id}}" data-adv-index="{{@index}}" data-field="dynamicTP" value="{{dynamicTP}}" /></td>
               <td>
                 <button type="button" class="delete-btn" data-action="remove-advantage" data-technique-id="{{../id}}" data-adv-index="{{@index}}">

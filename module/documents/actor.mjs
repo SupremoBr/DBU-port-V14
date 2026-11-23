@@ -2,6 +2,8 @@ import { awakeningAMB, limitedMartialPower, martialDie, martialLevel, martialRes
 import { applyConditionalCustomBuffs, buffAmount, buffEffectKey, conditionalBuff, linkedCatalogBuffs } from "../helpers/custom-buffs.mjs";
 import { uses093 } from "../rules/v093.mjs";
 import { racialSaves093, racialLife093, applyRacial093, applyCatalogPassives093, applyRacialAttribute093, ignoresSaiyanPenalties093 } from "../rules/runtime-v093.mjs";
+import { applyRacialResources093 } from "../rules/racial-resources-v093.mjs";
+import { talentPassiveBonus093 } from "../rules/talent-passives-v093.mjs";
 import { getDisabledRacialPassives, getRacialStressBonus } from "../helpers/catalog-index.mjs";
 /**
  * Extend the base Actor document for the DBU-OLD system.
@@ -400,6 +402,7 @@ export class DBUActor extends Actor {
     // ---- Talent Automation ----
     applyTalentBonuses(system, tier, baseTier);
     applyCatalogPassives093(system, tier, baseTier);
+    applyRacialResources093(system, tier);
 
     // ---- Damage Reduction Finalizer ----
     // Now that racial + talent + bestial DR additions are accumulated in
@@ -1231,7 +1234,8 @@ export class DBUActor extends Actor {
 
     // --- Surgency = Force total (+2(T) with Archetype Focus L2) ---
     const talents = system._martialTalents ?? system.talents ?? [];
-    const surgency = foTotal + (talents.includes("archetype_focus") ? 2 * tier : 0);
+    const surgency = foTotal + (talents.includes("archetype_focus") ? 2 * tier : 0) + talentPassiveBonus093(system, "surgency", tier);
+    if (uses093(system)) system.status.surgency = surgency;
 
     // --- Healing Surge ---
     // Base: "2d10(T) Life Points" + Surgency (Force Modifier) (actions-combat.txt)

@@ -1,5 +1,6 @@
 import { progressionRowIsEarned, usesPathToPower } from './path-to-power-v093.mjs';
 import { CATALOGS_093 } from './catalogs-v093.mjs';
+import { talentPassiveBonus093 } from './talent-passives-v093.mjs';
 
 const talentsByName = new Map(CATALOGS_093.talents.map(talent => [talent.name, talent]));
 // These Skill talents require another Skill talent in the 0.9.3 catalog.
@@ -33,7 +34,7 @@ export function progression093(system, rows, tpPerSkillImprovement = 0) {
   });
   const bonus = (Number(system.aptitudes?.giftedStudentTPPerSI) || 0)
     + (Number(system.aptitudes?.rapidLearnerTPPerSI) || 0)
-    + tpPerSkillImprovement;
+    + tpPerSkillImprovement + talentPassiveBonus093(system, 'tpPerSkillImprovement');
   return { skillRankSlots, tpRows, skillImprovementCount, totalTP: totalTP + bonus * skillImprovementCount };
 }
 
