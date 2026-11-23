@@ -177,7 +177,10 @@ async function dbuRevealNativeAttackMessage(attack) {
   };
 
   await original.update(updates);
+  await dbuShowAttackDice(reveal);
+}
 
+async function dbuShowAttackDice(reveal) {
   // Feedback de dados somente depois que todos os defensores escolheram.
   try { foundry.audio.AudioHelper.play({ src: CONFIG.sounds.dice }, true); } catch {}
   if (game.dice3d) {
@@ -290,6 +293,15 @@ async function dbuGMRevealCombatResults(messageId) {
     const secretResults = wrapper.querySelector("[data-dbu-secret-attack-results]");
     if (secretResults) secretResults.innerHTML = dbuAttackRevealHTML(attack);
 
+    const unified = message.getFlag("world", "dbuUnifiedAttackCard");
+    const reveal = unified ? message.getFlag(DBU_SYSTEM_ID, "attackReveal") : null;
+    if (reveal && secretResults) {
+      const nativeCard = document.createElement("div");
+      nativeCard.innerHTML = reveal.revealedHtml || "";
+      const payment = nativeCard.querySelector("[data-dbu-pay]");
+      if (payment) secretResults.append(payment.closest(".dbu-attack-actions") || payment);
+    }
+
     const waitStatus = wrapper.querySelector("[data-dbu-secret-wait-status]");
     if (waitStatus) {
       waitStatus.innerHTML = "<strong>🔓 Todos os alvos registraram suas defesas — resultados revelados.</strong>";
@@ -308,10 +320,15 @@ async function dbuGMRevealCombatResults(messageId) {
       content: wrapper.innerHTML,
       "flags.world.dbuDefenseStates": states,
       "flags.world.dbuCombatRevealed": true,
-      "flags.world.dbuCombatRevealInProgress": false
+      "flags.world.dbuCombatRevealInProgress": false,
+      ...(reveal ? {
+        [`flags.${DBU_SYSTEM_ID}.attackReveal.revealed`]: true,
+        [`flags.${DBU_SYSTEM_ID}.attackReveal.woundTotal`]: attack.woundTotal
+      } : {})
     });
 
-    await dbuRevealNativeAttackMessage(attack);
+    if (reveal) await dbuShowAttackDice(reveal);
+    if (!unified) await dbuRevealNativeAttackMessage(attack);
 
     const pendingIntervenes = Object.values(states).filter(st => st?.damagePending && !st?.damageResolved).length;
     ui.notifications.info(

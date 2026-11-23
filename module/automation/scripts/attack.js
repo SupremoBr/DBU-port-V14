@@ -79,78 +79,6 @@ const ATTACK_VISUAL_FALLBACK = {
 // HELPERS BÁSICOS
 // ============================================================
 
-function watchNativeAttackMessage(actorId, oldMessages = new Set()) {
-  let createHookId = null;
-  let updateHookId = null;
-  let timer = null;
-  let settled = false;
-  let resolvePromise = null;
-
-  const matches = message => {
-    if (!message || oldMessages.has(message.id)) return false;
-    const reveal = message.getFlag?.("DBU-MRR-OLD", "attackReveal");
-    return !!reveal && String(reveal.actorId || "") === String(actorId || "");
-  };
-
-  const scan = () =>
-    (game.messages?.contents || []).slice().reverse().find(matches) || null;
-
-  const cleanup = () => {
-    if (createHookId != null) {
-      try { Hooks.off("createChatMessage", createHookId); } catch {}
-      createHookId = null;
-    }
-    if (updateHookId != null) {
-      try { Hooks.off("updateChatMessage", updateHookId); } catch {}
-      updateHookId = null;
-    }
-    if (timer) clearTimeout(timer);
-    timer = null;
-  };
-
-  const finish = message => {
-    if (settled) return;
-    settled = true;
-    cleanup();
-    resolvePromise?.(message || null);
-  };
-
-  const promise = new Promise(resolve => {
-    resolvePromise = resolve;
-    const inspect = message => {
-      if (matches(message)) finish(message);
-    };
-    // Os hooks ficam ativos ANTES da chamada nativa para não perder uma carta
-    // criada imediatamente pelo DBU.
-    createHookId = Hooks.on("createChatMessage", inspect);
-    updateHookId = Hooks.on("updateChatMessage", inspect);
-  });
-
-  // O timeout começa somente DEPOIS de _onRollTrackerAttack() terminar.
-  // Assim animações/integrações lentas não consomem a janela de captura.
-  const armTimeout = (timeoutMs = 3000) => {
-    if (settled) return;
-
-    const immediate = scan();
-    if (immediate) {
-      finish(immediate);
-      return;
-    }
-
-    if (timer) clearTimeout(timer);
-    timer = setTimeout(() => {
-      // Scan único final de segurança; continua sem polling.
-      finish(scan());
-    }, Math.max(500, Number(timeoutMs) || 3000));
-  };
-
-  return {
-    promise,
-    armTimeout,
-    cancel: () => finish(null)
-  };
-}
-
 function dbuEsc(value) {
   return String(value ?? "")
     .replace(/&/g, "&amp;")
@@ -1462,61 +1390,22 @@ await sheet.getData();
 // ROLAGEM ORIGINAL DO DBU
 // ============================================================
 
-const oldMessages = new Set(game.messages.map(message => message.id));
-const nativeAttackWatch = watchNativeAttackMessage(actor.id, oldMessages);
-
-const fakeButton = {
-  dataset: {
-    round: String(currentRound.roundNumber),
-    actionIndex: String(actionIndex)
-  }
-};
-
-const fakeEvent = {
-  preventDefault() {},
-  stopPropagation() {},
-  currentTarget: fakeButton,
-  target: fakeButton
-};
-
+let nativeMessage;
 try {
-  await sheet._onRollTrackerAttack(fakeEvent);
+  nativeMessage = await sheet._onRollTrackerAttack({
+    preventDefault() {},
+    currentTarget: { dataset: { round: String(currentRound.roundNumber), actionIndex: String(actionIndex) } }
+  }, { prepareOnly: true });
 } catch (error) {
-  nativeAttackWatch.cancel();
   console.error("DBU | _onRollTrackerAttack:", error);
   return ui.notifications.error("Erro executando a rolagem original do DBU.");
 }
 
-// ============================================================
-// LOCALIZAR MENSAGEM ORIGINAL
-// ============================================================
+const reveal = nativeMessage?.flags?.["DBU-MRR-OLD"]?.attackReveal;
+if (!reveal) return null;
 
-// v1.8.15: os hooks já estavam ativos durante a rolagem, mas a janela de
-// timeout só começa agora, depois que o handler nativo concluiu. Isso mantém
-// a captura orientada a eventos sem falhar em rolagens/animações mais lentas.
-nativeAttackWatch.armTimeout(3000);
-const attackMessage = await nativeAttackWatch.promise;
-
-if (!attackMessage) {
-  // O handler nativo do DBU 0.9.2 já informa o motivo quando uma regra
-  // bloqueia o ataque (ex.: Shield Aura, Harsh Focus, arma quebrada ou
-  // Ultimate de Minion). Não exibir um segundo aviso genérico como se o
-  // Attack Core tivesse falhado.
-  console.info("DBU | Ataque nativo encerrado sem ChatMessage; uma regra do DBU pode ter bloqueado a rolagem.");
-  return null;
-}
-
-const reveal = attackMessage.getFlag("DBU-MRR-OLD", "attackReveal");
-if (!reveal) return ui.notifications.error("attackReveal não encontrado.");
-
-// The DBU native Pay button only stores actor.id, which is shared by all
-// unlinked clones. Persist the exact attacking token on its native message so
-// the Pay handler updates the correct Synthetic Actor after reveal.
-try {
-  await attackMessage.setFlag("world", "dbuAttackPaymentRef", participantReference(actor, attackerToken));
-} catch (error) {
-  console.warn("DBU | Não foi possível vincular pagamento nativo ao token do ataque:", error);
-}
+// Reserve the chat id so the visual and legacy integrations can refer to the same card.
+const messageId = foundry.utils.randomID();
 
 // ============================================================
 // RECONSTRUIR OS DADOS ORIGINAIS DA ROLAGEM
@@ -1731,25 +1620,6 @@ updatedReveal.manualModifiers = {
   damageCategoryAdjusted
 };
 
-const originalMessageUpdates = {
-  "flags.DBU-MRR-OLD.attackReveal": updatedReveal
-};
-
-// Normalmente ainda está oculto. Se por algum motivo já estiver revelado,
-// também atualiza o conteúdo visível.
-if (reveal.revealed) {
-  originalMessageUpdates.content = patchedRevealHtml;
-}
-
-try {
-  await attackMessage.update(originalMessageUpdates);
-} catch (error) {
-  console.error("DBU | Não consegui atualizar o reveal original:", error);
-  ui.notifications.warn(
-    "O resultado modificado foi calculado, mas a carta original do DBU não pôde ser atualizada."
-  );
-}
-
 // ============================================================
 // ATTACK DATA USADO PELA DEFESA / VISUAIS
 // ============================================================
@@ -1789,9 +1659,7 @@ const attackData = {
   unitedAttackContributions: [],
   unitedAttackLocked: false,
 
-  // Mensagem oculta/original criada pelo _onRollTrackerAttack.
-  // Mantemos a referência para sincronizar com o helper nativo de United Attack.
-  originalAttackMessageId: attackMessage.id,
+  originalAttackMessageId: messageId,
 
   strikeNatural: strikeNat,
   woundNatural: woundNat,
@@ -1900,19 +1768,6 @@ const attackData = {
     .map(token => token.actor?.id)
     .filter(Boolean)
 };
-
-// ============================================================
-// VISUAL NO MAPA
-// ============================================================
-
-await dbuRunVisual(
-  actor,
-  attackerToken,
-  targetTokens,
-  source,
-  attackData,
-  visualMacroName
-);
 
 // ============================================================
 // ESTADOS DOS DEFENSORES
@@ -2089,12 +1944,16 @@ const woundStatusTags = [
 // CARTA DE DEFESA
 // ============================================================
 
-const defenseMessage = await ChatMessage.create({
-  speaker: ChatMessage.getSpeaker({ actor }),
+await ChatMessage.create({
+  _id: messageId,
+  speaker: nativeMessage.speaker,
 
   flags: {
+    "DBU-MRR-OLD": { attackReveal: updatedReveal },
     world: {
-      dbuAttackData: attackData,
+      dbuUnifiedAttackCard: true,
+      dbuAttackPaymentRef: attackData.attackerRef,
+      dbuAttackData: { ...attackData, messageId },
       dbuDefenseStates: defenseStates,
       dbuUnitedAttackLocked: false,
       dbuUnitedAttackContributions: [],
@@ -2198,23 +2057,11 @@ const defenseMessage = await ChatMessage.create({
       </div>
     </div>
   `
-});
+}, { keepId: true });
 
-attackData.messageId = defenseMessage?.id || null;
-
-// v11.6 — liga a mensagem nativa oculta do DBU à carta de defesas.
-// O Inicializador 6.7 bloqueia REVEAL até todos os alvos registrarem a defesa.
-if (defenseMessage?.id) {
-  try {
-    await attackMessage.update({
-      "flags.world.dbuAutomationDefenseMessageId": defenseMessage.id,
-      "flags.world.dbuAutomationSecretCombat": true,
-      "flags.world.dbuAutomationCombatRevealed": false
-    });
-  } catch (error) {
-    console.warn("DBU | Não consegui vincular a carta secreta ao ataque nativo:", error);
-  }
-}
+// The visual can find the chat document by its original attack id.
+await dbuRunVisual(actor, attackerToken, targetTokens, source, attackData, visualMacroName);
+attackData.messageId = messageId;
 
 // ============================================================
 // DEBUG

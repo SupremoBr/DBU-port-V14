@@ -560,3 +560,118 @@ test('the subrace selector lists real choices for the chosen race and leaves fac
   assert.equal(factor.isSubraceTrait, undefined);
   assert.deepEqual(actor.system.racialTraits, [additional.id, trait.id]);
 });
+
+test('an automated attack publishes one card with the native roll and the defense controls', async () => {
+  const { attack } = await import('../module/automation/scripts/attack.js');
+  const saved = { game, ChatMessage, Roll, Dialog, document: globalThis.document, randomID: foundry.utils.randomID };
+  const messages = [];
+  const actor = new ActorStub({
+    rulesVersion: '0.9.3', tier: 1, baseTier: 1, kiPool: { value: 30 },
+    status: { maxCapacity: 20 }, combatTabState: { rounds: [{ roundNumber: 1, actions: [] }] }
+  });
+  Object.assign(actor, { id: 'attacker', name: 'Atacante', getFlag: () => undefined, _getActiveAura: () => null });
+  actor.sheet = new DBUCharacterSheet(actor);
+  actor.sheet.getData = async () => ({});
+  actor.sheet._trackerSourceGroups = [{ label: 'Attack Refs', sources: [
+    { key: 'ref_0', name: 'Beam', foundation: 'Energy', profile: 'Beam', damageCat: 'Standard',
+      strikeFormula: '1d10+10', woundFormula: '1d10+10', strikeCT: 10, woundCT: 10, kiCost: 2 }
+  ] }];
+  const defender = { id: 'defender', name: 'Defensor', system: {} };
+  const scene = { id: 'scene' };
+  const attackerToken = { id: 'attacker-token', actor, document: { parent: scene, actorLink: true } };
+  const target = { id: 'defender-token', actor: defender, document: { parent: scene, actorLink: true } };
+  try {
+    let visuals = 0;
+    actor.getFlag = (scope, key) => scope === 'DBU-MRR-OLD' && key === 'visualConfig'
+      ? { attacks: { ref_0: { visualMode: 'custom', visualMacro: 'Visual Beam' } } } : undefined;
+    globalThis.game = { combat: null, user: { isGM: true, targets: new Set() }, actors: new Map(),
+      macros: { getName: () => ({ execute: async data => {
+        assert.equal(messages[0]?.data._id, data.attackData.originalAttackMessageId);
+        visuals++;
+      } }) } };
+    foundry.utils.randomID = () => 'UniqueAttackCard';
+    globalThis.Dialog = { wait: async () => ({ index: 0, wager: 0, strikeBotch: 1, woundBotch: 1 }) };
+    globalThis.ChatMessage = { getSpeaker: () => ({ actor: actor.id }), create: async (data, options) => {
+      messages.push({ data, options });
+      return { id: data._id };
+    } };
+    globalThis.Roll = class {
+      constructor(formula) { this.formula = formula; this.total = 12; this.dice = [{ results: [{ result: 2 }] }]; }
+      async evaluate() { return this; }
+      toJSON() { return { formula: this.formula }; }
+      static fromData(data) { return new this(data.formula); }
+    };
+    globalThis.document = { createElement: () => ({
+      innerHTML: '', querySelector: () => null, querySelectorAll: () => []
+    }) };
+
+    const result = await attack({ attackerToken, targets: [target], __dbuaActionValidated: true });
+    assert.equal(messages.length, 1);
+    assert.equal(visuals, 1);
+    const [{ data, options }] = messages;
+    assert.deepEqual(options, { keepId: true });
+    assert.equal(data._id, result.originalAttackMessageId);
+    assert.equal(data._id, result.messageId);
+    assert.equal(data.flags.world.dbuUnifiedAttackCard, true);
+    assert.equal(data.flags['DBU-MRR-OLD'].attackReveal.revealed, false);
+    assert.match(data.flags['DBU-MRR-OLD'].attackReveal.revealedHtml, /data-dbu-pay="combined"/);
+    assert.match(data.content, /data-dbu-secret-attack-results/);
+    assert.match(data.content, /data-target-row/);
+    assert.doesNotMatch(data.content, /data-dbu-pay="combined"/);
+    assert.equal(actor.system.combatTabState.rounds[0].actions.length, 1);
+  } finally {
+    const { randomID, ...globals } = saved;
+    Object.assign(globalThis, globals);
+    foundry.utils.randomID = randomID;
+  }
+});
+
+test('the combined card reveals and attaches one native payment after the last defense', async () => {
+  const { initializeRevealCore } = await import('../module/automation/scripts/combat/reveal-core.js');
+  const saved = { game, document: globalThis.document, Hooks: globalThis.Hooks, DBU_BOOTSTRAP: globalThis.DBU_BOOTSTRAP };
+  const targets = [{ id: 'first', name: 'Primeiro' }, { id: 'last', name: 'Último' }];
+  const gm = { id: 'gm', isGM: true, active: true };
+  const card = {
+    id: 'unified', content: 'secret-results defense-controls',
+    flags: {
+      'DBU-MRR-OLD': { attackReveal: { revealed: false, revealedHtml: 'native-payment' } },
+      world: { dbuUnifiedAttackCard: true, dbuCombatRevealed: false, dbuDefenseStates: {},
+        dbuAttackData: { originalAttackMessageId: 'unified', attackerId: 'attacker',
+          strikeTotal: 14, woundTotal: 12, targetActorIds: targets.map(target => target.id) } }
+    },
+    getFlag(scope, key) { return this.flags[scope]?.[key]; },
+    async update(changes) { applyUpdate(this, changes); }
+  };
+  const payment = { closest: () => null };
+  let placements = 0;
+  try {
+    globalThis.Hooks = { on: () => 1 };
+    globalThis.DBU_BOOTSTRAP = {};
+    globalThis.game = { user: gm, users: Object.assign([gm], { get: () => gm }),
+      socket: { on() {} }, messages: new Map([[card.id, card]]), actors: new Map(targets.map(t => [t.id, t])) };
+    globalThis.document = { addEventListener() {}, createElement: () => ({
+      innerHTML: '',
+      querySelector(selector) {
+        if (selector === '[data-dbu-pay]' && this.innerHTML === 'native-payment') return payment;
+        if (selector !== '[data-dbu-secret-attack-results]' || !this.innerHTML.includes('secret-results')) return null;
+        const wrapper = this;
+        return {
+          set innerHTML(value) { wrapper.innerHTML = wrapper.innerHTML.replace('secret-results', value); },
+          append(node) { assert.equal(node, payment); wrapper.innerHTML += ' native-payment'; placements++; }
+        };
+      }
+    }) };
+    const reveal = initializeRevealCore({ DBU_SYSTEM_ID: 'DBU-MRR-OLD', dbuEsc: String, dbuSetDefenseState: async () => {} });
+    await reveal.dbuUpdateTargetStatus(card, targets[0], 'defended', 'Dodge');
+    assert.equal(card.flags.world.dbuCombatRevealed, false);
+    assert.equal(placements, 0);
+    await reveal.dbuUpdateTargetStatus(card, targets[1], 'defended', 'Dodge');
+    assert.equal(card.flags.world.dbuCombatRevealed, true);
+    assert.equal(card.flags['DBU-MRR-OLD'].attackReveal.revealed, true);
+    assert.match(card.content, /defense-controls/);
+    assert.match(card.content, /data-dbu-wound-total>12/);
+    assert.equal(placements, 1);
+  } finally {
+    Object.assign(globalThis, saved);
+  }
+});

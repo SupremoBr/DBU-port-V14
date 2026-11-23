@@ -123,12 +123,12 @@ export function installRulesSheet093(Sheet) {
     return original(event);
   });
   for (const name of ['_onRollTrackerAttack','_onRollTrackerTransform','_onUseTrackerGrapple','_onUseTrackerThrust','_onUseTrackerTerrify','_onUseTrackerFeint','_onUseTrackerDirtyTrick','_onInitiateDuel','_onRollTrackerDefend']) {
-    wrap(name, async function(original, event) {
+    wrap(name, async function(original, event, ...args) {
       const index = Number(event.currentTarget?.dataset?.actionIndex);
       const rounds = this.actor.system.combatTabState?.rounds || [];
       const round = rounds.find(r => r.roundNumber === Number(event.currentTarget?.dataset?.round));
       const row = round?.actions?.[index];
-      if (!row) return original(event);
+      if (!row) return original(event, ...args);
       if (round !== rounds.at(-1)) return warn('0.9.3: Actions de rodadas anteriores expiraram.');
       if (row.source?.startsWith('tech_')) {
         const tech = this.actor.system.signatureTechniques?.find(t => 'tech_'+t.id === row.source);
@@ -148,7 +148,7 @@ export function installRulesSheet093(Sheet) {
       const pools = roundPools093(this.actor, { excludeIndex: index });
       if (pools[type === 'counter' ? 'counter' : 'standard'].remaining < rowCost093(row)) return warn('Actions insuficientes para essa manobra.');
       const attacksBefore = this.actor.system.combatTabState?.roundAttackCount || 0;
-      const result = await original(event);
+      const result = await original(event, ...args);
       if (name === '_onRollTrackerAttack' && (this.actor.system.combatTabState?.roundAttackCount || 0) > attacksBefore) {
         const cts = structuredClone(this.actor.system.combatTabState || {});
         cts.rounds.at(-1).actions[index].rules093Executed = true;

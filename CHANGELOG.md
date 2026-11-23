@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.0.12-rules093-alpha.18] — card de ataque integrado
+
+- Ataques da automação integrada publicam um card principal com os visuais, a rolagem nativa, as defesas e United Attack.
+- Após a última defesa, o mesmo card revela Strike e Wound e exibe o botão de pagamento de Ki e Capacity. Cartas anteriores continuam usando seu fluxo original.
+
 ## [1.0.12-rules093-alpha.17] — tema da automação integrada
 
 - HUD, painéis, manobras e Configurar Visuais passam a usar as cores, a tipografia e o fundo da ficha nativa.

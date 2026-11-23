@@ -278,7 +278,7 @@ export const combatTrackerMethods = {
    * auto-deducts Ki (cost + wager), and whispers the remaining KP to the GM
    * and the actor's owner. Reveal logic lives in dbu-old.mjs (renderChatMessage).
    */
-  async _onRollTrackerAttack(event) {
+  async _onRollTrackerAttack(event, { prepareOnly = false } = {}) {
     event.preventDefault();
     const btn = event.currentTarget;
     const roundNum = Number(btn.dataset.round);
@@ -532,7 +532,7 @@ export const combatTrackerMethods = {
       </div>
     </div>`;
 
-    await ChatMessage.create({
+    const messageData = {
       speaker,
       content: hiddenHtml,
       flags: {
@@ -556,7 +556,9 @@ export const combatTrackerMethods = {
           }
         }
       }
-    });
+    };
+    if (prepareOnly) return messageData;
+    await ChatMessage.create(messageData);
   },
 
   /** Store the chosen transformation index on the tracker "transform" action. */
