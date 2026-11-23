@@ -45,6 +45,20 @@ export class DBUItemSheet extends ItemSheet {
 
     // System config (for drop-down options, labels, etc.)
     context.config = CONFIG.DBU ?? {};
+    if (this.item.type === "uniqueAbility") {
+      const catalog = context.config.uniqueAbilitiesCatalog || {};
+      const key = this.item.system.abilityKey;
+      context.isUniqueAbility = true;
+      context.uniqueAbility = catalog[key];
+      context.uniqueAbilityOptions = Object.fromEntries([
+        ["unknown", "Sem habilidade vinculada"],
+        ...Object.values(catalog)
+          .filter(ability => !ability.legacy || ability.id === key)
+          .sort((a, b) => a.name.localeCompare(b.name))
+          .map(ability => [ability.id, ability.name + (ability.legacy ? " (legado)" : "")])
+      ]);
+      if (key && !Object.hasOwn(context.uniqueAbilityOptions, key)) context.uniqueAbilityOptions[key] = key;
+    }
 
     // Enrich the description field for display
     context.enrichedDescription = await TextEditor.enrichHTML(

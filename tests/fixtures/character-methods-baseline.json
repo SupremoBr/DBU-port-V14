@@ -155,17 +155,20 @@
     "_prepareUniqueData": {
       "hash": "ed0d0862a877913a5f5345079432c901289c19456b59e593e72ab828dfa6a217",
       "length": 2,
-      "async": false
+      "async": false,
+      "rules093Hash": "36d053fd0fe72dc4e57d0c76d94dee72f98f39fcd9ee6705fc935261a3e53acd"
     },
     "_prepareShapeshiftConfig": {
       "hash": "a701542fc8e4add86b1f581f2fd5445d5c4c635536cc92cd8318b89d574d0fcb",
       "length": 2,
-      "async": false
+      "async": false,
+      "rules093Hash": "3d1476e384a0edb678b785a88ed71d46d735e5d5fc1b7e0858a583e24c200708"
     },
     "_shapeshiftCosts": {
       "hash": "5f3800f208813c397b9ae3cda890ba314062f5d64bd0c66cdd5c8866f9516f45",
       "length": 1,
-      "async": false
+      "async": false,
+      "rules093Hash": "567561fcca266d9f5cd04a656565565a67a076ce4b10026441be85f05e49cdbc"
     },
     "_onShapeshiftField": {
       "hash": "d27950bcd78819e6ca1e91198ffe5c3887780631c1646e92bef1a91fca8812e0",
@@ -180,7 +183,8 @@
     "_onShapeshiftToggle": {
       "hash": "f16cc02db923132c147293f6ab9d5663f2981e6e8463efc75cba143a03593613",
       "length": 1,
-      "async": true
+      "async": true,
+      "rules093Hash": "86ee15678e799f99952827efafc26c30c425b5d101d9b31d190095056052972d"
     },
     "_shapeshiftDurationLabel": {
       "hash": "08f2820d556f29133df15a15ac4e06e25d445a5b6e9dc7d3a76ce989e6b1f1f7",
@@ -935,7 +939,8 @@
     "_onAddUnique": {
       "hash": "d12a20e929a7fbd7fcf69aab6efb62930af4d71011da1f53351ffaceb8fbf4d7",
       "length": 1,
-      "async": true
+      "async": true,
+      "rules093Hash": "4923d793d223b1a0b54e1341f669e0a400e1aa4ba27d25679462fd9367e1cb97"
     },
     "_onDeleteUnique": {
       "hash": "e9849eb262fabb6fb28435a45196027d8684a0110e0a1b016ba89160e79f4ba9",
@@ -950,7 +955,8 @@
     "_onAddUniqueAdvancement": {
       "hash": "96e5085cc5f80a06ff16d669cb949249784a41a7865867b686671c4f299fbc1c",
       "length": 1,
-      "async": true
+      "async": true,
+      "rules093Hash": "4453ab4fe7b63ba7c04fd6f795e88b5e15439335f895716c2684fabe1aedfb8d"
     },
     "_onRemoveUniqueAdvancement": {
       "hash": "3db8eb164795b750ce2d74776200b011842ba2114cac34e4745e8905af955c12",
@@ -960,7 +966,8 @@
     "_onUniqueAdvSelect": {
       "hash": "5b2b375a0064737f94870ea5c5760c0bc4f0f32bae7c31ae3b3551aa14db49fd",
       "length": 1,
-      "async": true
+      "async": true,
+      "rules093Hash": "c83e49da046da1edccc30c0e055e2c22783a8433d922c3090da70411bfb25613"
     },
     "_onUniqueAdvFree": {
       "hash": "c594b64ff376c045036debcfc243010a283f6b8d1b4c46c9ef9a947b8d9f7002",
@@ -970,12 +977,14 @@
     "_onUniqueAdvAmount": {
       "hash": "07314911112f9aa54e3bf522c0c4f2cd25b1ceea031204bc14ed4ce8bbbce0a2",
       "length": 1,
-      "async": true
+      "async": true,
+      "rules093Hash": "d43d717d6c1696073455d69812c3a8f2c5c407d86fcf56f38a35cdf80f4c94da"
     },
     "_onAddUniqueRestriction": {
       "hash": "419c832a542b91f8ba1c10eec3f476f06518418eccd7ded4f6ee262091b57c66",
       "length": 1,
-      "async": true
+      "async": true,
+      "rules093Hash": "ca7044761b6e34708e4547a5d76013be34ee6bfa7221cc0d29dc2812701442d0"
     },
     "_onRemoveUniqueRestriction": {
       "hash": "f4f1f6cf6e66d01ef7dc3ead42ed2af52c4d414b56f529e7f01c749b389d92b8",
@@ -985,7 +994,8 @@
     "_onUniqueResSelect": {
       "hash": "a4549f1914fa98d60d35622a7f58aab1b4780bc36e27bacb7e7ca1034550a477",
       "length": 1,
-      "async": true
+      "async": true,
+      "rules093Hash": "9a902495327ed7cab54b03d208ae23c609de7c3f22f3423ef88af75b4a53e3a3"
     },
     "_onAddProgressionRow": {
       "hash": "8586046b0bdfbd11d14f64e3e9e5014b01dfd73f9952f132223428a26dfb51fe",

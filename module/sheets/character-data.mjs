@@ -1,5 +1,6 @@
 import { getCatalogById, getRacialCatalogIndex } from "../helpers/catalog-index.mjs";
 import { ELEMENTAL_PROFILES_093 } from "../rules/profiles-v093.mjs";
+import { uniqueAbilityUsage } from "../rules/unique-abilities-v093.mjs";
 
 // View data only: keep clones for editable selections; never cache actor state.
 
@@ -216,15 +217,15 @@ export function prepareCombatResources(system) {
     }
 
     // Base effect
+    const usage = uniqueAbilityUsage(data, ua);
     resources.push({
       id: `unique_${abilityKey}`,
       sourceName: data.name,
       sourceType: "unique",
       level: 1,
       activationType: "triggered",
-      usageLimit: "round",
-      maxUses: 1,
-      keyword: `${data.maneuverType || "Standard"}, 1/Round`,
+      ...usage,
+      keyword: `${data.maneuverType || "Standard"}, ${usage.maxUses}/${usage.usageLimit === "encounter" ? "Encounter" : "Round"}`,
       text: effectText,
       isTrackable: true,
       actionType: "chat"

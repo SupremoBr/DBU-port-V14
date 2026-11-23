@@ -58,6 +58,16 @@ export function installRulesSheet093(Sheet) {
   });
   wrap('activateListeners', function(original, html) {
     original(html); if (!this.isEditable) return;
+    html.on('change', '[data-dbu-unique-type]', async event => {
+      const { value, dataset } = event.currentTarget;
+      const rows = structuredClone(this.actor.system.uniqueAbilities || []);
+      const row = rows[Number(dataset.dbuUniqueType)];
+      const data = CONFIG.DBU?.uniqueAbilitiesCatalog?.[row?.abilityKey];
+      if (data?.abilityType !== 'Technical/Magical' || data.legacy) return;
+      if (!['', 'Technical', 'Magical'].includes(value)) return;
+      row.abilityType = value;
+      await this.actor.update({ 'system.uniqueAbilities': rows });
+    });
     html.on('click', '[data-dbu-edit-attack-visual]', async event => {
       event.preventDefault();
       await game.dbu?.automation?.editAttackVisual?.(this.actor, event.currentTarget.dataset.dbuEditAttackVisual);

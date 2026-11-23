@@ -1,6 +1,7 @@
 import { CATALOGS_093 } from './catalogs-v093.mjs';
 import { RACES_093 } from './races-v093.mjs';
 import { PROFILES_093, PROFILE_SUMMARIES_093 } from './profiles-v093.mjs';
+import { uniqueAbilityCatalog093 } from './unique-abilities-v093.mjs';
 
 export function installRules093(config) {
   config.rulesVersion = '0.9.3';
@@ -11,6 +12,7 @@ export function installRules093(config) {
     (config.talentCategories[category] ??= []).push(id);
   }
   config.transformationsCatalog = CATALOGS_093.transformations;
+  config.uniqueAbilitiesCatalog = uniqueAbilityCatalog093(config.uniqueAbilitiesCatalog);
   config.techniqueAdvantagesData = CATALOGS_093.advantages;
   config.techniqueDisadvantagesData = CATALOGS_093.disadvantages;
   config.profileData = Object.fromEntries(Object.entries(PROFILES_093).map(([name, p]) => [name, { ...p, effect: PROFILE_SUMMARIES_093[name] + ' Efeitos no alvo e no ambiente: resolução manual pela fonte.' }]));

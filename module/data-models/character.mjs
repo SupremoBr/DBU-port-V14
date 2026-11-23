@@ -117,6 +117,7 @@ function uniqueAbilityField() {
   return new SchemaField({
     id: new NumberField({ required: true, nullable: false, integer: true }),
     abilityKey: new StringField({ required: true, blank: false }),
+    abilityType: new StringField({ initial: "", choices: ["", "Technical", "Magical"] }),
     free: new BooleanField({ initial: false }),
     advancements: new ArrayField(new SchemaField({
       advancementId: new StringField({ required: true, blank: false }),

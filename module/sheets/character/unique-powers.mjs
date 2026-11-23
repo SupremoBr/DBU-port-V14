@@ -1,5 +1,53 @@
 import { getRacialCatalogIndex } from "../../helpers/catalog-index.mjs";
 import { Dialog } from "../../helpers/foundry-compat.mjs";
+import { minimumUniqueKi093, uniqueAbilityOptions } from "../../rules/unique-abilities-v093.mjs";
+import { uses093 } from "../../rules/v093.mjs";
+
+function prepareUniqueSelections(sheet, selection, data) {
+  const options = uniqueAbilityOptions(data, selection.restrictions);
+  const selectedAdvancements = (selection.advancements || []).map(sel => {
+    const option = data.advancements?.find(row => row.id === sel.advancementId);
+    return {
+      ...sel,
+      amount: sel.amount || 1,
+      name: option?.name || sel.advancementId,
+      legacy: !option || !!option.legacy,
+      unavailable: !options.advancements.some(row => row.id === sel.advancementId),
+      tpDisplay: option ? sheet._calcAdvancementTP(option, sel) : "?",
+      effect: option?.effect || "",
+      prerequisites: option?.prerequisites || "",
+      maxRanks: data.source && option && !option.legacy ? (option.maxRanks ?? 1) : 5
+    };
+  });
+  const selectedRestrictions = (selection.restrictions || []).map(sel => {
+    const option = data.restrictions?.find(row => row.id === sel.restrictionId);
+    return {
+      ...sel,
+      name: option?.name || sel.restrictionId,
+      legacy: !option || !!option.legacy,
+      tpDisplay: option?.tpCost ?? "?",
+      effect: option?.effect || "",
+      lockedAdvs: (option?.lockedAdvancements || []).join(", ") || "-"
+    };
+  });
+  return {
+    selectedAdvancements, selectedRestrictions,
+    availableAdvancements: options.advancements,
+    availableRestrictions: options.restrictions,
+    canAddAdvancement: options.advancements.some(row => !selectedAdvancements.some(sel => sel.advancementId === row.id)),
+    canAddRestriction: options.restrictions.some(row =>
+      !selectedRestrictions.some(sel => sel.restrictionId === row.id) && !restrictionConflicts(data, selection, row)),
+    hasAdvancements: !!(selectedAdvancements.length || options.advancements.length),
+    hasRestrictions: !!(selectedRestrictions.length || options.restrictions.length),
+    hasCatalogOptions: !!data.source && [...data.advancements, ...data.restrictions].some(row => !row.legacy)
+  };
+}
+
+function restrictionConflicts(data, selection, restriction) {
+  const locked = restriction.lockedAdvancements || [];
+  return (selection.advancements || []).some(({ advancementId }) =>
+    data.advancements?.some(option => option.id === advancementId && locked.includes(option.name)));
+}
 
 /** Character sheet domain: unique-powers. Methods run with the sheet as this. */
 export const uniquePowersMethods = {
@@ -36,8 +84,9 @@ export const uniquePowersMethods = {
       // KP Cost resolved at current tier + Energy Control / Technique Master
       // reduction (−2(T)) for Technical Unique Abilities (talents-catalog).
       const kpResolved = this._resolveUAKpCost(data.kpCost, uaTier, uaBaseTier);
-      const isTechnical = /technical/i.test(data.abilityType || "");
-      const ecApplies = isTechnical && uaTalents.includes("energy_control")
+      const chooseType = !!data.source && data.abilityType === "Technical/Magical";
+      const uaType = chooseType ? ua.abilityType : data.abilityType;
+      const ecApplies = !data.source && /technical/i.test(uaType || "") && uaTalents.includes("energy_control")
         && (uaTalents.includes("technique_master") || String(ecSelection) === `ua:${ua.abilityKey}`);
       let kpEffective = (kpResolved != null && ecApplies)
         ? Math.max(0, kpResolved - 2 * uaTier) : kpResolved;
@@ -50,52 +99,17 @@ export const uniquePowersMethods = {
         // "Ki Point Cost Unique Abilities" buffs (delta; negative = discount),
         // Magical/Technical variants by ability type, and Deep Control's
         // all-maneuver reduction — previously dead aptitudes.
-        const uaType = String(data.abilityType || "");
         kpEffective = Math.max(0, kpEffective
           + (system.aptitudes?.kiCostUnique || 0)
-          + (/magical/i.test(uaType) ? (system.aptitudes?.kiCostUniqueMagical || 0) : 0)
-          + (/technical/i.test(uaType) ? (system.aptitudes?.kiCostUniqueTechnical || 0) : 0)
+          + (uaType === "Magical" || (!data.source && /magical/i.test(uaType)) ? (system.aptitudes?.kiCostUniqueMagical || 0) : 0)
+          + (uaType === "Technical" || (!data.source && /technical/i.test(uaType)) ? (system.aptitudes?.kiCostUniqueTechnical || 0) : 0)
           - (system.aptitudes?.allManeuverKiReduction || 0));
       }
-      // Sustained heuristic: effects that require paying the KP Cost each turn
-      const isSustained = /pay the (KP|Ki Point) Cost/i.test(data.effect || "");
-
-      // Prepare selected advancements with resolved data
-      // Collect locked advancement names from selected restrictions
-      const lockedAdvNames = [];
-      for (const sel of (ua.restrictions || [])) {
-        const resData = (data.restrictions || []).find(r => r.id === sel.restrictionId);
-        if (resData?.lockedAdvancements) lockedAdvNames.push(...resData.lockedAdvancements);
+      const isSustained = data.source
+        ? !!data.isSustained : /pay the (KP|Ki Point) Cost/i.test(data.effect || "");
+      if (kpEffective != null && data.source) {
+        kpEffective = Math.max(kpEffective, minimumUniqueKi093(kpResolved, uaTier));
       }
-
-      const selectedAdvancements = (ua.advancements || []).map((sel, ai) => {
-        const advData = (data.advancements || []).find(a => a.id === sel.advancementId);
-        return {
-          advancementId: sel.advancementId,
-          free: sel.free,
-          amount: sel.amount || 1,
-          tpDisplay: advData ? this._calcAdvancementTP(advData, sel) : "?",
-          effect: advData?.effect || "Unknown advancement",
-          prerequisites: advData?.prerequisites || ""
-        };
-      });
-
-      // Prepare selected restrictions with resolved data
-      const selectedRestrictions = (ua.restrictions || []).map((sel, ri) => {
-        const resData = (data.restrictions || []).find(r => r.id === sel.restrictionId);
-        return {
-          restrictionId: sel.restrictionId,
-          tpDisplay: resData?.tpCost || 0,
-          effect: resData?.effect || "Unknown restriction",
-          lockedAdvs: (resData?.lockedAdvancements || []).join(", ") || "-"
-        };
-      });
-
-      // Available advancements/restrictions for selects (filter out locked advancements)
-      const availableAdvancements = (data.advancements || [])
-        .filter(a => !lockedAdvNames.includes(a.name || a.id))
-        .map(a => ({ id: a.id, name: a.name || a.id }));
-      const availableRestrictions = (data.restrictions || []).map(r => ({ id: r.id, name: r.name || r.id }));
 
       // Shapeshift: interactive effects-config panel (own ability only —
       // the state lives on this actor; gained clones don't get the panel)
@@ -111,16 +125,14 @@ export const uniquePowersMethods = {
         ...ua,
         uniqueIndex: index,
         data,
+        chooseType: chooseType && uses093(system),
         tpCost,
         kpResolved,
         kpEffective,
-        ecApplies,
+        kpModified: kpEffective !== kpResolved,
         isSustained,
         shapeshift,
-        selectedAdvancements,
-        selectedRestrictions,
-        availableAdvancements,
-        availableRestrictions
+        ...prepareUniqueSelections(this, ua, data)
       };
     });
 
@@ -138,40 +150,12 @@ export const uniquePowersMethods = {
           const cloned = foundry.utils.deepClone(su);
           const data = catalog[cloned.abilityKey] || { name: cloned.abilityKey, tpCost: 0, advancements: [], restrictions: [] };
           const tpCost = this._calcUniqueTPCost(cloned, data);
-          const lockedAdvNames = [];
-          for (const sel of (cloned.restrictions || [])) {
-            const resData = (data.restrictions || []).find(r => r.id === sel.restrictionId);
-            if (resData?.lockedAdvancements) lockedAdvNames.push(...resData.lockedAdvancements);
-          }
-          const selectedAdvancements = (cloned.advancements || []).map((sel, ai) => {
-            const advData = (data.advancements || []).find(a => a.id === sel.advancementId);
-            return {
-              advancementId: sel.advancementId, free: sel.free, amount: sel.amount || 1,
-              tpDisplay: advData ? this._calcAdvancementTP(advData, sel) : "?",
-              effect: advData?.effect || "Unknown advancement",
-              prerequisites: advData?.prerequisites || ""
-            };
-          });
-          const selectedRestrictions = (cloned.restrictions || []).map((sel, ri) => {
-            const resData = (data.restrictions || []).find(r => r.id === sel.restrictionId);
-            return {
-              restrictionId: sel.restrictionId, tpDisplay: resData?.tpCost || 0,
-              effect: resData?.effect || "Unknown restriction",
-              lockedAdvs: (resData?.lockedAdvancements || []).join(", ") || "-"
-            };
-          });
-          const availableAdvancements = (data.advancements || [])
-            .filter(a => !lockedAdvNames.includes(a.name || a.id))
-            .map(a => ({ id: a.id, name: a.name || a.id }));
-          const availableRestrictions = (data.restrictions || []).map(r => ({ id: r.id, name: r.name || r.id }));
           prepared.push({
             ...cloned,
             isGained: true,
             gainedFrom: suppActor.name,
             uniqueIndex: prepared.length,
-            data, tpCost,
-            selectedAdvancements, selectedRestrictions,
-            availableAdvancements, availableRestrictions
+            data, tpCost, ...prepareUniqueSelections(this, cloned, data)
           });
         }
       }
@@ -182,8 +166,12 @@ export const uniquePowersMethods = {
       const bjUAs = system._pilotedJacket.uniqueAbilities || [];
       for (const su of bjUAs) {
         const cloned = foundry.utils.deepClone(su);
+        const data = catalog[cloned.abilityKey] || { name: cloned.abilityKey, tpCost: 0 };
         prepared.push({
           ...cloned,
+          data,
+          tpCost: this._calcUniqueTPCost(cloned, data),
+          ...prepareUniqueSelections(this, cloned, data),
           isGained: true,
           gainedFrom: system._pilotedJacket.name,
           gainedSource: "battleJacket"
@@ -200,7 +188,6 @@ export const uniquePowersMethods = {
    * vehicle form (BP 8) / weapon form (3 Qualities, +Might Wound).
    */
   _prepareShapeshiftConfig(system, { hasDiploma, hasQuickShift }) {
-    const tier = system.tier || 1;
     const st = system.transformationMeta?.shapeshiftState || {};
     const effects = st.effects || {};
     // Magical Girl "A Different Me" (trait level 5+): Diploma granted while
@@ -208,7 +195,7 @@ export const uniquePowersMethods = {
     const mgL5 = (system.transformations || []).some(t =>
       t?.active && t?.catalogKey === "magical_girl" && (t.level || 0) >= 5);
     const diploma = hasDiploma || mgL5;
-    const kpActivate = Math.max(0, (8 - (diploma ? 2 : 0)) * tier);
+    const costs = this._shapeshiftCosts(system);
     const chosen = ["bestial", "size", "vehicle", "weapon"].filter(k => effects[k]);
     const actions = hasQuickShift ? 3 : Math.min(3, Math.max(1, st.actions || 1));
 
@@ -246,9 +233,7 @@ export const uniquePowersMethods = {
     return {
       active: !!st.active,
       actions, hasQuickShift, diploma, mgL5,
-      kpActivate,
-      kpSustain: Math.ceil(kpActivate / 2),
-      kpRegain: 6 * tier,
+      ...costs,
       duration: diploma ? "Unlimited (Diploma)" : "5 rounds",
       effects: {
         bestial: !!effects.bestial, size: !!effects.size,
@@ -274,8 +259,12 @@ export const uniquePowersMethods = {
     const hasDiploma = (ua?.advancements || []).some(a => a.advancementId === "shapeshift_diploma");
     const mgL5 = (system.transformations || []).some(t =>
       t?.active && t?.catalogKey === "magical_girl" && (t.level || 0) >= 5);
-    const kpActivate = Math.max(0, (8 - ((hasDiploma || mgL5) ? 2 : 0)) * tier);
-    return { kpActivate, kpSustain: Math.ceil(kpActivate / 2), kpRegain: 6 * tier };
+    const costTier = uses093(system) ? system.baseTier || 1 : tier;
+    const baseCost = 8 * costTier;
+    const discount = (hasDiploma || mgL5) ? 2 * tier : 0;
+    const floor = uses093(system) ? minimumUniqueKi093(baseCost, tier) : 0;
+    const kpActivate = Math.max(floor, baseCost - discount);
+    return { kpActivate, kpSustain: Math.ceil(kpActivate / 2), kpRegain: 6 * costTier };
   },
 
   /** Shapeshift config field change (actions, trait/size/weapon selections). */
@@ -331,8 +320,12 @@ export const uniquePowersMethods = {
         ui.notifications.warn("Shapeshift: select at least one effect before activating.");
         return;
       }
+      if (ki < kpActivate) {
+        ui.notifications.warn(`Shapeshift: requer ${kpActivate} KP.`);
+        return;
+      }
       st.active = true;
-      updates["system.kiPool.value"] = Math.max(0, ki - kpActivate);
+      updates["system.kiPool.value"] = ki - kpActivate;
       const chips = chosen.map(c => `<span class="dbu-meta-chip">${c}</span>`).join(" ");
       card = `<div class="dbu-attack-roll">
         <div class="dbu-attack-title"><i class="fas fa-random"></i> ${this.actor.name} — Shapeshift</div>
@@ -440,9 +433,10 @@ export const uniquePowersMethods = {
     const existingKeys = existing.map(u => u.abilityKey);
 
     const available = Object.entries(catalog)
-      .filter(([key]) => !existingKeys.includes(key))
+      .filter(([key, data]) => !data.legacy && !existingKeys.includes(key))
       .map(([key, data]) => ({ key, name: data.name, type: data.abilityType }))
       .sort((a, b) => a.name.localeCompare(b.name));
+    if (!available.length) return;
 
     const optionsHtml = available.map(a =>
       `<option value="${a.key}">${a.name} (${a.type})</option>`
@@ -454,9 +448,11 @@ export const uniquePowersMethods = {
       callback: (html) => html.find('[name="abilityKey"]').val(),
       rejectClose: false
     });
-    if (!result) return;
+    if (!result || !Object.hasOwn(catalog, result) || catalog[result].legacy) return;
 
-    const uniques = foundry.utils.deepClone(existing);
+    const current = this.actor.system.uniqueAbilities || [];
+    if (current.some(row => row.abilityKey === result)) return;
+    const uniques = foundry.utils.deepClone(current);
     const nextId = uniques.length > 0 ? Math.max(...uniques.map(u => u.id || 0)) + 1 : 1;
     uniques.push({ id: nextId, abilityKey: result, free: false, advancements: [], restrictions: [] });
     await this.actor.update({ "system.uniqueAbilities": uniques });
@@ -493,8 +489,11 @@ export const uniquePowersMethods = {
     if (index < 0 || index >= uniques.length) return;
     const catalog = CONFIG.DBU?.uniqueAbilitiesCatalog || {};
     const data = catalog[uniques[index].abilityKey];
-    if (!data?.advancements?.length) return;
-    uniques[index].advancements.push({ advancementId: data.advancements[0].id, free: false, amount: 1 });
+    if (!data) return;
+    const available = uniqueAbilityOptions(data, uniques[index].restrictions).advancements;
+    const option = available.find(row => !uniques[index].advancements.some(sel => sel.advancementId === row.id));
+    if (!option) return;
+    uniques[index].advancements.push({ advancementId: option.id, free: false, amount: 1 });
     await this.actor.update({ "system.uniqueAbilities": uniques });
   },
 
@@ -514,8 +513,18 @@ export const uniquePowersMethods = {
     const uIdx = Number(event.currentTarget.dataset.uniqueIndex);
     const aIdx = Number(event.currentTarget.dataset.advIndex);
     const uniques = foundry.utils.deepClone(this.actor.system.uniqueAbilities || []);
-    if (uIdx < 0 || uIdx >= uniques.length || aIdx < 0) return;
-    uniques[uIdx].advancements[aIdx].advancementId = event.currentTarget.value;
+    const unique = uniques[uIdx];
+    const selected = unique?.advancements[aIdx];
+    if (!selected) return;
+    const data = CONFIG.DBU?.uniqueAbilitiesCatalog?.[unique.abilityKey];
+    const option = data && uniqueAbilityOptions(data, unique.restrictions).advancements
+      .find(row => row.id === event.currentTarget.value);
+    if (!option || unique.advancements.some((row, i) => i !== aIdx && row.advancementId === option.id)) {
+      event.currentTarget.value = selected.advancementId;
+      return;
+    }
+    selected.advancementId = option.id;
+    selected.amount = Math.min(selected.amount || 1, data.source ? option.maxRanks ?? 1 : 5);
     await this.actor.update({ "system.uniqueAbilities": uniques });
   },
 
@@ -534,8 +543,14 @@ export const uniquePowersMethods = {
     const uIdx = Number(event.currentTarget.dataset.uniqueIndex);
     const aIdx = Number(event.currentTarget.dataset.advIndex);
     const uniques = foundry.utils.deepClone(this.actor.system.uniqueAbilities || []);
-    if (uIdx < 0 || uIdx >= uniques.length || aIdx < 0) return;
-    uniques[uIdx].advancements[aIdx].amount = Number(event.currentTarget.value) || 1;
+    const unique = uniques[uIdx];
+    const selected = unique?.advancements[aIdx];
+    if (!selected) return;
+    const data = CONFIG.DBU?.uniqueAbilitiesCatalog?.[unique.abilityKey];
+    const option = data?.advancements?.find(row => row.id === selected.advancementId);
+    if (!option) return;
+    const max = data.source && !option.legacy ? option.maxRanks ?? 1 : 5;
+    selected.amount = Math.max(1, Math.min(max, Math.trunc(Number(event.currentTarget.value)) || 1));
     await this.actor.update({ "system.uniqueAbilities": uniques });
   },
 
@@ -547,8 +562,12 @@ export const uniquePowersMethods = {
     if (index < 0 || index >= uniques.length) return;
     const catalog = CONFIG.DBU?.uniqueAbilitiesCatalog || {};
     const data = catalog[uniques[index].abilityKey];
-    if (!data?.restrictions?.length) return;
-    uniques[index].restrictions.push({ restrictionId: data.restrictions[0].id });
+    if (!data) return;
+    const option = uniqueAbilityOptions(data).restrictions.find(row =>
+      !uniques[index].restrictions.some(sel => sel.restrictionId === row.id) &&
+      !restrictionConflicts(data, uniques[index], row));
+    if (!option) return;
+    uniques[index].restrictions.push({ restrictionId: option.id });
     await this.actor.update({ "system.uniqueAbilities": uniques });
   },
 
@@ -568,8 +587,21 @@ export const uniquePowersMethods = {
     const uIdx = Number(event.currentTarget.dataset.uniqueIndex);
     const rIdx = Number(event.currentTarget.dataset.resIndex);
     const uniques = foundry.utils.deepClone(this.actor.system.uniqueAbilities || []);
-    if (uIdx < 0 || uIdx >= uniques.length || rIdx < 0) return;
-    uniques[uIdx].restrictions[rIdx].restrictionId = event.currentTarget.value;
+    const unique = uniques[uIdx];
+    const selected = unique?.restrictions[rIdx];
+    if (!selected) return;
+    const data = CONFIG.DBU?.uniqueAbilitiesCatalog?.[unique.abilityKey];
+    const option = data && uniqueAbilityOptions(data).restrictions.find(row => row.id === event.currentTarget.value);
+    if (!option || unique.restrictions.some((row, i) => i !== rIdx && row.restrictionId === option.id)) {
+      event.currentTarget.value = selected.restrictionId;
+      return;
+    }
+    if (restrictionConflicts(data, unique, option)) {
+      event.currentTarget.value = selected.restrictionId;
+      ui.notifications.warn("Remova os avanços bloqueados antes de escolher essa restrição.");
+      return;
+    }
+    selected.restrictionId = option.id;
     await this.actor.update({ "system.uniqueAbilities": uniques });
   },
 };

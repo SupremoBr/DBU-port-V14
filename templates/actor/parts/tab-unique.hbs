@@ -34,12 +34,13 @@
 
   {{!-- Unique Abilities List --}}
   <div class="unique-abilities-list">
-    {{#each characterUniques}}
+    {{#each characterUniques as |ability|}}
     <div class="unique-ability-card {{#if isGained}}gained-ability{{/if}}" data-unique-index="{{@index}}">
       <div class="unique-header-bar">
         <span class="unique-name-display">{{data.name}}</span>
         {{#if isGained}}<span class="gained-badge"><i class="fas fa-link"></i> Gained from: {{gainedFrom}}</span>{{/if}}
-        <span class="unique-type-badge">{{data.abilityType}}</span>
+        <span class="unique-type-badge">{{#if abilityType}}{{abilityType}}{{else}}{{data.abilityType}}{{/if}}</span>
+        {{#if data.legacy}}<span class="unique-type-badge">Legado</span>{{/if}}
         <span class="unique-tp-badge">TP: {{tpCost}}</span>
         {{#unless isGained}}
         <label class="unique-free-label">
@@ -59,7 +60,15 @@
           </div>
           <div class="unique-field">
             <label>Type</label>
+            {{#if chooseType}}
+            <select data-dbu-unique-type="{{uniqueIndex}}" aria-label="Type">
+              <option value="">Selecione</option>
+              <option value="Technical" {{#if (eq abilityType "Technical")}}selected{{/if}}>Technical</option>
+              <option value="Magical" {{#if (eq abilityType "Magical")}}selected{{/if}}>Magical</option>
+            </select>
+            {{else}}
             <span class="unique-auto-field">{{data.abilityType}}</span>
+            {{/if}}
           </div>
           <div class="unique-field">
             <label>Prerequisites</label>
@@ -75,13 +84,19 @@
           </div>
           <div class="unique-field">
             <label>KP Cost</label>
-            <span class="unique-auto-field">{{data.kpCost}}{{#if kpResolved}} = {{#if ecApplies}}<s>{{kpResolved}}</s> <b title="Energy Control{{#if data.abilityType}} (Technical){{/if}}: −2(T) Ki Point Cost">{{kpEffective}} KP</b>{{else}}<b>{{kpResolved}} KP</b>{{/if}}{{/if}}</span>
+            <span class="unique-auto-field">{{data.kpCost}}{{#if kpResolved}} = {{#if kpModified}}<s>{{kpResolved}}</s> {{/if}}<b>{{kpEffective}} KP</b>{{/if}}</span>
             {{#if isSustained}}<span class="unique-sustained-tag" title="Sustained: this ability requires paying its KP Cost again at the start of your turns to maintain its effect (see effect text)"><i class="fas fa-sync-alt"></i> Sustained</span>{{/if}}
           </div>
           <div class="unique-field">
             <label>Base TP</label>
             <span class="unique-auto-field">{{data.tpCost}}</span>
           </div>
+          {{#if data.minions}}
+          <div class="unique-field">
+            <label>Minions</label>
+            <span class="unique-auto-field">{{data.minions}}</span>
+          </div>
+          {{/if}}
         </div>
 
         {{#if data.passiveBonus}}
@@ -94,7 +109,20 @@
         <div class="unique-effect-section">
           <label>Effect</label>
           <span class="unique-effect-text">{{{data.effect}}}</span>
+          {{#if data.source}}<a class="dbu-catalog-source" href="{{data.source}}" target="_blank" rel="noopener noreferrer">Regra completa no site</a>{{/if}}
         </div>
+
+        {{#if hasCatalogOptions}}
+        <details class="unique-advres-section">
+          <summary>Ver avanços e restrições</summary>
+          {{#each data.advancements}}{{#unless legacy}}
+          <p><strong>{{name}} · {{tpCost}} TP</strong> {{effect}}{{#if prerequisites}} <small>{{prerequisites}}</small>{{/if}}</p>
+          {{/unless}}{{/each}}
+          {{#each data.restrictions}}{{#unless legacy}}
+          <p><strong>{{name}} · {{tpCost}} TP</strong> {{effect}}</p>
+          {{/unless}}{{/each}}
+        </details>
+        {{/if}}
 
         {{#if shapeshift}}
         <div class="shapeshift-config {{#if shapeshift.active}}ss-active{{/if}}">
@@ -244,11 +272,13 @@
       </div>
 
       {{!-- Advancements --}}
-      {{#if data.advancements.length}}
+      {{#if hasAdvancements}}
       <div class="unique-advres-section">
         <div class="advdis-header">
           Advancements
+          {{#unless isGained}}{{#if canAddAdvancement}}
           <button type="button" class="add-btn" data-action="add-unique-advancement" data-unique-index="{{@index}}"><i class="fas fa-plus"></i></button>
+          {{/if}}{{/unless}}
         </div>
         <table class="advdis-table">
           <thead><tr><th>Name</th><th>Free?</th><th>Prereqs</th><th>TP</th><th>Amt</th><th>Effect</th><th></th></tr></thead>
@@ -256,19 +286,20 @@
             {{#each selectedAdvancements}}
             <tr>
               <td>
-                <select class="unique-adv-select" data-unique-index="{{../../uniqueIndex}}" data-adv-index="{{@index}}">
-                  {{#each ../../availableAdvancements}}
+                <select class="unique-adv-select" data-unique-index="{{ability.uniqueIndex}}" data-adv-index="{{@index}}">
+                  {{#if unavailable}}<option value="{{advancementId}}" selected>{{name}}{{#if legacy}} (legado){{else}} (bloqueado){{/if}}</option>{{/if}}
+                  {{#each ability.availableAdvancements}}
                   <option value="{{id}}" {{#if (eq id ../advancementId)}}selected{{/if}}>{{name}}</option>
                   {{/each}}
                 </select>
               </td>
-              <td><input type="checkbox" class="unique-adv-free" data-unique-index="{{../../uniqueIndex}}" data-adv-index="{{@index}}" {{#if free}}checked{{/if}} /></td>
+              <td><input type="checkbox" class="unique-adv-free" data-unique-index="{{ability.uniqueIndex}}" data-adv-index="{{@index}}" {{#if free}}checked{{/if}} /></td>
               <td class="unique-adv-prereq">{{prerequisites}}</td>
               <td>{{tpDisplay}}</td>
-              <td><input type="number" class="unique-adv-amount" data-unique-index="{{../../uniqueIndex}}" data-adv-index="{{@index}}" value="{{amount}}" min="1" max="5" /></td>
+              <td><input type="number" class="unique-adv-amount" data-unique-index="{{ability.uniqueIndex}}" data-adv-index="{{@index}}" value="{{amount}}" min="1" max="{{maxRanks}}" /></td>
               <td class="unique-adv-effect">{{{effect}}}</td>
               <td>
-                <button type="button" class="delete-btn" data-action="remove-unique-advancement" data-unique-index="{{../../uniqueIndex}}" data-adv-index="{{@index}}"><i class="fas fa-times"></i></button>
+                <button type="button" class="delete-btn" data-action="remove-unique-advancement" data-unique-index="{{ability.uniqueIndex}}" data-adv-index="{{@index}}"><i class="fas fa-times"></i></button>
               </td>
             </tr>
             {{/each}}
@@ -278,11 +309,13 @@
       {{/if}}
 
       {{!-- Restrictions --}}
-      {{#if data.restrictions.length}}
+      {{#if hasRestrictions}}
       <div class="unique-advres-section">
         <div class="advdis-header">
           Restrictions
+          {{#unless isGained}}{{#if canAddRestriction}}
           <button type="button" class="add-btn" data-action="add-unique-restriction" data-unique-index="{{@index}}"><i class="fas fa-plus"></i></button>
+          {{/if}}{{/unless}}
         </div>
         <table class="advdis-table">
           <thead><tr><th>Name</th><th>Locked Advs</th><th>TP</th><th>Effect</th><th></th></tr></thead>
@@ -290,8 +323,9 @@
             {{#each selectedRestrictions}}
             <tr>
               <td>
-                <select class="unique-res-select" data-unique-index="{{../../uniqueIndex}}" data-res-index="{{@index}}">
-                  {{#each ../../availableRestrictions}}
+                <select class="unique-res-select" data-unique-index="{{ability.uniqueIndex}}" data-res-index="{{@index}}">
+                  {{#if legacy}}<option value="{{restrictionId}}" selected>{{name}} (legado)</option>{{/if}}
+                  {{#each ability.availableRestrictions}}
                   <option value="{{id}}" {{#if (eq id ../restrictionId)}}selected{{/if}}>{{name}}</option>
                   {{/each}}
                 </select>
@@ -300,7 +334,7 @@
               <td>{{tpDisplay}}</td>
               <td class="unique-res-effect">{{{effect}}}</td>
               <td>
-                <button type="button" class="delete-btn" data-action="remove-unique-restriction" data-unique-index="{{../../uniqueIndex}}" data-res-index="{{@index}}"><i class="fas fa-times"></i></button>
+                <button type="button" class="delete-btn" data-action="remove-unique-restriction" data-unique-index="{{ability.uniqueIndex}}" data-res-index="{{@index}}"><i class="fas fa-times"></i></button>
               </td>
             </tr>
             {{/each}}

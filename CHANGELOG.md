@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.0.12-rules093-alpha.21] — Unique Abilities 0.9.3
+
+- Catálogo com 66 habilidades, 100 avanços e 16 restrições da 0.9.3. A ficha mostra resumos em português, custos e links oficiais. Os itens Unique Ability podem exibir a mesma referência.
+- Entradas e opções antigas sem correspondência permanecem nas fichas como legado. Shapeshift usa Tier base no custo e na recuperação de Ki.
+
 ## [1.0.12-rules093-alpha.20] — visuais de ataques e técnicas na ficha
 
 - Attack References e Signature Techniques têm um botão Visuais que edita a mesma configuração do menu Configurar Visuais.
