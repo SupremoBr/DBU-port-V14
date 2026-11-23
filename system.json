@@ -2,7 +2,7 @@
   "id": "DBU-MRR-OLD",
   "title": "Dragon Universe RPG — regras 0.9.3 (prévia)",
   "description": "Fork do sistema de MRR / ArdillaTactica, com DBU Automation integrada e base de regras atualizada a partir de dbu-rpg.com. Prévia 0.9.3: migração com backup e efeitos manuais identificados. Consulte RULES-0.9.3.md antes de atualizar um mundo.",
-  "version": "1.0.12-rules093-alpha.16",
+  "version": "1.0.12-rules093-alpha.17",
   "compatibility": {
     "minimum": "12",
     "verified": "13",
@@ -27,7 +27,8 @@
     "styles/dbu-old.css",
     "module/automation/styles/dbu-automation.css",
     "module/automation/styles/dbu-hud-v2.css",
-    "module/automation/styles/dbu-action-windows.css"
+    "module/automation/styles/dbu-action-windows.css",
+    "module/automation/styles/dbu-sheet-theme.css"
   ],
   "languages": [
     {
@@ -113,7 +114,7 @@
   },
   "url": "https://github.com/SupremoBr/DBU-port-V14",
   "manifest": "https://raw.githubusercontent.com/SupremoBr/DBU-port-V14/main/system.json",
-  "download": "https://github.com/SupremoBr/DBU-port-V14/archive/refs/tags/v1.0.12-rules093-alpha.16.zip",
+  "download": "https://github.com/SupremoBr/DBU-port-V14/archive/refs/tags/v1.0.12-rules093-alpha.17.zip",
   "readme": "https://github.com/SupremoBr/DBU-port-V14/blob/main/README.md",
   "changelog": "https://github.com/SupremoBr/DBU-port-V14/blob/main/CHANGELOG.md",
   "bugs": "https://github.com/SupremoBr/DBU-port-V14/issues",

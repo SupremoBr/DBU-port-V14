@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.0.12-rules093-alpha.17] — tema da automação integrada
+
+- HUD, painéis, manobras e Configurar Visuais passam a usar as cores, a tipografia e o fundo da ficha nativa.
+- As janelas usam campos de alto contraste e foco de teclado visível. O menu de visuais e o HUD reorganizam os controles em telas estreitas.
+
 ## [1.0.12-rules093-alpha.16] — opção de sub-raça Saiyan
 
 - O seletor Subrace usa as sub-raças da 0.9.3. Full-Blooded integra a descrição da raça Saiyan, e as variantes de Racial Factors continuam na aba Traits.

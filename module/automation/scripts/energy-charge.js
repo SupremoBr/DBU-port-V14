@@ -837,15 +837,11 @@ async function dbuCancelCharge(actor, token, state) {
   const confirmed = await Dialog.confirm({
     title: "Cancelar Energy Charge?",
     content: `
-      <p>
-        <b>${dbuEsc(state.attackName || "Ataque")}</b>
-      </p>
-      <p>
-        Você perderá <b>${Number(state.gatheredCharges || 0)} Energy Charge(s)</b> reunidos.
-      </p>
-      <p>
-        Os Ki Points já gastos <b>não são reembolsados</b>.
-      </p>
+      <div class="dbua-sheet-content">
+        <p><b>${dbuEsc(state.attackName || "Ataque")}</b></p>
+        <p>Você perderá <b>${Number(state.gatheredCharges || 0)} Energy Charge(s)</b> reunidos.</p>
+        <p>Os Ki Points já gastos <b>não são reembolsados</b>.</p>
+      </div>
     `,
     yes: () => true,
     no: () => false,
@@ -1125,8 +1121,10 @@ if (state?.active) {
     const cancelBroken = await Dialog.confirm({
       title: "Energy Charge inválido",
       content: `
-        <p>O ataque declarado <b>${dbuEsc(state.attackName || state.sourceKey)}</b> não existe mais na ficha.</p>
-        <p>Deseja limpar o estado de Energy Charge?</p>
+        <div class="dbua-sheet-content">
+          <p>O ataque declarado <b>${dbuEsc(state.attackName || state.sourceKey)}</b> não existe mais na ficha.</p>
+          <p>Deseja limpar o estado de Energy Charge?</p>
+        </div>
       `,
       yes: () => true,
       no: () => false,

@@ -752,7 +752,7 @@ async function maintainAuraAtTurnStart(combat, { forceLocal = false } = {}) {
     const decision = await Dialog.wait({
       title: `${actor.name} — Manutenção de Aura`,
       content: `
-        <div class="dbu-aura-maintenance">
+        <div class="dbu-aura-maintenance dbua-sheet-content">
           <p><b>${esc(active.name || "Aura")}</b> está ativa.</p>
           <div class="dbu-attack-meta">
             <span class="dbu-meta-chip">Manutenção: ${cost} KP / Capacity</span>

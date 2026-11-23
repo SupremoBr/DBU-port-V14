@@ -781,7 +781,7 @@ async function dbuResolveDefense(
       title: `${defender.name} — Power Flare`,
 
       content: `
-        <div>
+        <div class="dbua-sheet-content">
           <p>
             Wound recebido: <b>${deferReveal ? "🔒 oculto" : wound}</b>
           </p>

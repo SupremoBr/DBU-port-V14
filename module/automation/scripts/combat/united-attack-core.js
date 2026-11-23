@@ -293,7 +293,7 @@ async function dbuRunUnitedAttackJoin(message) {
     const choice = await Dialog.wait({
       title: "United Attack — escolha quem ajuda",
       content: `
-        <div class="form-group">
+        <div class="form-group dbua-sheet-content">
           <label><b>Aliado</b></label>
           <select id="dbu-ua-actor" style="width:100%;">
             ${owned.map(actor =>
@@ -624,17 +624,19 @@ const dbuUnitedDuelClickHandler = async event => {
   const confirmed = await Dialog.wait({
     title: `${defender.name} — United Duel`,
     content: `
-      <p>
-        Entrar como co-target apoiando
-        <b>${dbuEsc(primary?.name || "o defensor principal")}</b>?
-      </p>
-      <p>
-        Você concede <b>+1(T)</b> aos Clashes do defensor principal e pode
-        distribuir até <b>${cap} KP</b> de wager total no Duel${teamwork ? " (Teamwork ×2)" : ""}.
-      </p>
-      <p class="notes">
-        Depois de entrar no United Duel, você não poderá escolher Dodge/Parry/Guard separadamente para este ataque.
-      </p>
+      <div class="dbua-sheet-content">
+        <p>
+          Entrar como co-target apoiando
+          <b>${dbuEsc(primary?.name || "o defensor principal")}</b>?
+        </p>
+        <p>
+          Você concede <b>+1(T)</b> aos Clashes do defensor principal e pode
+          distribuir até <b>${cap} KP</b> de wager total no Duel${teamwork ? " (Teamwork ×2)" : ""}.
+        </p>
+        <p class="notes">
+          Depois de entrar no United Duel, você não poderá escolher Dodge/Parry/Guard separadamente para este ataque.
+        </p>
+      </div>
     `,
     buttons: {
       join: {

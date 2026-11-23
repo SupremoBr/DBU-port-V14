@@ -1283,14 +1283,15 @@ export async function openVisualConfigurator(context = {}) {
     title: `${actor.name} — Configurar Visuais`,
     content: `
       <div class="dbu-auto-window dbu-auto-visual-menu">
-        <p style="margin:0 0 4px;">Escolha o que deseja personalizar para <b>${esc(actor.name)}</b>.</p>
-        <button type="button" data-choice="attacks" style="min-height:44px"><i class="fas fa-fist-raised"></i> Ataques — GIF + macro visual</button>
-        <button type="button" data-choice="defenses" style="min-height:44px"><i class="fas fa-shield-alt"></i> Defesas — GIF + macro visual</button>
-        <button type="button" data-choice="transformations" style="min-height:44px"><i class="fas fa-dragon"></i> Transformações — token + macro visual</button>
-        <button type="button" data-choice="signatureAuras" style="min-height:44px"><i class="fas fa-sun"></i> Signature Auras — GIF + macros de ativar/desativar</button>
-        <button type="button" data-choice="energyCharge" style="min-height:44px"><i class="fas fa-bolt"></i> Energy Charge — macro por estágio (1/2/3/4/MAX)</button>
-        <button type="button" data-choice="combatReactions" style="min-height:44px"><i class="fas fa-magic"></i> Intervene / Deflect / Reflect / Duel — macro por ação</button>
-        <div style="font-size:11px;opacity:.7;margin-top:4px;">As preferências ficam salvas somente neste personagem. O jogador não edita o JavaScript dos macros.</div>
+        <div class="dbu-visual-menu-grid">
+          <button type="button" data-choice="attacks"><i class="fas fa-fist-raised" aria-hidden="true"></i><span><strong>Ataques</strong><small>GIF no chat e macro</small></span></button>
+          <button type="button" data-choice="defenses"><i class="fas fa-shield-alt" aria-hidden="true"></i><span><strong>Defesas</strong><small>GIF no chat e macro</small></span></button>
+          <button type="button" data-choice="transformations"><i class="fas fa-dragon" aria-hidden="true"></i><span><strong>Transformações</strong><small>Imagem do token, tamanho e macro</small></span></button>
+          <button type="button" data-choice="signatureAuras"><i class="fas fa-sun" aria-hidden="true"></i><span><strong>Signature Auras</strong><small>GIF e macros de ativar e desativar</small></span></button>
+          <button type="button" data-choice="energyCharge"><i class="fas fa-bolt" aria-hidden="true"></i><span><strong>Energy Charge</strong><small>Macro por estágio</small></span></button>
+          <button type="button" data-choice="combatReactions"><i class="fas fa-magic" aria-hidden="true"></i><span><strong>Reações de combate</strong><small>Intervene, Deflect, Reflect e Duel</small></span></button>
+        </div>
+        <small>As escolhas são salvas neste personagem.</small>
       </div>
     `,
     buttons: { close: { label: "Fechar", callback: () => null } },
@@ -1313,7 +1314,7 @@ export async function openVisualConfigurator(context = {}) {
         });
       }
     }
-  });
+  }, { width: 560 });
 
   return choice;
 }
