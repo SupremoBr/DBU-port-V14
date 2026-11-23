@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.0.12-rules093-alpha.22] — correção no cadastro de Unique Abilities
+
+- A ficha aceita salvar habilidades únicas sem escolher um tipo. Habilidades de tipo duplo permitem escolher ou limpar Technical ou Magical.
+
 ## [1.0.12-rules093-alpha.21] — Unique Abilities 0.9.3
 
 - Catálogo com 66 habilidades, 100 avanços e 16 restrições da 0.9.3. A ficha mostra resumos em português, custos e links oficiais. Os itens Unique Ability podem exibir a mesma referência.
