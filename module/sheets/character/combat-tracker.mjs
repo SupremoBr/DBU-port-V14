@@ -304,7 +304,7 @@ export const combatTrackerMethods = {
     // Broken weapon guard (weapons.txt "Damaging Weapons"): a Weapon at 0 LP
     // cannot be used for any Attacking Maneuvers. Matches the attack ref's
     // free-text "Weapon Equipped" against owned weapon items by name.
-    if (String(action.source).startsWith("ref_")) {
+    if (!uses093(this.actor.system) && String(action.source).startsWith("ref_")) {
       const refIdx = Number(String(action.source).slice(4));
       const refWeapon = String(this.actor.system.attackRefs?.[refIdx]?.weaponEquipped || "").trim().toLowerCase();
       if (refWeapon && refWeapon !== "unarmed") {

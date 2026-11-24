@@ -1278,16 +1278,16 @@ export function registerConfig() {
     },
 
     weaponCategories: {
-      bludgeoning: { id: "bludgeoning", name: "Bludgeoning", type: "physical", freeQuality: "staggering", effect: "On a Critical Result, push target 1 Space." },
-      slashing: { id: "slashing", name: "Slashing", type: "physical", freeQuality: null, effect: "On a Critical Result, reduce target Soak Value by 1(bT) until end of your next turn." },
-      piercing: { id: "piercing", name: "Piercing", type: "physical", freeQuality: "lasting_wounds", effect: "On a Critical Result, inflict Bleeding (1) Condition." },
-      shield: { id: "shield", name: "Shield", type: "physical", freeQuality: null, effect: "Gain +1(bT) Defense Value while equipped. Cannot be used for Attacking Maneuvers." },
-      efficient: { id: "efficient", name: "Efficient", type: "energy", freeQuality: null, effect: "Reduce Ki Cost of Energy Attacks by 1(bT)." },
-      precision: { id: "precision", name: "Precision", type: "energy", freeQuality: "far_sight", effect: "Increase Strike Roll by 1(bT) with this weapon." },
-      high_power: { id: "high_power", name: "High Power", type: "energy", freeQuality: null, effect: "Increase Wound Roll by 1(bT) with this weapon." },
-      magic_staff: { id: "magic_staff", name: "Magic Staff", type: "magic", freeQuality: null, effect: "Increase Magic Modifier by 1(bT) while equipped." },
-      elemental_tool: { id: "elemental_tool", name: "Elemental Tool", type: "magic", freeQuality: null, effect: "Choose an Element; attacks with this weapon gain that Element." },
-      magic_orb: { id: "magic_orb", name: "Magic Orb", type: "magic", freeQuality: "spiritual_weapon", effect: "Can use Magic attacks at Melee range without penalty." }
+      bludgeoning: { id: "bludgeoning", name: "Bludgeoning", type: "physical", freeQuality: "staggering", effect: "Ignore half of the target’s DR with this weapon. Grants Staggering." },
+      slashing: { id: "slashing", name: "Slashing", type: "physical", freeQuality: null, effect: "+2(T) Wound. Apply Diminishing Defense at Attack Declaration." },
+      piercing: { id: "piercing", name: "Piercing", type: "physical", freeQuality: "lasting_wounds", effect: "Ignore ¼ of the target’s Soak, rounded up. Grants Lasting Wounds." },
+      shield: { id: "shield", name: "Shield", type: "physical", freeQuality: null, effect: "Extra LP per Power Level by size, 1/2/3. Grants Block while wielded." },
+      efficient: { id: "efficient", name: "Efficient", type: "energy", freeQuality: null, effect: "−2(T) Ki with this weapon. +2(T) Wound for Simple." },
+      precision: { id: "precision", name: "Precision", type: "energy", freeQuality: "far_sight", effect: "On Called Shot, +1(T) Strike and +2(T) Wound. Grants Far Sight." },
+      high_power: { id: "high_power", name: "High Power", type: "energy", freeQuality: null, effect: "If Ki Wager is at least half of Max Capacity, add an Energy Charge. AoE magnitude +1." },
+      magic_staff: { id: "magic_staff", name: "Magic Staff", type: "magic", freeQuality: null, effect: "While wielded, −2(T) Ki on Magic Attacks and Magical Unique Abilities, +2 to Use Magic checks." },
+      elemental_tool: { id: "elemental_tool", name: "Elemental Tool", type: "magic", freeQuality: null, effect: "Choose an Elemental Profile as a Favored Element while wielded." },
+      magic_orb: { id: "magic_orb", name: "Magic Orb", type: "magic", freeQuality: "spiritual_weapon", effect: "+2(T) Wound with this weapon. Grants Spiritual Weapon." }
     },
 
     weaponSizes: {
@@ -1304,7 +1304,7 @@ export function registerConfig() {
       environmental_protection: { id: "environmental_protection", name: "Environmental Protection", slots: 2, categories: ["standard_clothing"], prerequisites: "", effect: "Ignore Battle Environments, Environmental Qualities, Unbreathable Atmosphere.", special: false },
       focal: { id: "focal", name: "Focal", slots: 1, categories: ["weights"], prerequisites: "", effect: "Select Strike or Dodge. Only that roll is reduced by Weight penalty; only that roll benefits from Doff Bonus.", special: false },
       hefty_plating: { id: "hefty_plating", name: "Hefty Plating", slots: 1, categories: ["weights"], prerequisites: "Force Score 6+", effect: "Hardness Value = 4. If hit Opponent via Throw, Might Clash: win = Prone.", special: false },
-      jacket: { id: "jacket", name: "Jacket", slots: 1, categories: ["standard_clothing"], prerequisites: "", effect: "Increase Soak Value by 1(bT). Can be worn over Armor.", special: false },
+      jacket: { id: "jacket", name: "Jacket", slots: [1, 2, 3], categories: ["standard_clothing"], prerequisites: "", effect: "+1(bT) Soak per Quality Slot. Can be worn over Armor.", special: false },
       joint_protection: { id: "joint_protection", name: "Joint Protection", slots: 1, categories: ["armor"], prerequisites: "", effect: "First time Break Value would be lowered from max in a Combat Encounter, it is not lowered.", special: false },
       lab_coat: { id: "lab_coat", name: "Lab Coat", slots: 1, categories: ["standard_clothing"], prerequisites: "Scholarship Score 4+", effect: "+2 Dice Score on chosen Scholarship-based Skill Checks.", special: false },
       leaders_insignia: { id: "leaders_insignia", name: "Leader's Insignia", slots: 1, categories: ["armor","combat_clothing","standard_clothing"], prerequisites: "Personality Score 6+", effect: "+1(bT) Combat Rolls for Minions. If has Team Outfit, +1(bT) Wound Roll for same-team Allies.", special: false },
@@ -1340,6 +1340,7 @@ export function registerConfig() {
     },
 
     weaponQualities: {
+      shishkebab: { id: "shishkebab", name: "Shishkebab", slots: [1, 2, 3], types: ["physical","energy","magic"], prerequisites: "Gear Kit or Crafting", effect: "While equipped, spend 1 Action to gain a Snack. Uses per encounter equal occupied slots.", special: false },
       artisan: { id: "artisan", name: "Artisan", slots: [1, 2], types: ["physical","energy","magic"], prerequisites: "", effect: "For each slot, increase Wound Rolls by 1(T).", special: false },
       barrage_weapon: { id: "barrage_weapon", name: "Barrage Weapon", slots: 1, types: ["physical"], prerequisites: "Throwing Weapon quality", effect: "When throwing, may use Combination Profile (Physical) instead of Simple.", special: false },
       boomerang: { id: "boomerang", name: "Boomerang", slots: [1, 2], types: ["physical"], prerequisites: "Throwing Weapon quality; NOT Multi-Storage", effect: "1 slot: Thrown weapon returns immediately. 2 slots: Also apply Homing Advantage to Throw Maneuver attacks.", special: false },

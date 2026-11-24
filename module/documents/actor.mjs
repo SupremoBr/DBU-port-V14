@@ -499,6 +499,7 @@ export class DBUActor extends Actor {
 
     // ---- Equipment Quality Automation (apparel/weapon qualities) ----
     applyEquipmentQualityBonuses(this, system, tier, baseTier);
+    if (uses093(system)) system.status.damageReduction += system.equipmentFlags?.wardingDR || 0;
 
     // ---- Clamp Attribute totalScores to minimum ----
     // Applied after ALL automation that can modify totalScore
@@ -3411,14 +3412,17 @@ export class DBUActor extends Actor {
     const baseTier = system.baseTier || 1;
     let soak = 0;
     const slots = system.wornApparelSlots || {};
+    const seen = new Set();
     for (const key of ["topLayer", "middleLayer", "bottomLayer"]) {
       const itemId = slots[key];
-      if (!itemId) continue;
+      if (!itemId || (uses093(this.system) && seen.has(itemId))) continue;
+      seen.add(itemId);
       const item = this.items.get(itemId);
-      if (!item) continue;
+      if (!item || (uses093(this.system) && item.system.breakValueCurrent === 0)) continue;
       const quals = item.system.qualities || [];
-      if (quals.some(q => q.qualityKey === "jacket")) soak += baseTier;
-      if (key === "topLayer" && quals.some(q => q.qualityKey === "enchanted")) {
+      const jacket = quals.find(q => q.qualityKey === "jacket");
+      if (jacket) soak += baseTier * (uses093(system) ? Math.min(3, Number(jacket.slotsUsed) || 1) : 1);
+      if ((key === "topLayer" || uses093(system)) && quals.some(q => q.qualityKey === "enchanted")) {
         soak += this._calcApparelBonus(item);
       }
     }
@@ -3428,10 +3432,10 @@ export class DBUActor extends Actor {
   _getEquipmentDR() {
     const system = this.system;
     const slots = system.wornApparelSlots || {};
-    const topId = slots.topLayer;
-    if (!topId) return 0;
-    const item = this.items.get(topId);
-    if (!item || item.system.apparelCategory !== "armor") return 0;
+    const top = slots.topLayer ? this.items.get(slots.topLayer) : null;
+    const coversArmor = uses093(system) && top?.system.qualities?.some(q => q.qualityKey === "jacket");
+    const item = coversArmor && slots.middleLayer ? this.items.get(slots.middleLayer) : top;
+    if (!item || item.system.apparelCategory !== "armor" || (uses093(system) && item.system.breakValueCurrent === 0)) return 0;
     let bonus = this._calcApparelBonus(item);
     const quals = item.system.qualities || [];
     if (quals.some(q => q.qualityKey === "sleek_design")) bonus = Math.floor(bonus / 2);
@@ -3444,7 +3448,7 @@ export class DBUActor extends Actor {
     const topId = slots.topLayer;
     if (!topId) return 0;
     const item = this.items.get(topId);
-    if (!item || item.system.apparelCategory !== "combat_clothing") return 0;
+    if (!item || item.system.apparelCategory !== "combat_clothing" || (uses093(system) && item.system.breakValueCurrent === 0)) return 0;
     return Math.ceil(this._calcApparelBonus(item) / 2);
   }
 
@@ -3452,11 +3456,13 @@ export class DBUActor extends Actor {
     const system = this.system;
     const slots = system.wornApparelSlots || {};
     let penalty = this._calcLayerPenalty();
+    const seen = new Set();
     for (const key of ["topLayer", "middleLayer", "bottomLayer"]) {
       const itemId = slots[key];
-      if (!itemId) continue;
+      if (!itemId || (uses093(this.system) && seen.has(itemId))) continue;
+      seen.add(itemId);
       const item = this.items.get(itemId);
-      if (!item || item.system.apparelCategory !== "weights") continue;
+      if (!item || item.system.apparelCategory !== "weights" || (uses093(system) && item.system.breakValueCurrent === 0)) continue;
       const quals = item.system.qualities || [];
       if (!quals.some(q => q.qualityKey === "focal")) {
         penalty += this._calcApparelBonus(item);
@@ -3469,11 +3475,13 @@ export class DBUActor extends Actor {
     const baseTier = this.system.baseTier || 1;
     const slots = this.system.wornApparelSlots || {};
     let penalizingLayers = 0;
+    const seen = new Set();
     for (const key of ["topLayer", "middleLayer", "bottomLayer"]) {
       const itemId = slots[key];
-      if (!itemId) continue;
+      if (!itemId || (uses093(this.system) && seen.has(itemId))) continue;
+      seen.add(itemId);
       const item = this.items.get(itemId);
-      if (!item) continue;
+      if (!item || (uses093(this.system) && item.system.breakValueCurrent === 0)) continue;
       if (item.system.apparelCategory === "standard_clothing") continue;
       const quals = item.system.qualities || [];
       if (quals.some(q => q.qualityKey === "lightweight")) continue;

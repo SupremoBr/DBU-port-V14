@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.0.12-rules093-alpha.28] — equipamentos e técnicas assinaturas
+
+- As 64 vantagens e 41 desvantagens mostram efeitos, requisitos e links oficiais. O cálculo usa o TP atual por rank e sinaliza combinações incompatíveis.
+- As listas de modificadores ocupam a largura da técnica, com os botões de adicionar acima delas. O seletor legado de Limit Break sai da ficha 0.9.3.
+- As Referências de Ataque usam a arma selecionada, principal ou secundária. Weapon Assisted permite escolher a arma da técnica e valida se ela pode ser usada.
+- A ficha usa os espaços de qualidade por fabricação e corrige os cálculos revisados de durabilidade e proteção de equipamentos. O reparo de armas continua assistido.
+- Links, avisos de migração e backup do GM ficam no fim de Progressão. Steadfast e Reparo seguem o estilo dos botões da ficha.
+
 ## [1.0.12-rules093-alpha.27] — limiares de saúde e perícias
 
 - A ficha registra Steadfast pendente ao cruzar um limiar de saúde. Combat permite rolar ou registrar o resultado, e o HUD indica a pendência.

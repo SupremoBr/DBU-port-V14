@@ -1,7 +1,8 @@
+import { attackWeapon093, weaponRollModifiers093, wieldingStrikePenalty093 } from '../../helpers/weapon-state.mjs';
 import { limitedMartialPower } from "../../rules/path-to-power-v093.mjs";
 import { energyChargeDie, greaterDiceCategoryBonus, shiftAttackDamageCategory, signatureBuffDice } from "../../helpers/custom-buffs.mjs";
 import { techniqueKiCost093, signatureEnergyCharges093, martialTechnique, martialTechniqueTPCap, startingTechniqueAvailable093, startingTechniqueEligible093 } from "../../rules/techniques-v093.mjs";
-import { uses093, techniquePointCost, paidAdvantageTP093 } from "../../rules/v093.mjs";
+import { isLegacyLimitBreakType, uses093, techniquePointCost, paidAdvantageTP093, signatureModifierTP093 } from "../../rules/v093.mjs";
 import { progression093 } from "../../rules/progression-v093.mjs";
 
 /** Character sheet domain: techniques. Methods run with the sheet as this. */
@@ -27,6 +28,15 @@ export const techniquesMethods = {
     // Helper: get attribute modifier
     const getAttrMod = (key) => system.attributes?.[key]?.modifier ?? 0;
 
+    const enrichModifier = (row, group, definitions) => {
+      const { requirement = "", effect, source } = definitions[row.name] || {};
+      const tpCost = currentRules ? signatureModifierTP093(row, group) : row.tpCost;
+      const paidTP = currentRules && group === 'Advantages' ? paidAdvantageTP093(row) : tpCost;
+      return { ...row, tpCost, paidTP, requirement, effect, source };
+    };
+    const enrichAdvantages = rows => (rows || []).map(row => enrichModifier(row, 'Advantages', advData));
+    const enrichDisadvantages = rows => (rows || []).map(row => enrichModifier(row, 'Disadvantages', disadvData));
+
     // Calculate enriched data for each technique
     const preparedTechniques = techniques.map(t => {
       const isFreeStarter = t === startingTechnique && startingTechniqueEligible093(t, system);
@@ -42,7 +52,7 @@ export const techniquesMethods = {
       const profileInfo = profileDataMap[tCalc.profile] || null;
 
       // KP model (Free TP excluded, Efficiency/Inefficiency, profile-KP floor)
-      const { profileBaseKP, tpFull, kpCost, kpReduction, finalKP } = this._calcTechKP(t);
+      const { profileBaseKP, tpFull, kpCost, kpReduction, finalKP, issues } = this._calcTechKP(t);
 
       // Dynamic Ki: sum of all dynamicTP values
       let dynamicKi = 0;
@@ -52,18 +62,8 @@ export const techniquesMethods = {
       // Available profiles for selected foundation
       const availableProfiles = foundations[t.foundation] || Object.keys(profileDataMap);
 
-      // Enrich advantages with requirement field
-      const enrichedAdvantages = (t.advantages || []).map(adv => ({
-        ...adv,
-        paidTP: currentRules ? paidAdvantageTP093(adv) : adv.tpCost,
-        requirement: advData[adv.name]?.requirement || ""
-      }));
-
-      // Enrich disadvantages with requirement field
-      const enrichedDisadvantages = (t.disadvantages || []).map(dis => ({
-        ...dis,
-        requirement: disadvData[dis.name]?.requirement || ""
-      }));
+      const enrichedAdvantages = enrichAdvantages(t.advantages);
+      const enrichedDisadvantages = enrichDisadvantages(t.disadvantages);
 
       // Strike formula
       const strikeInfo = this._calcTechStrike(tCalc, system, tier);
@@ -80,6 +80,12 @@ export const techniquesMethods = {
         tpDiscounted: currentRules && tpFull !== tpCost,
         ...(currentRules && t.startingTechnique ? { startingTechniqueNeedsReview: !isFreeStarter } : {}),
         tpFull,
+        weaponOptionRows: currentRules && t.isWeapon ? Array.from(this.actor.items || [])
+          .filter(item => item.type === 'equipment' && item.system.equipmentType === 'weapon'
+            && (item.system.weaponType || 'physical').toLowerCase() === t.foundation?.toLowerCase())
+          .map(item => ({ id: item.id, name: item.name, selected: [item.id, item.name].includes(t.weaponEquipped) })) : [],
+        legacyLimitBreakType: currentRules && isLegacyLimitBreakType(t.type ?? t.techType),
+        modifierIssues: issues,
         mfProfile,
         kpCost,
         kpReduction,
@@ -151,12 +157,8 @@ export const techniquesMethods = {
           for (const adv of (cloned.advantages || [])) dynamicKi += (adv.dynamicTP || 0);
           for (const dis of (cloned.disadvantages || [])) dynamicKi += (dis.dynamicTP || 0);
           const availableProfiles = foundations[cloned.foundation] || Object.keys(profileDataMap);
-          const enrichedAdvantages = (cloned.advantages || []).map(adv => ({
-            ...adv, requirement: advData[adv.name]?.requirement || ""
-          }));
-          const enrichedDisadvantages = (cloned.disadvantages || []).map(dis => ({
-            ...dis, requirement: disadvData[dis.name]?.requirement || ""
-          }));
+          const enrichedAdvantages = enrichAdvantages(cloned.advantages);
+          const enrichedDisadvantages = enrichDisadvantages(cloned.disadvantages);
           const strikeInfo = this._calcTechStrike(cloned, system, tier);
           const woundInfo = this._calcTechWound(cloned, system, tier);
           const ctInfo = this._calcTechCT(cloned, system);
@@ -211,12 +213,8 @@ export const techniquesMethods = {
         // Rule: "Reduce their Ki Point Cost by 1/2."
         const finalKP = Math.ceil(baseFinalKP / 2);
         const availableProfiles = foundations[cloned.foundation] || Object.keys(profileDataMap);
-        const enrichedAdvantages = (cloned.advantages || []).map(adv => ({
-          ...adv, requirement: advData[adv.name]?.requirement || ""
-        }));
-        const enrichedDisadvantages = (cloned.disadvantages || []).map(dis => ({
-          ...dis, requirement: disadvData[dis.name]?.requirement || ""
-        }));
+        const enrichedAdvantages = enrichAdvantages(cloned.advantages);
+        const enrichedDisadvantages = enrichDisadvantages(cloned.disadvantages);
         const strikeInfo = this._calcTechStrike(cloned, system, tier);
         const woundInfo  = this._calcTechWound(cloned, system, tier);
         const ctInfo     = this._calcTechCT(cloned, system);
@@ -296,7 +294,11 @@ export const techniquesMethods = {
    * Magical Flavor swaps in the chosen Energy Profile's KP cost/minimum.
    */
   _calcTechKP(tech) {
-    if (uses093(this.actor.system)) return techniqueKiCost093(tech, { system: this.actor.system });
+    if (uses093(this.actor.system)) {
+      const weapon = tech.isWeapon ? attackWeapon093(this.actor, tech).item : null;
+      return techniqueKiCost093(tech, { system: this.actor.system,
+        usageDiscount: weapon?.system.weaponCategory === "efficient" ? 2 : 0 });
+    }
     const profileKpCosts = CONFIG.DBU?.profileKpCosts || {};
     const mfProfile = this._techMagicalFlavor(tech);
     const profileBaseKP = profileKpCosts[mfProfile || tech.profile] || 0;
@@ -435,6 +437,13 @@ export const techniquesMethods = {
     const hasGreater = !isImpediment && (combatStates.superior || (grApply.global || 0) > 0 || (grApply.strike || 0) > 0);
     const grCatBonus = greaterDiceCategoryBonus(system, "strike");
     const greaterDice = hasGreater ? this._resolveExtraDice(tier, 1, grCatBonus) : "";
+    if (uses093(system) && (tech.advantages || []).some(row => row.name === "Last Legs")) {
+      totalMod += (system.thresholds?.penalties || 0) + (system.thresholds?.crossedCount || 0) * tier;
+    }
+    if (uses093(system)) {
+      const weapon = tech.isWeapon ? attackWeapon093(this.actor, tech).item : null;
+      totalMod += weaponRollModifiers093(system, weapon, tech.profile).strike - wieldingStrikePenalty093(this.actor, system);
+    }
     totalMod += sig?.strikeBonus || 0;
     const formula = this._buildFormula(topDice, greaterDice, totalMod, this._extraDicePool(system, "strike") + signatureBuffDice(system, "strike"));
 
@@ -446,10 +455,14 @@ export const techniquesMethods = {
     const getAttrTotal = (key) => system.attributes?.[key]?.totalScore ?? 0;
     const profileInfo = config.profileData?.[tech.profile] || {};
 
-    // Damage attribute: Physical/Energy → Force Modifier, Magic → Magic Modifier
-    let damageAttr = tech.foundation === "Magic" ? getAttrTotal("ma") : getAttrTotal("fo");
+    const weapon = uses093(system) && tech.isWeapon ? attackWeapon093(this.actor, tech).item : null;
+    const highTech = weapon?.system.qualities?.some(quality => quality.qualityKey === "high_tech");
+    let damageAttr = getAttrTotal(highTech ? "sc" : tech.foundation === "Magic" ? "ma" : "fo");
     // Crushing: "Reduce the bonus to your Wound Roll from your Force by 1/2" (attacking.txt)
     if (tech.profile === "Crushing" && !uses093(system)) damageAttr = Math.floor(damageAttr / 2);
+    if (uses093(system) && (tech.disadvantages || []).some(row => row.name === "Low-Power Crush")) {
+      damageAttr = Math.floor(damageAttr / 2);
+    }
     // Powered: double damage attribute
     let extraDamageAttr = tech.profile === "Powered" ? damageAttr : 0;
 
@@ -484,6 +497,12 @@ export const techniquesMethods = {
     const allOutSigWound = (system.tracking?.holdingBackStacks || 0) === 0
       ? (system.aptitudes?.allOutStartSigWound || 0) : 0;
     let totalMod = damageAttr + extraDamageAttr + powerShotBonus - lowPenPenalty + woundBuffTotal + foundationWoundBuff + unarmedWoundBuff + armedWoundBuff + allOutSigWound;
+
+    if (uses093(system) && (tech.advantages || []).some(row => row.name === "Last Legs")) {
+      totalMod += (system.thresholds?.penalties || 0) + (system.thresholds?.crossedCount || 0) * tier;
+    }
+
+    totalMod += weaponRollModifiers093(system, weapon, tech.profile).wound;
 
     // Aura wound bonus (Powerful Aura advantage)
     const activeAura = this.actor._getSelfBenefitAura(system);
@@ -535,7 +554,9 @@ export const techniquesMethods = {
     let damageCat = profileInfo.damageCat || "Standard";
     if (tech.profile === "Mega Flare" && charges >= 7) damageCat = "Direct";
 
-    return { formula, damageCat: shiftAttackDamageCategory(damageCat, system.aptitudes?.attackingDamageCategory) };
+    const weaponCategoryBonus = system.equipmentFlags?.weaponDamageCatBonus?.[weapon?.id] || 0;
+    return { formula, damageCat: shiftAttackDamageCategory(damageCat,
+      (system.aptitudes?.attackingDamageCategory || 0) + weaponCategoryBonus) };
   },
 
   _calcTechCT(tech, system) {
@@ -732,6 +753,11 @@ export const techniquesMethods = {
     const tech = techs.find(t => t.id === techId);
     if (!tech?.disadvantages?.[disadvIndex]) return;
     if (field === "name") {
+      if (uses093(this.actor.system) && el.value && tech.disadvantages.some((row, index) => index !== disadvIndex && row.name === el.value)) {
+        el.value = tech.disadvantages[disadvIndex].name;
+        ui.notifications.warn("Ajuste os ranks na linha existente desta desvantagem.");
+        return;
+      }
       tech.disadvantages[disadvIndex].name = el.value;
       const maxR = CONFIG.DBU?.techniqueDisadvantagesData?.[el.value]?.maxRanks || 99;
       tech.disadvantages[disadvIndex].ranks = Math.min(tech.disadvantages[disadvIndex].ranks || 1, maxR);
@@ -739,7 +765,7 @@ export const techniquesMethods = {
     } else if (field === "ranks") {
       const disName = tech.disadvantages[disadvIndex].name;
       const maxR = CONFIG.DBU?.techniqueDisadvantagesData?.[disName]?.maxRanks || 99;
-      let r = Number(el.value) || 1;
+      let r = Math.max(1, Math.trunc(Number(el.value)) || 1);
       if (r > maxR) { ui.notifications.warn(`${disName} allows at most ${maxR} rank(s).`); r = maxR; }
       tech.disadvantages[disadvIndex].ranks = r;
       tech.disadvantages[disadvIndex].tpCost = this._lookupDisadvTP(disName, r);

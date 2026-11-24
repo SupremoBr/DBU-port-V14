@@ -19,6 +19,8 @@ test('the real system init installs the current catalogs, schema, sheet adapter 
   await import('../dbu-old.mjs');
   await hooks.get('init')();
   assert.equal(CONFIG.DBU.rulesVersion,'0.9.3');
+  assert.deepEqual(CONFIG.DBU.weaponQualities.durable.slots, [1, 2]);
+  assert.deepEqual(CONFIG.DBU.apparelQualities.jacket.slots, [1, 2, 3]);
   assert.equal(CONFIG.DBU.talentsCatalog.length,275);
   const { talentCategories, talentsCatalog } = CONFIG.DBU;
   assert.equal(Object.keys(talentCategories).length, 33);

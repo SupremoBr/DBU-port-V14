@@ -69,6 +69,9 @@
         {{/unless}}
       </div>
 
+      {{#if modifierIssues}}
+      <ul class="rules093-warning">{{#each modifierIssues}}<li>{{this}}</li>{{/each}}</ul>
+      {{/if}}
       <div class="tech-main-section">
         {{!-- Left: Info Fields --}}
         <div class="tech-info-left">
@@ -80,6 +83,7 @@
             <label>Type</label>
             <select class="tech-input" data-tech-id="{{id}}" data-field="type">
               {{#if ../limitedMartialPower}}<option value="signature" selected>Super</option>{{else}}
+              {{#if legacyLimitBreakType}}<option value="{{type}}" selected disabled>Selecione o tipo atual</option>{{/if}}
               {{selectOptions ../techniqueTypeOptions selected=type}}
               {{/if}}
             </select>
@@ -122,12 +126,14 @@
             <label>Extra Energy Charges</label>
             <input type="number" class="tech-input" data-tech-id="{{id}}" data-field="extraEnergyCharges" value="{{extraEnergyCharges}}" min="0" />
           </div>
+          {{#unless ../rules093}}
           <div class="tech-row check-field">
             <label>
               <input type="checkbox" class="tech-input" data-tech-id="{{id}}" data-field="isLimitBreak" {{#if isLimitBreak}}checked{{/if}} />
-              {{#if ../rules093}}Legado: Limit Break — revisar e desmarcar{{else}}Limit Break{{/if}}
+              Limit Break
             </label>
           </div>
+          {{/unless}}
         </div>
 
         {{!-- Right: Cost Display --}}
@@ -198,6 +204,14 @@
           <button type="button" class="style-btn {{#unless isWeapon}}active{{/unless}}" data-style="unarmed">Unarmed</button>
           <button type="button" class="style-btn {{#if isWeapon}}active{{/if}}" data-style="weapon">Weapon</button>
         </div>
+        {{#if @root.rules093}}{{#if isWeapon}}{{#unless isGained}}
+        <label>Arma usada
+          <select class="tech-input" data-tech-id="{{id}}" data-field="weaponEquipped">
+            <option value="">Selecione</option>
+            {{#each weaponOptionRows}}<option value="{{id}}" {{#if selected}}selected{{/if}}>{{name}}</option>{{/each}}
+          </select>
+        </label>
+        {{/unless}}{{/if}}{{/if}}
         <div class="tech-formula-row">
           <label>Strike</label>
           <span class="formula-value">{{strikeFormula}}</span>
@@ -226,28 +240,28 @@
 
       {{!-- Advantages Table --}}
       <div class="tech-advdis-section">
+        <section class="signature-modifier-group" aria-label="Vantagens">
         <div class="advdis-header">
-          Advantages
-          <button type="button" class="add-btn add-adv-btn" data-action="add-advantage" data-technique-id="{{id}}"><i class="fas fa-plus"></i></button>
+          <span>Vantagens</span>
+          <button type="button" class="add-btn add-adv-btn" data-action="add-advantage" data-technique-id="{{id}}" aria-label="Adicionar vantagem" title="Adicionar vantagem"><i class="fas fa-plus" aria-hidden="true"></i></button>
         </div>
         <table class="advdis-table">
           <thead>
             <tr>
-              <th>Name</th>
+              <th class="signature-modifier-name">Nome</th>
               <th>Ranks</th>
-              <th>Notes</th>
-              <th>Req.</th>
+              <th class="signature-modifier-notes">Notas</th>
               <th>TP pago</th>
               {{#if ../rules093}}<th>Ranks grátis</th>{{/if}}
               <th>Dyn.</th>
-              <th></th>
+              <th class="signature-modifier-delete"></th>
             </tr>
           </thead>
           <tbody>
             {{#each advantages}}
             <tr data-adv-index="{{@index}}">
               <td>
-                <select class="adv-input" data-tech-id="{{../id}}" data-adv-index="{{@index}}" data-field="name">
+                <select class="adv-input" data-tech-id="{{../id}}" data-adv-index="{{@index}}" data-field="name" aria-label="Nome da vantagem">
                   <option value="">-- Select --</option>
                   {{#each ../../advantageOptions}}
                   <option value="{{this}}" {{#if (eq this ../name)}}selected{{/if}}>{{this}}</option>
@@ -273,7 +287,6 @@
                 <input type="text" class="adv-input" data-tech-id="{{../id}}" data-adv-index="{{@index}}" data-field="notes" value="{{notes}}" />
                 {{/if}}
               </td>
-              <td class="adv-req">{{requirement}}</td>
               <td class="adv-tp">{{#if freeRanks}}{{paidTP}}{{else}}{{tpCost}}{{/if}}</td>
               {{#if @root.rules093}}
               <td>
@@ -283,36 +296,46 @@
               {{/if}}
               <td><input type="number" class="adv-input adv-dtp" data-tech-id="{{../id}}" data-adv-index="{{@index}}" data-field="dynamicTP" value="{{dynamicTP}}" /></td>
               <td>
-                <button type="button" class="delete-btn" data-action="remove-advantage" data-technique-id="{{../id}}" data-adv-index="{{@index}}">
+                <button type="button" class="delete-btn" data-action="remove-advantage" aria-label="Remover vantagem" title="Remover vantagem" data-technique-id="{{../id}}" data-adv-index="{{@index}}">
                   <i class="fas fa-times"></i>
                 </button>
               </td>
             </tr>
+            {{#if name}}{{#if requirement}}
+            <tr class="signature-modifier-summary">
+              <td colspan="{{#if @root.rules093}}7{{else}}6{{/if}}">
+                {{#if effect}}<span>{{effect}}</span>{{/if}}
+                {{#unless (eq requirement "Sem requisito de aquisição.")}}<span class="signature-modifier-requirement"><strong>Requisito</strong> {{requirement}}</span>{{/unless}}
+                {{#if source}}<a href="{{source}}" target="_blank" rel="noopener noreferrer" aria-label="Regra oficial de {{name}}">Regra oficial</a>{{/if}}
+              </td>
+            </tr>
+            {{/if}}{{/if}}
             {{/each}}
           </tbody>
         </table>
+        </section>
 
+        <section class="signature-modifier-group" aria-label="Desvantagens">
         <div class="advdis-header">
-          Disadvantages
-          <button type="button" class="add-btn add-disadv-btn" data-action="add-disadvantage" data-technique-id="{{id}}"><i class="fas fa-plus"></i></button>
+          <span>Desvantagens</span>
+          <button type="button" class="add-btn add-disadv-btn" data-action="add-disadvantage" data-technique-id="{{id}}" aria-label="Adicionar desvantagem" title="Adicionar desvantagem"><i class="fas fa-plus" aria-hidden="true"></i></button>
         </div>
         <table class="advdis-table">
           <thead>
             <tr>
-              <th>Name</th>
+              <th class="signature-modifier-name">Nome</th>
               <th>Ranks</th>
-              <th>Notes</th>
-              <th>Req.</th>
+              <th class="signature-modifier-notes">Notas</th>
               <th>TP</th>
               <th>Dyn.</th>
-              <th></th>
+              <th class="signature-modifier-delete"></th>
             </tr>
           </thead>
           <tbody>
             {{#each disadvantages}}
             <tr data-disadv-index="{{@index}}">
               <td>
-                <select class="disadv-input" data-tech-id="{{../id}}" data-disadv-index="{{@index}}" data-field="name">
+                <select class="disadv-input" data-tech-id="{{../id}}" data-disadv-index="{{@index}}" data-field="name" aria-label="Nome da desvantagem">
                   <option value="">-- Select --</option>
                   {{#each ../../disadvantageOptions}}
                   <option value="{{this}}" {{#if (eq this ../name)}}selected{{/if}}>{{this}}</option>
@@ -331,18 +354,27 @@
                 <input type="text" class="disadv-input" data-tech-id="{{../id}}" data-disadv-index="{{@index}}" data-field="notes" value="{{notes}}" />
                 {{/if}}
               </td>
-              <td class="disadv-req">{{requirement}}</td>
               <td class="disadv-tp">{{tpCost}}</td>
               <td><input type="number" class="disadv-input disadv-dtp" data-tech-id="{{../id}}" data-disadv-index="{{@index}}" data-field="dynamicTP" value="{{dynamicTP}}" /></td>
               <td>
-                <button type="button" class="delete-btn" data-action="remove-disadvantage" data-technique-id="{{../id}}" data-disadv-index="{{@index}}">
+                <button type="button" class="delete-btn" data-action="remove-disadvantage" aria-label="Remover desvantagem" title="Remover desvantagem" data-technique-id="{{../id}}" data-disadv-index="{{@index}}">
                   <i class="fas fa-times"></i>
                 </button>
               </td>
             </tr>
+            {{#if name}}{{#if requirement}}
+            <tr class="signature-modifier-summary">
+              <td colspan="6">
+                {{#if effect}}<span>{{effect}}</span>{{/if}}
+                {{#unless (eq requirement "Sem requisito de aquisição.")}}<span class="signature-modifier-requirement"><strong>Requisito</strong> {{requirement}}</span>{{/unless}}
+                {{#if source}}<a href="{{source}}" target="_blank" rel="noopener noreferrer" aria-label="Regra oficial de {{name}}">Regra oficial</a>{{/if}}
+              </td>
+            </tr>
+            {{/if}}{{/if}}
             {{/each}}
           </tbody>
         </table>
+        </section>
       </div>
     </div>
     {{else}}

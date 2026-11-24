@@ -167,6 +167,7 @@ function signatureTechniqueField() {
     baseEnergyCharges: new NumberField({ required: true, nullable: false, initial: 0, integer: true }),
     extraEnergyCharges: new NumberField({ required: true, nullable: false, initial: 0, integer: true }),
     isWeapon: new BooleanField({ initial: false }),
+    weaponEquipped: new StringField({ initial: "", blank: true }),
     isLimitBreak: new BooleanField({ initial: false }),
     advantages: new ArrayField(advDisField()),
     disadvantages: new ArrayField(advDisField())

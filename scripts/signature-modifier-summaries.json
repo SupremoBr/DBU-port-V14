@@ -1,0 +1,422 @@
+{
+  "Controlled Blast": {
+    "requirement": "Cone AoE",
+    "effect": "Escolha uma casa a menos de Long Range como origem do cone e aponte na direção desejada."
+  },
+  "Hurricane Assault": {
+    "requirement": "Sweeping",
+    "effect": "A área passa a magnitude Standard antes dos demais ajustes."
+  },
+  "Intense Blast": {
+    "requirement": "AoE",
+    "effect": "A técnica se torna um Absolute Attack. Em caso de erro, ainda aplica metade do resultado de Wound contra Soak e DR."
+  },
+  "Pinpoint Precision": {
+    "requirement": "AoE Standard ou Minor, sem Concentrated Strike",
+    "effect": "Se só houver um oponente como alvo, pode usar Called Shot. Se acertar, aplique Broken até o começo do seu próximo turno."
+  },
+  "Splitting": {
+    "requirement": "Energy ou Magic sem AoE",
+    "effect": "Escolha até 2 alvos no rank 1 ou 4 no rank 2. Wound sofre −1(T) por alvo além do primeiro."
+  },
+  "Terrain Destruction": {
+    "requirement": "AoE",
+    "effect": "Aumente em um grau a magnitude da área por rank."
+  },
+  "Widespread Assault": {
+    "requirement": "Sem AoE",
+    "effect": "Escolha uma área Standard. Com Sphere, o centro pode ser uma casa diferente da sua."
+  },
+  "Encompassing Attack": {
+    "requirement": "AoE",
+    "effect": "Cada rank encarece Defend em 2(bT) Ki. Com 2 ranks, impede Parry e Unique Abilities Counter, salvo Barrier."
+  },
+  "Concentrated Strike": {
+    "requirement": "AoE, sem Pinpoint Precision",
+    "effect": "Ganhe uma Energy Charge se a área tiver um único personagem como alvo."
+  },
+  "Maximum Charge": {
+    "requirement": "Ultimate",
+    "effect": "Suba uma categoria dos dados extras de Energy Charges."
+  },
+  "Reinforced Plantlife": {
+    "requirement": "Elemental (Plantlife)",
+    "effect": "Aumente o Hardness das Features criadas pelo perfil em 1 por rank."
+  },
+  "Weather Calling": {
+    "requirement": "Perfil conectado a Battle Weather",
+    "effect": "Ao acertar, aplique o clima ligado ao perfil numa Sphere centrada no alvo. Natural em Super, Unnatural em Ultimate."
+  },
+  "Back Flip": {
+    "requirement": "Hit and Run, ataque elegível e sem AoE salvo Line",
+    "effect": "Mova-se com Hit and Run após declarar o ataque e antes de executá-lo. Com Charging Assault, mova-se antes da investida e reduza o Ki em 1(T)."
+  },
+  "Charging Assault": {
+    "requirement": "Sem requisito de aquisição.",
+    "effect": "Antes de rolar, avance em linha reta até Boosted Speed e termine em Melee Range. Após a terceira casa, some +1 Wound por casa, até +2(T). A regra permite mudar de altitude conforme o ambiente."
+  },
+  "Express Ticket": {
+    "requirement": "Charging Assault",
+    "effect": "Ao acertar e vencer um Might Clash, arraste o alvo até Boosted Speed. No percurso completo sem colisão, ele perde LP iguais à metade do seu Might."
+  },
+  "High-Speed Dash": {
+    "requirement": "Hit and Run",
+    "effect": "O movimento de Hit and Run usa Boosted Speed e evita Exploit."
+  },
+  "Hit and Run": {
+    "requirement": "Sem requisito de aquisição.",
+    "effect": "Após atacar, mova-se em linha reta até Normal Speed. Pode atravessar a casa do alvo sem colisão, mas sair de Melee Range pode provocar Exploit."
+  },
+  "Knockback": {
+    "requirement": "Sem requisito de aquisição.",
+    "effect": "Após causar dano, um Might Clash pode afastar o alvo em linha reta."
+  },
+  "Two-Step Strike": {
+    "requirement": "Energy, Magic, Soaring ou Physical com Charging Assault. Sem Concentration",
+    "effect": "Antes de declarar, pode usar Push Back de Thrust fora da sequência contra um oponente em Melee Range."
+  },
+  "Accurate": {
+    "requirement": "Sem Inaccurate",
+    "effect": "Some +1(T) a Strike por rank."
+  },
+  "Armor-Piercing": {
+    "requirement": "Pinpoint",
+    "effect": "Ignore DR igual à metade do seu Insight Modifier."
+  },
+  "Brutal Blitz": {
+    "requirement": "Blitz",
+    "effect": "Ao usar Charging Assault com deslocamento igual a Boosted Speed, pode usar Agility como atributo de dano."
+  },
+  "Final Chance": {
+    "requirement": "Ultimate",
+    "effect": "Em Injured ou pior, pode zerar seus LP ao declarar e somar o valor perdido ao Ki Wager. A derrota é resolvida após o ataque."
+  },
+  "Full Wager": {
+    "requirement": "Sem requisito de aquisição.",
+    "effect": "Limite o Ki Wager à Capacity restante."
+  },
+  "Last Legs": {
+    "requirement": "Ultimate",
+    "effect": "Ignore as penalidades de Health Thresholds no ataque. Ganhe +1(T) em Strike e Wound por limiar alcançado."
+  },
+  "Long Shot": {
+    "requirement": "Sem requisito de aquisição.",
+    "effect": "Contra alvos a 9 ou mais casas, ganhe +1(T) por rank em Strike e Wound."
+  },
+  "Minion Destroyer": {
+    "requirement": "Sem requisito de aquisição.",
+    "effect": "Ao causar dano a um Minion, acrescente o valor do atributo de dano."
+  },
+  "Overwhelming Terror": {
+    "requirement": "Acesso a Terrify",
+    "effect": "Aplique uma Energy Charge se todos os alvos estiverem Shaken."
+  },
+  "Peppering Blows": {
+    "requirement": "Combination",
+    "effect": "Cada rank conta como um ataque adicional para Diminishing Defense."
+  },
+  "Power Burst": {
+    "requirement": "Ultimate",
+    "effect": "Ganhe um Super Stack por rank durante o ataque. Ignore em Strike a Muscle Penalty dos stacks concedidos."
+  },
+  "Power Shot": {
+    "requirement": "Sem Low Penetration",
+    "effect": "Some +2(T) a Wound por rank."
+  },
+  "Shattering Blow": {
+    "requirement": "Crushing",
+    "effect": "Ao causar dano, aumente-o em ¼ do Soak do alvo por rank."
+  },
+  "Sky Assault": {
+    "requirement": "Energy ou Magic",
+    "effect": "Ignore a penalidade de Long Range causada pela altitude superior do alvo."
+  },
+  "Super Advantage": {
+    "requirement": "Ultimate",
+    "effect": "Dobre o bônus de Long Shot, Accurate ou Power Shot. Para Power Shot, conte até 3 ranks."
+  },
+  "Transformation Boost": {
+    "requirement": "Ultimate",
+    "effect": "Ao declarar em Form ou Transcended Enhancement, acrescente uma Energy Charge."
+  },
+  "Counter": {
+    "requirement": "Sem requisito de aquisição.",
+    "effect": "Permite usar esta técnica no lugar do Basic Attack de Cross Counter, sem reduzir seu Defense Value à metade."
+  },
+  "Delayed": {
+    "requirement": "Uso pela Signature Technique Maneuver",
+    "effect": "Ao acertar, registre Wound e aplique Imminent para resolver o dano mais tarde."
+  },
+  "Exploiting Technique": {
+    "requirement": "Sem AoE ou desvantagens que impeçam Exploit",
+    "effect": "Pode usar a técnica no lugar do Basic Attack de Exploit."
+  },
+  "Fake Out": {
+    "requirement": "Super, 2+ ranks em Bluff",
+    "effect": "Ao declarar, dispute Bluff contra Intuition. O alvo derrotado só pode usar Guard, Dodge normal ou Afterimage. Se escolher Dodge, você pode atacar um desses alvos fora da sequência. Uma vez por rodada."
+  },
+  "Instant Assault": {
+    "requirement": "Sem requisito de aquisição.",
+    "effect": "Impede Instant Maneuvers em resposta a este ataque."
+  },
+  "Low Stakes Attack": {
+    "requirement": "Fake Out",
+    "effect": "O uso fica fora da contagem da Signature Technique Maneuver."
+  },
+  "Personal Bomb": {
+    "requirement": "Delayed e Sphere AoE",
+    "effect": "Pode concentrar a declaração em um alvo e aplicar a área ao resolver Imminent."
+  },
+  "Trick Attack": {
+    "requirement": "2+ ranks em Bluff ou Acrobatics",
+    "effect": "Escolha Bluff ou Acrobatics. Vencer a disputa contra Intuition ou Perception concede +2(bT) a Strike."
+  },
+  "Condition": {
+    "requirement": "Sem Elemental Fire, Ice, Water, Lightning ou Poison",
+    "effect": "Ao causar dano, aplique a condição escolhida na compra, conforme a duração da opção."
+  },
+  "Deadly Drop": {
+    "requirement": "Physical, Grappling e Restricted a High Environment",
+    "effect": "Ao acertar como Grappler no ar, pode trazer o Grapple ao solo. Deep Space fica fora."
+  },
+  "Hefty Stagger": {
+    "requirement": "Staggering Attack",
+    "effect": "Some +1(T) por rank ao Might Clash de Staggering Attack."
+  },
+  "Homing": {
+    "requirement": "Sem AoE",
+    "effect": "Ao errar, pode repetir Strike até o número de ranks, com +1(T) em Strike por erro anterior e sem Diminishing Defense adicional. A partir de 2 ranks, pode alcançar um alvo que saiu do alcance se ainda estiver no campo, sem novo Homing se errar."
+  },
+  "Penetration": {
+    "requirement": "Sem Sphere, Cone ou Low Penetration",
+    "effect": "Ao acertar, aplique um stack de Broken por rank até o começo do seu próximo turno."
+  },
+  "Perfect Strike": {
+    "requirement": "Ultimate com Simple",
+    "effect": "Pague o Ki integral. A perda de Capacity Rate por esse custo é reduzida à metade."
+  },
+  "Powerbomb": {
+    "requirement": "Physical com Grappling",
+    "effect": "Ao atacar o alvo do seu Grapple, pode encerrar o Grapple para ganhar Wound igual à metade do Might por rank. Você fica sem usar Grapple até o início do próximo turno."
+  },
+  "Rebound": {
+    "requirement": "Homing",
+    "effect": "Ao repetir Strike com Homing, pode trocar de alvo."
+  },
+  "Staggering Attack": {
+    "requirement": "Sem requisito de aquisição.",
+    "effect": "Ao causar dano, vença um Might Clash para deixar o alvo Staggered até o fim do turno dele."
+  },
+  "Sudden Blast": {
+    "requirement": "Clearing",
+    "effect": "Impede Deflect e Distant Deflect em resposta ao ataque."
+  },
+  "Sustained": {
+    "requirement": "Sem requisito de aquisição.",
+    "effect": "Ao causar dano, aplique um stack de DOT por rank por três rodadas."
+  },
+  "Terrain Slam": {
+    "requirement": "Powerbomb",
+    "effect": "Após o ataque, um Might Clash permite arremessar o alvo contra uma casa ou Feature adjacente."
+  },
+  "Alotta Lotta Attacks": {
+    "requirement": "Combination",
+    "effect": "Após acertar, faça um Strike adicional por rank."
+  },
+  "Ascended Signature": {
+    "requirement": "Super",
+    "effect": "Pode declarar a técnica como Ultimate. Depois disso, ela fica indisponível pelo resto do encontro e sua lista de vantagens continua sujeita às regras de Super."
+  },
+  "Efficiency": {
+    "requirement": "Sem Inefficiency",
+    "effect": "Reduza o custo de Ki em 4(T) por rank."
+  },
+  "Forceful Launch": {
+    "requirement": "Launching",
+    "effect": "Some +1(T) por rank à distância de Knockback e à pontuação no Might Clash correspondente."
+  },
+  "Precise Strike": {
+    "requirement": "Launching",
+    "effect": "Um crítico em Strike aumenta a distância de Knockback em metade."
+  },
+  "Throwing Technique": {
+    "requirement": "Physical com Simple ou Combination",
+    "effect": "Use a técnica no lugar de Throw, mantendo as regras de alcance de Throw."
+  },
+  "Transformation Flare": {
+    "requirement": "Restricted – Untransformed",
+    "effect": "Ao acertar ou sofrer Duel, permite usar Transformation fora da sequência antes de resolver o ataque."
+  },
+  "Twin-Linked": {
+    "requirement": "Sem Dead-Link na mesma rolagem",
+    "effect": "Escolha Strike ou Wound. Faça duas rolagens e use o maior resultado. Para Strike, os Strikes adicionais de Combination ficam fora."
+  },
+  "Weapon Assisted": {
+    "requirement": "Sem requisito de aquisição.",
+    "effect": "Permite usar uma arma compatível e aplicar tamanho, categoria e qualidades dela."
+  },
+  "Drop Down": {
+    "requirement": "Charging Assault e Restricted – Environment (High)",
+    "effect": "Exige atacante em High Environment e alvo fora dele ou em altitude inferior."
+  },
+  "Recoil": {
+    "requirement": "Hit and Run",
+    "effect": "Mova-se toda a Normal Speed em linha reta para longe do alvo. Pode causar Collision."
+  },
+  "All or Nothing": {
+    "requirement": "Sem requisito de aquisição.",
+    "effect": "Exige o maior Ki Wager possível e zera a Capacity restante após o uso."
+  },
+  "Backlash": {
+    "requirement": "Sem requisito de aquisição.",
+    "effect": "Após o ataque, perca 2(bT) LP por rank."
+  },
+  "Inefficiency": {
+    "requirement": "Sem Efficiency",
+    "effect": "Aumente o custo de Ki em 4(T) por rank."
+  },
+  "Concentration": {
+    "requirement": "Energy, Magic, Soaring ou Physical com Widespread Assault ou Charging Assault",
+    "effect": "Bloqueia Signature Technique dentro de Melee Range inimigo. Ainda permite Energy Charge."
+  },
+  "Grappling": {
+    "requirement": "Sem requisito de aquisição.",
+    "effect": "Exige que você esteja em Grapple com pelo menos um dos alvos."
+  },
+  "Restricted – Environment": {
+    "requirement": "Sem requisito de aquisição.",
+    "effect": "Escolha um ambiente diferente de Standard e só use nele. A escolha High vale para todos os High Environments."
+  },
+  "Restricted – Stance": {
+    "requirement": "Martial Skill Awakening",
+    "effect": "Escolha uma Stance. A técnica só pode ser usada nessa postura."
+  },
+  "Restricted – State": {
+    "requirement": "Sem requisito de aquisição.",
+    "effect": "Escolha um State. A técnica só pode ser usada nesse estado."
+  },
+  "Restricted – Transformation": {
+    "requirement": "Sem Restricted – Untransformed",
+    "effect": "No rank 1, escolha Form ou Enhancement. No rank 2, escolha uma transformação específica. Só use durante a escolha."
+  },
+  "Restricted – Untransformed": {
+    "requirement": "Possuir Form, sem Restricted – Transformation",
+    "effect": "Só pode ser usada no Normal State."
+  },
+  "Restricted – Weapon": {
+    "requirement": "Weapon Assisted",
+    "effect": "Exige uma categoria de arma compatível. No rank 2, escolha uma arma específica."
+  },
+  "Restricted – Weather": {
+    "requirement": "Sem requisito de aquisição.",
+    "effect": "Escolha um Battle Weather e só use a técnica sob esse clima."
+  },
+  "Required Counter": {
+    "requirement": "Counter",
+    "effect": "Só pode ser usada pelo efeito da vantagem Counter."
+  },
+  "Time-Skipped": {
+    "requirement": "Time to Make the Donuts",
+    "effect": "Só pode ser usada pelo efeito de Time-Skip."
+  },
+  "Vehicle Attack": {
+    "requirement": "Blitz ou Restricted – Weapon",
+    "effect": "Exige estar pilotando um veículo."
+  },
+  "Consolidated Strike": {
+    "requirement": "Sem AoE",
+    "effect": "Só pode ser usada com Called Shot."
+  },
+  "Lead Up": {
+    "requirement": "Sem Mandatory Charge",
+    "effect": "O último movimento deve ter sido um ataque do perfil escolhido que acertou o oponente exigido."
+  },
+  "Mandatory Charge": {
+    "requirement": "Sem requisito de aquisição.",
+    "effect": "Exige dois usos de Energy Charge por rank antes do ataque."
+  },
+  "Sneak Attack": {
+    "requirement": "Sem requisito de aquisição.",
+    "effect": "Exige estar Hidden e que todos os alvos estejam Oblivious em relação a você."
+  },
+  "Special Set Up": {
+    "requirement": "Sem Mandatory Charge ou Lead Up",
+    "effect": "Escolha uma Special Maneuver de 1 Standard Action. Ela deve ter sido sua última manobra."
+  },
+  "Distant Explosion": {
+    "requirement": "Sphere AoE, sem Self-Explosion",
+    "effect": "O centro da área deve ser ocupado por um oponente, que também se torna alvo."
+  },
+  "Hostile Chase": {
+    "requirement": "Energy ou Magic com Homing rank 2+",
+    "effect": "Um botch em Strike ou crítico inimigo em Dodge pode fazer seu próprio ataque acertar você."
+  },
+  "Limited Line": {
+    "requirement": "Line AoE",
+    "effect": "A linha termina após 8 casas no rank 1 ou 4 casas no rank 2."
+  },
+  "Self-Explosion": {
+    "requirement": "Sphere AoE, sem Distant Explosion",
+    "effect": "Centralize a área numa casa que você ocupa."
+  },
+  "Skyward Strike": {
+    "requirement": "Sem AoE, Energy, Magic ou Physical com Charging Assault",
+    "effect": "Restringe o ataque conforme a diferença de altitude entre atacante e alvo."
+  },
+  "Small Scale Blast": {
+    "requirement": "Sphere AoE, sem Terrain Destruction",
+    "effect": "A esfera passa a magnitude Minor."
+  },
+  "Volatile Explosion": {
+    "requirement": "Sphere AoE",
+    "effect": "Se estiver na área, você é acertado automaticamente e fica sem Counter para esse ataque."
+  },
+  "Compressed Element": {
+    "requirement": "Elemental Fire, Ice, Lightning, Poison, Water, Dark, Light ou Plantlife",
+    "effect": "Ignore o segundo efeito do perfil Elemental aplicado."
+  },
+  "Exhaustive": {
+    "requirement": "Sem requisito de aquisição.",
+    "effect": "Ganhe Fatigued por rank até o fim do seu próximo turno. Reusar durante o efeito renova a duração."
+  },
+  "Inaccurate": {
+    "requirement": "Sem Accurate",
+    "effect": "Reduza Strike em 1(T) por rank."
+  },
+  "Low Penetration": {
+    "requirement": "Sem Power Shot ou Penetration",
+    "effect": "Reduza Wound em 1(T) por rank."
+  },
+  "Low-Power Crush": {
+    "requirement": "Crushing",
+    "effect": "Reduza pela metade o atributo de dano."
+  },
+  "Short Range": {
+    "requirement": "Energy ou Magic, sem AoE",
+    "effect": "Fora de Melee Range, sofre −2(bT) em Strike e Wound no rank 1. O rank 2 restringe o ataque a Melee Range."
+  },
+  "Stat Drain": {
+    "requirement": "Sem requisito de aquisição.",
+    "effect": "Após o uso, reduza Combat Rolls e Soak em 1(bT) por rank até o fim do próximo turno."
+  },
+  "Climax Attack": {
+    "requirement": "Sem requisito de aquisição.",
+    "effect": "Só pode ser usada em Bruised ou pior no rank 1, Injured ou pior no rank 2 e Critical no rank 3."
+  },
+  "Dead-Link": {
+    "requirement": "Sem Twin-Linked na mesma rolagem",
+    "effect": "Escolha Strike ou Wound. Faça duas rolagens e use o menor resultado."
+  },
+  "Shoot and Pray": {
+    "requirement": "Combination",
+    "effect": "Cada rank conta como um ataque adicional para Diminishing Offense."
+  },
+  "Short Delay": {
+    "requirement": "Delayed",
+    "effect": "Se Imminent não for removido em duas rodadas, a remoção e a aplicação de Wound tornam-se obrigatórias."
+  },
+  "United Attack": {
+    "requirement": "Sem requisito de aquisição.",
+    "effect": "Exige um aliado no encontro com esta mesma técnica e que aceite usar a manobra United Attack. Se ele recusar ou estiver impedido, recupere a Action e o Ki gastos."
+  }
+}

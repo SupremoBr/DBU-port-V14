@@ -162,7 +162,7 @@
       </div>
       {{!-- Qualities expandable section --}}
       <div class="eq-card-qualities-toggle" data-action="toggle-qualities-card" data-item-id="{{_id}}">
-        <i class="fas fa-chevron-{{#if expanded}}up{{else}}down{{/if}}"></i> Qualities ({{qualitiesEnriched.length}} / 3)
+        <i class="fas fa-chevron-{{#if expanded}}up{{else}}down{{/if}}"></i> Qualities ({{qualitySlotsUsed}} / {{qualitySlotsMax}} slots)
       </div>
       {{#if expanded}}
       <div class="eq-card-qualities-section">
@@ -176,6 +176,11 @@
                 {{catalogName}}
               </td>
               <td class="eq-quality-config-cell">
+                {{#if slotChoices}}
+                  <select class="eq-quality-config-input" data-item-id="{{itemId}}" data-q-idx="{{qIdx}}" data-config-key="slotsUsed" aria-label="Espaços de qualidade">
+                    {{#each slotChoices}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{value}} slot(s)</option>{{/each}}
+                  </select>
+                {{/if}}
                 {{#each configFields}}
                   {{#if (eq type "text")}}
                   <input type="text" class="eq-quality-config-input"
@@ -307,9 +312,9 @@
             <input type="number" class="eq-weapon-lp" data-item-id="{{_id}}" value="{{_wLpCurrent}}" min="0" max="{{_wLpMax}}" {{#if _wUnbreakable}}disabled{{/if}} /> / {{_wLpMax}}
           </span>
           <span class="eq-wd-item" title="Weapons have Damage Reduction of 6(bT) against Called Shots targeting them"><i class="fas fa-shield-alt"></i> DR {{_wDR}}</span>
-          <span class="eq-wd-item" title="Hardness Value: 3 by default (4 with Super Heavy). Not added to Wound Rolls — used only when throwing the Weapon"><i class="fas fa-gem"></i> Hardness {{_wHardness}}</span>
+          <span class="eq-wd-item" title="Hardness padrão {{#if _wRepairAssist}}2{{else}}3{{/if}}. Super Heavy usa 4. Not added to Wound Rolls — used only when throwing the Weapon"><i class="fas fa-gem"></i> Hardness {{_wHardness}}</span>
           {{#unless _wUnbreakable}}
-          <button type="button" class="eq-wd-repair" data-action="weapon-repair" data-item-id="{{_id}}" title="Repairing Weapons: one hour outside combat + a {{#if _wHasSpecial}}Master{{else}}Qualified{{/if}} Weapon Craft Skill Check restores the Weapon, even if destroyed"><i class="fas fa-wrench"></i> Repair</button>
+          <button type="button" class="add-row-btn eq-wd-repair" data-action="weapon-repair" data-item-id="{{_id}}" title="{{#if _wRepairAssist}}Registre a restauração de LP após o reparo confirmado pelo mestre{{else}}Repairing Weapons: one hour outside combat and a Weapon Craft Skill Check{{/if}}"><i class="fas fa-wrench"></i> Repair</button>
           {{/unless}}
         </div>
         <div class="eq-field full-width">
@@ -319,7 +324,7 @@
       </div>
       {{!-- Qualities expandable section --}}
       <div class="eq-card-qualities-toggle" data-action="toggle-qualities-card" data-item-id="{{_id}}">
-        <i class="fas fa-chevron-{{#if expanded}}up{{else}}down{{/if}}"></i> Qualities ({{qualitiesEnriched.length}} / 3)
+        <i class="fas fa-chevron-{{#if expanded}}up{{else}}down{{/if}}"></i> Qualities ({{qualitySlotsUsed}} / {{qualitySlotsMax}} slots)
       </div>
       {{#if expanded}}
       <div class="eq-card-qualities-section">
@@ -333,6 +338,11 @@
                 {{catalogName}}
               </td>
               <td class="eq-quality-config-cell">
+                {{#if slotChoices}}
+                  <select class="eq-quality-config-input" data-item-id="{{itemId}}" data-q-idx="{{qIdx}}" data-config-key="slotsUsed" aria-label="Espaços de qualidade">
+                    {{#each slotChoices}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{value}} slot(s)</option>{{/each}}
+                  </select>
+                {{/if}}
                 {{#each configFields}}
                   {{#if (eq type "text")}}
                   <input type="text" class="eq-quality-config-input"

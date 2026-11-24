@@ -1,3 +1,6 @@
+import { uses093 } from "../rules/v093.mjs";
+import { weaponBroken } from "../helpers/weapon-state.mjs";
+
 /**
  * Equipment Quality Automation
  * Applies effects of apparel/weapon qualities to actor stats.
@@ -17,25 +20,6 @@ const APPAREL_HANDLERS = {};
 const WEAPON_HANDLERS  = {};
 
 /**
- * Compute Apparel Bonus for an item: gradeBonus × baseTier.
- * Grade mapping (per rules):
- *   1 (Apprentice / Low)         → 1 × bT
- *   2 (Qualified / Standard-low) → 2 × bT
- *   3 (Expert / Standard)        → 2 × bT  (Standard grade in rules)
- *   4 (Master / High)            → 3 × bT
- *   5 (Grandmaster / High+)      → 3 × bT
- *
- * Note: rules define 3 grades (Low=1bT, Standard=2bT, High=3bT) but the
- * UI exposes a 5-step craftsmanshipGrade. Mapping treats 1=Low, 2-3=Standard,
- * 4-5=High to match common-sense scaling.
- */
-function computeApparelBonus(item, baseTier) {
-  const grade = item.system.craftsmanshipGrade || 1;
-  const gradeMult = { 1: 1, 2: 2, 3: 2, 4: 3, 5: 3 }[grade] ?? 1;
-  return gradeMult * baseTier;
-}
-
-/**
  * Public entry point. Iterates worn apparel + equipped weapons, dispatches each
  * quality to its handler.
  */
@@ -44,6 +28,15 @@ export function applyEquipmentQualityBonuses(actor, system, tier, baseTier) {
   if (!system.equipmentFlags) return;  // schema not yet loaded
 
   const items = Array.from(actor.items || []);
+  const currentRules = uses093(system);
+  if (currentRules) {
+    system._magicStaff093 = false;
+    system.equipmentFlags.wardingDR = 0;
+    system.equipmentFlags.opponentClashDice = 0;
+    for (const field of ['skillBonuses', 'weaponStrikePenalty', 'weaponWoundBonus', 'weaponDamageCatBonus', 'weaponLongRangeStrikeBonus']) {
+      system.equipmentFlags[field] = {};
+    }
+  }
   const apparelItems = items.filter(i => i.type === "equipment" && i.system.equipmentType === "apparel");
   const weaponItems  = items.filter(i => i.type === "equipment" && i.system.equipmentType === "weapon");
 
@@ -65,10 +58,10 @@ export function applyEquipmentQualityBonuses(actor, system, tier, baseTier) {
   const wornApparelIds = new Set([topLayerId, middleLayerId, bottomLayerId].filter(Boolean));
 
   for (const item of apparelItems) {
-    if (!wornApparelIds.has(item.id)) continue;
+    if (!wornApparelIds.has(item.id) || (currentRules && item.system.breakValueCurrent === 0)) continue;
     ctx.item = item;
     ctx.isTopLayer = (item.id === topLayerId);
-    ctx.apparelBonus = computeApparelBonus(item, baseTier);
+    ctx.apparelBonus = actor._calcApparelBonus(item);
     for (const q of (item.system.qualities || [])) {
       const handler = APPAREL_HANDLERS[q.qualityKey];
       if (handler) {
@@ -80,7 +73,11 @@ export function applyEquipmentQualityBonuses(actor, system, tier, baseTier) {
 
   // --- Weapons: only equipped weapons ---
   for (const item of weaponItems) {
-    if (!item.system.worn) continue;
+    if (!item.system.worn || (currentRules && weaponBroken(system, item.system))) continue;
+    if (currentRules && item.system.weaponType === "magic" && item.system.weaponCategory === "magic_staff" && !system._magicStaff093) {
+      system._magicStaff093 = true;
+      _addSkillBonus(system, "use_magic", 2);
+    }
     ctx.item = item;
     ctx.isTopLayer = false;
     ctx.apparelBonus = 0;
@@ -380,13 +377,13 @@ APPAREL_HANDLERS.power_enhancement = (ctx) => {
 // ---------------------------------------------------------------
 
 // artisan: +2*tier Wound Rolls (when using this weapon)
-WEAPON_HANDLERS.artisan = (ctx) => {
+WEAPON_HANDLERS.artisan = (ctx, quality) => {
   const map = _ensureObj(ctx.system.equipmentFlags, "weaponWoundBonus");
-  map[ctx.item.id] = (map[ctx.item.id] || 0) + 2 * ctx.tier;
+  map[ctx.item.id] = (map[ctx.item.id] || 0) + (uses093(ctx.system) ? Math.min(2, Number(quality.slotsUsed) || 1) : 2) * ctx.tier;
 };
 
 // durable: register weapon ID for BV-related lookups
-WEAPON_HANDLERS.durable = (ctx) => {
+WEAPON_HANDLERS.durable_weapon = WEAPON_HANDLERS.durable = (ctx) => {
   const arr = ctx.system.equipmentFlags.durableWeapons;
   if (!Array.isArray(arr)) {
     ctx.system.equipmentFlags.durableWeapons = [ctx.item.id];
@@ -415,6 +412,7 @@ WEAPON_HANDLERS.giant_weapon = (ctx) => {
 
 // high_tech: Wound bonus = ceil(SC totalScore / 4); also flag for sig tech alt comp
 WEAPON_HANDLERS.high_tech = (ctx) => {
+  if (uses093(ctx.system)) return;
   const sc = ctx.system.attributes?.sc?.totalScore || 0;
   const bonus = Math.ceil(sc / 4);
   const wMap = _ensureObj(ctx.system.equipmentFlags, "weaponWoundBonus");
@@ -462,6 +460,11 @@ WEAPON_HANDLERS.super_heavy = (ctx) => {
 
 // warding_weapon (special): +4*baseTier system DR, +1*tier Clash dice when opponent initiates clash
 WEAPON_HANDLERS.warding_weapon = (ctx) => {
+  if (uses093(ctx.system)) {
+    ctx.system.equipmentFlags.wardingDR = 2 * ctx.baseTier;
+    ctx.system.equipmentFlags.opponentClashDice = ctx.tier;
+    return;
+  }
   ctx.system.equipmentFlags.wardingDR =
     (ctx.system.equipmentFlags.wardingDR || 0) + 4 * ctx.baseTier;
   ctx.system.equipmentFlags.opponentClashDice =
@@ -563,4 +566,4 @@ WEAPON_HANDLERS.quick_draw = (ctx) => {
 };
 
 // Export for testing/debugging if needed
-export { APPAREL_HANDLERS, WEAPON_HANDLERS, computeApparelBonus };
+export { APPAREL_HANDLERS, WEAPON_HANDLERS };

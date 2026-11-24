@@ -1,7 +1,8 @@
+import { attackWeapon093 } from '../../helpers/weapon-state.mjs';
 import { inCombat093 } from "../../rules/actions-v093.mjs";
 import { profileRoll093 } from "../../rules/profiles-v093.mjs";
 import { uses093 } from "../../rules/v093.mjs";
-import { validateTechnique093, validateTechniqueUsage093, maximumWager093 } from "../../rules/techniques-v093.mjs";
+import { validateTechnique093, validateTechniqueUsage093, signatureUseIssue093, maximumWager093 } from "../../rules/techniques-v093.mjs";
 // DBU Automation v1.8.12 DEV — Attack Core
 import { getAttackVisualSettings } from "./visual-config.js";
 import { getAreaSpec, resolveAreaTargets, magnitudeLabel } from "./area-attack.js";
@@ -1152,11 +1153,18 @@ const selected = sources[selection.index];
 if (!selected) return ui.notifications.error("Ataque selecionado não encontrado.");
 
 const source = selected.source;
+if (uses093(actor.system) && source.key?.startsWith("ref_")) {
+  const ref = actor.system.attackRefs?.[Number(source.key.slice(4))];
+  const issue = ref && attackWeapon093(actor, ref).issue;
+  if (issue) return ui.notifications.warn(issue);
+}
 if (uses093(actor.system) && source.key?.startsWith("tech_")) {
   const technique = (actor.system.signatureTechniques || []).find(t => "tech_"+t.id === source.key);
   if (technique) {
     const validation = validateTechnique093(technique, actor.system);
     if (!validation.ok) return ui.notifications.warn(validation.issues.join("; "));
+    const restriction = signatureUseIssue093(actor, technique);
+    if (restriction) return ui.notifications.warn(restriction);
     if (inCombat093(actor)) {
       const usage = validateTechniqueUsage093(actor, technique);
       if (!usage.ok) return ui.notifications.warn(usage.reason);

@@ -149,27 +149,45 @@
                             </tr>
                             {{!-- Row 9: Weapons and power shot --}}
                             <tr>
-                                <td class="ar-lbl">Weapon Equipped</td>
+                                <td class="ar-lbl">{{#if @root.rules093}}Arma principal{{else}}Weapon Equipped{{/if}}</td>
                                 <td class="ar-val" colspan="2">
-                                    <select class="ar-input" name="system.attackRefs.{{_idx}}.weaponEquipped" title="Pick one of your Weapons from the Equipment tab. Its Size, Weapon Penalty and (while Equipped) quality bonuses are applied to the Strike/Wound formulas above.">
+                                    <select class="ar-input" name="system.attackRefs.{{_idx}}.weaponEquipped" title="Selecione uma arma equipada da mesma Foundation" aria-label="Arma principal">
                                         <option value="">Unarmed</option>
+                                        {{#if @root.rules093}}
+                                        {{#each ../attackWeaponOptions}}
+                                        <option value="{{id}}" {{#if (eq id ../primaryWeaponId)}}selected{{/if}}>{{name}}</option>
+                                        {{/each}}
+                                        {{else}}
                                         {{#each ../weaponOptions}}
                                         <option value="{{this}}" {{#if (eq this ../weaponEquippedLabel)}}selected{{/if}}>{{this}}</option>
                                         {{/each}}
+                                        {{/if}}
                                         {{#unless weaponMatched}}{{#if weaponEquipped}}{{#unless (eq weaponEquipped "Unarmed")}}
                                         <option value="{{weaponEquipped}}" selected>{{weaponEquipped}} (?)</option>
                                         {{/unless}}{{/if}}{{/unless}}
                                     </select>
                                 </td>
                                 <td class="ar-val ar-check-cell">
-                                    <input type="checkbox" class="ar-checkbox" name="system.attackRefs.{{_idx}}.weaponCheckbox" {{#if weaponCheckbox}}checked{{/if}} />
+                                    {{#unless @root.rules093}}<input type="checkbox" class="ar-checkbox" name="system.attackRefs.{{_idx}}.weaponCheckbox" {{#if weaponCheckbox}}checked{{/if}} />{{/unless}}
                                 </td>
-                                <td class="ar-lbl">Off-Hand</td>
+                                <td class="ar-lbl">{{#if @root.rules093}}Arma secundária{{else}}Off-Hand{{/if}}</td>
                                 <td class="ar-val" colspan="2">
+                                    {{#if @root.rules093}}
+                                    <select class="ar-input" name="system.attackRefs.{{_idx}}.offHand" aria-label="Arma secundária">
+                                        <option value="">Unarmed</option>
+                                        {{#each ../attackWeaponOptions}}
+                                        <option value="{{id}}" {{#if (eq id ../offHandId)}}selected{{/if}}>{{name}}</option>
+                                        {{/each}}
+                                        {{#unless offHandId}}{{#if offHand}}{{#unless (eq offHand "Unarmed")}}
+                                        <option value="{{offHand}}" selected>{{offHand}} (?)</option>
+                                        {{/unless}}{{/if}}{{/unless}}
+                                    </select>
+                                    {{else}}
                                     <input type="text" class="ar-input" name="system.attackRefs.{{_idx}}.offHand" value="{{offHandLabel}}" />
+                                    {{/if}}
                                 </td>
                                 <td class="ar-val ar-check-cell">
-                                    <input type="checkbox" class="ar-checkbox" name="system.attackRefs.{{_idx}}.offHandCheckbox" {{#if offHandCheckbox}}checked{{/if}} />
+                                    <input type="checkbox" class="ar-checkbox" aria-label="Usar arma secundária neste ataque" title="Usar arma secundária neste ataque" name="system.attackRefs.{{_idx}}.offHandCheckbox" {{#if offHandCheckbox}}checked{{/if}} />
                                 </td>
                             </tr>
                             {{#if weaponNotes.length}}

@@ -122,13 +122,14 @@ for oldkey,t in old['transformations'].items():
 # Canonical renamed entry on the unchanged official /unlock-potential/ page.
 matches=[x['id'] for x in transforms.values() if x['name']=='Unlocked Potential' and x['category']=='manifested_power']
 if len(matches)==1:trans_map['unlock_potential']=matches[0]
+modifier_summaries=json.loads(Path(__file__).with_name("signature-modifier-summaries.json").read_text())
 modifiers={}
 for group,rows in read('parsed-signature.json').items():
  out={}
  for row in rows:
   costs=[int(n) for n in re.findall(r'(?<!\w)-?\d+',row['cost'])]
   if not costs:raise ValueError(row)
-  out[row['name']]=dict(tpPerRank=costs if len(costs)>1 else costs[0],maxRanks=len(costs),hasNotes=True,requirement='Consultar requisitos 0.9.3 na fonte.',effect='Aplicar o efeito atual descrito na fonte oficial.',source=url('signature'))
+  out[row['name']]=dict(tpPerRank=costs if len(costs)>1 else costs[0],maxRanks=len(costs),hasNotes=True,source=url('signature'),**modifier_summaries[row['name']])
  modifiers[group]=out
 payload=dict(racialTraits=traits,talents=talents,transformations=transforms,advantages=modifiers['Advantages'],disadvantages=modifiers['Disadvantages'],raceSlugs=race_slugs, subraceOptions=subrace_options, migrationMaps=dict(racialTraits={k:list(dict.fromkeys(v)) for k,v in racial_map.items()},talents=talent_map,transformations=trans_map),unavailableSources=['https://dbu-rpg.com/?page_id=10503'])
 data_dir=target.parent/'data';data_dir.mkdir(exist_ok=True)

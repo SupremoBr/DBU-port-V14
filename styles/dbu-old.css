@@ -2999,6 +2999,65 @@
   overflow: hidden;
 }
 
+/* Signature modifiers use the full card width for input rows and rules. */
+.dbu-old.sheet .signature-technique-card > .tech-advdis-section {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.dbu-old.sheet .signature-modifier-group {
+  min-width: 0;
+}
+
+.dbu-old.sheet .signature-modifier-group .advdis-header {
+  min-height: 32px;
+}
+
+.dbu-old.sheet .signature-modifier-group .advdis-header .add-btn {
+  flex: 0 0 auto;
+  width: 28px;
+  height: 28px;
+  min-height: 0;
+  padding: 0;
+}
+
+.dbu-old.sheet .signature-modifier-group .advdis-table {
+  table-layout: fixed;
+}
+
+.dbu-old.sheet .signature-modifier-name {
+  width: 30%;
+}
+
+.dbu-old.sheet .signature-modifier-notes {
+  width: 23%;
+}
+
+.dbu-old.sheet .signature-modifier-delete {
+  width: 32px;
+}
+
+.dbu-old.sheet .signature-modifier-group :is(input, select) {
+  min-width: 0;
+}
+
+.dbu-old.sheet .advdis-table .signature-modifier-summary td {
+  text-align: left;
+  padding: 3px 8px 8px;
+  color: var(--text-primary);
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.dbu-old.sheet .signature-modifier-summary :is(.signature-modifier-requirement, a) {
+  display: inline-block;
+  margin-inline-end: .65em;
+  color: var(--text-secondary);
+}
+
+.dbu-old.sheet .signature-modifier-summary a {
+  color: var(--accent-cyan);
+}
+
 .dbu-old.sheet .tech-adv-table,
 .dbu-old.sheet .tech-disadv-table {
   overflow-x: auto;
@@ -8671,21 +8730,22 @@
   border-radius: 3px;
   color: inherit;
 }
-.dbu-old.sheet .eq-weapon-durability .eq-wd-repair {
-  margin-left: auto;
-  padding: 2px 8px;
-  font-size: 0.78rem;
-  background: rgba(120, 200, 220, 0.15);
-  color: #82d8ec;
-  border: 1px solid #82d8ec;
-  border-radius: 3px;
-  cursor: pointer;
-  line-height: 1.4;
+.dbu-old.sheet .eq-weapon-durability .eq-wd-repair,
+.dbu-old.sheet .dmg-threshold .dbu-steadfast-btn {
   width: auto;
+  min-height: 24px;
+  padding: 3px 8px;
+  font-size: .78rem;
 }
-.dbu-old.sheet .eq-weapon-durability .eq-wd-repair:hover {
-  background: rgba(120, 200, 220, 0.3);
+
+.dbu-old.sheet .eq-weapon-durability .eq-wd-repair {
+  margin-inline-start: auto;
 }
+
+.dbu-old.sheet .dmg-threshold .dbu-steadfast-btn {
+  margin: 4px auto 0;
+}
+
 .dbu-old.sheet .eq-type-badge.eq-broken-badge {
   background: rgba(255, 68, 68, 0.35);
   color: #fff;
@@ -15383,6 +15443,7 @@
 /* Current rules: compact action pools and persistent migration notices. */
 .dbu-old .dbu-rules-actions { display:flex; gap:.5rem; align-items:center; flex-wrap:wrap; padding:.5rem; }
 .dbu-old .dbu-rules-actions button, .dbu-old .dbu-rules-review button { width:auto; }
+.dbu-old .progression-controls[aria-label="Fontes oficiais"] { flex-wrap: wrap; }
 .dbu-old .dbu-rules-review { padding:.5rem; border:1px solid #b68b38; margin:.25rem; max-height:18rem; overflow:auto; }
 
 /* Keep these controls readable on the sheet's dark background in every theme. */

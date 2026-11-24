@@ -1,5 +1,17 @@
+import { uses093 } from '../../rules/v093.mjs';
+import { inCombat093 } from '../../rules/actions-v093.mjs';
 import { Dialog } from "../../helpers/foundry-compat.mjs";
-import { weaponLifeMax } from "../../helpers/weapon-state.mjs";
+import { weaponLifeMax, weaponBroken, weaponUsesHand, wieldedWeapons } from "../../helpers/weapon-state.mjs";
+
+function qualitySlots(definition) {
+  return Array.isArray(definition?.slots) ? definition.slots : [definition?.slots || 1];
+}
+
+function qualityRoom(item, qualities) {
+  const max = CONFIG.DBU?.craftsmanshipGrades?.[item.system.craftsmanshipGrade || 1]?.qualitySlots || 0;
+  const used = qualities.reduce((sum, quality) => sum + (Number(quality.slotsUsed) || 0), 0);
+  return { max, used };
+}
 
 /** Character sheet domain: equipment. Methods run with the sheet as this. */
 export const equipmentMethods = {
@@ -37,23 +49,20 @@ export const equipmentMethods = {
       item.bvMax = this._calcBreakValueMax(item);
     }
 
-    // Weapon durability (weapons.txt "Damaging Weapons" / "Hardness Value"):
-    // LP max = 32 + 8 per Power Level beyond the 1st (+2×PL with Durable),
-    // DR 6(bT), Hardness 3 (4 with Super Heavy). Broken at 0 LP.
-    const wLevel = this.actor.system.level || 1;
+    // Share durability with the roll-time weapon check.
+    const currentRules = uses093(this.actor.system);
     const wBaseTier = this.actor.system.baseTier || 1;
     for (const item of weapons) {
       const qKeys = (item.system.qualities || []).map(q => q.qualityKey);
-      const hasDurable = qKeys.includes("durable");
       item._wUnbreakable = qKeys.includes("unbreakable");
-      item._wHasSpecial = (item.system.qualities || []).some(q =>
-        CONFIG.DBU?.weaponQualities?.[q.qualityKey]?.isSpecial);
-      item._wLpMax = 32 + 8 * (wLevel - 1) + (hasDurable ? 2 * wLevel : 0);
+      item._wLpMax = this._calcWeaponLPMax(item);
       item._wLpCurrent = item._wUnbreakable
         ? item._wLpMax
         : Math.max(0, item._wLpMax - (item.system.weaponLPDamage || 0));
       item._wBroken = !item._wUnbreakable && item._wLpCurrent <= 0;
-      item._wHardness = qKeys.includes("super_heavy") ? 4 : (item.system.weaponHardness ?? 3);
+      item._wRepairAssist = currentRules;
+      const hardness = item.system.weaponHardness ?? 3;
+      item._wHardness = qKeys.includes("super_heavy") ? 4 : (currentRules && hardness === 3 ? 2 : hardness);
       item._wDR = 6 * wBaseTier;
     }
 
@@ -139,13 +148,13 @@ export const equipmentMethods = {
           return {
             name: qData.name || q.qualityKey,
             notes: q.notes || "",
-            effect: qData.effect || "",
+            effect: qData.effect || qData.description || "",
             slotsUsed: q.slotsUsed || (Array.isArray(qData.slots) ? qData.slots[0] : qData.slots || 1)
           };
         });
         const slotsUsed = quals.reduce((sum, q) => sum + q.slotsUsed, 0);
         const availQualities = Object.values(config.apparelQualities || {})
-          .filter(q => q.categories?.includes(detailItem.system.apparelCategory))
+          .filter(q => (q.compatibility || []).includes(detailItem.system.apparelCategory) || (q.compatibility || []).includes("any"))
           .filter(q => !(detailItem.system.qualities || []).some(eq => eq.qualityKey === q.id));
         context.battleUniformDetail = {
           itemId: detailItem._id,
@@ -221,7 +230,8 @@ export const equipmentMethods = {
         itemId: item._id,
         qIdx: idx,
         catalogName: cat.name || q.qualityKey,
-        description: cat.description || "",
+        description: uses093(sys) ? cat.effect || cat.description || "" : cat.description || "",
+        slotChoices: uses093(sys) ? qualitySlots(cat).map(value => ({ value, selected: value === q.slotsUsed })) : [],
         isSpecial: !!cat.isSpecial,
         configFields: (cat.config || []).map(cfg => ({
           ...cfg,
@@ -231,6 +241,11 @@ export const equipmentMethods = {
       };
     });
 
+    const { max, used } = qualityRoom(item, item.system.qualities || []);
+    item.qualitySlotsMax = max;
+    item.qualitySlotsUsed = used;
+    const available = q => !uses093(sys) || qualitySlots(q)[0] <= max - used;
+
     const usedKeys = new Set((item.system.qualities || []).map(q => q.qualityKey));
     const itemCatKey = isApparel ? item.system.apparelCategory : item.system.weaponType;
     const isCompatible = (q) => {
@@ -239,9 +254,9 @@ export const equipmentMethods = {
       return q.compatibility.includes(itemCatKey);
     };
     item.availableStandard = Object.values(catalog)
-      .filter(q => !q.isSpecial && isCompatible(q) && !usedKeys.has(q.id));
+      .filter(q => !q.isSpecial && isCompatible(q) && available(q) && !usedKeys.has(q.id));
     item.availableSpecial = Object.values(catalog)
-      .filter(q => q.isSpecial && !usedKeys.has(q.id));
+      .filter(q => q.isSpecial && (!uses093(sys) || isCompatible(q)) && available(q) && !usedKeys.has(q.id));
 
     item.expanded = this._expandedQualityCards?.has(item._id) || false;
   },
@@ -294,7 +309,18 @@ export const equipmentMethods = {
   async _onEquipmentWornToggle(event) {
     const itemId = event.currentTarget.dataset.itemId;
     const item = this.actor.items.get(itemId);
-    if (item) await item.update({ "system.worn": event.currentTarget.checked });
+    if (!item) return;
+    const checked = event.currentTarget.checked;
+    if (checked && !item.system.worn && uses093(this.actor.system) && item.system.equipmentType === "weapon") {
+      const full = weaponUsesHand(item.system)
+        && wieldedWeapons(this.actor.system, this.actor.items).filter(weaponUsesHand).length >= 2;
+      if (full || weaponBroken(this.actor.system, item.system)) {
+        event.currentTarget.checked = false;
+        ui.notifications.warn(full ? "Você já empunha duas armas." : "Repare a arma antes de equipá-la.");
+        return;
+      }
+    }
+    await item.update({ "system.worn": checked });
   },
 
   async _onEquipmentInlineEdit(event) {
@@ -316,7 +342,7 @@ export const equipmentMethods = {
 
   /** Weapon LP max (weapons.txt): 32 + 8 per Power Level beyond the 1st; Durable adds +2×PL. */
   _calcWeaponLPMax(item) {
-    return weaponLifeMax(this.actor.system.level, item.system);
+    return weaponLifeMax(this.actor.system.level, item.system, uses093(this.actor.system));
   },
 
   /** Edit a weapon's current LP (stored as damage taken so max can scale with PL). */
@@ -344,18 +370,22 @@ export const equipmentMethods = {
     event.preventDefault();
     const item = this.actor.items.get(event.currentTarget.dataset.itemId);
     if (!item) return;
+    const currentRules = uses093(this.actor.system);
+    if (currentRules && inCombat093(this.actor)) return ui.notifications.warn("Resolva o reparo fora do combate.");
     const hasSpecial = (item.system.qualities || []).some(q =>
       CONFIG.DBU?.weaponQualities?.[q.qualityKey]?.isSpecial);
     const dc = hasSpecial ? "Master" : "Qualified";
     const confirmed = await Dialog.confirm({
-      title: `Repair ${item.name}`,
-      content: `<p>Repairing requires <b>one hour outside of Combat Encounters</b> and a successful <b>${dc} Weapon Craft Skill Check</b>.</p><p>Restore <b>${item.name}</b> to full Life Points?</p>`
+      title: `Repair ${Handlebars.escapeExpression(item.name)}`,
+      content: currentRules
+        ? '<p>O mestre já resolveu o reparo e confirmou a recuperação total dos LP desta arma?</p>'
+        : `<p>Repairing requires <b>one hour outside of Combat Encounters</b> and a successful <b>${dc} Weapon Craft Skill Check</b>.</p>`
     });
     if (!confirmed) return;
     await item.update({ "system.weaponLPDamage": 0 });
     ChatMessage.create({
       speaker: ChatMessage.getSpeaker({ actor: this.actor }),
-      content: `<div style="font-size:0.9rem"><b><i class="fas fa-wrench"></i> ${item.name} — Repaired</b><br>Restored to full Life Points (${this._calcWeaponLPMax(item)}) after a successful ${dc} Weapon Craft Skill Check.</div>`
+      content: `<div style="font-size:0.9rem"><b><i class="fas fa-wrench"></i> ${Handlebars.escapeExpression(item.name)} — Repaired</b><br>Restored to full Life Points (${this._calcWeaponLPMax(item)}).</div>`
     });
   },
 
@@ -375,6 +405,25 @@ export const equipmentMethods = {
     event.preventDefault();
     const layer = event.currentTarget.dataset.layer;
     const itemId = event.currentTarget.value || "";
+    if (itemId && uses093(this.actor.system)) {
+      const slots = this.actor.system.wornApparelSlots || {};
+      const item = this.actor.items.get(itemId);
+      const accessory = layer.startsWith("accessory");
+      const duplicate = Object.entries(slots).some(([slot, id]) => {
+        if (slot === layer || !id) return false;
+        if (id === itemId) return true;
+        if (!accessory || !slot.startsWith("accessory")) return false;
+        const other = this.actor.items.get(id);
+        const key = item?.system.basicItemKey;
+        if (key) return key === other?.system.basicItemKey;
+        const name = item?.name.trim().toLowerCase();
+        return !!name && name === other?.name.trim().toLowerCase();
+      });
+      if (duplicate || item?.system.equipmentType !== (accessory ? "accessory" : "apparel")) {
+        event.currentTarget.value = slots[layer] || "";
+        return ui.notifications.warn("Selecione um equipamento válido que ainda não esteja em outro espaço.");
+      }
+    }
     await this.actor.update({ [`system.wornApparelSlots.${layer}`]: itemId });
   },
 
@@ -394,8 +443,12 @@ export const equipmentMethods = {
     const item = this.actor.items.get(itemId);
     if (!item) return;
     const qData = CONFIG.DBU.apparelQualities?.[qualityKey] || {};
-    const slotsUsed = Array.isArray(qData.slots) ? qData.slots[0] : (qData.slots || 1);
-    const quals = [...(item.system.qualities || []), { qualityKey, notes: "", slotsUsed }];
+    const slotsUsed = qualitySlots(qData)[0];
+    const quals = [...(item.system.qualities || []), { qualityKey, name: qData.name || qualityKey, notes: "", slotsUsed }];
+    const { max, used } = qualityRoom(item, quals);
+    if (uses093(this.actor.system) && (used > max || quals.some((row, index) => index !== quals.length - 1 && row.qualityKey === qualityKey))) {
+      return ui.notifications.warn("Qualidade repetida ou sem espaços disponíveis.");
+    }
     await item.update({ "system.qualities": quals });
   },
 
@@ -454,8 +507,19 @@ export const equipmentMethods = {
     const isApparel = item.system.equipmentType === "apparel";
     const cat = (isApparel ? CONFIG.DBU.apparelQualities : CONFIG.DBU.weaponQualities)[qualityKey];
     if (!cat) return;
-    const newQ = { qualityKey, name: cat.name, notes: "", slotsUsed: 1, ranks: 1, config: {} };
+    const currentRules = uses093(this.actor.system);
+    const newQ = { qualityKey, name: cat.name, notes: "", slotsUsed: currentRules ? qualitySlots(cat)[0] : 1, ranks: 1, config: {} };
     const quals = [...(item.system.qualities || []), newQ];
+    if (currentRules) {
+      const type = isApparel ? item.system.apparelCategory : item.system.weaponType;
+      if (!cat.compatibility?.includes('any') && !cat.compatibility?.includes(type)) {
+        return ui.notifications.warn("Esta qualidade não se aplica a esse equipamento.");
+      }
+      const { max, used } = qualityRoom(item, quals);
+      if (used > max || quals.some((row, index) => index !== quals.length - 1 && row.qualityKey === qualityKey)) {
+        return ui.notifications.warn("Qualidade repetida ou sem espaços disponíveis.");
+      }
+    }
     await item.update({ "system.qualities": quals });
   },
 
@@ -479,8 +543,20 @@ export const equipmentMethods = {
     if (!item) return;
     const quals = foundry.utils.deepClone(item.system.qualities || []);
     if (!quals[qIdx]) return;
-    if (!quals[qIdx].config) quals[qIdx].config = {};
-    quals[qIdx].config[configKey] = value;
+    if (configKey === 'slotsUsed' && uses093(this.actor.system)) {
+      const catalog = item.system.equipmentType === 'apparel' ? CONFIG.DBU.apparelQualities : CONFIG.DBU.weaponQualities;
+      const old = quals[qIdx].slotsUsed;
+      const slotsUsed = Number(value);
+      quals[qIdx].slotsUsed = slotsUsed;
+      const { max, used } = qualityRoom(item, quals);
+      if (!qualitySlots(catalog[quals[qIdx].qualityKey]).includes(slotsUsed) || (used > max && slotsUsed > old)) {
+        event.currentTarget.value = old;
+        return ui.notifications.warn("Essa quantidade de espaços não está disponível.");
+      }
+    } else {
+      if (!quals[qIdx].config) quals[qIdx].config = {};
+      quals[qIdx].config[configKey] = value;
+    }
     await item.update({ "system.qualities": quals });
   },
 

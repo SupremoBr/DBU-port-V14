@@ -1,3 +1,4 @@
+import { attackWeapon093, weaponRollModifiers093, wieldingStrikePenalty093 } from "../../helpers/weapon-state.mjs";
 import { martialDie, martialEnergyCharges } from "../../rules/path-to-power-v093.mjs";
 import { energyChargeDie, greaterDiceCategoryBonus, shiftAttackDamageCategory } from "../../helpers/custom-buffs.mjs";
 import { PROFILES_093 } from "../../rules/profiles-v093.mjs";
@@ -253,8 +254,18 @@ export const combatMathMethods = {
         weaponItemsByName.set(it.name.trim().toLowerCase(), it);
     }
     context.weaponOptions = [...weaponItemsByName.values()].map(it => it.name).sort((a, b) => a.localeCompare(b));
+    context.attackWeaponOptions = Array.from(this.actor.items)
+      .filter(item => item.type === "equipment" && item.system.equipmentType === "weapon")
+      .map(item => ({ id: item.id, name: item.name })).sort((a, b) => a.name.localeCompare(b.name));
     const hasWeaponSpecialist = (system.talents || []).includes("weapon_specialist") || system.aptitudes?.ignoreWeaponPenalty;
     const eqFlags = system.equipmentFlags || {};
+
+    const resolveSavedWeapon = value => {
+      const key = String(value || '').trim().toLowerCase();
+      const match = context.attackWeaponOptions.filter(option =>
+        option.id === value || option.name.toLowerCase() === key);
+      return match.length === 1 ? match[0].id : '';
+    };
 
     // Prepare each attack ref card with calculated formulas
     const refs = system.attackRefs || [];
@@ -268,10 +279,19 @@ export const combatMathMethods = {
 
       // --- WEAPON (Armed Attack) ---
       const wKey = String(ref.weaponEquipped || "").trim().toLowerCase();
-      const wItem = (wKey && wKey !== "unarmed") ? weaponItemsByName.get(wKey) : null;
+      const selection = revised ? attackWeapon093(this.actor, ref) : {};
+      const wItem = revised ? selection.item : (wKey && wKey !== "unarmed") ? weaponItemsByName.get(wKey) : null;
+      const category = wItem?.system.weaponCategory;
+      const qualities = wItem?.system.qualities || [];
       let weaponStrikeMod = 0, weaponWoundMod = 0, weaponDamageCatBonus = 0;
       const weaponNotes = [];
-      if (wItem) {
+      if (selection.issue) weaponNotes.push(selection.issue);
+      if (revised) {
+        const modifiers = weaponRollModifiers093(system, wItem, ref.profile, targetRange);
+        weaponStrikeMod = modifiers.strike - wieldingStrikePenalty093(this.actor, system);
+        weaponWoundMod = modifiers.wound;
+        if (wItem) weaponDamageCatBonus = eqFlags.weaponDamageCatBonus?.[wItem.id] || 0;
+      } else if (wItem) {
         // Weapon Penalty (weapons.txt): -2(T) Strike, removed by Weapon Specialist
         if (!hasWeaponSpecialist) {
           weaponStrikeMod -= 2 * tier;
@@ -311,6 +331,9 @@ export const combatMathMethods = {
         weaponNotes.push(`No weapon named "${ref.weaponEquipped}" in the Equipment tab`);
       }
 
+
+      const ignoringLongRange = revised && (category === "precision" || qualities.some(q => q.qualityKey === "far_sight"));
+
       // --- STRIKE ---
       let haste = system.aptitudes?.haste ?? 0;
       let awareness = system.aptitudes?.awareness ?? 0;
@@ -329,7 +352,7 @@ export const combatMathMethods = {
       const lrThreshold = system.status?.longRangeNumeric || 9;
       const isAtLongRange = targetRange >= lrThreshold;
       const lrEyesightPen = isAtLongRange ? (system.aptitudes?.longRangeCombatRollPenalty || 0) : 0;
-      const strikePenLR = (isAtLongRange ? 2 * baseTier : 0) + lrEyesightPen;
+      const strikePenLR = (isAtLongRange && !ignoringLongRange ? 2 * baseTier : 0) + lrEyesightPen;
       // Diminishing Offense is NOT baked into the prep formula — it's applied
       // dynamically at roll time from the auto attack counter (see
       // _onRollTrackerAttack), so the same formula stays valid all round.
@@ -375,7 +398,8 @@ export const combatMathMethods = {
 
       // --- WOUND ---
       const isMagic = ref.foundation === "Magic";
-      let damageAttr = isMagic ? ma : fo;
+      const highTech = revised && qualities.some(q => q.qualityKey === "high_tech");
+      let damageAttr = highTech ? (system.attributes?.sc?.totalScore || 0) : isMagic ? ma : fo;
       // Crushing: "Reduce the bonus to your Wound Roll from your Force by 1/2" (attacking.txt)
       if (ref.profile === "Crushing" && !uses093(system)) damageAttr = Math.floor(damageAttr / 2);
       const isPowered = ref.profile === "Powered";
@@ -433,7 +457,7 @@ export const combatMathMethods = {
       // Available profiles for this foundation
       const availableProfiles = foundationProfiles[ref.foundation] || Object.keys(profileData);
       const { strikeCT, woundCT } = this._calcCombatCTs(system, {
-        isWeapon: !!wKey && wKey !== "unarmed", foundation: ref.foundation, profile: ref.profile
+        isWeapon: revised ? !!wItem : !!wKey && wKey !== "unarmed", foundation: ref.foundation, profile: ref.profile
       });
 
       return {
@@ -443,7 +467,7 @@ export const combatMathMethods = {
         extraProfile: ref.extraProfile || "",
         profileEffect: profile.effect || "—",
         profileRange: profile.range || "—",
-        profileKP: revised ? `${attackReferenceKiCost093(ref, system, this.actor._getActiveAura?.(system))} KP`
+        profileKP: revised ? `${attackReferenceKiCost093(ref, system, this.actor._getActiveAura?.(system), wItem)} KP`
           : profile.kpCost != null ? `${profile.kpCost}(T)` : "—",
         damageCat,
         damageCatClass: `dmg-cat-${damageCat.toLowerCase()}`,
@@ -469,7 +493,11 @@ export const combatMathMethods = {
         weaponNotes,
         weaponStrikeMod,
         weaponWoundMod,
-        weaponMatched: !!wItem,
+        weaponMatched: revised ? !!resolveSavedWeapon(ref.weaponEquipped) : !!wItem,
+        primaryWeaponId: resolveSavedWeapon(ref.weaponEquipped),
+        offHandId: resolveSavedWeapon(ref.offHand),
+        selectedWeapon: wItem,
+        weaponIssue: selection.issue,
         offHandLabel: ref.offHand || "Unarmed",
         defense: system.defense ?? 0,
         soak: system.soak ?? 0,

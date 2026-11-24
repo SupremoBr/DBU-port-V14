@@ -1,10 +1,11 @@
+import { weaponLifeMax } from '../module/helpers/weapon-state.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { techniquePointCap, techniquePointCost, techniqueBaseKiUnits, awakeningLimits, fullAwakeningRecovery, validateTransformationStack, stackedStressRequirement, actionPools, canConvertAction, validateManeuverTiming } from '../module/rules/v093.mjs';
 import { RACES_093, validateRacialAttributes } from '../module/rules/races-v093.mjs';
 import { PROFILES_093, profileKiUnits, minimumAttackKiUnits, validFoundation } from '../module/rules/profiles-v093.mjs';
 import { techniquesMethods } from '../module/sheets/character/techniques.mjs';
-import { attackPowerShot093, attackReferenceKiCost093, validateTechnique093, techniqueKiCost093 } from '../module/rules/techniques-v093.mjs';
+import { attackPowerShot093, attackReferenceKiCost093, validateTechnique093, signatureUseIssue093, techniqueKiCost093 } from '../module/rules/techniques-v093.mjs';
 
 test('signature caps follow the official base-tier table', () => {
   assert.deepEqual([1, 2, 3, 4, 5, 6, 7].map(techniquePointCap), [25, 30, 40, 50, 50, 50, 50]);
@@ -106,4 +107,49 @@ test('Counter actions, turn timing, Instant sequencing and one OoS per trigger a
   assert.equal(validateManeuverTiming({ type: 'instant', pools, lastVoluntaryType: 'instant' }).reason, 'consecutive-instant');
   assert.equal(validateManeuverTiming({ type: 'out-of-sequence', pools, triggerId: 'attack-1', usedTriggers: ['attack-1'] }).reason, 'trigger-used');
   assert.equal(validateManeuverTiming({ type: 'counter', pools: actionPools(), isAttackTarget: true }).ok, true);
+});
+
+test('current signature TP overrides stale prices and linked rolls can differ', () => {
+  const system = { baseTier: 6, rulesVersion: '0.9.3' };
+  const beam = { foundation: 'Energy', profile: 'Beam',
+    advantages: [{ name: 'Splitting', ranks: 2, tpCost: 4 }],
+    disadvantages: [{ name: 'Backlash', ranks: 2, tpCost: -1 }] };
+  assert.equal(techniquePointCost(beam), 13);
+  assert.equal(validateTechnique093(beam, system).ok, true);
+  const linked = { ...beam,
+    advantages: [{ name: 'Twin-Linked', notes: 'Strike' }],
+    disadvantages: [{ name: 'Dead-Link', notes: 'Wound' }] };
+  assert.equal(validateTechnique093(linked, system).ok, true);
+  linked.disadvantages[0].notes = 'Strike';
+  assert.match(validateTechnique093(linked, system).issues.join(' '), /mesma rolagem/);
+  linked.advantages = [{ name: 'Efficiency' }];
+  linked.disadvantages = [{ name: 'Inefficiency' }];
+  assert.match(validateTechnique093(linked, system).issues.join(' '), /incompatível/);
+});
+
+test('a saved Limit Break checkbox does not block a current technique or give it a Super Profile', () => {
+  const beam = { foundation: 'Energy', profile: 'Beam', type: 'signature', isLimitBreak: true };
+  assert.equal(validateTechnique093(beam).ok, true);
+  assert.equal(techniquePointCost(beam), 8);
+  assert.equal(validateTechnique093({ ...beam, type: 'Limit Break' }).ok, false);
+  assert.match(validateTechnique093({ ...beam, type: 'dramatic_finisher' }).issues.join(' '), /exige um Super Profile/);
+});
+
+test('weapon durability scales with shield size and Durable slots in 0.9.3', () => {
+  for (const qualityKey of ['durable_weapon', 'durable']) {
+    const shield = { weaponCategory: 'shield', weaponSize: 'big', qualities: [{ qualityKey, slotsUsed: 2 }] };
+    assert.equal(weaponLifeMax(2, shield), 44);
+    assert.equal(weaponLifeMax(2, shield, true), 54);
+  }
+});
+
+test('signature use checks Climax and the selected Weapon Assisted weapon', () => {
+  const actor = { system: { level: 1, rulesVersion: '0.9.3', thresholds: { injured: { crossed: true } } }, items: [] };
+  const technique = { foundation: 'Physical', profile: 'Simple',
+    disadvantages: [{ name: 'Climax Attack', ranks: 2 }] };
+  assert.equal(signatureUseIssue093(actor, technique), '');
+  actor.system.thresholds.injured.crossed = false;
+  assert.match(signatureUseIssue093(actor, technique), /injured/);
+  assert.match(signatureUseIssue093(actor, { ...technique, isWeapon: true }), /Selecione a arma/);
+  assert.match(validateTechnique093({ ...technique, isWeapon: true }).issues.join(' '), /Weapon Assisted/);
 });

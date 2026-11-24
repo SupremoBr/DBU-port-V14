@@ -14,6 +14,9 @@ export const RULE_SOURCES = Object.freeze({
 const n = value => Number.isFinite(Number(value)) ? Number(value) : 0;
 const int = value => Math.max(0, Math.trunc(n(value)));
 export function uses093(system) { return system?.rulesVersion === RULES_VERSION; }
+export function isLegacyLimitBreakType(type) {
+  return /^limit[ _-]*break$/i.test(String(type ?? '').trim());
+}
 export function isUltimateTechnique(type) { return /ultimate|dramatic[ _-]*finisher/i.test(String(type || '')); }
 
 export function techniquePointCap(baseTier) {
@@ -30,8 +33,12 @@ export function modifierPointCost(definition, ranks = 1) {
     : definition.tpPerRank * count;
 }
 
+export function signatureModifierTP093(row, group) {
+  return modifierPointCost(SIGNATURE_MODIFIERS_093[group][row.name], row.ranks ?? 1) ?? n(row.tpCost);
+}
+
 export function paidAdvantageTP093(row) {
-  const cost = n(row.tpCost);
+  const cost = signatureModifierTP093(row, 'Advantages');
   const freeRanks = Math.min(int(row.ranks ?? 1), int(row.freeRanks));
   if (!freeRanks) return cost;
   const paidRanks = int(row.ranks ?? 1) - freeRanks;
@@ -42,8 +49,8 @@ export function paidAdvantageTP093(row) {
 /** Return the amount spent or, with credits excluded, the full value used for KP and caps. */
 export function techniquePointCost(technique, { includeFreeTP = true } = {}) {
   const advantages = (technique.advantages || []).reduce((sum, row) =>
-    sum + (includeFreeTP ? paidAdvantageTP093(row) : n(row.tpCost)), 0);
-  const disadvantages = (technique.disadvantages || []).reduce((sum, row) => sum + n(row.tpCost), 0);
+    sum + (includeFreeTP ? paidAdvantageTP093(row) : signatureModifierTP093(row, 'Advantages')), 0);
+  const disadvantages = (technique.disadvantages || []).reduce((sum, row) => sum + signatureModifierTP093(row, 'Disadvantages'), 0);
   const free = includeFreeTP ? Math.max(0, n(technique.freeTP)) : 0;
   const base = technique.profile === 'Simple' ? 4 : 8;
   const subtotal = Math.max(8, base + advantages + disadvantages);

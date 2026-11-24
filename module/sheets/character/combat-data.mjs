@@ -358,15 +358,16 @@ export const combatDataMethods = {
       }
       // "Ki Point Cost Attacks" buffs (delta; negative = discount) and Deep
       // Control's all-maneuver reduction — previously dead aptitudes.
-      kiCost = uses093(system) ? attackReferenceKiCost093(ref, system, this.actor._getActiveAura(system))
-        : attackKiWithBuffs(kiCost, 0, system.aptitudes);
       const prep = prepRefs[i] || {};
-      const isArmed = !!ref.weaponEquipped && String(ref.weaponEquipped).toLowerCase() !== "unarmed";
+      kiCost = uses093(system) ? attackReferenceKiCost093(ref, system, this.actor._getActiveAura(system), prep.selectedWeapon)
+        : attackKiWithBuffs(kiCost, 0, system.aptitudes);
+      const isArmed = uses093(system) ? !!prep.selectedWeapon : !!ref.weaponEquipped && String(ref.weaponEquipped).toLowerCase() !== "unarmed";
       const refCTs = prep.woundCT != null ? prep : this._calcCombatCTs(system, {
         isWeapon: isArmed, foundation: ref.foundation || "", profile: ref.profile || ""
       });
       arSources.push({
         key: `ref_${i}`,
+        weaponIssue: prep.weaponIssue,
         name: ref.name,
         kiCost,
         strikeFormula: prep.strikeFormula || "",

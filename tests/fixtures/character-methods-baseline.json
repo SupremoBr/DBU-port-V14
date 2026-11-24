@@ -33,7 +33,7 @@
       "hash": "17ada8954086af70c1b8a9345e7f44290840c1cbcda347381dee3831835d5b4b",
       "length": 2,
       "async": false,
-      "rules093Hash": "d92d9845078f36b965bc34fe75761c8956428bef123c03b0c19c3679d95bd41c"
+      "rules093Hash": "e56460497ffbbc6a063b7aadf21d30e8b7749a21b9ebf0553428942459b13ec7"
     },
     "_techMagicalFlavor": {
       "hash": "72986b04c47c5c6704e65e42dec7e7e9acabf0db1ce20ba3cf2d3bfd43919efc",
@@ -44,7 +44,7 @@
       "hash": "5af3763a522ad282703a3342121cef69c8d427f537049a5dbd8a221e128a8685",
       "length": 1,
       "async": false,
-      "rules093Hash": "071a331f023046fd8f4beb72448f6e9ab98a573d5d2ed2b93f6b74b7a3af841d"
+      "rules093Hash": "edaf8f80559e15f0453518c8036e91e684a6d8124596f9c1c9bbff405ff2e15a"
     },
     "_calcTechTPCost": {
       "hash": "2fd792e0ac1472275e861678f6ec634068c8f9c2cc4a40610f059033c5ee099c",
@@ -56,13 +56,13 @@
       "hash": "06ab9c03615bc27cdfa4c3b05034697622c20c0be61879199a5a23a3bbd8802b",
       "length": 3,
       "async": false,
-      "rules093Hash": "d7bb069e1ecabac9c7ed5c43c4e5b9db035aae7ed8eabcfb3e12be8964c488e5"
+      "rules093Hash": "2fc976f90e9c02e44ecbd9fee9883f5af4b33c825e728a8d57b073fb13aaa39f"
     },
     "_calcTechWound": {
       "hash": "e308a52e83f36bdb9b183a9b5664da04a72ca64bd60e99d890f907d08136fb91",
       "length": 3,
       "async": false,
-      "rules093Hash": "751564d1a5eeda6461acd1296b366e4cd4dda32bdab375a9059f55864c1bcf5e"
+      "rules093Hash": "177d63730600fb4ef17bee61b4a7aa075ae6d736086c4ce0530e8c324b8c76e3"
     },
     "_getConditionStacks": {
       "hash": "964b9ca13b969c730f79d0bfca19af3bed37678dad10750f0ed2c0f0f9b18e1b",
@@ -266,7 +266,7 @@
       "hash": "89a3fcc378f5d72b1e0236f0297e33d53a27477fa663eafc312b38a9c5849c47",
       "length": 2,
       "async": false,
-      "rules093Hash": "ade4dc41b313f4e9778d02bb853606c461449a2af9a3a270f85efd700d1a2fc9"
+      "rules093Hash": "45a1e04237026117a20159e0dc1f5d6166712b7c3963525477b6bc06fdc66822"
     },
     "_resolveExtraDice": {
       "hash": "49fedc480071c6fdf0676894e505a0a70a194ba5df7bdcca8f256e2ba01ea58d",
@@ -304,7 +304,7 @@
       "hash": "0d9ef838c77a8a873e804dc48b0865c0129730a5abf3ec4375ca86f32129d3d8",
       "length": 2,
       "async": false,
-      "rules093Hash": "54293f4be419af7d0311818d1a96984d65557e1fa40d653131bd90f6a265d4ed"
+      "rules093Hash": "c0f685fe937179b9cced42d016e450c57e1291331f0139cfc15d77440c7a09c2"
     },
     "_prepareFusionData": {
       "hash": "90a362f26626f6c73eca74a9bef323a326206b9c3f3efe2f35b8fdc29e8ef330",
@@ -452,7 +452,8 @@
     "_prepareItems": {
       "hash": "b007fd86e2042831d4a1c8e79f37259f49f9b20585b7d6841f43621ad7ad922f",
       "length": 1,
-      "async": false
+      "async": false,
+      "rules093Hash": "941f08e6dfb62a60bfbf789859543acbe8f1e387e8719222cc94cf6603c4bd8e"
     },
     "_prepareBattleJacketTabData": {
       "hash": "e702aa871635c1ff0fdd00c1b6b3e279cbfd387ca54b25ac8d5e1e272de03d5d",
@@ -482,7 +483,8 @@
     "_enrichItemQualities": {
       "hash": "4a989deb73040060b10f7ba4baa0f05ea1b7f91ed4cdcd6d3196b71708c63f63",
       "length": 1,
-      "async": false
+      "async": false,
+      "rules093Hash": "15bc182be48bef9406c59f10bf71f8a51691ed2220e9ac053795cee8c0df3fc3"
     },
     "_resolveQualityConfigOptions": {
       "hash": "483b2e983586812567f63b29ee2ce0bdf4cfc3d334948afbf0712a31af81d050",
@@ -718,7 +720,8 @@
     "_onTechDisadvField": {
       "hash": "9bff9d0650881dcf5f1b902d9b2928a7b54839d794ca1de28d6cd4721c2efa76",
       "length": 1,
-      "async": true
+      "async": true,
+      "rules093Hash": "90714b94cfbf2edc7e25b184188bca08f561fda649673b0e305fe8fb69f151ad"
     },
     "_lookupAdvTP": {
       "hash": "5518e2c9dbcd362cdc0a84b57ea1352a027f95589cde7540698b959728d4a035",
@@ -1016,7 +1019,8 @@
     "_onEquipmentWornToggle": {
       "hash": "d74759b332ed443690cafa31f255420ff9be51d624381ec5a69bb951295fdfc1",
       "length": 1,
-      "async": true
+      "async": true,
+      "rules093Hash": "30811f353a80732517827097e8e86d29970a9bbe4190a502f3cb75d22b285bad"
     },
     "_onEquipmentInlineEdit": {
       "hash": "a3c7b2c36bd1577e31f1df8f62ebdd8c7daf3bb0df92036f4698b36ad997e6ba",
@@ -1027,7 +1031,7 @@
       "hash": "d4814b301c35b9129102f934ce2b0a57848321d34b45930e3db0a841ae67d7b5",
       "length": 1,
       "async": false,
-      "rules093Hash": "e6cd2d79b78c33dfd0a80d27a4916db1ed917fca8eda8c9193ac291636f7accb"
+      "rules093Hash": "78763e563a3ccb251b9c0f7434a8dddac1cece5eb9708011baee26fc0495acc5"
     },
     "_onWeaponLPChange": {
       "hash": "451c85a42d71926594ddca09bea6ed488de0ea72dd5f6f71cea1761f889ae227",
@@ -1037,7 +1041,8 @@
     "_onWeaponRepair": {
       "hash": "8040391886834e6ae391f3c39e1572f9b2a2327e1d3624a19eb92bc0f094acd5",
       "length": 1,
-      "async": true
+      "async": true,
+      "rules093Hash": "9b5d31a7d1260de082b28c9e27da8b3fe92bf5b3990ba67d6af36eb17343867f"
     },
     "_onEquipmentInlineCheck": {
       "hash": "8ddd925d69c81414298f23ca0320b1808a088e4ac1b6570e73c65ab0281e2017",
@@ -1047,7 +1052,8 @@
     "_onAssignLayer": {
       "hash": "77447c4b5dacf385fe720f720e6c06e9b2dd63beb1b1fdae5329899b144b133b",
       "length": 1,
-      "async": true
+      "async": true,
+      "rules093Hash": "090f68fdb37f53cd39c1459f9914e90c51feae9ec4b9a50e0f06b69c33bd5432"
     },
     "_onToggleDetail": {
       "hash": "16ed2d194c42992e6c2aa0d2360d0b72aa213b219d359fe6d6efee04e93ddc01",
@@ -1057,7 +1063,8 @@
     "_onAddQuality": {
       "hash": "5bdb661a8be969458486e747e902d442341b05f4991a8242ad07cb9c4eec44b5",
       "length": 1,
-      "async": true
+      "async": true,
+      "rules093Hash": "e79a1260759c84182e3a97652aaca9c5c272d84566b4928222101b532f57cb80"
     },
     "_onRemoveQuality": {
       "hash": "db9765229a0f8f8bdfe2cc86762200633b8b95063df1ee184a63ebfac658368c",
@@ -1082,7 +1089,8 @@
     "_onAddItemQuality": {
       "hash": "5ef680a5b6f49d1fc60c9c28a4e284ded8ef4cb200fb5a6ad2f52889e804f9be",
       "length": 1,
-      "async": true
+      "async": true,
+      "rules093Hash": "93935d09f43f5029278a3f1e40eac9a10ac916f7112698c75f11d424d8a0d652"
     },
     "_onRemoveItemQuality": {
       "hash": "91a30a730f7d57dc66811f8a0e7d1aace415ff478e2821f62c1c4ba6891ab175",
@@ -1092,7 +1100,8 @@
     "_onChangeQualityConfig": {
       "hash": "12c43358cca2d22295ba62637ed1e8dfe8e418ef036a30584194c8e8d10b8fc4",
       "length": 1,
-      "async": true
+      "async": true,
+      "rules093Hash": "4c11d8701f39816790964ec15a8441e6551cdeb5a56452a106173513619eb1aa"
     },
     "_onChangeQualityNotes": {
       "hash": "3c0b2133ac62dadf669dfd15efa8cd3e87a0ef47336e2d95f5ed2bd59bf46613",
@@ -1580,7 +1589,7 @@
       "hash": "107bfc82ff4ad271e3dd06b55204849e90b6474e10fde2b6217d583419758e9b",
       "length": 1,
       "async": true,
-      "rules093Hash": "2d3b477b1be6c4d7b6ed1a6f5a393f2a5897c2daa94ce157a3c849bdbc8a253e"
+      "rules093Hash": "52201f37cc8ac90058a4b4f14408e3f2c29f1cb6c746f11d52128d299b48ce7b"
     },
     "_onTrackerTransformChange": {
       "hash": "f790ce3e3d5a630c200e16a6eff521671089512055b3a69f6420612d366d2e15",

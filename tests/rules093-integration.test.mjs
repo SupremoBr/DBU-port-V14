@@ -279,8 +279,8 @@ test('Weapon talent passives respect size, count, Weapon Category and armed atta
   const context = {};
   sheet._prepareAttackRefData(context, system);
   assert.deepEqual(context.attackRefs.map(attack => attack.strikeCT), [10, 9]);
-  assert.equal(context.attackRefs[0].strikeMod, 2);
-  assert.match(sheet._calcTechStrike(technique(), system, 2).formula, /\+2$/);
+  assert.equal(context.attackRefs[0].strikeMod, -2);
+  assert.match(sheet._calcTechStrike(technique(), system, 2).formula, /-2$/);
   assert.equal(sheet._calcCombatCTs(system, { isWeapon: true }).strikeCT, 9);
 });
 
@@ -746,4 +746,37 @@ test('the combined card reveals and attaches one native payment after the last d
   } finally {
     Object.assign(globalThis, saved);
   }
+});
+
+test('secondary weapon applies its own size, category, quality and damage attribute', () => {
+  const system = {
+    rulesVersion: '0.9.3', level: 2, tier: 1, baseTier: 1,
+    talents: [], aptitudes: {}, attributes: { fo: { totalScore: 5 }, sc: { totalScore: 12 } },
+    equipmentFlags: { weaponWoundBonus: { sword: 8, knife: 1 } },
+    attackRefs: [{
+      name: 'Ataque', foundation: 'Physical', profile: 'Simple',
+      weaponEquipped: 'Sword', offHand: 'knife', offHandCheckbox: true
+    }]
+  };
+  const actor = new DBUActor(system);
+  actor.items = [
+    { id: 'sword', name: 'Sword', type: 'equipment', system: {
+      equipmentType: 'weapon', weaponType: 'physical', worn: true, weaponSize: 'big', weaponLPDamage: 100
+    } },
+    { id: 'knife', name: 'Knife', type: 'equipment', system: {
+      equipmentType: 'weapon', weaponType: 'physical', worn: true, weaponSize: 'small', weaponCategory: 'slashing',
+      qualities: [{ qualityKey: 'high_tech' }]
+    } }
+  ];
+  const sheet = new DBUCharacterSheet(actor);
+  const context = {};
+  sheet._prepareAttackRefData(context, system);
+  const [attack] = context.attackRefs;
+  assert.equal(attack.selectedWeapon.id, 'knife');
+  assert.equal(attack.weaponStrikeMod, -1);
+  assert.equal(attack.weaponWoundMod, 1);
+  assert.equal(attack.damageAttr, 12);
+  system.attackRefs[0].offHandCheckbox = false;
+  sheet._prepareAttackRefData(context, system);
+  assert.match(context.attackRefs[0].weaponIssue, /quebrada/);
 });

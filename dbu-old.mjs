@@ -87,8 +87,13 @@ Hooks.once("init", async () => {
   CONFIG.DBU.bestialTraitsCatalog = BESTIAL_TRAITS_CATALOG;
   CONFIG.DBU.cyberneticTraitsCatalog = CYBERNETIC_TRAITS_CATALOG;
   CONFIG.DBU.metaTraitsCatalog = META_TRAITS_CATALOG;
-  CONFIG.DBU.apparelQualities = Object.fromEntries(APPAREL_QUALITIES_CATALOG.map(q => [q.id, q]));
-  CONFIG.DBU.weaponQualities  = Object.fromEntries(WEAPON_QUALITIES_CATALOG.map(q => [q.id, q]));
+  for (const [key, catalog] of [['apparelQualities', APPAREL_QUALITIES_CATALOG], ['weaponQualities', WEAPON_QUALITIES_CATALOG]]) {
+    const definitions = CONFIG.DBU[key];
+    CONFIG.DBU[key] = Object.fromEntries(catalog.map(quality => {
+      const rule = definitions[quality.id] || (key === 'weaponQualities' && quality.id === 'durable' ? definitions.durable_weapon : null);
+      return [quality.id, { ...quality, slots: rule?.slots, effect: rule?.effect }];
+    }));
+  }
   CONFIG.DBU.evilAuraTechniques = EVIL_AURA_TECHNIQUES;
   CONFIG.DBU.basicItemsCatalog = BASIC_ITEMS_CATALOG;
   CONFIG.DBU.craftDCLabels = CRAFT_DC_LABELS;

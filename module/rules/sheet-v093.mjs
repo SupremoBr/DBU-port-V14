@@ -1,13 +1,13 @@
+import { attackWeapon093 } from '../helpers/weapon-state.mjs';
 import { applyCatalogDescriptions, editCatalogDescription } from './catalog-descriptions.mjs';
 import { SUPER_PROFILES_093 } from "./super-profiles-v093.mjs";
 import { defendKiCost093 } from "./defenses-v093.mjs";
 import { applyLegendRealized093, newLevelOfPower093, requiresTransformationReview093 } from "./transformations-v093.mjs";
 import { Dialog } from '../helpers/foundry-compat.mjs';
 import { CATALOGS_093 } from './catalogs-v093.mjs';
-import { RACES_093 } from './races-v093.mjs';
 import { uses093, awakeningLimits, validateTransformationStack, fullAwakeningRecovery, stackedStressRequirement } from './v093.mjs';
 import { roundPools093, convertStandardToCounter093, isOwnTurn093, inCombat093, rowActionType093, rowCost093 } from './actions-v093.mjs';
-import { validateTechnique093, validateTechniqueUsage093, maximumWager093 } from './techniques-v093.mjs';
+import { validateTechnique093, validateTechniqueUsage093, signatureUseIssue093, maximumWager093 } from './techniques-v093.mjs';
 import { adjustRacialResource093, racialEncounterReset093, racialResourceView093, racialTurnReset093, promptPressureCheck093, rollPhantomSteadfast093, useMakyanPower093 } from './racial-resources-v093.mjs';
 import { editAttackGrant093 } from './attack-grants-v093.mjs';
 import { pendingSteadfast093 } from './health-thresholds-v093.mjs';
@@ -169,12 +169,6 @@ export function installRulesSheet093(Sheet) {
     });
     html.on('click', '[data-rules093-convert]', async event => { event.preventDefault(); const result = await convertStandardToCounter093(this.actor); if (!result.ok) warn(result.reason); });
     html.on('click', '[data-rules093-backup]', event => { event.preventDefault(); game.dbu.exportRulesBackup(); });
-    html.on('click', '[data-rules093-source]', event => {
-      event.preventDefault();
-      const selected = [ ...Object.values(CATALOGS_093.racialTraits).flat().filter(t => this.actor.system.racialTraits?.includes(t.id)), ...CATALOGS_093.talents.filter(t => this.actor.system.talents?.includes(t.id)), ...(this.actor.system.transformations || []).map(t => CATALOGS_093.transformations[t.catalogKey]).filter(Boolean) ];
-      const content = selected.map(t => `<p><a href="${t.source}" target="_blank" rel="noopener noreferrer">${escape(t.name)}</a> — ${t.automation === 'legacy-reviewed' ? 'Efeitos preservados' : t.automation === 'attributes-only' ? 'AMB aplicados; traços e aspectos manuais' : 'Revisar efeitos manuais'}</p>`).join('');
-      new Dialog({ title: 'DBU 0.9.3 — fontes das escolhas', content: content || '<p>Nenhuma escolha registrada.</p>', buttons: { close: { label: 'Fechar' } } }).render(true);
-    });
     html.on('click', '[data-rules093-born-max]', async event => {
       event.preventDefault();
       if (this.actor.system.rules093State?.bornMaxUsed) return warn('Born for Battle 3 já foi usado neste encontro.');
@@ -204,9 +198,6 @@ export function installRulesSheet093(Sheet) {
     context.canEditAttackVisual = context.editable && !!game.dbu?.automation?.editAttackVisual;
     context.canEditTransformationToken = context.editable && !!game.dbu?.automation?.editTransformationToken;
     context.rules093Pools = roundPools093(this.actor);
-    context.rules093Race = RACES_093[this.actor.system.race];
-    const stats = context.rules093Race?.attributes;
-    context.rules093RaceAttributes = stats ? Object.entries(stats.fixed).map(([key,n]) => key.toUpperCase()+' +'+n).concat(stats.choices.map(c => c.count+' × +'+c.amount+' ('+c.attributes.map(k => k.toUpperCase()).join('/')+')')).join('; ') : 'Escolher raça base atual.';
     context.canExportRulesBackup = !!game.user.isGM;
     context.rules093Born = (this.actor.system.racialTraits || []).includes(CATALOGS_093.racialTraits.saiyan.find(t => t.name === 'Born for Battle').id);
     return context;
@@ -243,10 +234,16 @@ export function installRulesSheet093(Sheet) {
         if (tech) {
           if (this.actor.system.minion?.enabled && /ultimate|dramatic[ _-]*finisher/i.test(tech.type || '')) return warn('Minions não podem usar Ultimates ou Dramatic Finishers.');
           const result = validateTechnique093(tech, this.actor.system); if (!result.ok) return warn(result.issues.join('; '));
+          const restriction = signatureUseIssue093(this.actor, tech); if (restriction) return warn(restriction);
           if (inCombat093(this.actor)) { const usage = validateTechniqueUsage093(this.actor, tech, { excludeIndex: index }); if (!usage.ok) return warn(usage.reason); }
         }
       }
       if (name === '_onRollTrackerAttack') {
+        if (row.source?.startsWith('ref_')) {
+          const ref = this.actor.system.attackRefs?.[Number(row.source.slice(4))];
+          const issue = ref && attackWeapon093(this.actor, ref).issue;
+          if (issue) return warn(issue);
+        }
         const technique = this.actor.system.signatureTechniques?.find(t => 'tech_'+t.id === row.source);
         if ((Number(row.kiWager) || 0) > maximumWager093(this.actor, technique || (this._trackerSourceGroups || []).flatMap(g => g.sources).find(s => s.key === row.source), Number(row.kiCost) || 0)) return warn('Ki Wager acima do limite atual de Capacity/Ki. Full Wager usa a Capacity restante.');
         if (row.rules093Executed) return warn('Esta ação já foi executada. Use um novo registro para outra manobra.');
