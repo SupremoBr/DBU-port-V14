@@ -815,7 +815,7 @@ export const combatDataMethods = {
   _getCombatConditions(system) {
     const defaults = [
       { id: "blinded", name: "Blinded", maxStacks: 1, effect: "No Sight. Illuminating Aura cannot reduce or remove this." },
-      { id: "broken", name: "Broken", maxStacks: 3, effect: "Soak \u22122(T)/stack. If Soak=0, +2(T) damage received/stack." },
+      { id: "broken", name: "Broken", maxStacks: 3, effect: uses093(system) ? "Soak −2(bT)/stack after other reductions. Excess over available Soak adds damage." : "Soak \u22122(T)/stack. If Soak=0, +2(T) damage received/stack." },
       { id: "compelled", name: "Compelled", maxStacks: 1, effect: "Must target assigned character. Ki Wager 6(bT) min. 2 Actions/turn attacking target. Combat Rolls become Urgent. Fail = lose 6(bT) LP." },
       { id: "fatigued", name: "Fatigued", maxStacks: 2, effect: "Halve Max Capacity per stack." },
       { id: "guardDown", name: "Guard Down", maxStacks: 1, effect: "Defense Value & Defend Strike \u22122(T). Guard KP cost +50%." },

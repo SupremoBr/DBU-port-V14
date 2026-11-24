@@ -323,6 +323,7 @@
     },
     "_getCombatConditions": {
       "hash": "8a72d60abeea04ffe8e0bc6173ea3e1422b7468635d504864a9071c2b0b49e96",
+      "rules093Hash": "79559719a11e288ed2b6aee6650ffd32681b87b5788b3092e58180a0b803213f",
       "length": 1,
       "async": false
     },

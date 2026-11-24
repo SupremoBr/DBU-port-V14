@@ -14,6 +14,22 @@ const subraceTraits = {
   r093_yardrats_spiritual_pacifist: 'bulbousYardrat'
 };
 
+export function matchesRacialSubrace093(system, race, id, allowLegacySelection = false) {
+  const required = subraceTraits[id];
+  if (!required) return true;
+  const normalize = value => String(value || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+  const subrace = normalize(system.subrace);
+  const selectedSubrace = (CATALOGS_093.subraceOptions[race] || []).find(option =>
+    normalize(option.id) === subrace || normalize(option.name) === subrace);
+  if (selectedSubrace) return required === selectedSubrace.id;
+  if (system.subraceTraits?.length) return system.subraceTraits.includes(id);
+  if (!allowLegacySelection || (subrace && subrace !== 'none')) return false;
+  // Older sheets can have the trait but no subrace. Only infer an unambiguous choice.
+  const traits = (CATALOGS_093.racialTraits[race] || []).filter(trait =>
+    subraceTraits[trait.id] && system.racialTraits?.includes(trait.id));
+  return traits.length === 1 && traits[0].id === id;
+}
+
 function combatEffect(effect) {
   const keyword = effect.keyword || '';
   return !/Downtime|Adventuring|Character Creation/i.test(keyword)
@@ -23,19 +39,12 @@ function combatEffect(effect) {
 
 export function racialTrackerTraits093(system, preparedTraits) {
   const race = system.fusion?._possessionRace || system.race;
-  const normalize = value => String(value || '').toLowerCase().replace(/[^a-z0-9]/g, '');
-  const subrace = normalize(system.subrace);
-  const selectedSubrace = (CATALOGS_093.subraceOptions[race] || []).find(option =>
-    normalize(option.id) === subrace || normalize(option.name) === subrace);
   const selected = new Set(system.racialTraits || []);
   const listed = new Set();
   const result = [];
   for (const trait of preparedTraits || []) {
     if (trait.race !== race || !selected.has(trait.id) || listed.has(trait.id) || trait.isSelectable === false) continue;
-    const requiredSubrace = subraceTraits[trait.id];
-    if (requiredSubrace && (selectedSubrace
-      ? requiredSubrace !== selectedSubrace.id
-      : !system.subraceTraits?.includes(trait.id))) continue;
+    if (!matchesRacialSubrace093(system, race, trait.id)) continue;
     const effects = (trait.effects || []).flatMap(effect => [
       effect,
       ...(effect.options || []).filter(option => option.selected).map(option => ({ ...option, level: effect.level }))

@@ -192,7 +192,7 @@ export function applyConditionalCustomBuffs(system, buffs) {
   }
   for (const [field, amount] of Object.entries(statusDeltas)) {
     if (field === 'soak' && system.status.rawSoak != null) {
-      const minimum = system.tier || 1;
+      const minimum = (system.rulesVersion === '0.9.3' ? system.baseTier : system.tier) || 1;
       const before = Math.max(minimum, system.status.rawSoak);
       system.status.rawSoak += amount;
       const after = Math.max(minimum, system.status.rawSoak);

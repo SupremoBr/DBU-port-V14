@@ -52,15 +52,16 @@ test('the real system init installs the current catalogs, schema, sheet adapter 
   assert.ok(CONFIG.Item.dataModels.technique.defineSchema().superProfile);
   assert.ok(events.some(e=>Array.isArray(e)&&e[0]==='templates'&&e[1]>=24));
 
+  const CharacterModel = CONFIG.Actor.dataModels.character;
+  const initial = schema => Object.fromEntries(Object.entries(schema).map(([key, {definition}]) => {
+    if (definition instanceof TestField) return [key, []];
+    if (!definition) return [key, undefined];
+    if (Object.hasOwn(definition, 'initial')) return [key, structuredClone(definition.initial)];
+    if (Object.values(definition).every(field => field instanceof TestField)) return [key, initial(definition)];
+    return [key, undefined];
+  }));
+
   await t.test('selected racial bonuses reach derived attributes, rolls, resources and defenses and clear on removal', () => {
-    const CharacterModel = CONFIG.Actor.dataModels.character;
-    const initial = schema => Object.fromEntries(Object.entries(schema).map(([key, {definition}]) => {
-      if (definition instanceof TestField) return [key, []];
-      if (!definition) return [key, undefined];
-      if (Object.hasOwn(definition, 'initial')) return [key, structuredClone(definition.initial)];
-      if (Object.values(definition).every(field => field instanceof TestField)) return [key, initial(definition)];
-      return [key, undefined];
-    }));
     const system = Object.assign(new CharacterModel(), initial(CharacterModel.defineSchema()), {
       level: 5, race: 'bioAndroid', rulesVersion: '0.9.3',
     });
@@ -110,6 +111,73 @@ test('the real system init installs the current catalogs, schema, sheet adapter 
     assert.equal(survivor.dodge, baseline.dodge);
     system.racialTraits = [];
     assert.deepEqual(stats(), baseline);
+  });
+
+  await t.test('Demon Actor prepares one set of modifiers, with final LP, Prone, Soak and Broken', () => {
+    const system = Object.assign(new CharacterModel(), initial(CharacterModel.defineSchema()), {
+      level: 5, race: 'demon', subrace: 'phantom', rulesVersion: '0.9.3',
+      racialTraits: ['r093_demons_demonic_pressure', 'r093_demons_demonic_resilience', 'r093_demons_fallen_idol'],
+      rules093State: { racialResources: {} },
+    });
+    const actor = Object.assign(new CONFIG.Actor.documentClass(), { system, items: [] });
+    system.attributes.ag.racial = 9;
+    system.attributes.te.racial = 5;
+    system.damageCalc.woundRoll = 30;
+    system.lifePoints.value = 100;
+    system.adversary.enabled = true;
+    system.adversary.category = 'villain';
+    const stats = () => { system.prepareDerivedData(); actor._prepareCharacterData(system); };
+    stats();
+    const { damageReduction: dr, soak, might } = system.status;
+    const { defenseValue: defense, woundBuffTotal: wound } = system.aptitudes;
+    const score = system.attributes.fo.score, save = system.savingThrows.cognitive.bonus;
+    system.lifePoints.value = Math.floor(system.lifePoints.max / 4);
+    Object.assign(system.rules093State.racialResources, { demonicPower: 2, demonicFatigue: 1, resilienceActive: true });
+    system.conditions = [{ id: 'prone', active: true, stacks: 1 }];
+    stats();
+    assert.equal(system.savingThrows.cognitive.bonus, save + 2);
+    assert.equal(system.status.damageReduction, dr + 4);
+    assert.equal(system.status.soak, soak + 2);
+    assert.equal(system.status.might, might + 2);
+    assert.equal(system.attributes.fo.score, score);
+    assert.equal(system.aptitudes.defenseValue, Math.floor((defense - 2) / 2));
+    assert.equal(system.aptitudes.woundBuffTotal, wound + 8 - system.thresholds.penalties);
+    system.lifePoints.value++;
+    system.rules093State.racialResources.demonicFatigue = 40;
+    system.conditions = [{ id: 'broken', active: true, stacks: 3 }];
+    stats();
+    assert.equal(system.savingThrows.cognitive.bonus, save);
+    assert.equal(system.status.soak, 2);
+    assert.equal(system.status.brokenOverflow093, 10);
+    assert.equal(system.damageCalc.healthReduction, 30 - 2 - system.status.damageReduction + 10);
+    system.rules093State.racialResources.resilienceSuccesses = 2;
+    stats();
+    assert.equal(system.status.damageReduction, dr + 8);
+    assert.equal(system.damageCalc.healthReduction, 30 - 2 - (dr + 8) + 10);
+    assert.equal(system.status.brokenOverflow093, 10);
+    stats();
+    assert.equal(system.status.damageReduction, dr + 8);
+    system.rules093State.racialResources = {};
+    system.conditions = [];
+    stats();
+    assert.equal(system.status.soak, soak);
+    assert.equal(system.status.damageReduction, dr);
+    assert.equal(system.damageCalc.healthReduction, 30 - soak - dr);
+    const baseLife = system.lifePoints.max;
+    const baseSurgency = system.status.surgency;
+    const factorCases = [
+      ['r093_megath_colossal_demon', 4 * system.level, 0, 0],
+      ['r093_monster_custom_monstrosity', 2 * system.level, 0, 0],
+      ['r093_monster_genie', 0, Math.floor(system.attributes.in.totalScore / 2), 0],
+      ['r093_monster_mummy', 0, 2 * system.baseTier, 2 * system.baseTier],
+    ];
+    for (const [id, lifeGain, extraDR, recovery] of factorCases) {
+      system.racialTraits = [id];
+      stats();
+      assert.equal(system.lifePoints.max, baseLife + lifeGain, id);
+      assert.equal(system.status.damageReduction, dr + extraDR, id);
+      assert.equal(system.status.surgency, baseSurgency + recovery, id);
+    }
   });
 
   await t.test('unique abilities can be added without a type and a dual type can be changed or cleared', async () => {

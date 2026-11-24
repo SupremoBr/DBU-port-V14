@@ -1,3 +1,4 @@
+import { matchesRacialSubrace093 } from './racial-tracker-v093.mjs';
 import { RACES_093 } from './races-v093.mjs';
 import { CATALOGS_093 } from './catalogs-v093.mjs';
 import { uses093 } from './v093.mjs';
@@ -94,6 +95,7 @@ export function applyRacialAttribute093(system, tier, bonuses = racialPassiveBon
 export function racialEffectEnabled093(system, name, level = 1) {
   const trait = (CATALOGS_093.racialTraits[system.race] || []).find(t => t.name === name);
   if (!trait || !system.racialTraits?.includes(trait.id)) return false;
+  if (system.race === 'demon' && !matchesRacialSubrace093(system, system.race, trait.id, true)) return false;
   const key = trait.name.toLowerCase().replace(/[^a-z0-9]/g, '_');
   return system.effectTracking?.enabledPassives?.[`racial_${trait.traitCategory}_${key}_${level}`] !== false;
 }

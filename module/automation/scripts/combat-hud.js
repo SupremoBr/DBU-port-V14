@@ -421,8 +421,12 @@ function hudContent(actor, token) {
   const grapple = safeCall(() => StandardActions.getGrappleState(actor), null, "Grapple state");
   const powerStacks = Math.max(0, number(actor.system?.tracking?.powerStacks, 0));
   const pressure = racialResourceView093(actor);
-  const pressureAvailable = pressure.canAttack ||
-    (pressure.hasDefenseCheck && pressure.canDefend) || (pressure.hasSteadfastCheck && pressure.canSteadfast);
+  const pressureActions = [
+    { visible: pressure.hasAttackCheck, source: "attack", label: "Pressure Ataque", icon: "fist-raised",
+      available: pressure.canAttack, title: `Após atacar no próprio turno · ${pressure.attackChecks}/3 nesta rodada` },
+    { visible: pressure.hasDefenseCheck, source: "defense", label: "Pressure Defesa", icon: "shield-alt",
+      available: pressure.canDefend, title: `Ao ser alvo de um ataque · ${pressure.defenseChecks}/2 nesta rodada` }
+  ].filter(action => action.visible);
   const pending = safeCall(() => getPendingActions(actor).length, 0, "pending actions");
   const targets = game.user?.targets?.size || 0;
   const turn = combatLabel(actor, token);
@@ -470,10 +474,9 @@ function hudContent(actor, token) {
         ${resource("KI",ki.value,ki.max,"ki")}
         ${resource("CAPACITY",capacity.left,capacity.max,"capacity",`${capacity.spent} gastos`)}
       </div>
-      ${pressure.demon ? `<div class="dbua-v2-pressure" aria-label="Demonic Pressure">
-        ${pressure.pressure ? `<span title="Demonic Power"><i class="fas fa-fire" aria-hidden="true"></i> Power <b>${pressure.power}</b></span>
-        <span title="Demonic Fatigue"><i class="fas fa-hourglass-half" aria-hidden="true"></i> Fatigue <b>${pressure.fatigue}</b></span>` : ""}
-        <button type="button" data-dbu-hud-action="hud-pressure" ${pressureAvailable ? "" : "disabled"}>Pressure Check</button>
+      ${pressure.pressure ? `<div class="dbua-v2-pressure" aria-label="Demonic Pressure">
+        <span title="Demonic Power"><i class="fas fa-fire" aria-hidden="true"></i> Power <b>${pressure.power}</b></span>
+        <span title="Demonic Fatigue"><i class="fas fa-hourglass-half" aria-hidden="true"></i> Fatigue <b>${pressure.fatigue}</b></span>
       </div>` : ""}
       <div class="dbua-v2-vital-tags">
         <span title="Transformation"><i class="fas fa-dragon"></i>${esc(activeForm)}</span>
@@ -508,10 +511,15 @@ function hudContent(actor, token) {
       <div class="dbu-hud-allies-list">${allies}</div>
     </aside>`:""}
 
-    <div class="dbu-hud-dock">
+    <div class="dbu-hud-dock${pressureActions.length ? " dbua-pressure-dock" : ""}">
       ${!state.collapsed?hudV2Panel({tab:state.hudTab,selected:state.hudSelected,favorites:favoriteIds,pending}):""}
       <div class="dbua-v2-dock-row" role="navigation" aria-label="Menu de combate DBU">
-        <div class="dbua-v2-dock-tabs">${hudV2Tabs(state.collapsed?null:state.hudTab,pending)}</div>
+        <div class="dbua-v2-dock-tabs" style="--dbua-dock-actions:${4 + pressureActions.length}">
+          ${hudV2Tabs(state.collapsed?null:state.hudTab,pending)}
+          ${pressureActions.map(action => `<button type="button" class="dbua-v2-tab" data-dbu-hud-action="hud-pressure-${action.source}"
+            title="${action.title}" ${action.available ? "" : "disabled"}><i class="fas fa-${action.icon}" aria-hidden="true"></i>
+            <span>${action.label}</span></button>`).join("")}
+        </div>
         <div class="dbua-v2-dock-tools">
         <button type="button" class="dbua-v2-clash" data-dbu-hud-action="hud-clash" title="Clash com bônus manual">
           <i class="fas fa-dice-d10" aria-hidden="true"></i> Clash
@@ -573,7 +581,8 @@ async function dispatchHudAction(button, actor, token) {
   if (action === "hud-favorite")return toggleHudFavorite(actor,token,button.dataset.hudId);
   if (action === "hud-run")return runV2Action(button.dataset.hudId,actor,token);
   if (action === "hud-clash")return rollHudClash(actor,token);
-  if (action === "hud-pressure") return promptPressureCheck093(actor);
+  if (action === "hud-pressure-attack") return promptPressureCheck093(actor, "attack");
+  if (action === "hud-pressure-defense") return promptPressureCheck093(actor, "defense");
   if (action === "hud-allies-detach" || action === "hud-allies-attach") {
     await game.settings.set(MODULE_ID,"combatHudAlliesIndependent",action === "hud-allies-detach");
     return renderCombatHud();

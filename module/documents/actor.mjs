@@ -2,7 +2,7 @@ import { awakeningAMB, limitedMartialPower, martialDie, martialLevel, martialRes
 import { applyConditionalCustomBuffs, buffAmount, buffEffectKey, conditionalBuff, linkedCatalogBuffs } from "../helpers/custom-buffs.mjs";
 import { uses093 } from "../rules/v093.mjs";
 import { racialSaves093, racialLife093, applyRacial093, applyCatalogPassives093, applyRacialAttribute093, ignoresSaiyanPenalties093 } from "../rules/runtime-v093.mjs";
-import { applyRacialResources093 } from "../rules/racial-resources-v093.mjs";
+import { applyRacialResources093, applyResilienceSave093, racialResourceBonuses093 } from "../rules/racial-resources-v093.mjs";
 import { racialPassiveBonuses093 } from "../rules/racial-passives-v093.mjs";
 import { talentPassiveBonus093 } from "../rules/talent-passives-v093.mjs";
 import { getDisabledRacialPassives, getRacialStressBonus } from "../helpers/catalog-index.mjs";
@@ -238,6 +238,9 @@ export class DBUActor extends Actor {
     }
     system.skills = skillsObj;
 
+    // Rebuild the demon's Steadfast total before racial and transformation effects.
+    if (uses093(system) && system.race === "demon") system.aptitudes.steadfastBonus = 0;
+
     // ---- Attribute Modifiers (with transformations, auras, buffs) ----
     const racialBonuses = racialPassiveBonuses093(system, tier, baseTier);
     this._calculateAttributeModifiers(system, tier);
@@ -280,7 +283,9 @@ export class DBUActor extends Actor {
     this._calculateThresholds(system, tier, baseTier);
 
     // ---- Combat Stats (size-dependent) ----
-    this._calculateCombatStats(system, tier, baseTier, racialBonuses);
+    const racialResources = uses093(system) && ["demon", "arcosian"].includes(system.race)
+      ? racialResourceBonuses093(system, tier) : {};
+    this._calculateCombatStats(system, tier, baseTier, racialBonuses, racialResources);
 
     // ---- Custom buff: ToP / Greater Extra Dice Category bonuses ----
     // Each variant routes to a specific sub-bucket of system.dicePools.
@@ -406,7 +411,7 @@ export class DBUActor extends Actor {
     // ---- Talent Automation ----
     applyTalentBonuses(system, tier, baseTier);
     applyCatalogPassives093(system, tier, baseTier, this.items);
-    applyRacialResources093(system, tier);
+    applyRacialResources093(system, tier, racialResources);
 
     // ---- Damage Reduction Finalizer ----
     // Now that racial + talent + bestial DR additions are accumulated in
@@ -414,7 +419,7 @@ export class DBUActor extends Actor {
     system.status.damageReduction = (system.status.damageReduction || 0)
       + (system.status.dr || 0)
       + (system.talentBonuses?.totals?.dr || 0)
-      + (racialBonuses.dr || 0)
+      + (racialResources.dr || 0) + (racialBonuses.dr || 0)
       + (racialBonuses.drHalfInsight || 0) * Math.floor(Math.max(1, system.attributes.in?.totalScore ?? 0) / 2);
 
     // ---- Super Stack wound dice FINAL recompute (post-automation) ----
@@ -527,8 +532,17 @@ export class DBUActor extends Actor {
     // ---- Adversary stat modifications ----
     this._calculateAdversaryStats(system, level, tier, baseTier);
 
+    if (system.race === 'demon') applyResilienceSave093(system, tier);
+
     // Health triggers read the final maximum LP, including adversary modifiers.
     applyConditionalCustomBuffs(system, [...(system.customBuffs || []), ...system._linkedCustomBuffs]);
+
+    if (uses093(system) && system.status.effectiveBrokenStacks) {
+      const penalty = 2 * baseTier * system.status.effectiveBrokenStacks;
+      const before = Math.max(0, system.status.soak);
+      system.status.brokenOverflow093 = Math.max(0, penalty - before);
+      system.status.soak = Math.min(before, Math.max(baseTier, before - penalty));
+    }
 
     // ---- Damage Calculator derived values ----
     this._calculateDamageCalc(system, tier, baseTier);
@@ -1462,7 +1476,7 @@ export class DBUActor extends Actor {
   // Combat Stats (Speed, Soak, Reach, Range, Defense)
   // =============================================================
 
-  _calculateCombatStats(system, tier, baseTier, racialBonuses = racialPassiveBonuses093(system, tier, baseTier)) {
+  _calculateCombatStats(system, tier, baseTier, racialBonuses = racialPassiveBonuses093(system, tier, baseTier), racialResources = {}) {
     let size = system.status?.currentSize || system.baseSize || "medium";
     // Growth Aspect (transformation-aspects.txt:46): LV1 sets Size Category to
     // Large; each further level +1 (LV2 Enormous, LV3 Gigantic). Cannot lower
@@ -1679,7 +1693,8 @@ export class DBUActor extends Actor {
     }
     brokenStacks = Math.min(3, brokenStacks);
     if (system.status) system.status.effectiveBrokenStacks = brokenStacks;
-    const brokenPenalty = brokenStacks * 2 * tier;
+    // In 0.9.3 Broken is resolved after other Soak reductions.
+    const brokenPenalty = uses093(system) ? 0 : brokenStacks * 2 * tier;
 
     // Custom buff soak (unified: flat + bT×baseTier + T×tier)
     const customBuffSoak = this._getBuffTotal(system, "Soak")
@@ -1693,10 +1708,10 @@ export class DBUActor extends Actor {
     const doubledPortion = basePortion * doubleBaseBuff;
     const baseSoak = basePortion + doubledPortion - brokenPenalty
       + this._getEquipmentSoakBonus() + godKiSoak + superStackSoak + customBuffSoak + fissionSoak
-      + (racialBonuses.soak || 0);
-    // Manual: "minimum Soak Value of 1(T)" = 1 × Tier of Power
+      + (racialBonuses.soak || 0) + (racialResources.soak || 0);
+    // Damage & Recovery sets the 0.9.3 minimum to 1(bT).
     system.status.rawSoak = baseSoak;  // Pre-minimum value for Broken extra damage check
-    system.status.soak = Math.max(tier, baseSoak);
+    system.status.soak = Math.max(uses093(system) ? baseTier : tier, baseSoak);
 
     // --- Normal Speed ---
     // Formula: 2 + floor(AG total / 2) + SizeMod + AuraBonus
@@ -1823,7 +1838,7 @@ export class DBUActor extends Actor {
 
     const customBuffDefense = this._getBuffTotal(system, "Defense Value");
     let defenseValue = agTotal + (sizeData.defenseMod * tier) + auraDefense + this._getEquipmentDefenseBonus() + customBuffDefense
-      + (racialBonuses.defense || 0) + (racialBonuses.defenseQuarterInsight || 0) * quarterInsight;
+      - (racialResources.defensePenalty || 0) + (racialBonuses.defense || 0) + (racialBonuses.defenseQuarterInsight || 0) * quarterInsight;
     // Raging state: "Reduce your Defense Value by 1(T)" (states.txt)
     if (system.combatStates?.raging) defenseValue -= tier;
     // Guard Down condition: reduce Defense Value by 2(T)
@@ -3172,7 +3187,9 @@ export class DBUActor extends Actor {
     // stacks from Broken, increase the Damage you receive by 2(T) for each stack" (damage-conditions.txt)
     // Check rawSoak (pre-minimum) since the tier minimum clamp would otherwise prevent this from firing.
     const rawSoak = system.status?.rawSoak ?? soak;
-    if (rawSoak <= 0) {
+    if (uses093(system)) {
+      if (system.status?.effectiveBrokenStacks) healthReduction += system.status.brokenOverflow093 || 0;
+    } else if (rawSoak <= 0) {
       // effectiveBrokenStacks includes Vulnerable Aura ranks (set in _calculateCombatStats)
       const brokenStacks = system.status?.effectiveBrokenStacks
         ?? this._getConditionStacks(system, "broken");

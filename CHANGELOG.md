@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.0.12-rules093-alpha.26] — auditoria dos Demônios e Pressure no HUD
+
+- Demonic Resilience concede +2(T) de redução de dano por sucesso defensivo, até +4(T), com duração até o início do próximo turno.
+- O HUD tem botões separados para Pressure Ataque e Pressure Defesa. Ambos usam os limites da ficha.
+- Corrigidos a seleção de sub-raça, o cálculo de Soak, a interação com Prone e Broken, o limite de LP de Demonic Resilience e o registro de Steadfast. [Auditoria por efeito](docs/auditoria-demonio-093.md)
+
 ## [1.0.12-rules093-alpha.25] — passivas raciais de atributos
 
 - O Actor aplica bônus numéricos de 48 efeitos e opções em 42 traços raciais, incluindo fatores. Os cálculos usam o Tier ou Tier base indicado pela regra.

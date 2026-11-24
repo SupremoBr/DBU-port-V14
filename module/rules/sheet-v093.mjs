@@ -8,7 +8,7 @@ import { RACES_093 } from './races-v093.mjs';
 import { uses093, awakeningLimits, validateTransformationStack, fullAwakeningRecovery, stackedStressRequirement } from './v093.mjs';
 import { roundPools093, convertStandardToCounter093, isOwnTurn093, inCombat093, rowActionType093, rowCost093 } from './actions-v093.mjs';
 import { validateTechnique093, validateTechniqueUsage093, maximumWager093 } from './techniques-v093.mjs';
-import { adjustRacialResource093, racialEncounterReset093, racialResourceView093, racialTurnReset093, promptPressureCheck093, useMakyanPower093 } from './racial-resources-v093.mjs';
+import { adjustRacialResource093, racialEncounterReset093, racialResourceView093, racialTurnReset093, promptPressureCheck093, rollPhantomSteadfast093, useMakyanPower093 } from './racial-resources-v093.mjs';
 import { editAttackGrant093 } from './attack-grants-v093.mjs';
 import { racialTrackerTraits093 } from './racial-tracker-v093.mjs';
 const installed = new WeakSet();
@@ -74,6 +74,8 @@ export function installRulesSheet093(Sheet) {
           const { system } = this.actor;
           const changes = { ...racialTurnReset093(system, 'start'), ...racialTurnReset093(system, 'end') };
           if (Object.keys(changes).length) await this.actor.update(changes);
+        } else if (button.dataset.rules093Resource === 'steadfast') {
+          await rollPhantomSteadfast093(this.actor);
         } else if (button.dataset.rules093Resource === 'makyanPower') {
           if (!(await useMakyanPower093(this.actor))) warn('Power Up Makyan indisponível nesta rodada ou encontro.');
         } else {
