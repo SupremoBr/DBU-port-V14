@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.0.12-rules093-alpha.25] — passivas raciais de atributos
+
+- O Actor aplica bônus numéricos de 48 efeitos e opções em 42 traços raciais, incluindo fatores. Os cálculos usam o Tier ou Tier base indicado pela regra.
+- As passivas chegam às rolagens, à redução de dano, aos limites de LP e à recuperação por Surges. Blood of the Warrior também atualiza o valor calculado de Surgency.
+
 ## [1.0.12-rules093-alpha.24] — HUD, traços no tracker e passivas de armas
 
 - Os botões inferiores do HUD têm textos e ícones maiores e se reorganizam em telas estreitas.

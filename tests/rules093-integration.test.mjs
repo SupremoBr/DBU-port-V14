@@ -150,6 +150,7 @@ test('new Saiyan passives replace the old wager bonus and use actual Force Modif
   applyRacial093(sys,2,1);
   assert.equal(sys.battleBorn.woundBonus,8); // 2 Born + 4 Blood + 2 Tailless.
   assert.equal(sys.status.soak,9); // 3 Physique + 4 Blood + 2 Tailless.
+  assert.equal(sys.status.surgency,4);
   assert.equal(sys.status.powerSurgeKi,24);
   assert.equal(sys.savingThrows.cognitive.bonus,5);
   assert.equal(sys.aptitudes.bloodOfWarriorKiWagerThreshold,undefined);

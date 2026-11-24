@@ -3,6 +3,7 @@ import { applyConditionalCustomBuffs, buffAmount, buffEffectKey, conditionalBuff
 import { uses093 } from "../rules/v093.mjs";
 import { racialSaves093, racialLife093, applyRacial093, applyCatalogPassives093, applyRacialAttribute093, ignoresSaiyanPenalties093 } from "../rules/runtime-v093.mjs";
 import { applyRacialResources093 } from "../rules/racial-resources-v093.mjs";
+import { racialPassiveBonuses093 } from "../rules/racial-passives-v093.mjs";
 import { talentPassiveBonus093 } from "../rules/talent-passives-v093.mjs";
 import { getDisabledRacialPassives, getRacialStressBonus } from "../helpers/catalog-index.mjs";
 /**
@@ -238,8 +239,9 @@ export class DBUActor extends Actor {
     system.skills = skillsObj;
 
     // ---- Attribute Modifiers (with transformations, auras, buffs) ----
+    const racialBonuses = racialPassiveBonuses093(system, tier, baseTier);
     this._calculateAttributeModifiers(system, tier);
-    applyRacialAttribute093(system, tier);
+    applyRacialAttribute093(system, tier, racialBonuses);
 
     // ---- One-Sided Fusion Attribute Bonuses ----
     this._applyOneSidedFusionBonuses(system, tier, baseTier);
@@ -265,20 +267,20 @@ export class DBUActor extends Actor {
     this._applyEarlyMutationEffects(system, tier, baseTier);
 
     // ---- Resources ----
-    this._calculateResources(system, level, tier, baseTier);
+    this._calculateResources(system, level, tier, baseTier, racialBonuses);
     if (martialLevel(system) || system._masterMartialLevel) {
       system.lifePoints.value = Math.min(system.lifePoints.value, system.lifePoints.max);
       system.kiPool.value = Math.min(system.kiPool.value, system.kiPool.max);
     }
 
     // ---- Saving Throws ----
-    this._calculateSavingThrows(system, tier);
+    this._calculateSavingThrows(system, tier, racialBonuses);
 
     // ---- Health Thresholds ----
     this._calculateThresholds(system, tier, baseTier);
 
     // ---- Combat Stats (size-dependent) ----
-    this._calculateCombatStats(system, tier, baseTier);
+    this._calculateCombatStats(system, tier, baseTier, racialBonuses);
 
     // ---- Custom buff: ToP / Greater Extra Dice Category bonuses ----
     // Each variant routes to a specific sub-bucket of system.dicePools.
@@ -411,7 +413,9 @@ export class DBUActor extends Actor {
     // system.status.dr and talentBonuses.totals.dr, fold them into the displayed total.
     system.status.damageReduction = (system.status.damageReduction || 0)
       + (system.status.dr || 0)
-      + (system.talentBonuses?.totals?.dr || 0);
+      + (system.talentBonuses?.totals?.dr || 0)
+      + (racialBonuses.dr || 0)
+      + (racialBonuses.drHalfInsight || 0) * Math.floor(Math.max(1, system.attributes.in?.totalScore ?? 0) / 2);
 
     // ---- Super Stack wound dice FINAL recompute (post-automation) ----
     // The combat-stats pass computes a first value, but category/count bonuses
@@ -894,7 +898,7 @@ export class DBUActor extends Actor {
   // Resources: LP, Ki, Capacity
   // =============================================================
 
-  _calculateResources(system, level, tier, baseTier) {
+  _calculateResources(system, level, tier, baseTier, racialBonuses = racialPassiveBonuses093(system, tier, baseTier)) {
     // Unification (Unify Maneuver): each Secondary Character increases Max LP,
     // Max Ki Pool and Capacity "as if they had just gained a Power Level" —
     // effective PL for those three formulas ONLY (not for other level-scaled effects).
@@ -916,7 +920,7 @@ export class DBUActor extends Actor {
     }
     const modifyLife = system.lifePoints?.modify || 0;
     // Custom buff "Racial Life Modifier" — added to rlm before the formula uses it (scales by level)
-    rlm += this._getBuffTotal(system, "Racial Life Modifier");
+    rlm += this._getBuffTotal(system, "Racial Life Modifier") + (racialBonuses.racialLife || 0);
     system.lifePoints.max = 48 + (resLevel * (12 + rlm + (2 * teScore))) + modifyLife - martialPenalty;
     // Custom buff "Max Life Points" (unified: flat + bT×baseTier + T×tier)
     system.lifePoints.max += this._getBuffTotal(system, "Max Life Points");
@@ -1225,7 +1229,7 @@ export class DBUActor extends Actor {
       }
     }
     // Custom buff "Might"
-    might += this._getBuffTotal(system, "Might");
+    might += this._getBuffTotal(system, "Might") + (racialBonuses.might || 0);
     system.status.might = might;
     // Custom buff "Might for Clashes" — separate stat used in Might Clashes only.
     // Penetrating Fist L1: +1(T) Might Clash Dice Score (clashes ONLY, not Might).
@@ -1236,7 +1240,10 @@ export class DBUActor extends Actor {
 
     // --- Surgency = Force total (+2(T) with Archetype Focus L2) ---
     const talents = system._martialTalents ?? system.talents ?? [];
-    const surgency = foTotal + (talents.includes("archetype_focus") ? 2 * tier : 0) + talentPassiveBonus093(system, "surgency", tier);
+    const insight = Math.max(1, system.attributes.in?.totalScore ?? 0);
+    const racialSurgency = (racialBonuses.surgency || 0) + (racialBonuses.surgencyHalfInsight || 0) * Math.ceil(insight / 2);
+    const surgency = foTotal + (talents.includes("archetype_focus") ? 2 * tier : 0)
+      + talentPassiveBonus093(system, "surgency", tier) + racialSurgency;
     if (uses093(system)) system.status.surgency = surgency;
 
     // --- Healing Surge ---
@@ -1304,7 +1311,7 @@ export class DBUActor extends Actor {
   // Saving Throws
   // =============================================================
 
-  _calculateSavingThrows(system, tier) {
+  _calculateSavingThrows(system, tier, racialBonuses = racialPassiveBonuses093(system, tier, system.baseTier || 1)) {
     const saveMap = {
       impulsive: "ag",
       corporeal: "te",
@@ -1372,7 +1379,8 @@ export class DBUActor extends Actor {
       const minionClassSaves = (system._minionClassOpt?.includes("weird") || system._minionAscended)
         ? (system._minionZ || 0) : 0;
 
-      const bonus = attrScore + profBonus + auraBonus + customSaveBonus + valorBonus + strugglingBonus + lightningInitBonus - drunkPenalty - minionSavePenalty + minionClassSaves;
+      const bonus = attrScore + profBonus + auraBonus + customSaveBonus + valorBonus + strugglingBonus + lightningInitBonus
+        - drunkPenalty - minionSavePenalty + minionClassSaves + (racialBonuses[`${saveKey}Save`] || 0);
       // CT formula: max(7, 10 - proficiency(1) - mindful(1))
       // CT is only reduced by boolean flags (1 each), NOT by the full save bonus
       const profCT = isProficient ? 1 : 0;
@@ -1454,7 +1462,7 @@ export class DBUActor extends Actor {
   // Combat Stats (Speed, Soak, Reach, Range, Defense)
   // =============================================================
 
-  _calculateCombatStats(system, tier, baseTier) {
+  _calculateCombatStats(system, tier, baseTier, racialBonuses = racialPassiveBonuses093(system, tier, baseTier)) {
     let size = system.status?.currentSize || system.baseSize || "medium";
     // Growth Aspect (transformation-aspects.txt:46): LV1 sets Size Category to
     // Large; each further level +1 (LV2 Enormous, LV3 Gigantic). Cannot lower
@@ -1566,6 +1574,8 @@ export class DBUActor extends Actor {
 
     const agTotal = system.attributes.ag?.totalScore ?? 0;
     const teTotal = system.attributes.te?.totalScore ?? 0;
+    const inTotal = (system.attributes.in?.score ?? 0) + (system.attributes.in?.modifier ?? 0);
+    const quarterInsight = Math.ceil(Math.max(1, inTotal) / 4);
 
     // --- Super Stacks ---
     // Rule: "For every multiple of 5 your Force Score exceeds your Agility Score by,
@@ -1682,14 +1692,15 @@ export class DBUActor extends Actor {
     const basePortion = teTotal + (sizeData.soakMod * tier) + auraDR;
     const doubledPortion = basePortion * doubleBaseBuff;
     const baseSoak = basePortion + doubledPortion - brokenPenalty
-      + this._getEquipmentSoakBonus() + godKiSoak + superStackSoak + customBuffSoak + fissionSoak;
+      + this._getEquipmentSoakBonus() + godKiSoak + superStackSoak + customBuffSoak + fissionSoak
+      + (racialBonuses.soak || 0);
     // Manual: "minimum Soak Value of 1(T)" = 1 × Tier of Power
     system.status.rawSoak = baseSoak;  // Pre-minimum value for Broken extra damage check
     system.status.soak = Math.max(tier, baseSoak);
 
     // --- Normal Speed ---
     // Formula: 2 + floor(AG total / 2) + SizeMod + AuraBonus
-    let normalSpeed = Math.max(0, 2 + Math.floor(agTotal / 2) + sizeData.speedMod);
+    let normalSpeed = Math.max(0, 2 + Math.floor(agTotal / 2) + sizeData.speedMod + (racialBonuses.normalSpeed || 0));
     if (this._isConditionActive(system, "prone")) normalSpeed = Math.floor(normalSpeed / 2);
 
     // Aura Speed Bonus (benefit — skipped with Infusion)
@@ -1728,7 +1739,7 @@ export class DBUActor extends Actor {
 
     // --- Boosted Speed ---
     // Formula: 2 + AG total + SizeMod + AuraBonus
-    let boostedSpeed = Math.max(0, 2 + agTotal + sizeData.speedMod);
+    let boostedSpeed = Math.max(0, 2 + agTotal + sizeData.speedMod + (racialBonuses.boostedSpeed || 0));
     if (this._isConditionActive(system, "prone")) boostedSpeed = Math.floor(boostedSpeed / 2);
 
     // Aura Speed Bonus (Boosted; benefit skipped with Infusion, penalty kept)
@@ -1811,7 +1822,8 @@ export class DBUActor extends Actor {
     }
 
     const customBuffDefense = this._getBuffTotal(system, "Defense Value");
-    let defenseValue = agTotal + (sizeData.defenseMod * tier) + auraDefense + this._getEquipmentDefenseBonus() + customBuffDefense;
+    let defenseValue = agTotal + (sizeData.defenseMod * tier) + auraDefense + this._getEquipmentDefenseBonus() + customBuffDefense
+      + (racialBonuses.defense || 0) + (racialBonuses.defenseQuarterInsight || 0) * quarterInsight;
     // Raging state: "Reduce your Defense Value by 1(T)" (states.txt)
     if (system.combatStates?.raging) defenseValue -= tier;
     // Guard Down condition: reduce Defense Value by 2(T)
@@ -1831,7 +1843,6 @@ export class DBUActor extends Actor {
 
     // --- Awareness ---
     // Rule: "Add your Insight Modifier to Strike Rolls" (attributes.txt)
-    const inTotal = (system.attributes.in?.score ?? 0) + (system.attributes.in?.modifier ?? 0);
     system.aptitudes.awareness = inTotal
       + this._getBuffTotal(system, "Awareness");
 
@@ -1843,7 +1854,7 @@ export class DBUActor extends Actor {
     // Initiative Value (separate bonus for Initiative Advantage determination only,
     // NOT added to the d10 roll — from transformations like SSJ, Golden Power, etc.)
     // Derived-only field, populated by alternate-forms/legendary-forms/manifested-powers.
-    system.aptitudes.initiativeValue = 0;
+    system.aptitudes.initiativeValue = (racialBonuses.initiativeQuarterInsight || 0) * quarterInsight;
 
     // Initiative Roll Bonus (bonuses to the d10 roll, e.g. Improved Initiative +2bT)
     // Derived-only field (not in TypeDataModel schema), populated by talents.mjs
@@ -1957,10 +1968,10 @@ export class DBUActor extends Actor {
     // "Strike (All)" / "Wound (All)" are the catalog dropdown's names for the
     // plain Strike/Wound buffs — accept both (the (All) forms did nothing).
     const combatRollsBuff = this._getBuffTotal(system, "Combat Rolls");
-    system.aptitudes.strikeBuffTotal = this._getBuffTotal(system, "Strike") + combatRollsBuff - fissionCRPenalty - thresholdCRPenalty;
-    system.aptitudes.dodgeBuffTotal = this._getBuffTotal(system, "Dodge") + combatRollsBuff - fissionCRPenalty - thresholdCRPenalty;
+    system.aptitudes.strikeBuffTotal = this._getBuffTotal(system, "Strike") + combatRollsBuff - fissionCRPenalty - thresholdCRPenalty + (racialBonuses.strike || 0);
+    system.aptitudes.dodgeBuffTotal = this._getBuffTotal(system, "Dodge") + combatRollsBuff - fissionCRPenalty - thresholdCRPenalty + (racialBonuses.dodge || 0);
     system.aptitudes.woundBuffTotal = this._getBuffTotal(system, "Wound") + combatRollsBuff - fissionCRPenalty - thresholdCRPenalty
-      + (system.fusion?._fissionWoundBonus || 0);
+      + (system.fusion?._fissionWoundBonus || 0) + (racialBonuses.wound || 0);
     // "No Strike/Dodge/Wound Penalties" — cancel penalty subtractions for that roll type
     if (this._getBuffTotal(system, "No Strike Penalties") > 0) {
       system.aptitudes.strikeBuffTotal += fissionCRPenalty + thresholdCRPenalty + (system.aptitudes.superStackStrikePenalty || 0);
@@ -1977,7 +1988,7 @@ export class DBUActor extends Actor {
     system.aptitudes.analysisIntuition = this._getBuffTotal(system, "Analysis Maneuver (Intuition)");
 
     // Damage-type-specific Strike/Wound variants (applied at roll time based on attack type)
-    system.aptitudes.strikePhysical = this._getBuffTotal(system, "Strike (Physical)");
+    system.aptitudes.strikePhysical = this._getBuffTotal(system, "Strike (Physical)") + (racialBonuses.strikePhysical || 0);
     system.aptitudes.strikeEnergy = this._getBuffTotal(system, "Strike (Energy)");
     system.aptitudes.strikeMagic = this._getBuffTotal(system, "Strike (Magic)");
     system.aptitudes.woundPhysical = this._getBuffTotal(system, "Wound (Physical)");

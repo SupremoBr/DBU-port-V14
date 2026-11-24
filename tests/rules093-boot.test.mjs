@@ -52,6 +52,66 @@ test('the real system init installs the current catalogs, schema, sheet adapter 
   assert.ok(CONFIG.Item.dataModels.technique.defineSchema().superProfile);
   assert.ok(events.some(e=>Array.isArray(e)&&e[0]==='templates'&&e[1]>=24));
 
+  await t.test('selected racial bonuses reach derived attributes, rolls, resources and defenses and clear on removal', () => {
+    const CharacterModel = CONFIG.Actor.dataModels.character;
+    const initial = schema => Object.fromEntries(Object.entries(schema).map(([key, {definition}]) => {
+      if (definition instanceof TestField) return [key, []];
+      if (!definition) return [key, undefined];
+      if (Object.hasOwn(definition, 'initial')) return [key, structuredClone(definition.initial)];
+      if (Object.values(definition).every(field => field instanceof TestField)) return [key, initial(definition)];
+      return [key, undefined];
+    }));
+    const system = Object.assign(new CharacterModel(), initial(CharacterModel.defineSchema()), {
+      level: 5, race: 'bioAndroid', rulesVersion: '0.9.3',
+    });
+    const actor = Object.assign(new CONFIG.Actor.documentClass(), { system, items: [] });
+    system.attributes.te.racial = 3;
+    system.lifePoints.value = 110;
+    system.damageCalc.woundRoll = 30;
+    const stats = () => {
+      system.prepareDerivedData();
+      actor._prepareCharacterData(system);
+      return {
+        insight: system.attributes.in.totalScore, insightScore: system.attributes.in.score,
+        cognitive: system.savingThrows.cognitive.bonus, awareness: system.aptitudes.awareness,
+        life: system.lifePoints.max, soak: system.status.soak, dr: system.status.damageReduction,
+        damage: system.damageCalc.healthReduction,
+        surgency: system.status.surgency, healing: system.status.healingSurge, ki: system.status.powerSurgeKi,
+        normalSpeed: system.status.normalSpeed, boostedSpeed: system.status.boostedSpeed,
+        dodge: system.aptitudes.dodgeBuffTotal,
+      };
+    };
+    const baseline = stats();
+    const psychic = 'r093_mutation_psychic';
+    const design = 'r093_bio_android_defensive_design';
+    const armor = 'r093_cybernetic_enhancement_armor_plating';
+    const life = 'r093_cybernetic_enhancement_life_support';
+    const warrior = 'r093_bio_android_artificial_warrior';
+    system.racialTraits = [psychic, design, armor, life, warrior, psychic];
+    system.racialOptionSelections = { [warrior]: { 4: 'Genetic Agility' } };
+    const withPassives = stats();
+    assert.deepEqual(withPassives, {
+      insight: baseline.insight + 2, insightScore: baseline.insightScore,
+      cognitive: baseline.cognitive + 2, awareness: baseline.awareness + 2,
+      life: baseline.life + 5 * 6, soak: baseline.soak + 2, dr: baseline.dr + 4, damage: baseline.damage - 6,
+      surgency: baseline.surgency + 4, healing: `4d10+${baseline.surgency + 4}`, ki: baseline.ki + 4,
+      normalSpeed: baseline.normalSpeed + 2, boostedSpeed: baseline.boostedSpeed + 2,
+      dodge: baseline.dodge + 2,
+    });
+    assert.deepEqual(stats(), withPassives);
+    system.racialOptionSelections[warrior][4] = 'Genetic Survivor';
+    system.effectTracking = { enabledPassives: { 'racial_secondary_defensive_design_2': false } };
+    const survivor = stats();
+    assert.equal(survivor.life, withPassives.life + 10);
+    assert.equal(survivor.soak, withPassives.soak + 2);
+    assert.equal(survivor.dr, withPassives.dr - 2);
+    assert.equal(survivor.normalSpeed, baseline.normalSpeed);
+    assert.equal(survivor.boostedSpeed, baseline.boostedSpeed);
+    assert.equal(survivor.dodge, baseline.dodge);
+    system.racialTraits = [];
+    assert.deepEqual(stats(), baseline);
+  });
+
   await t.test('unique abilities can be added without a type and a dual type can be changed or cleared', async () => {
     const schema = CONFIG.Actor.dataModels.character.defineSchema();
     const abilityType = schema.uniqueAbilities.definition.definition.abilityType.definition;

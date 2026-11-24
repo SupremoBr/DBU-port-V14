@@ -5,6 +5,7 @@ import { applyCatalogPassives093, racialLife093 } from '../module/rules/runtime-
 import { talentPassiveBonus093, TALENT_PASSIVES_093 } from '../module/rules/talent-passives-v093.mjs';
 import { CATALOGS_093 } from '../module/rules/catalogs-v093.mjs';
 import { racialTrackerTraits093 } from '../module/rules/racial-tracker-v093.mjs';
+import { RACIAL_PASSIVES_093, racialPassiveBonuses093 } from '../module/rules/racial-passives-v093.mjs';
 
 const source = 'system.rules093State.racialResources.';
 function actor(race, selected, resources = {}) {
@@ -24,6 +25,37 @@ function actor(race, selected, resources = {}) {
     }
   };
 }
+
+test('racial stat automation uses only catalogued passives and respects selection and Tier', () => {
+  const traits = new Map(Object.values(CATALOGS_093.racialTraits).flat().map(trait => [trait.id, trait]));
+  for (const [id, rules] of Object.entries(RACIAL_PASSIVES_093)) {
+    const trait = traits.get(id);
+    assert.ok(trait, id);
+    for (const rule of rules) {
+      const levels = trait.effects.filter(effect => effect.level === rule.level);
+      const effects = rule.option
+        ? levels.flatMap(effect => effect.options || []).filter(option => option.name === rule.option)
+        : levels;
+      assert.ok(effects.some(effect => effect.keyword === 'Passive'), `${trait.name} ${rule.level} ${rule.option || ''}`);
+    }
+  }
+  const armor = 'r093_cybernetic_enhancement_armor_plating';
+  const psychic = 'r093_mutation_psychic';
+  const computer = 'r093_cybernetic_enhancement_mental_supercomputer';
+  const heran = 'r093_herans_brigand_combat';
+  const system = {
+    rulesVersion: '0.9.3', racialTraits: [armor, psychic, computer, heran, armor],
+    tracking: { powerStacks: 1 },
+    racialOptionSelections: { [heran]: { 3: 'Riches of Mysticism' } },
+  };
+  const totals = () => racialPassiveBonuses093(system, 3, 2);
+  assert.deepEqual(totals(), { racialLife: 2, dr: 2, in: 3, cognitiveSave: 3 });
+  system.tracking.powerStacks = 2;
+  system.racialOptionSelections[heran][3] = 'Riches of Might';
+  assert.deepEqual(totals(), { racialLife: 5, dr: 2, in: 3, cognitiveSave: 3, sc: 3, pe: 3, might: 3 });
+  system.rulesVersion = '0.9.2';
+  assert.deepEqual(totals(), {});
+});
 
 test('tracker counts each selected combat trait once for the current race and subrace', () => {
   const catalog = CATALOGS_093.racialTraits;

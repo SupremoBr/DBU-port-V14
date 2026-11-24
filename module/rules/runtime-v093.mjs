@@ -2,6 +2,7 @@ import { RACES_093 } from './races-v093.mjs';
 import { CATALOGS_093 } from './catalogs-v093.mjs';
 import { uses093 } from './v093.mjs';
 import { applyTalentPassives093, talentPassiveBonus093 } from './talent-passives-v093.mjs';
+import { racialPassiveBonuses093 } from './racial-passives-v093.mjs';
 
 const racialById = new Map(Object.values(CATALOGS_093.racialTraits).flat().map(t => [t.id, t]));
 const talentById = new Map(CATALOGS_093.talents.map(t => [t.id, t]));
@@ -46,6 +47,7 @@ export function applyRacial093(system, tier, baseTier) {
   system.status.soak += bloodBonus;
   system.aptitudes.surgencyBonus093 = bloodBonus;
   if (bloodBonus) {
+    system.status.surgency = (system.status.surgency || 0) + bloodBonus;
     system.status.healingSurge += '+' + bloodBonus;
     system.status.powerSurgeKi += bloodBonus;
   }
@@ -76,9 +78,14 @@ export function applyCatalogPassives093(system, tier, baseTier, items) {
   applyTalentPassives093(system, tier, baseTier, items);
 }
 
-export function applyRacialAttribute093(system, tier) {
-  if (!uses093(system) || system.race !== 'saiyan' || (system.tracking?.powerStacks || 0) < 2) return;
-  const trait = CATALOGS_093.racialTraits.saiyan.find(t => t.name === 'Powerful Physique');
+export function applyRacialAttribute093(system, tier, bonuses = racialPassiveBonuses093(system, tier, system.baseTier || 1)) {
+  if (!uses093(system)) return;
+  for (const [key, attribute] of Object.entries(system.attributes || {})) {
+    if (!bonuses[key]) continue;
+    attribute.modifier = (attribute.modifier || 0) + bonuses[key];
+    attribute.totalScore = (attribute.score || 0) + attribute.modifier;
+  }
+  if (system.race !== 'saiyan' || (system.tracking?.powerStacks || 0) < 2) return;
   if (!racialEffectEnabled093(system, 'Powerful Physique', 2)) return;
   const force = system.attributes.fo;
   force.modifier += tier; force.totalScore = force.score + force.modifier;

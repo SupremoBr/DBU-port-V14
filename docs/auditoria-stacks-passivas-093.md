@@ -1,6 +1,6 @@
 # Auditoria de recursos raciais e passivas DBU 0.9.3
 
-Auditoria iniciada na alpha.23 e ampliada na alpha.24. Esta auditoria compara os traços, as fichas e o runtime com as fontes arquivadas no ambiente e as páginas oficiais. [Regras centrais](https://dbu-rpg.com/core-rules/) · [Índice de fontes](rules093-sources.json)
+A auditoria compara as regras oficiais com as fichas e os cálculos das versões alpha.23 a alpha.25. [Regras centrais](https://dbu-rpg.com/core-rules/) · [Índice de fontes](rules093-sources.json)
 
 ## Como as automações se conectam
 
@@ -34,6 +34,12 @@ Demais raças do catálogo foram conferidas quanto a recursos raciais próprios 
 - A escolha de gastar Power para usar uma manobra ou acrescentar Condition permanece com a mesa. Diminua o contador após resolver a escolha. A aprovação do ARC também decide a proximidade do Makyo Star e as mudanças de Awakenings.
 - As opções do teste respeitam os limites registrados. Informe a condição causada por **Denizen of the Demon Realm** ao rolar, pois a origem da condição ainda não está registrada de forma uniforme. Use o botão Makyan após usar Power Up para controlar a concessão opcional.
 - Em combate registrado no Foundry, o avanço do turno e o fim do encontro controlam a limpeza automática. Em uma sessão manual, use **Novo turno** na ficha e o controle de novo encontro no rastreador.
+
+## Passivas raciais de atributos na alpha.25
+
+Os bônus de 48 efeitos e opções em 42 traços entram no cálculo quando o traço está selecionado. Psychic aumenta o modificador de Insight e o Cognitive Save. Defensive Design e Armor Plating aumentam Damage Reduction. Life Support aumenta o Racial Life Modifier, Soak e Surgency. Blazing Speed aumenta as duas velocidades e Defense Value. Genetic Agility, de Artificial Warrior, usa a opção salva na ficha. Mental Supercomputer usa os stacks de Power do próprio personagem.
+
+Em efeitos mistos, Damage Inhibitor, Abnormal Anatomy e Synthetic Muscle aplicam a parcela de Damage Reduction. A redução de dano de colisão e os Greater Dice situacionais continuam manuais. Efeitos Twinned exigem saber quais traços a espécie escolheu como primários. Buffs personalizados acrescentados pela mesa são somados aos bônus raciais. [Índice dos bônus implementados](../module/rules/racial-passives-v093.mjs) · [Fontes oficiais](rules093-sources.json)
 
 ## Passivas de talentos
 
