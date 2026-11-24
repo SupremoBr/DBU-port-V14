@@ -463,9 +463,10 @@ export default class DBUCharacterData extends foundry.abstract.TypeDataModel {
 
       // ---- Health thresholds (user-checked) ----
       thresholds: new SchemaField({
-        bruised: new SchemaField({ checked: new BooleanField({ initial: false }) }),
-        injured: new SchemaField({ checked: new BooleanField({ initial: false }) }),
-        critical: new SchemaField({ checked: new BooleanField({ initial: false }) })
+        ...Object.fromEntries(["bruised", "injured", "critical"].map(key => [key, new SchemaField({
+          checked: new BooleanField({ initial: false }),
+          steadfast: new StringField({ initial: "", blank: true })
+        })]))
       }),
 
       // ---- Status (stored user inputs for status section) ----

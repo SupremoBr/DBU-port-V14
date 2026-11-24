@@ -440,7 +440,8 @@ async function dbuApplyDamage(
 
   await sheet._onApplyDamage({
     preventDefault() {},
-    stopPropagation() {}
+    stopPropagation() {},
+    dbuAttackingManeuver: true
   });
 
   // v1.8.0 — Throw / Collision. O DBU 0.9.2 adiciona ao Damage do
@@ -458,7 +459,7 @@ async function dbuApplyDamage(
       const afterCollision = Math.max(0, currentLife - appliedFlatDamage);
       const actualCollision = Math.max(0, currentLife - afterCollision);
       appliedFlatDamage = actualCollision;
-      await defender.update({ "system.lifePoints.value": afterCollision });
+      await defender.update({ "system.lifePoints.value": afterCollision }, { dbuHealthDamage: "effect" });
       await ChatMessage.create({
         speaker: ChatMessage.getSpeaker({ actor: defender }),
         content: `<div class="dbu-attack-roll"><div class="dbu-card-body"><div class="dbu-defend-guide"><b>${String(attack.flatDamageLabel || "Collision")}</b>: ${defender.name} perde <b>${actualCollision} LP</b>${multiplier !== 1 ? ` (multiplicador de Collision ×${multiplier})` : ""}.</div></div></div>`

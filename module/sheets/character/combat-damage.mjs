@@ -1,3 +1,4 @@
+import { uses093 } from "../../rules/v093.mjs";
 import { Dialog } from "../../helpers/foundry-compat.mjs";
 
 /** Character sheet domain: combat-damage. Methods run with the sheet as this. */
@@ -510,6 +511,7 @@ export const combatDamageMethods = {
     let thresholdsCrossed = 0;
     const crossedNames = [];
     for (const t of thresholdValues) {
+      if (uses093(system) && system._minionThresholdsNA && t.name !== "Injured") continue;
       if (currentLP > t.value && newLP <= t.value) {
         thresholdsCrossed++;
         crossedNames.push(t.name);
@@ -825,7 +827,7 @@ export const combatDamageMethods = {
       updates["system.damageCalc.guardPaidViaCard"] = false;
     }
 
-    await this.actor.update(updates);
+    await this.actor.update(updates, { dbuHealthDamage: event.dbuAttackingManeuver ? "attack" : "effect" });
 
     // --- Damage applied: public chat card + LP remaining whisper (GM/owner) ---
     {

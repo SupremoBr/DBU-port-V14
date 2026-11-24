@@ -362,6 +362,8 @@ export function registerConfig() {
       { id: "concealment", name: "Concealment", attribute: "in", ranks: 0 },
       { id: "crafting", name: "Craft", attribute: "sc", ranks: 0 },
       { id: "creature_handling", name: "Creature Handling", attribute: "in", ranks: 0 },
+      { id: "cooking", name: "Cooking", attribute: "pe", ranks: 0 },
+      { id: "flight", name: "Flight", attribute: "ag", ranks: 0, required093: true },
       { id: "empathy", name: "Intuition", attribute: "in", ranks: 0 },
       { id: "intimidation", name: "Intimidation", attribute: "pe", ranks: 2 },
       { id: "investigation", name: "Investigation", attribute: "sc", ranks: 0 },
@@ -370,19 +372,11 @@ export function registerConfig() {
       { id: "perception", name: "Perception", attribute: "in", ranks: 2 },
       { id: "performance", name: "Performance", attribute: "pe", ranks: 0 },
       { id: "persuasion", name: "Persuasion", attribute: "pe", ranks: 1 },
-      { id: "piloting", name: "Pilot", attribute: "ag", ranks: 0 },
+      { id: "piloting", name: "Pilot", attribute: "in", ranks: 0, required093: true },
       { id: "sleight_of_hand", name: "Thievery", attribute: "ag", ranks: 0 },
       { id: "stealth", name: "Stealth", attribute: "ag", ranks: 1 },
       { id: "survival", name: "Survival", attribute: "in", ranks: 1 },
       { id: "use_magic", name: "Use Magic", attribute: "ma", ranks: 0 }
-    ],
-
-    // ==================== AVAILABLE SKILLS (for dropdowns) ====================
-    availableSkills: [
-      "Acrobatics", "Bluff", "Clairvoyance", "Concealment",
-      "Craft", "Creature Handling", "Intuition", "Intimidation", "Investigation",
-      "Knowledge", "Medicine", "Perception", "Performance", "Persuasion", "Pilot",
-      "Thievery", "Stealth", "Survival", "Use Magic"
     ],
 
     // ==================== TECHNIQUE TYPES ====================
@@ -1023,7 +1017,7 @@ export function registerConfig() {
       "Hype Maneuver", "Analysis Maneuver (Investigation)", "Analysis Maneuver (Intuition)",
       // Skills
       "Agility Skills", "Force Skills", "Scholarship Skills", "Insight Skills", "Magic Skills", "Personality Skills",
-      "Acrobatics", "Bluff", "Clairvoyance", "Concealment", "Craft", "Creature Handling",
+      "Acrobatics", "Bluff", "Clairvoyance", "Concealment", "Cooking", "Craft", "Creature Handling", "Flight",
       "Intimidation", "Intuition", "Investigation", "Knowledge", "Medicine", "Perception",
       "Performance", "Persuasion", "Pilot", "Stealth", "Survival", "Thievery", "Use Magic",
       // States & Dice
@@ -1704,4 +1698,5 @@ export function registerConfig() {
     }
 
   }; // end CONFIG.DBU
+  CONFIG.DBU.availableSkills = CONFIG.DBU.skillsData.map(skill => skill.name);
 }

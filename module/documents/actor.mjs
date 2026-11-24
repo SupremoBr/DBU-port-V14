@@ -1,3 +1,4 @@
+import { healthThresholdChanges093, pendingSteadfast093 } from "../rules/health-thresholds-v093.mjs";
 import { awakeningAMB, limitedMartialPower, martialDie, martialLevel, martialResourcePenalty, martialSkillSlots, progressionRowIsEarned, usesPathToPower } from "../rules/path-to-power-v093.mjs";
 import { applyConditionalCustomBuffs, buffAmount, buffEffectKey, conditionalBuff, linkedCatalogBuffs } from "../helpers/custom-buffs.mjs";
 import { uses093 } from "../rules/v093.mjs";
@@ -36,6 +37,41 @@ import { applyBestialTraitBonuses } from "../racial-automation/bestial-traits.mj
 import { applyCyberneticTraitBonuses, getActiveCyberneticTraits, getCyberneticAttrBonus } from "../racial-automation/cybernetic-traits.mjs";
 
 export class DBUActor extends Actor {
+
+  /** @override */
+  async _preUpdate(changes, options, user) {
+    const allowed = await super._preUpdate(changes, options, user);
+    if (allowed === false || this.type !== "character" || !uses093(this.system)) return allowed;
+    const resolution = options.dbuSteadfast;
+    if (resolution) {
+      const threshold = this.system.thresholds[resolution.key];
+      if (!threshold?.crossed || threshold.steadfast !== resolution.pending) return false;
+    }
+
+    const nextLP = changes.system?.lifePoints?.value ?? changes["system.lifePoints.value"];
+    if (!Number.isFinite(nextLP) || nextLP === this.system.lifePoints.value) return allowed;
+    const eventId = foundry.utils.randomID();
+    const thresholds = healthThresholdChanges093(this.system, nextLP, options.dbuHealthDamage, eventId);
+    for (const [key, fields] of Object.entries(thresholds)) {
+      for (const [field, value] of Object.entries(fields)) {
+        const path = `system.thresholds.${key}.${field}`;
+        const explicit = changes[path] ?? changes.system?.thresholds?.[key]?.[field];
+        if (explicit !== undefined && explicit !== this.system.thresholds[key][field]) continue;
+        if (Object.hasOwn(changes, path)) changes[path] = value;
+        else foundry.utils.setProperty(changes, path, value);
+      }
+    }
+    const damageLog = changes.system?.combatTabState?.damageLog ?? changes["system.combatTabState.damageLog"];
+    const entry = damageLog?.at(-1);
+    if (options.dbuHealthDamage && entry && Object.keys(thresholds).length) {
+      entry.steadfastEvent = eventId;
+      entry.steadfastResults = Object.entries(thresholds)
+        .filter(([, row]) => row.checked || row.steadfast === "automatic")
+        .map(([key, row]) => ({ threshold: key, passed: row.checked, autoFail: !row.checked }));
+    }
+    return allowed;
+  }
+
 
   /** @override */
   prepareDerivedData() {
@@ -280,6 +316,11 @@ export class DBUActor extends Actor {
     this._calculateSavingThrows(system, tier, racialBonuses);
 
     // ---- Health Thresholds ----
+    if (uses093(system) && system.adversary?.enabled) {
+      if (system.adversary.category === "villain") system.lifePoints.max += 4 * level;
+      if (system.adversary.category === "superior") system.lifePoints.max += 2 * level;
+      if (system.adversary.category === "mook") system.lifePoints.max = Math.floor(system.lifePoints.max / 4);
+    }
     this._calculateThresholds(system, tier, baseTier);
 
     // ---- Combat Stats (size-dependent) ----
@@ -1437,12 +1478,12 @@ export class DBUActor extends Actor {
       system.thresholds.critical.crossed = false;
     }
 
-    // Penalties: crossed thresholds that have NOT been saved (checked = saved, no penalty).
-    // Rules: "reduce your Combat Rolls by 1(bT) and your Stress Bonus by 1" (damage-conditions.txt)
     let penaltyCount = 0;
-    if (system.thresholds.bruised.crossed && !system.thresholds.bruised.checked) penaltyCount++;
-    if (system.thresholds.injured.crossed && !system.thresholds.injured.checked) penaltyCount++;
-    if (system.thresholds.critical.crossed && !system.thresholds.critical.checked) penaltyCount++;
+    for (const key of ["bruised", "injured", "critical"]) {
+      const row = system.thresholds[key];
+      row.pending = uses093(system) && row.crossed && pendingSteadfast093(row);
+      if (row.crossed && !row.checked && !row.pending) penaltyCount++;
+    }
     const poisonMult = this._isConditionActive(system, "poisoned") ? 2 : 1;
     system.thresholds.penalties = penaltyCount * baseTier * poisonMult;
     system.thresholds.stressPenalty = penaltyCount * poisonMult;
@@ -3279,15 +3320,15 @@ export class DBUActor extends Actor {
     // ---- Adversary Category: LP/KP modifications ----
     switch (adv.category) {
       case "villain":
-        system.lifePoints.max += 4 * pl;
+        if (!uses093(system)) system.lifePoints.max += 4 * pl;
         system.kiPool.max += 4 * pl;
         break;
       case "superior":
-        system.lifePoints.max += 2 * pl;
+        if (!uses093(system)) system.lifePoints.max += 2 * pl;
         system.kiPool.max += 2 * pl;
         break;
       case "mook":
-        system.lifePoints.max = Math.floor(system.lifePoints.max / 4);
+        if (!uses093(system)) system.lifePoints.max = Math.floor(system.lifePoints.max / 4);
         system.kiPool.max = Math.floor(system.kiPool.max / 2);
         break;
       // "standard" = no change

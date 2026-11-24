@@ -922,20 +922,20 @@
             <div class="dmg-threshold {{#if system._minionThresholdsNA}}threshold-na{{/if}} {{#if system.thresholds.bruised.crossed}}threshold-crossed{{/if}} {{#if system.thresholds.bruised.checked}}threshold-saved{{/if}}" data-threshold="bruised" {{#if system._minionThresholdsNA}}title="Minions only possess the Healthy and Injured Health Thresholds"{{/if}}>
               <span class="threshold-label">Bruised</span>
               <span class="threshold-value">{{#if system._minionThresholdsNA}}N/A{{else}}{{system.thresholds.bruised.value}}{{/if}}</span>
-              <span class="threshold-status">{{#if system._minionThresholdsNA}}--{{else}}{{#if system.thresholds.bruised.crossed}}{{#if system.thresholds.bruised.checked}}SAVED{{else}}FAILED{{/if}}{{else}}--{{/if}}{{/if}}</span>
-              {{#unless system._minionThresholdsNA}}<input type="checkbox" name="system.thresholds.bruised.checked" {{checked system.thresholds.bruised.checked}} class="threshold-check" title="Check = saved (no penalty)" />{{/unless}}
+              <span class="threshold-status">{{#if system._minionThresholdsNA}}--{{else}}{{#if system.thresholds.bruised.crossed}}{{#if system.thresholds.bruised.pending}}PENDENTE{{else}}{{#if system.thresholds.bruised.checked}}SAVED{{else}}FAILED{{/if}}{{/if}}{{else}}--{{/if}}{{/if}}</span>
+              {{#unless system._minionThresholdsNA}}{{#if system.thresholds.bruised.pending}}{{#if editable}}<button type="button" data-rules093-steadfast="bruised" aria-label="Resolver Steadfast de Bruised">Steadfast</button>{{/if}}{{else}}<input type="checkbox" name="system.thresholds.bruised.checked" {{checked system.thresholds.bruised.checked}} class="threshold-check" title="Check = saved (no penalty)" />{{/if}}{{/unless}}
             </div>
             <div class="dmg-threshold {{#if system.thresholds.injured.crossed}}threshold-crossed{{/if}} {{#if system.thresholds.injured.checked}}threshold-saved{{/if}}" data-threshold="injured">
               <span class="threshold-label">Injured</span>
               <span class="threshold-value">{{system.thresholds.injured.value}}</span>
-              <span class="threshold-status">{{#if system.thresholds.injured.crossed}}{{#if system.thresholds.injured.checked}}SAVED{{else}}FAILED{{/if}}{{else}}--{{/if}}</span>
-              <input type="checkbox" name="system.thresholds.injured.checked" {{checked system.thresholds.injured.checked}} class="threshold-check" title="Check = saved (no penalty)" />
+              <span class="threshold-status">{{#if system.thresholds.injured.crossed}}{{#if system.thresholds.injured.pending}}PENDENTE{{else}}{{#if system.thresholds.injured.checked}}SAVED{{else}}FAILED{{/if}}{{/if}}{{else}}--{{/if}}</span>
+              {{#if system.thresholds.injured.pending}}{{#if editable}}<button type="button" data-rules093-steadfast="injured" aria-label="Resolver Steadfast de Injured">Steadfast</button>{{/if}}{{else}}<input type="checkbox" name="system.thresholds.injured.checked" {{checked system.thresholds.injured.checked}} class="threshold-check" title="Check = saved (no penalty)" />{{/if}}
             </div>
             <div class="dmg-threshold {{#if system._minionThresholdsNA}}threshold-na{{/if}} {{#if system.thresholds.critical.crossed}}threshold-crossed{{/if}} {{#if system.thresholds.critical.checked}}threshold-saved{{/if}}" data-threshold="critical" {{#if system._minionThresholdsNA}}title="Minions only possess the Healthy and Injured Health Thresholds"{{/if}}>
               <span class="threshold-label">Critical</span>
               <span class="threshold-value">{{#if system._minionThresholdsNA}}N/A{{else}}{{system.thresholds.critical.value}}{{/if}}</span>
-              <span class="threshold-status">{{#if system._minionThresholdsNA}}--{{else}}{{#if system.thresholds.critical.crossed}}{{#if system.thresholds.critical.checked}}SAVED{{else}}FAILED{{/if}}{{else}}--{{/if}}{{/if}}</span>
-              {{#unless system._minionThresholdsNA}}<input type="checkbox" name="system.thresholds.critical.checked" {{checked system.thresholds.critical.checked}} class="threshold-check" title="Check = saved (no penalty)" />{{/unless}}
+              <span class="threshold-status">{{#if system._minionThresholdsNA}}--{{else}}{{#if system.thresholds.critical.crossed}}{{#if system.thresholds.critical.pending}}PENDENTE{{else}}{{#if system.thresholds.critical.checked}}SAVED{{else}}FAILED{{/if}}{{/if}}{{else}}--{{/if}}{{/if}}</span>
+              {{#unless system._minionThresholdsNA}}{{#if system.thresholds.critical.pending}}{{#if editable}}<button type="button" data-rules093-steadfast="critical" aria-label="Resolver Steadfast de Critical">Steadfast</button>{{/if}}{{else}}<input type="checkbox" name="system.thresholds.critical.checked" {{checked system.thresholds.critical.checked}} class="threshold-check" title="Check = saved (no penalty)" />{{/if}}{{/unless}}
             </div>
           </div>
           <div class="dmg-penalties-row">

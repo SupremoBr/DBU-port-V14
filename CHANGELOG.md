@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.0.12-rules093-alpha.27] — limiares de saúde e perícias
+
+- A ficha registra Steadfast pendente ao cruzar um limiar de saúde. Combat permite rolar ou registrar o resultado, e o HUD indica a pendência.
+- A cura acima do limiar limpa o resultado anterior. Dano maciço com origem conhecida aplica as falhas automáticas pertinentes. O Stress Test segue assistido.
+- Flight e Cooking entram no catálogo e na progressão. Pilot usa Insight e preserva os ranks salvos.
+
 ## [1.0.12-rules093-alpha.26] — auditoria dos Demônios e Pressure no HUD
 
 - Demonic Resilience concede +2(T) de redução de dano por sucesso defensivo, até +4(T), com duração até o início do próximo turno.

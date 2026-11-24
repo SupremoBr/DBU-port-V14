@@ -524,7 +524,7 @@ async function applyPreparedDamage(actor, attack, {
   const predicted = Math.max(0, Number(actor.system.damageCalc?.healthReduction || 0));
 
   try {
-    await sheet._onApplyDamage({ preventDefault() {}, stopPropagation() {} });
+    await sheet._onApplyDamage({ preventDefault() {}, stopPropagation() {}, dbuAttackingManeuver: true });
   } finally {
     // Extra DR da Defense Wall vale somente para este Attacking Maneuver.
     try {

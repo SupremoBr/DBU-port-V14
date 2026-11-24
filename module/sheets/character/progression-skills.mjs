@@ -339,6 +339,10 @@ export const progressionSkillsMethods = {
     const skillDef = (CONFIG.DBU?.skillsData || []).find(s => s.id === skillKey);
     const skillName = (skillDef?.name || skillKey) + (specialty ? `: ${specialty}` : "");
     const bd = this._calcSkillBreakdown(skillKey, specialty);
+    if (uses093(this.actor.system) && skillDef?.required093 && bd.rankNum < 1) {
+      ui.notifications.warn(`${skillDef.name}: falha automática sem pelo menos 1 rank.`);
+      return;
+    }
     const attrKey = bd.attrKey;
     let bonus = bd.total;
     let breakdownParts = bd.parts;

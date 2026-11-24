@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 test('the real system init installs the current catalogs, schema, sheet adapter and migration before ready',async t=>{
   const hooks=new Map(), events=[], callbacks=new Map();
   globalThis.Hooks={once(name,fn){hooks.set(name,fn);return name;},on(name,fn){events.push(name);callbacks.set(name,fn);return name;}};
-  globalThis.Actor=class{}; globalThis.Item=class{}; globalThis.Combat=class{};
+  globalThis.Actor=class { async _preUpdate() {} }; globalThis.Item=class{}; globalThis.Combat=class{};
   globalThis.ActorSheet=class{ activateListeners() {} }; globalThis.ItemSheet=class{};
   let selectedAbility;
   globalThis.Dialog=class{ static async prompt() { return selectedAbility; } };
@@ -131,6 +131,7 @@ test('the real system init installs the current catalogs, schema, sheet adapter 
     const { damageReduction: dr, soak, might } = system.status;
     const { defenseValue: defense, woundBuffTotal: wound } = system.aptitudes;
     const score = system.attributes.fo.score, save = system.savingThrows.cognitive.bonus;
+    const baselinePenalty = system.thresholds.penalties;
     system.lifePoints.value = Math.floor(system.lifePoints.max / 4);
     Object.assign(system.rules093State.racialResources, { demonicPower: 2, demonicFatigue: 1, resilienceActive: true });
     system.conditions = [{ id: 'prone', active: true, stacks: 1 }];
@@ -141,7 +142,7 @@ test('the real system init installs the current catalogs, schema, sheet adapter 
     assert.equal(system.status.might, might + 2);
     assert.equal(system.attributes.fo.score, score);
     assert.equal(system.aptitudes.defenseValue, Math.floor((defense - 2) / 2));
-    assert.equal(system.aptitudes.woundBuffTotal, wound + 8 - system.thresholds.penalties);
+    assert.equal(system.aptitudes.woundBuffTotal, wound + 8 - (system.thresholds.penalties - baselinePenalty));
     system.lifePoints.value++;
     system.rules093State.racialResources.demonicFatigue = 40;
     system.conditions = [{ id: 'broken', active: true, stacks: 3 }];
@@ -178,6 +179,73 @@ test('the real system init installs the current catalogs, schema, sheet adapter 
       assert.equal(system.status.damageReduction, dr + extraDR, id);
       assert.equal(system.status.surgency, baseSurgency + recovery, id);
     }
+  });
+
+  await t.test('HP updates persist one current Steadfast and clear old results on recovery', async () => {
+    const system = Object.assign(new CharacterModel(), initial(CharacterModel.defineSchema()), {
+      race: 'demon', rulesVersion: '0.9.3',
+    });
+    const actor = Object.assign(new CONFIG.Actor.documentClass(), { system, type: 'character', items: [] });
+    let counter = 0;
+    foundry.utils.randomID = () => 'hit' + ++counter;
+    foundry.utils.setProperty = (object, path, value) => {
+      const keys = path.split('.');
+      const last = keys.pop();
+      const container = keys.reduce((data, key) => data[key] ??= {}, object);
+      container[last] = value;
+    };
+    const prepare = () => { system.prepareDerivedData(); actor._prepareCharacterData(system); };
+    system.lifePoints.value = 100;
+    prepare();
+    const update = async (value, damage) => {
+      const changes = { system: { lifePoints: { value }, combatTabState: { damageLog: [{}] } } };
+      await actor._preUpdate(changes, { dbuHealthDamage: damage });
+      system.lifePoints.value = value;
+      for (const [key, fields] of Object.entries(changes.system.thresholds || {})) Object.assign(system.thresholds[key], fields);
+      prepare();
+      return changes.system.combatTabState.damageLog[0];
+    };
+
+    const injured = system.thresholds.injured.value;
+    const injury = await update(injured, 'attack');
+    assert.equal(system.thresholds.bruised.steadfast, 'automatic');
+    assert.equal(system.thresholds.injured.steadfast, 'massive:hit1');
+    assert.equal(system.thresholds.injured.pending, true);
+    assert.equal(system.thresholds.penalties, system.baseTier);
+    assert.deepEqual(injury.steadfastResults, [{ threshold: 'bruised', passed: false, autoFail: true }]);
+    assert.equal(await actor._preUpdate({}, { dbuSteadfast: { key: 'injured', pending: 'old' } }), false);
+
+    system.thresholds.injured.checked = true;
+    system.thresholds.injured.steadfast = '';
+    await update(injured + 1);
+    assert.equal(system.thresholds.injured.checked, false);
+    assert.equal(system.thresholds.bruised.steadfast, 'automatic');
+    await update(injured);
+    assert.equal(system.thresholds.injured.steadfast, 'pending:hit3');
+    await update(100);
+    await update(0, 'attack');
+    assert.equal(system.thresholds.injured.steadfast, 'automatic');
+    assert.equal(system.thresholds.critical.pending, false);
+  });
+
+  await t.test('Flight and Cooking reach progression and Pilot uses Insight with the existing ranks', async () => {
+    const { progressionSkillsMethods } = await import('../module/sheets/character/progression-skills.mjs');
+    const system = { rulesVersion: '0.9.3', skills: { piloting: { rank: 2 } }, attributes: {
+      in: { score: 8 }, ag: { score: 2 }, pe: { score: 4 }
+    } };
+    const sheet = { actor: { system, _getBuffTotal: () => 0 }, ...progressionSkillsMethods };
+    for (const [id, name, attribute, rank] of [
+      ['flight', 'Flight', 'ag', 0], ['cooking', 'Cooking', 'pe', 0], ['piloting', 'Pilot', 'in', 2]
+    ]) {
+      assert.ok(CONFIG.DBU.availableSkills.includes(name));
+      const skill = sheet._calcSkillBreakdown(id);
+      assert.equal(skill.attrKey, attribute);
+      assert.equal(skill.rankNum, rank);
+    }
+    let warning;
+    globalThis.ui = { notifications: { warn(message) { warning = message; } } };
+    await sheet._onRollSkill({ preventDefault() {}, currentTarget: { dataset: { skill: 'flight', skillKey: 'flight' } } });
+    assert.match(warning, /Flight.*rank/);
   });
 
   await t.test('unique abilities can be added without a type and a dual type can be changed or cleared', async () => {

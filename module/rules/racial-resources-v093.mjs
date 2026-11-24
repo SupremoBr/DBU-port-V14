@@ -112,7 +112,7 @@ function pressureAvailable(actor, source, combat) {
 const healthThresholds = ['bruised', 'injured', 'critical'];
 function failedThreshold(system, key) {
   const threshold = system.thresholds?.[key];
-  return healthThresholds.includes(key) && threshold?.crossed && !threshold.checked;
+  return healthThresholds.includes(key) && threshold?.crossed && !threshold.checked && !threshold.steadfast;
 }
 
 export async function promptPressureCheck093(actor, source, combat = globalThis.game?.combat) {

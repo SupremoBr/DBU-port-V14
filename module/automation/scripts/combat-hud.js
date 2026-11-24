@@ -421,6 +421,7 @@ function hudContent(actor, token) {
   const grapple = safeCall(() => StandardActions.getGrappleState(actor), null, "Grapple state");
   const powerStacks = Math.max(0, number(actor.system?.tracking?.powerStacks, 0));
   const pressure = racialResourceView093(actor);
+  const pendingSteadfast = Object.values(actor.system?.thresholds || {}).some(threshold => threshold?.pending);
   const pressureActions = [
     { visible: pressure.hasAttackCheck, source: "attack", label: "Pressure Ataque", icon: "fist-raised",
       available: pressure.canAttack, title: `Após atacar no próprio turno · ${pressure.attackChecks}/3 nesta rodada` },
@@ -479,6 +480,7 @@ function hudContent(actor, token) {
         <span title="Demonic Fatigue"><i class="fas fa-hourglass-half" aria-hidden="true"></i> Fatigue <b>${pressure.fatigue}</b></span>
       </div>` : ""}
       <div class="dbua-v2-vital-tags">
+        ${pendingSteadfast ? `<span title="Resolva em Combat na ficha"><i class="fas fa-dice-d10" aria-hidden="true"></i>Steadfast pendente</span>` : ""}
         <span title="Transformation"><i class="fas fa-dragon"></i>${esc(activeForm)}</span>
         <span title="Signature Aura"><i class="fas fa-sun"></i>${esc(aura)}</span>
         ${charge?`<span title="Energy Charge"><i class="fas fa-bolt"></i>${esc(number(charge.gatheredCharges,0))} EC</span>`:""}

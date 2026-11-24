@@ -605,7 +605,7 @@ export const combatDataMethods = {
           cls: sr.passed ? "passed" : "failed",
           icon: sr.passed ? "check" : "times",
           initial: (sr.threshold || "?").charAt(0).toUpperCase(),
-          rollText: sr.autoFail ? "auto" : String(sr.roll)
+          rollText: sr.autoFail || sr.roll == null ? "auto" : String(sr.roll)
         }))
       };
     });
