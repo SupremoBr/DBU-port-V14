@@ -134,12 +134,18 @@ export async function migrateWorld093(game, { Journal = globalThis.JournalEntry 
   }
   const converted = new Set(state.converted || []);
   const migrateDocument = async (doc, plan) => {
-    if (!plan || converted.has(doc.uuid)) return;
-    const flags = copy(doc.toObject(true).flags || {});
-    flags[SYSTEM_ID] = { ...(flags[SYSTEM_ID] || {}), rules093Review: { backupId: backup.id, issues: plan.issues } };
-    await doc.update({ system: plan.system, flags, ...(plan.name ? { name: plan.name } : {}) }, { diff: false, recursive: false });
+    if (converted.has(doc.uuid)) return;
+    const review = doc.getFlag(SYSTEM_ID, 'rules093Review');
+    const applied = review?.backupId === backup.id;
+    if (!plan && !applied) return;
+    const issues = applied ? review.issues : plan.issues;
+    if (!applied) {
+      const flags = copy(doc.toObject(true).flags || {});
+      flags[SYSTEM_ID] = { ...(flags[SYSTEM_ID] || {}), rules093Review: { backupId: backup.id, issues } };
+      await doc.update({ system: plan.system, flags, ...(plan.name ? { name: plan.name } : {}) }, { diff: false, recursive: false, dbuRulesMigration: true });
+    }
     converted.add(doc.uuid);
-    state = { ...state, converted: [...converted], reports: [...(state.reports || []), { uuid: doc.uuid, issues: plan.issues.length }] };
+    state = { ...state, converted: [...converted], reports: [...(state.reports || []), { uuid: doc.uuid, issues: issues.length }] };
     await game.settings.set(SYSTEM_ID, MIGRATION_KEY, state);
   };
   for (const actor of collectMigrationActors(game)) {

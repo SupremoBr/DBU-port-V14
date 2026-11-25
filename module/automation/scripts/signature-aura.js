@@ -1,3 +1,4 @@
+import { listenRequests, sendRequest } from "./core/authorized-request.js";
 import { AUTOMATION_SOCKET, readAutomationFlag } from "../package.mjs";
 import { getSignatureAuraVisualSettings } from "./visual-config.js";
 import { renderActionWindow, ACTION_WINDOW_DIALOG_OPTIONS } from "./ui/action-windows.js";
@@ -816,7 +817,7 @@ export function initializeSignatureAuraAutomation() {
     try { Hooks.off("updateCombat", previous.combatHookId); } catch {}
   }
   if (previous?.socketHandler) {
-    try { game.socket?.off?.(SOCKET, previous.socketHandler); } catch {}
+    try { Hooks.off("createChatMessage", previous.socketHandler); } catch {}
   }
 
   const state = {
@@ -826,7 +827,8 @@ export function initializeSignatureAuraAutomation() {
     pending: auraRuntime.pending
   };
 
-  const socketHandler = async data => {
+  const socketHandler = async (data, sender) => {
+    if (!sender?.isGM) return;
     if (!data || data.type !== "dbuaAuraMaintenance") return;
     if (data.targetUserId !== game.user?.id || game.user?.isGM) return;
 
@@ -845,7 +847,7 @@ export function initializeSignatureAuraAutomation() {
     await maintainAuraAtTurnStart(combat, { forceLocal: true });
   };
 
-  game.socket?.on?.(SOCKET, socketHandler);
+  state.socketHandler = listenRequests("aura-maintenance", socketHandler);
 
   const hookId = Hooks.on("updateCombat", async (combat, changes) => {
     const turnChanged = Object.prototype.hasOwnProperty.call(changes, "turn");
@@ -859,7 +861,7 @@ export function initializeSignatureAuraAutomation() {
 
     const owner = preferredPlayerOwner(actor);
     if (owner) {
-      game.socket?.emit?.(SOCKET, {
+      await sendRequest("aura-maintenance", {
         type: "dbuaAuraMaintenance",
         targetUserId: owner.id,
         actorId: actor.id,
@@ -867,7 +869,7 @@ export function initializeSignatureAuraAutomation() {
         combatId: combat.id,
         round: Number(combat.round || 0),
         turn: Number(combat.turn ?? -1)
-      });
+      }, owner.id);
       return;
     }
 
@@ -876,7 +878,6 @@ export function initializeSignatureAuraAutomation() {
   });
 
   state.combatHookId = hookId;
-  state.socketHandler = socketHandler;
   globalThis.DBU_AURA_AUTOMATION = state;
 
   console.log("DBU Automation | Signature Aura v1.9.1 pronta", {

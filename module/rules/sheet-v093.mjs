@@ -1,3 +1,4 @@
+import { sendRequest, listenRequests } from "../automation/scripts/core/authorized-request.js";
 import { attackWeapon093 } from '../helpers/weapon-state.mjs';
 import { applyCatalogDescriptions, editCatalogDescription } from './catalog-descriptions.mjs';
 import { SUPER_PROFILES_093 } from "./super-profiles-v093.mjs";
@@ -8,7 +9,7 @@ import { CATALOGS_093 } from './catalogs-v093.mjs';
 import { uses093, awakeningLimits, validateTransformationStack, fullAwakeningRecovery, stackedStressRequirement } from './v093.mjs';
 import { roundPools093, convertStandardToCounter093, isOwnTurn093, inCombat093, rowActionType093, rowCost093 } from './actions-v093.mjs';
 import { validateTechnique093, validateTechniqueUsage093, signatureUseIssue093, maximumWager093 } from './techniques-v093.mjs';
-import { adjustRacialResource093, racialEncounterReset093, racialResourceView093, racialTurnReset093, promptPressureCheck093, rollPhantomSteadfast093, useMakyanPower093 } from './racial-resources-v093.mjs';
+import { roundKey, resolutionOwner, rollPressure093, adjustRacialResource093, racialEncounterReset093, racialResourceView093, racialTurnReset093, promptPressureCheck093, rollPhantomSteadfast093, useMakyanPower093 } from './racial-resources-v093.mjs';
 import { editAttackGrant093 } from './attack-grants-v093.mjs';
 import { pendingSteadfast093 } from './health-thresholds-v093.mjs';
 import { racialTrackerTraits093 } from './racial-tracker-v093.mjs';
@@ -16,6 +17,102 @@ const installed = new WeakSet();
 const resolvingSteadfast = new WeakSet();
 const warn = message => { ui.notifications.warn(message); return false; };
 const escape = text => String(text ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+async function resolveSteadfast(actor, key, pending, choice) {
+  const system = actor.system;
+  const bonus = (system.aptitudes?.steadfastBonus || 0)
+    + (system.talentBonuses?.totals?.steadfast || 0) + (system.legendaryTraitBonuses?.totals?.steadfast || 0);
+  const roll = choice === 'roll' ? await new Roll('1d10 + @bonus', { bonus }).evaluate() : null;
+  const passed = roll ? roll.total >= 6 : choice === 'success';
+  const updates = {
+    [`system.thresholds.${key}.checked`]: passed,
+    [`system.thresholds.${key}.steadfast`]: ''
+  };
+  const log = actor.system.combatTabState?.damageLog || [];
+  const eventId = pending.split(':')[1];
+  const index = log.findIndex(entry => entry?.steadfastEvent === eventId);
+  if (index >= 0) {
+    const entries = structuredClone(log);
+    entries[index].steadfastResults.push({ threshold: key, passed, roll: roll?.total ?? 'manual' });
+    updates['system.combatTabState.damageLog'] = entries;
+  }
+  const updated = await actor.update(updates, { dbuSteadfast: { key, pending } });
+  if (!updated || actor.system.thresholds[key].steadfast === pending) return;
+  if (roll) await roll.toMessage({ speaker: ChatMessage.getSpeaker({ actor }), flavor: `Steadfast · ${key} · ${passed ? 'Sucesso' : 'Falha'}` });
+  if ((pending.startsWith('massive:') || !passed) && actor.system.transformationRules?.combinedStressTest > 0) {
+    ui.notifications.info('Se estiver em Form ou Enhancement, confira o Stress Test na aba Transformations.');
+  }
+}
+
+async function promptSteadfast(actor, key) {
+  if (!['bruised', 'injured', 'critical'].includes(key) || resolvingSteadfast.has(actor)) return;
+  const threshold = actor.system.thresholds[key];
+  if (!threshold.crossed || !pendingSteadfast093(threshold)) return;
+  const pending = threshold.steadfast;
+  const review = pending.startsWith('review:');
+  resolvingSteadfast.add(actor);
+  try {
+    const choice = await Dialog.wait({
+      title: `Steadfast · ${key}`,
+      content: review
+        ? '<p>Confirme a causa da perda de LP e registre o resultado resolvido na mesa.</p>'
+        : '<p>Role 1d10 contra 6+. Registre o resultado manualmente se houver um modificador ou efeito especial.</p>',
+      buttons: {
+        ...(!review ? { roll: { label: 'Rolar', callback: () => 'roll' } } : {}),
+        success: { label: 'Registrar sucesso', callback: () => 'success' },
+        failure: { label: 'Registrar falha', callback: () => 'failure' },
+        cancel: { label: 'Cancelar', callback: () => null }
+      },
+      close: () => null
+    }, { classes: ['dbu-old', 'sheet', 'dbua-system-dialog'], width: 420 });
+    if (!choice || actor.system.thresholds[key].steadfast !== pending) return;
+    const owner = resolutionOwner(actor);
+    if (owner && owner.id !== game.user.id) {
+      await sendRequest("racial-resolution", { kind: "steadfast", actorUuid: actor.uuid, key, pending, choice }, owner.id);
+    } else await resolveSteadfast(actor, key, pending, choice);
+  } finally {
+    resolvingSteadfast.delete(actor);
+  }
+}
+
+export function registerRacialRequests() {
+  const queues = new WeakMap();
+  const prompted = new WeakMap();
+  Hooks.on("updateActor", (actor, changes, options) => {
+    if (!options?.dbuHealthDamage || !uses093(actor.system) || resolutionOwner(actor)?.id !== game.user.id) return;
+    const markers = prompted.get(actor) || {};
+    prompted.set(actor, markers);
+    const pending = ["bruised", "injured", "critical"].map(key => [key,
+      changes.system?.thresholds?.[key]?.steadfast ?? changes[`system.thresholds.${key}.steadfast`]
+    ]).filter(([key, marker]) => typeof marker === "string" && marker.includes(":") && markers[key] !== marker);
+    for (const [key, marker] of pending) markers[key] = marker;
+    if (!pending.length) return;
+    const next = (queues.get(actor) || Promise.resolve()).then(async () => {
+      for (const [key, marker] of pending) {
+        if (actor.system.thresholds[key].steadfast === marker) await promptSteadfast(actor, key);
+      }
+    }).catch(error => ui.notifications.error(error.message));
+    queues.set(actor, next);
+  });
+  listenRequests("racial-resolution", async (data, sender) => {
+    if (typeof data.actorUuid !== "string") return;
+    const actor = await fromUuid(data.actorUuid);
+    if (actor?.documentName !== "Actor" || resolutionOwner(actor)?.id !== game.user.id ||
+        (!sender.isGM && !actor.testUserPermission(sender, "OWNER"))) return;
+    if (data.kind === "pressure") {
+      if (data.round !== roundKey(actor, game.combat) || data.turn !== (game.combat?.turn ?? null)) return;
+      await rollPressure093(actor, data.source, data.options || {}, game.combat);
+      return;
+    }
+    if (data.kind !== "steadfast" || !["bruised","injured","critical"].includes(data.key) ||
+        !["roll","success","failure"].includes(data.choice) || resolvingSteadfast.has(actor)) return;
+    const threshold = actor.system.thresholds[data.key];
+    if (!threshold.crossed || !pendingSteadfast093(threshold) || threshold.steadfast !== data.pending) return;
+    resolvingSteadfast.add(actor);
+    try { await resolveSteadfast(actor, data.key, data.pending, data.choice); }
+    finally { resolvingSteadfast.delete(actor); }
+  });
+}
 
 export function transformationCanActivate093(actor, rows) {
   if (rows.some(t => t.active && requiresTransformationReview093(t))) return { ok: false, reason: 'AMB variável: preencha os valores da tabela oficial antes de ativar.' };
@@ -66,53 +163,7 @@ export function installRulesSheet093(Sheet) {
     html.on('click', '[data-rules093-steadfast]', async event => {
       const actor = this.actor;
       const key = event.currentTarget.dataset.rules093Steadfast;
-      if (!['bruised', 'injured', 'critical'].includes(key) || resolvingSteadfast.has(actor)) return;
-      const threshold = actor.system.thresholds[key];
-      if (!threshold.crossed || !pendingSteadfast093(threshold)) return;
-      const pending = threshold.steadfast;
-      const review = pending.startsWith('review:');
-      resolvingSteadfast.add(actor);
-      try {
-        const choice = await Dialog.wait({
-          title: `Steadfast · ${key}`,
-          content: review
-            ? '<p>Confirme a causa da perda de LP e registre o resultado resolvido na mesa.</p>'
-            : '<p>Role 1d10 contra 6+. Registre o resultado manualmente se houver um modificador ou efeito especial.</p>',
-          buttons: {
-            ...(!review ? { roll: { label: 'Rolar', callback: () => 'roll' } } : {}),
-            success: { label: 'Registrar sucesso', callback: () => 'success' },
-            failure: { label: 'Registrar falha', callback: () => 'failure' },
-            cancel: { label: 'Cancelar', callback: () => null }
-          },
-          close: () => null
-        });
-        if (!choice || actor.system.thresholds[key].steadfast !== pending) return;
-        const system = actor.system;
-        const bonus = (system.aptitudes?.steadfastBonus || 0)
-          + (system.talentBonuses?.totals?.steadfast || 0) + (system.legendaryTraitBonuses?.totals?.steadfast || 0);
-        const roll = choice === 'roll' ? await new Roll('1d10 + @bonus', { bonus }).evaluate() : null;
-        const passed = roll ? roll.total >= 6 : choice === 'success';
-        const updates = {
-          [`system.thresholds.${key}.checked`]: passed,
-          [`system.thresholds.${key}.steadfast`]: ''
-        };
-        const log = actor.system.combatTabState?.damageLog || [];
-        const eventId = pending.split(':')[1];
-        const index = log.findIndex(entry => entry?.steadfastEvent === eventId);
-        if (index >= 0) {
-          const entries = structuredClone(log);
-          entries[index].steadfastResults.push({ threshold: key, passed, roll: roll?.total ?? 'manual' });
-          updates['system.combatTabState.damageLog'] = entries;
-        }
-        const updated = await actor.update(updates, { dbuSteadfast: { key, pending } });
-        if (!updated || actor.system.thresholds[key].steadfast === pending) return;
-        if (roll) await roll.toMessage({ speaker: ChatMessage.getSpeaker({ actor }), flavor: `Steadfast · ${key} · ${passed ? 'Sucesso' : 'Falha'}` });
-        if ((pending.startsWith('massive:') || !passed) && actor.system.transformationRules?.combinedStressTest > 0) {
-          ui.notifications.info('Se estiver em Form ou Enhancement, confira o Stress Test na aba Transformations.');
-        }
-      } finally {
-        resolvingSteadfast.delete(actor);
-      }
+      await promptSteadfast(actor, key);
     });
     html.on('click', '[data-rules093-attack-grant]', async event => {
       const { rules093AttackGrant, grantName } = event.currentTarget.dataset;

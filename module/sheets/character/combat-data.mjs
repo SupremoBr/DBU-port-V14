@@ -1,7 +1,7 @@
 import { martialEnergyCharges } from "../../rules/path-to-power-v093.mjs";
 import { attackKiWithBuffs, greaterDiceCategoryBonus, customBuffState, linkedCatalogBuffs } from "../../helpers/custom-buffs.mjs";
 import { attackPowerShot093, attackReferenceKiCost093, signatureEnergyCharges093 } from "../../rules/techniques-v093.mjs";
-import { PROFILES_093 } from "../../rules/profiles-v093.mjs";
+import { profileAdvantages093, PROFILES_093 } from "../../rules/profiles-v093.mjs";
 import { uses093 } from "../../rules/v093.mjs";
 import { prepareCombatResources, prepareActiveEffects } from "../character-data.mjs";
 
@@ -307,11 +307,11 @@ export const combatDataMethods = {
       activeBuffs.push({ name: `Trans: ${t.name}`, tooltip: bonuses ? `AMB: ${bonuses}` : "Transformation active" });
     }
     if (system.combatStates?.raging)
-      activeBuffs.push({ name: "Raging", tooltip: "+1(T) Strike & Wound, -1(T) Dodge & DV" });
+      activeBuffs.push({ name: "Raging", tooltip: uses093(system) ? "Wound +L(T), Botch +L. Nível 2: Soak +L(T). Nível 3: ignora penalidades de limiar." : "+1(T) Strike & Wound, -1(T) Dodge & DV" });
     if (system.combatStates?.superior)
       activeBuffs.push({ name: "Superior", tooltip: "Apply Greater Dice an additional time" });
     if (system.combatStates?.mindful)
-      activeBuffs.push({ name: "Mindful", tooltip: "Saving Throw CT reduced by 1" });
+      activeBuffs.push({ name: "Mindful", tooltip: uses093(system) ? "CT −L em Combat Rolls, Saves e Skills. Wound −L(T)." : "Saving Throw CT reduced by 1" });
     if (system.combatStates?.evasiveStance)
       activeBuffs.push({ name: "Evasive Stance", tooltip: `+${tierForTip} Dodge (1×T)` });
     if (system.combatStates?.drunk)
@@ -371,6 +371,7 @@ export const combatDataMethods = {
         name: ref.name,
         kiCost,
         strikeFormula: prep.strikeFormula || "",
+        targetingBonus: prep.targetingBonus || 0,
         woundFormula: prep.woundFormula || "",
         strikeCT: refCTs.strikeCT,
         woundCT: refCTs.woundCT,
@@ -379,7 +380,7 @@ export const combatDataMethods = {
         profile: ref.profile || "",
         energyCharges: martialEnergyCharges(system, (ref.energyCharges || 0) + (uses093(system) ? ((PROFILES_093[ref.profile]?.freeCharges || 0) + (PROFILES_093[ref.profile]?.freeChargesOutsideLimit || 0)) : 0)),
         powerShot: uses093(system) ? attackPowerShot093(ref) : ref.powerShot || 0,
-        advantages: uses093(system) ? (ref.grantedAdvantages || []) : [],
+        advantages: uses093(system) ? profileAdvantages093(ref, ref.grantedAdvantages || []) : [],
         twinLinked: uses093(system) ? linkChoice(ref.grantedAdvantages, "Twin-Linked") : undefined,
         defaultWager: prep.maxWager || 0,
         activeBuffs
@@ -403,6 +404,7 @@ export const combatDataMethods = {
         kiCost: attackKiWithBuffs((tech.finalKP || 0) * trackerTier,
           uses093(system) ? (tech.profileBaseKP || 0) * trackerTier / 2 : 0, system.aptitudes),
         strikeFormula: tech.strikeFormula || "",
+        targetingBonus: tech.targetingBonus || 0,
         woundFormula: tech.woundFormula || "",
         strikeCT: tech.strikeCT || 10,
         woundCT: tech.woundCT || 10,
@@ -411,7 +413,7 @@ export const combatDataMethods = {
         profile: tech.profile || "",
         energyCharges: uses093(system) ? signatureEnergyCharges093(tech, system) : (tech.baseEnergyCharges || 0) + (tech.extraEnergyCharges || 0),
         powerShot: (tech.advantages || []).find(a => a.name === "Power Shot")?.ranks || 0,
-        advantages: tech.advantages || [],
+        advantages: uses093(system) ? profileAdvantages093(tech, tech.advantages || []) : tech.advantages || [],
         defaultWager: 0,
         twinLinked,
         deadLinked,

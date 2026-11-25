@@ -104,3 +104,18 @@ test('standalone racial Items honor the explicit Born for Battle rename',()=>{
   assert.equal(result.system.effects.length,4);
   assert.match(result.system.description,/0.9.3/);
 });
+
+test('resume restores the report after a checkpoint write fails without converting the same actor twice', async () => {
+  const f = fixture();
+  const persist = f.game.settings.set;
+  f.game.settings.set = async (scope, key, value) => {
+    if (value.converted?.length) throw new Error('checkpoint');
+    await persist(scope, key, value);
+  };
+  await assert.rejects(migrateWorld093(f.game, { Journal: f.Journal }), /checkpoint/);
+  f.game.settings.set = persist;
+  const state = await migrateWorld093(f.game, { Journal: f.Journal });
+  assert.equal(f.events.filter(([kind, uuid]) => kind === 'update' && uuid === f.actor.uuid).length, 1);
+  assert.equal(state.reports.filter(report => report.uuid === f.actor.uuid).length, 1);
+  assert.ok(state.converted.includes(f.actor.uuid));
+});

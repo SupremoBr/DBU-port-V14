@@ -1,5 +1,6 @@
+import { sendRequest } from "../core/authorized-request.js";
 // DBU Automation — United Attack / United Duel
-import { resolveParticipant, attackTargetKeys, combatantForIdentity } from "../core/token-identity.js";
+import { resolveParticipant, attackTargetKeys, participantKeyForAttack, combatantForIdentity } from "../core/token-identity.js";
 
 export function initializeUnitedAttackCore(deps = {}) {
   const {
@@ -228,7 +229,7 @@ async function dbuRequestUnitedAttackRefresh(
     return;
   }
 
-  game.socket.emit(DBU_SOCKET, payload);
+  await sendRequest("defense", payload);
 
   // Espera brevemente o GM atualizar a mensagem para que uma defesa clicada
   // logo em seguida já use o novo Wound.
@@ -536,7 +537,7 @@ async function dbuAnnounceDuelOnAttackCard(
   const payload = {
     type: "dbuSetActiveDuel",
     messageId: message.id,
-    primaryDefenderId: primaryDefender.id,
+    primaryDefenderId: participantKeyForAttack(primaryDefender, message.getFlag("world", "dbuAttackData")),
     duelId,
     sourceName: sourceName || "Duel Clash",
     userId: game.user.id
@@ -545,7 +546,7 @@ async function dbuAnnounceDuelOnAttackCard(
   if (game.user.isGM) {
     await dbuGMSetActiveDuelOnAttack(payload);
   } else {
-    game.socket.emit(DBU_SOCKET, payload);
+    await sendRequest("defense", payload);
 
     // Evita corrida entre a atualização "Duel ativo" e a atualização da
     // linha do defensor principal logo depois.

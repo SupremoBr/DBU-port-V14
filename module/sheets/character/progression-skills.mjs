@@ -1,3 +1,4 @@
+import { stateLevel, ragingBotch } from "../../rules/states-v093.mjs";
 import { martialAttributeBudget, martialAttributeWarnings, martialDie, martialLevel, martialProgressionRows, martialResourcePenalty, martialRowLevel, martialSkillSlots, progressionRowIsEarned, usesPathToPower, validMartialAttributes } from "../../rules/path-to-power-v093.mjs";
 import { uses093 } from "../../rules/v093.mjs";
 import { initialProgressionWarnings093, progression093 } from "../../rules/progression-v093.mjs";
@@ -382,8 +383,8 @@ export const progressionSkillsMethods = {
     const rawNat = roll.dice[0]?.results?.[0]?.result ?? "?";
     const nat = (rawNat !== "?" && geniusNatBonus) ? Math.min(10, rawNat + geniusNatBonus) : rawNat;
     const sysTier = this.actor.system.tier || 1;
-    const isCrit = nat === 10;
-    const isBotch = rawNat === 1;
+    const isCrit = nat >= 10 - (uses093(this.actor.system) ? stateLevel(this.actor.system, "mindful") : 0);
+    const isBotch = rawNat <= ragingBotch(this.actor.system);
     let critRoll = null;
     if (isCrit) { critRoll = new Roll(this._scaleDiceByTier("1d4", sysTier)); await critRoll.evaluate(); }
     const botchPenalty = 2;

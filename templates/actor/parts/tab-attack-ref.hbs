@@ -62,7 +62,7 @@
                             {{!-- Row 3: Strike formula and strike dice --}}
                             <tr>
                                 <td class="ar-lbl">Strike</td>
-                                <td class="ar-val ar-formula ar-strike" colspan="3">{{strikeFormula}} ({{strikeCT}}+)</td>
+                                <td class="ar-val ar-formula ar-strike" colspan="3">{{strikeFormula}} ({{strikeCT}}+){{#if targetingBonus}} · Natural +{{targetingBonus}} (Targeting System){{/if}}</td>
                                 <td class="ar-lbl">Strike Crit</td>
                                 <td class="ar-val">{{#if strikeCritical}}{{strikeCritical}}{{else}}-{{/if}}</td>
                                 <td class="ar-lbl">In Melee?</td>

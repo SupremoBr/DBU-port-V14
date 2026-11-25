@@ -1,3 +1,4 @@
+import { captureSheetEdits, omitUnchangedFields, rebaseSheetRows } from "./sheet-edits.mjs";
 import { martialAttributeWarnings, martialProgressionRows, progressionRowIsEarned, usesPathToPower } from "../rules/path-to-power-v093.mjs";
 import { buffAmount, buffEffectKey, buffStateLabels, buffTriggers, conditionalBuff, customBuffState, manualBuffEffect, supportsBuffTrigger } from "../helpers/custom-buffs.mjs";
 import { uses093 } from "../rules/v093.mjs";
@@ -56,6 +57,7 @@ export class DBUCharacterSheet extends ActorSheet {
 
   /** @override */
   async _updateObject(event, formData) {
+    omitUnchangedFields(this, formData);
     // Generic array merge: form data only contains visible fields per row.
     // Hidden fields (id, convertible, etc.) must be preserved from existing data.
     const arrayFieldsToMerge = [
@@ -67,7 +69,7 @@ export class DBUCharacterSheet extends ActorSheet {
 
     for (const { key, fallbackKey } of arrayFieldsToMerge) {
       const prefix = `system.${key}.`;
-      const formRows = {};
+      let formRows = {};
       const keysToRemove = [];
 
       // Collect array sub-keys from flat formData
@@ -95,9 +97,15 @@ export class DBUCharacterSheet extends ActorSheet {
       const baseRows = stored.length > 0 ? stored : fallback;
       const existing = key === "progressionRows" ? martialProgressionRows(this.actor.system, baseRows) : baseRows;
 
+      formRows = rebaseSheetRows(this._renderedArrays?.[key], stored, formRows);
+      if (!formRows) {
+        ui.notifications.warn("Esta linha mudou em outra operação. Confira a ficha antes de salvar.");
+        throw new Error("Conflito de edição na ficha.");
+      }
+
       // Merge form data onto existing rows
       const submittedIndices = Object.keys(formRows).map(Number);
-      const formIndices = key === "progressionRows" && (usesPathToPower(this.actor.system) || existing.some(row => row.id < 0))
+      const formIndices = existing.length > 0
         ? [...new Set([...existing.keys(), ...submittedIndices])].sort((a, b) => a - b)
         : submittedIndices.sort((a, b) => a - b);
       let mergedRows = formIndices.map(idx => {
@@ -390,6 +398,12 @@ export class DBUCharacterSheet extends ActorSheet {
     };
     if (uses093(system)) context.raceOptions = Object.fromEntries(Object.entries(RACES_093).map(([id, race]) => [id, race.name]));
     context.rules093 = uses093(system);
+    if (context.rules093 && system.combatStates?.surging) {
+      const focus = system.combatStates.surgingFocus;
+      context.surgingTargets = (globalThis.canvas?.tokens?.placeables || []).filter(t => t.visible && t.actor && t.actor.uuid !== this.actor.uuid)
+        .map(t => ({ id: t.document.uuid, name: t.name, selected: t.document.uuid === focus }));
+      if (focus && !context.surgingTargets.some(t => t.selected)) context.surgingTargets.push({id:focus, name:"Focus fora da cena", selected:true});
+    }
     context.rules093Issues = this.actor.getFlag("DBU-MRR-OLD", "rules093Review")?.issues || [];
     context.sizeOptions = {
       nano: "Nano", tiny: "Tiny", small: "Small", medium: "Medium",
@@ -504,13 +518,14 @@ export class DBUCharacterSheet extends ActorSheet {
       const cs = system.combatStates || {};
       const t = system.tier || 1;
       context.combatStateSummary = [];
-      if (cs.raging) {
+      if (cs.raging && uses093(system)) context.combatStateSummary.push({ state: "Raging", effect: `+${(cs.ragingLevel || 1) * t} Wound · Botch 1–${1 + (cs.ragingLevel || 1)}` });
+      else if (cs.raging) {
         const rageDice = this._ragingWoundDice(system, t).replace(/^\+/, "") || `${t}d4`;
         const rageCat = system.aptitudes?.ragingExtraDiceCatBonus || 0;
         context.combatStateSummary.push({ state: "Raging", effect: `+${rageDice} Wound${rageCat ? ` (Aspect LV${rageCat})` : ""}, \u2212${t} Defense` });
       }
-      if (cs.surging) context.combatStateSummary.push({ state: "Surging", effect: `+1d4\u00d7${t} Strike & Wound (vs target)` });
-      if (cs.mindful) context.combatStateSummary.push({ state: "Mindful", effect: `\u22121 Crit Target, \u2212${t} Wound` });
+      if (cs.surging) context.combatStateSummary.push({ state: "Surging", effect: uses093(system) ? "Energy Charge em ataques ao Focus" : `+1d4\u00d7${t} Strike & Wound (vs target)` });
+      if (cs.mindful) context.combatStateSummary.push({ state: "Mindful", effect: `−${cs.mindfulLevel || 1} Crit Target, −${(cs.mindfulLevel || 1)*t} Wound` });
       if (cs.superior) context.combatStateSummary.push({ state: "Superior", effect: `Greater Dice, +${2 * t} Dmg Received` });
       if (cs.undying) context.combatStateSummary.push({ state: "Undying", effect: `\u2212${t} All Combat Rolls` });
       context.hasCombatStateEffects = context.combatStateSummary.length > 0;
@@ -670,6 +685,7 @@ export class DBUCharacterSheet extends ActorSheet {
   /** @override Keep the Foundry lifecycle call on the actual sheet class. */
   activateListeners(html) {
     super.activateListeners(html);
+    captureSheetEdits(this, html, ["progressionRows", "customBuffs", "attackRefs", "transformations"]);
     return listenersMethods.activateListeners.call(this, html);
   }
 }

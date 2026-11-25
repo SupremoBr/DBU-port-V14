@@ -1,3 +1,4 @@
+import { sendRequest } from "../core/authorized-request.js";
 import { onAutomationChatRender } from "../../package.mjs";
 // DBU Automation — Duel Clash core
 
@@ -951,7 +952,7 @@ async function dbuRequestDuelCounterRefund(defender, duelId, context) {
   if (game.user.isGM) {
     await dbuGMRefundDuelCounter(payload);
   } else {
-    game.socket.emit(DBU_SOCKET, payload);
+    await sendRequest("defense", payload);
   }
 }
 

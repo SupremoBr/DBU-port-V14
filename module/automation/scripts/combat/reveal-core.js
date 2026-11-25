@@ -1,3 +1,7 @@
+import { resolveUrgentWound } from "../intervene.js";
+import { sendRequest, listenRequests } from "../core/authorized-request.js";
+import { openRoll, finishDefense } from "../core/private-rolls.js";
+import { uses093 } from "../../../rules/v093.mjs";
 import { onAutomationChatRender } from "../../package.mjs";
 // DBU Automation — Reveal, sincronização GM e finalização de defesa
 import { attackTargetKeys, resolveParticipant, participantKeyForAttack } from "../core/token-identity.js";
@@ -128,7 +132,7 @@ function dbuAttackRevealHTML(attack) {
         </span>
         ${woundTags}
       </span>
-      <span class="dbu-roll-total" data-dbu-wound-total>${Number(attack?.woundTotal || 0)}</span>
+      <span class="dbu-roll-total" data-dbu-wound-total>${attack.urgentPending ? "—" : Number(attack?.woundTotal || 0)}</span>
     </div>
   `;
 }
@@ -211,7 +215,8 @@ async function dbuFinalizeHiddenOutcome(defender, attack, outcome, { deferDamage
     outcome.targetLabel,
     outcome.target,
     !!outcome.success,
-    outcome.extra || ""
+    outcome.extra || "",
+    (outcome.rollData || []).map(data => Roll.fromData(typeof data === "string" ? JSON.parse(data) : data))
   );
 
   const damagePending = !!outcome.damageDefense;
@@ -248,6 +253,8 @@ async function dbuGMRevealCombatResults(messageId) {
   try {
     await message.update({ "flags.world.dbuCombatRevealInProgress": true });
 
+    const secret = attack.sealedRoll ? openRoll(attack, message) : null;
+
     // Resolve mensagens e dano apenas agora, quando todos já escolheram.
     for (const actorId of progress.ids) {
       const state = states[actorId];
@@ -255,6 +262,19 @@ async function dbuGMRevealCombatResults(messageId) {
 
       const defender = resolveParticipant(actorId, attack);
       let finalizeInfo = { damagePending: false };
+      if (attack.urgentPending && defender && state.hiddenOutcome) {
+        const check = finishDefense(attack, state.hiddenOutcome, uses093(defender.system));
+        if (check.damageDefense || check.defenseType === "powerFlare") {
+          await resolveUrgentWound(attack);
+          await message.update({ "flags.world.dbuAttackData": attack });
+        }
+      }
+      if ((secret || attack.isReflect) && defender && state.hiddenOutcome) {
+        state.hiddenOutcome = finishDefense(attack, state.hiddenOutcome, uses093(defender.system));
+        const outcome = state.hiddenOutcome;
+        state.status = outcome.success ? "defended" : outcome.damageDefense === "guard" ? "guard" : "hit";
+        state.text = outcome.name + " · " + (outcome.success ? "Sucesso" : "Impacto");
+      }
       if (defender && state.hiddenOutcome) {
         try {
           finalizeInfo = await dbuFinalizeHiddenOutcome(
@@ -294,7 +314,7 @@ async function dbuGMRevealCombatResults(messageId) {
     if (secretResults) secretResults.innerHTML = dbuAttackRevealHTML(attack);
 
     const unified = message.getFlag("world", "dbuUnifiedAttackCard");
-    const reveal = unified ? message.getFlag(DBU_SYSTEM_ID, "attackReveal") : null;
+    const reveal = secret?.reveal || (unified ? message.getFlag(DBU_SYSTEM_ID, "attackReveal") : null);
     if (reveal && secretResults) {
       const nativeCard = document.createElement("div");
       nativeCard.innerHTML = reveal.revealedHtml || "";
@@ -317,16 +337,18 @@ async function dbuGMRevealCombatResults(messageId) {
     }
 
     await message.update({
+      ...(secret ? { "flags.world.dbuAttackData": attack, [`flags.${DBU_SYSTEM_ID}.attackReveal`]: { ...reveal, revealed: true, woundTotal: attack.woundTotal } } : {}),
       content: wrapper.innerHTML,
       "flags.world.dbuDefenseStates": states,
       "flags.world.dbuCombatRevealed": true,
       "flags.world.dbuCombatRevealInProgress": false,
-      ...(reveal ? {
+      ...(reveal && !secret ? {
         [`flags.${DBU_SYSTEM_ID}.attackReveal.revealed`]: true,
         [`flags.${DBU_SYSTEM_ID}.attackReveal.woundTotal`]: attack.woundTotal
       } : {})
     });
 
+    if (secret) await secret.page.delete();
     if (reveal) await dbuShowAttackDice(reveal);
     if (!unified) await dbuRevealNativeAttackMessage(attack);
 
@@ -338,6 +360,7 @@ async function dbuGMRevealCombatResults(messageId) {
     );
   } catch (error) {
     console.error("DBU | Revelação conjunta:", error);
+    ui.notifications.error(error.message);
     try {
       const current = game.messages.get(messageId);
       await current?.update({ "flags.world.dbuCombatRevealInProgress": false });
@@ -713,7 +736,7 @@ async function dbuRequestUnitedAttackLock(
     return;
   }
 
-  game.socket.emit(DBU_SOCKET, payload);
+  await sendRequest("defense", payload);
 
   if (locked) {
     for (let attempt = 0; attempt < 12; attempt++) {
@@ -897,13 +920,15 @@ const dbuSocketHandler = async data => {
   }
 };
 
-game.socket.on(
-  DBU_SOCKET,
-  dbuSocketHandler
-);
-
-globalThis.DBU_BOOTSTRAP.socketHandler =
-  dbuSocketHandler;
+globalThis.DBU_BOOTSTRAP.socketHandler = listenRequests("defense", (packet, sender) => {
+  if (packet.type === "dbuRefreshUnitedAttack" && !packet.supporterId) return;
+  if (["dbuSetUnitedAttackLock", "dbuSetActiveDuel"].includes(packet.type)) {
+    const attack = game.messages.get(packet.messageId)?.getFlag("world", "dbuAttackData");
+    const key = packet.type === "dbuSetUnitedAttackLock" ? packet.defenderId : packet.primaryDefenderId;
+    if (!attack || !key || !dbuCombatProgress(attack, {}).ids.includes(key)) return;
+  }
+  return dbuSocketHandler({ ...packet, userId: sender.id });
+});
 
 // ============================================================
 // v6.7 — BLOQUEAR REVEAL NATIVO ATÉ TODAS AS DEFESAS
@@ -1030,10 +1055,7 @@ async function dbuUpdateTargetStatus(
   if (game.user.isGM) {
     await dbuQueueDefenseCard(payload);
   } else {
-    game.socket.emit(
-      DBU_SOCKET,
-      payload
-    );
+    await sendRequest("defense", payload);
   }
 }
 
@@ -1050,8 +1072,8 @@ async function dbuUpdateTargetStatus(
 
 const defenseActorSyncHookId = Hooks.on(
   "updateActor",
-  async (actor, changes) => {
-    if (!dbuIsPrimaryGM()) return;
+  async (actor, changes, options, senderId) => {
+    if (!senderId || !dbuIsPrimaryGM()) return;
 
     const touched =
       foundry.utils.hasProperty(changes, "flags.world.dbuDefenseStates")
@@ -1088,7 +1110,7 @@ const defenseActorSyncHookId = Hooks.on(
           defenseType: state.defenseType || "",
           defenseName: state.defenseName || "",
           hiddenOutcome: state.hiddenOutcome || null,
-          userId: null
+          userId: senderId
         });
 
         console.log(

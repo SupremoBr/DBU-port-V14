@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.0.12-rules093-alpha.29] — combate, técnicas e ficha
+
+- Ranks gratuitos ficam fora do TP pago e do limite da técnica. **Free TP** continua como crédito separado. Targeting System ajusta o dado natural de Strike e pode gerar crítico.
+- Parry apresenta a rolagem no chat quando as defesas são reveladas. Reflect usa o Wound do ataque original, incluindo Ki Wager e Energy Charges.
+- O HUD ganhou Pular turno para o personagem ativo. As ações de Pressure Ataque e Defesa ficam no HUD, enquanto a ficha mantém os stacks e o Pressure após falhar Steadfast.
+- Dano que cruza um limiar dispara a janela de Steadfast quando cabe teste. Path to Power ganhou um painel compacto.
+- A prévia inclui ajustes em alcance, área, Grapple e dano por diferença de tamanho. Slip Through e Tiny Target seguem manuais.
+- A ficha preserva mudanças concorrentes em campos não editados e a migração retoma o progresso a partir do backup existente.
+
+A validação no Foundry com Dice So Nice e Dice Tray segue pendente.
+
 ## [1.0.12-rules093-alpha.28] — equipamentos e técnicas assinaturas
 
 - As 64 vantagens e 41 desvantagens mostram efeitos, requisitos e links oficiais. O cálculo usa o TP atual por rank e sinaliza combinações incompatíveis.

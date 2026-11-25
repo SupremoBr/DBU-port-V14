@@ -56,7 +56,7 @@ export const combatDamageMethods = {
     event.preventDefault();
     const system = this.actor.system;
     const dc = system.damageCalc;
-    let damage = dc?.healthReduction || 0;
+    let damage = (dc?.healthReduction || 0) + (event.dbuSizeDamage || 0);
     if (damage <= 0) {
       // Guard is paid even when it reduces the final damage to 0 — the Defend
       // Maneuver's cost is spent on use, not on damage taken. Skip if already
@@ -475,14 +475,15 @@ export const combatDamageMethods = {
     }
 
     const currentLP = system.lifePoints?.value ?? 0;
-    let newLP = Math.max(0, currentLP - damage);
+    const undying = uses093(system) && system.combatStates?.undying;
+    let newLP = undying ? currentLP - damage : Math.max(0, currentLP - damage);
     let deadOrAliveUsed = false;
     let justiceChargesLostOnDefeat = 0;
     let defeatRecoveryLP = 0;
     let defeatRecoveryKP = 0;
 
     const justiceChargesRemaining = Math.max(0, justiceCharges - (justiceChargeSpent ? 1 : 0));
-    if (newLP <= 0 && justiceChargesRemaining > 0) {
+    if (!undying && newLP <= 0 && justiceChargesRemaining > 0) {
       const useDeadOrAlive = await Dialog.wait({
         title: "Dead or Alive",
         content: `<p>Use all remaining Justice Charges (${justiceChargesRemaining}) to avoid defeat?</p>`,

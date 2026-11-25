@@ -1,3 +1,4 @@
+import { PROFILES_093 } from './profiles-v093.mjs';
 import { SIGNATURE_MODIFIERS_093 } from './data/signature-modifiers-v093.mjs';
 
 /** Mechanical constants from the current DBU rules, not the Foundry version.
@@ -37,25 +38,31 @@ export function signatureModifierTP093(row, group) {
   return modifierPointCost(SIGNATURE_MODIFIERS_093[group][row.name], row.ranks ?? 1) ?? n(row.tpCost);
 }
 
-export function paidAdvantageTP093(row) {
+export function paidAdvantageTP093(row, profile) {
   const cost = signatureModifierTP093(row, 'Advantages');
-  const freeRanks = Math.min(int(row.ranks ?? 1), int(row.freeRanks));
+  const freeRanks = Math.min(int(row.ranks ?? 1), Math.max(int(row.freeRanks), PROFILES_093[profile]?.freeAdvantages?.includes(row.name) ? 1 : 0));
   if (!freeRanks) return cost;
   const paidRanks = int(row.ranks ?? 1) - freeRanks;
   if (!paidRanks) return 0;
   return modifierPointCost(SIGNATURE_MODIFIERS_093.Advantages[row.name], paidRanks) ?? cost;
 }
 
-/** Return the amount spent or, with credits excluded, the full value used for KP and caps. */
+/** Return the amount spent or, with credits excluded, the nominal cost used for KP. */
 export function techniquePointCost(technique, { includeFreeTP = true } = {}) {
   const advantages = (technique.advantages || []).reduce((sum, row) =>
-    sum + (includeFreeTP ? paidAdvantageTP093(row) : signatureModifierTP093(row, 'Advantages')), 0);
+    sum + (PROFILES_093[technique.profile]?.freeAdvantages?.includes(row.name)
+      ? paidAdvantageTP093(row, technique.profile)
+      : includeFreeTP ? paidAdvantageTP093(row) : signatureModifierTP093(row, 'Advantages')), 0);
   const disadvantages = (technique.disadvantages || []).reduce((sum, row) => sum + signatureModifierTP093(row, 'Disadvantages'), 0);
   const free = includeFreeTP ? Math.max(0, n(technique.freeTP)) : 0;
   const base = technique.profile === 'Simple' ? 4 : 8;
   const subtotal = Math.max(8, base + advantages + disadvantages);
   const surcharge = isUltimateTechnique(technique.type ?? technique.techType) ? 4 : 0;
   return Math.max(0, subtotal + surcharge - free);
+}
+
+export function techniqueCapUsage093(technique) {
+  return techniquePointCost({ ...technique, freeTP: 0 });
 }
 
 /** Returned KP is in (T) units, matching the sheet's existing cost pipeline. */

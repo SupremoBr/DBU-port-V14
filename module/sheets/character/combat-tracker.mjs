@@ -1,3 +1,7 @@
+import { energyChargeDie } from "../../helpers/custom-buffs.mjs";
+import { getAreaSpec } from "../../automation/scripts/area-attack.js";
+import { surgingCharge093, surgingTargetsAllowed093, ragingBotch } from "../../rules/states-v093.mjs";
+import { createHiddenTrackerCard, privateRollJournal } from "../../automation/scripts/core/private-rolls.js";
 import { defendKiCost093 } from "../../rules/defenses-v093.mjs";
 import { uses093 } from "../../rules/v093.mjs";
 import { profileRoll093 } from "../../rules/profiles-v093.mjs";
@@ -278,7 +282,7 @@ export const combatTrackerMethods = {
    * auto-deducts Ki (cost + wager), and whispers the remaining KP to the GM
    * and the actor's owner. Reveal logic lives in dbu-old.mjs (renderChatMessage).
    */
-  async _onRollTrackerAttack(event, { prepareOnly = false } = {}) {
+  async _onRollTrackerAttack(event, { prepareOnly = false, focusCharge = 0 } = {}) {
     event.preventDefault();
     const btn = event.currentTarget;
     const roundNum = Number(btn.dataset.round);
@@ -346,6 +350,14 @@ export const combatTrackerMethods = {
         return;
       }
     }
+    if (!prepareOnly && uses093(this.actor.system) && this.actor.system.combatStates?.surging) {
+      const targets = Array.from(game.user.targets || []);
+      if (!surgingTargetsAllowed093(this.actor.system, targets.map(t => t.document?.uuid), getAreaSpec(sd, this.actor, targets).isAoE)) {
+        return ui.notifications.warn("Surging exige o Focus como alvo.");
+      }
+      focusCharge = surgingCharge093(this.actor.system, sd);
+    }
+    const journal = prepareOnly ? null : await privateRollJournal();
     const wager = Math.max(0, Number(action.kiWager) || 0);
 
     // --- Diminishing Offense (attacking.txt:33-34): each Attacking Maneuver
@@ -361,7 +373,7 @@ export const combatTrackerMethods = {
 
     // Compose Strike + Wound formulas. Wager adds flat to wound (already baked
     // into prep formula if set in attack-ref, but for tracker wager we add now).
-    const strikeFormulaBase = sd.strikeFormula || "1d10";
+    const strikeFormulaBase = (sd.strikeFormula || "1d10") + (action.calledStrikePenalty ? "-" + Number(action.calledStrikePenalty) : "");
     const strikeFormulaRaw = dimOffensePen > 0
       ? `${strikeFormulaBase}-${dimOffensePen}`
       : strikeFormulaBase;
@@ -372,6 +384,14 @@ export const combatTrackerMethods = {
     let woundFormula = wager > 0
       ? `${woundFormulaBase}${woundFormulaBase.includes("+") ? "+" : "+"}${wager}`
       : woundFormulaBase;
+    if (focusCharge) {
+      const signature = String(action.source).startsWith("tech_");
+      const technique = this.actor.system.signatureTechniques?.find(t => "tech_"+t.id === action.source);
+      const die = energyChargeDie(this.actor.system.aptitudes, { signature, maximumCharge: technique?.advantages?.some(a => a.name === "Maximum Charge") });
+      const tier = this.actor.system.tier || 1;
+      woundFormula += "+" + tier + die + (sd.profile === "Mega Flare" ? "+" + tier : "");
+    }
+    if (action.calledWoundBonus) woundFormula += "+" + Number(action.calledWoundBonus);
     if (chargingBonus > 0) woundFormula = `${woundFormula}+${chargingBonus}`;
 
     // Execute rolls. Twin-Linked (signature.txt:382): roll the chosen Combat
@@ -433,7 +453,7 @@ export const combatTrackerMethods = {
     const critFormula = this._critExtraFormula(sysTier);
     const botchPenalty = 2 * sysBaseTier;
 
-    const profileRoll = uses093(this.actor.system) && strikeNat !== "?" ? profileRoll093(sd.profile, { strikeNatural: strikeNat, strikeCT, damageCat: sd.damageCat }) : null;
+    const profileRoll = uses093(this.actor.system) && strikeNat !== "?" ? profileRoll093(sd.profile, { strikeNatural: strikeNat, faces: strikeRoll.dice[0]?.faces || 10, targetingBonus: sd.targetingBonus || 0, strikeBotchThreshold: ragingBotch(this.actor.system), strikeCT, damageCat: sd.damageCat }) : null;
     const strikeCrit = profileRoll ? profileRoll.critical : strikeNat !== "?" && strikeNat >= strikeCT;
     const strikeBotch = profileRoll ? profileRoll.botch : strikeNat === 1;
     if (profileRoll) sd = { ...sd, damageCat: profileRoll.damageCat };
@@ -457,7 +477,7 @@ export const combatTrackerMethods = {
     const woundTag = woundCritRoll ? ` ${critTag(woundCritRoll)}` : (woundBotch ? ` ${botchTag()}` : "");
 
     const speaker = ChatMessage.getSpeaker({ actor: this.actor });
-    const kiCost = sd.kiCost || 0;
+    const kiCost = (sd.kiCost || 0) + (action.dbuCalledShot ? 2 * sysTier : 0);
 
     // ---- HIDDEN content: EVERYTHING except the attack name is masked —
     // profile/foundation, damage category, EC, cost, wager, buffs, CTs
@@ -516,7 +536,7 @@ export const combatTrackerMethods = {
           <span class="dbu-roll-label">Strike</span>
           <span class="dbu-roll-main">
             <code class="dbu-roll-formula">${strikeFormulaRaw}</code>
-            <span class="dbu-roll-sub">Nat ${strikeNat} · CT ${strikeCT}+</span>${strikeTag}
+            <span class="dbu-roll-sub">Nat ${profileRoll?.natural ?? strikeNat} · CT ${strikeCT}+</span>${strikeTag}
           </span>
           <span class="dbu-roll-total">${strikeTotal}</span>
         </div>
@@ -558,7 +578,7 @@ export const combatTrackerMethods = {
       }
     };
     if (prepareOnly) return messageData;
-    await ChatMessage.create(messageData);
+    await createHiddenTrackerCard(messageData, journal);
   },
 
   /** Store the chosen transformation index on the tracker "transform" action. */
@@ -1061,6 +1081,7 @@ export const combatTrackerMethods = {
 
     // ---- Roll-based options: Parry (Strike roll) / Power Flare (Wound roll) ----
     if (opt.rollBased) {
+      const journal = await privateRollJournal();
       const isParry = opt.key === "parry";
       const cts2 = this._calcCombatCTs(this.actor.system);
       const rollCT = isParry ? cts2.strikeCT : cts2.woundCT;
@@ -1084,7 +1105,7 @@ export const combatTrackerMethods = {
       await roll.evaluate();
       const nat = roll.dice[0]?.results?.[0]?.result ?? "?";
       const isCrit = nat !== "?" && nat >= rollCT;
-      const isBotch = nat === 1;
+      const isBotch = nat <= (isParry ? ragingBotch(this.actor.system) : 1);
       let critRoll = null;
       if (isCrit) { critRoll = new Roll(this._critExtraFormula(tier)); await critRoll.evaluate(); }
       const botchPenalty = 2 * baseTier;
@@ -1142,7 +1163,7 @@ export const combatTrackerMethods = {
       </div>`;
 
       await this.actor.update(updates);
-      await ChatMessage.create({
+      await createHiddenTrackerCard({
         speaker,
         content: hiddenHtml,
         flags: {
@@ -1160,7 +1181,7 @@ export const combatTrackerMethods = {
             }
           }
         }
-      });
+      }, journal);
       return;
     }
 
@@ -1241,7 +1262,7 @@ export const combatTrackerMethods = {
     const natBonus = Number(this.actor.system._bestialDodgeNaturalBonus) || 0;
     const nat = rawNat === "?" ? "?" : Math.min(10, rawNat + natBonus);
     const isCrit = nat !== "?" && nat >= td.ct;
-    const isBotch = rawNat === 1;
+    const isBotch = rawNat <= ragingBotch(this.actor.system);
     let critRoll = null;
     if (isCrit) { critRoll = new Roll(this._critExtraFormula(sysTier)); await critRoll.evaluate(); }
     const botchPenalty = 2 * sysBaseTier;

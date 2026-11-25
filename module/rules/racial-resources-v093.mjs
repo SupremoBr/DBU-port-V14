@@ -1,3 +1,4 @@
+import { sendRequest } from "../automation/scripts/core/authorized-request.js";
 import { inCombat093, isOwnTurn093 } from './actions-v093.mjs';
 import { racialEffectEnabled093 } from './runtime-v093.mjs';
 import { uses093 } from './v093.mjs';
@@ -12,6 +13,13 @@ const pressure = system => has(system, 'Demonic Pressure', 2);
 const resilience = system => has(system, 'Demonic Resilience', 2);
 const overwhelmEnabled = system => has(system, 'Overwhelming Fighter');
 
+export function resolutionOwner(actor) {
+  const users = globalThis.game?.users;
+  if (!users || !actor.testUserPermission) return null;
+  return Array.from(users).filter(user => user.active && (user.isGM || actor.testUserPermission(user, "OWNER")))
+    .sort((a,b) => Number(a.isGM) - Number(b.isGM) || a.id.localeCompare(b.id))[0];
+}
+
 function resources(system) { return system.rules093State?.racialResources || {}; }
 function resilienceSuccesses(state) {
   // Older actors recorded one active bonus as a boolean.
@@ -20,7 +28,7 @@ function resilienceSuccesses(state) {
 function updateFields(values) {
   return Object.fromEntries(Object.entries(values).map(([key, value]) => [`${resourcePath}.${key}`, value]));
 }
-function roundKey(actor, combat) {
+export function roundKey(actor, combat) {
   if (inCombat093(actor, combat)) return `${combat.id}:${combat.round}`;
   return `sheet:${actor.system.combatTabState?.currentRound || 1}`;
 }
@@ -156,6 +164,11 @@ export async function promptPressureCheck093(actor, source, combat = globalThis.
     close: () => null
   }) : { trigger: source, options: {} };
   if (!selection) return;
+  const owner = resolutionOwner(actor);
+  if (owner && owner.id !== game.user.id) {
+    return sendRequest("racial-resolution", { kind: "pressure", actorUuid: actor.uuid,
+      source: selection.trigger, options: selection.options, round: roundKey(actor, combat), turn: combat?.turn ?? null }, owner.id);
+  }
   const result = await rollPressure093(actor, selection.trigger, selection.options, combat);
   if (!result) ui.notifications.warn('Pressure Check indisponível neste turno ou rodada.');
   return result;

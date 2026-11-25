@@ -1,3 +1,4 @@
+import { changeJacketPilot } from "../jacket-pilot.mjs";
 
 
 /** Character sheet domain: battle-jacket. Methods run with the sheet as this. */
@@ -92,19 +93,15 @@ export const battleJacketMethods = {
     const jacketId = select.val();
     if (!jacketId) return;
     const bjActor = game.actors.get(jacketId);
-    if (!bjActor) return;
-    await this.actor.update({ "system.pilotedJacketId": jacketId });
-    await bjActor.update({ "system.pilotId": this.actor.id });
+    if (!bjActor?.isOwner || bjActor.type !== "battleJacket" || bjActor.system.pilotId)
+      return ui.notifications.warn("Battle Jacket ocupada ou sem permissão de edição.");
+    await changeJacketPilot(bjActor, this.actor);
   },
 
   async _onUnlinkJacket(event) {
     event.preventDefault();
     const jacketId = this.actor.system.pilotedJacketId;
-    if (jacketId) {
-      const bjActor = game.actors.get(jacketId);
-      if (bjActor) await bjActor.update({ "system.pilotId": "" });
-    }
-    await this.actor.update({ "system.pilotedJacketId": "", "system.isPiloting": false });
+    await changeJacketPilot(game.actors.get(jacketId), this.actor, { unlink: true });
   },
 
   async _onEnterJacket(event) {

@@ -1,3 +1,5 @@
+import { sizeLead } from "../../rules/size-v093.mjs";
+import { sendRequest, listenRequests } from "./core/authorized-request.js";
 import { unsetAutomationFlag } from "../migration.mjs";
 import { readAutomationFlag, onAutomationChatRender } from "../package.mjs";
 // ============================================================
@@ -493,7 +495,7 @@ export function validateGrappleMovement({ actor, token = null, kind = "movement"
   if (grapple.sceneId && sceneId && grapple.sceneId !== sceneId) {
     return { ok: false, requiresClash: false, kind, grapple, message: "O Grapple pertence a outra Scene; sincronize os tokens antes de mover." };
   }
-  if (!clashResolved) {
+  if (!clashResolved && sizeLead(actor, resolveParticipantActor(opponentRef)) < 3) {
     return {
       ok: false,
       requiresClash: true,
@@ -612,9 +614,13 @@ function requestGM(type, payload = {}) {
     const timeout = setTimeout(() => {
       state.pendingRequests.delete(requestId);
       reject(new Error("O GM não confirmou a atualização dentro do tempo limite."));
-    }, 12000);
+    }, 60000);
     state.pendingRequests.set(requestId, { resolve, reject, timeout });
-    game.socket.emit(SOCKET, { type, requestId, requesterId: game.user.id, ...payload });
+    sendRequest("standard", { type, requestId, ...payload, expiresAt: Date.now() + 60000 }, gm.id).catch(error => {
+      clearTimeout(timeout);
+      state.pendingRequests.delete(requestId);
+      reject(error);
+    });
   });
 }
 
@@ -793,7 +799,7 @@ async function beginTurnGrappleEscape(combat, changes = {}) {
     return null;
   }
 
-  const challengerRoll = await evaluateGrappleCheck(grappled, await preparedStrike(grappled));
+  const challengerRoll = await evaluateGrappleCheck(grappled, await preparedStrike(grappled), grappler);
   const pendingId = foundry.utils.randomID(14);
   const all = foundry.utils.deepClone(readAutomationFlag(grappler, `${STATE_FLAG}.pendingActions`) || {});
   all[pendingId] = {
@@ -830,7 +836,7 @@ export async function respondGrappleEscape(actor, pendingId, choice) {
   const grapple = currentGrapple(actor);
   if (!grapple?.active || (grapple.grappleId || grapple.id) !== pending.grappleId) return ui.notifications.warn("O Grapple desta pendência não está mais ativo.");
   const prepared = choice === "dodge" ? await preparedDodge(actor) : await preparedStrike(actor);
-  const responseRoll = await evaluateGrappleCheck(actor, prepared);
+  const responseRoll = await evaluateGrappleCheck(actor, prepared, grappleActor(grapple, "grappled"));
   const escaped = num(pending.challengerRoll?.total, 0) > responseRoll.total;
   pending.status = "resolved";
   pending.choice = choice === "dodge" ? "dodge" : "strike";
@@ -881,7 +887,7 @@ export async function respondSyntheticGrappleClash(actor, pendingId, choice) {
     prepared = choice === "dodge" ? await preparedDodge(actor) : await preparedStrike(actor);
     choice = choice === "dodge" ? "dodge" : "strike";
   }
-  const responseRoll = await evaluateGrappleCheck(actor, prepared);
+  const responseRoll = await evaluateGrappleCheck(actor, prepared, pending.responderKind === "might" ? null : resolveParticipantActor(pending.initiator));
   if (!game.user.isGM && primaryGM()) {
     const response = await requestGM("dbuaStandardResolveSyntheticClashRequest", {
       responderRef: participantRef(actor),
@@ -896,6 +902,12 @@ export async function respondSyntheticGrappleClash(actor, pendingId, choice) {
   return { responseRoll };
 }
 
+function empowerRoundState(actor, target, amount, actions, miracle) {
+  const { cts, round } = getCurrentRoundData(actor);
+  round.actions.push({ type: "empower", dbuStandardKey: "empower", ...roundTrackingMeta(actor), actionCost: actions, kiCost: 0, description: `Empower → ${target.name}: ${amount} Ki${miracle ? " · Miracle" : ""}`, dbuEmpowerTargetId: target.id, dbuEmpowerAmount: amount, dbuMiracleEmpowerment: !!miracle });
+  return cts;
+}
+
 async function applyEmpowerTransaction(source, target, {
   amount,
   capacityCost,
@@ -903,18 +915,18 @@ async function applyEmpowerTransaction(source, target, {
   sourceKiBefore,
   sourceCapacityBefore,
   targetKiBefore,
-  combatTabState
+  combatTabState, miracle, sourceToken, targetToken
 }) {
   const payload = {
-    sourceRef: participantRef(source),
-    targetRef: participantRef(target),
+    sourceRef: participantRef(source, sourceToken),
+    targetRef: participantRef(target, targetToken),
+    miracle,
     amount,
     capacityCost,
     actions,
     sourceKiBefore,
     sourceCapacityBefore,
-    targetKiBefore,
-    combatTabState
+    targetKiBefore
   };
   if (!game.user.isGM && !target.isOwner) {
     const response = await requestGM("dbuaStandardEmpowerRequest", payload);
@@ -1001,8 +1013,7 @@ async function empower(context = {}) {
   if (amount <= 0) return ui.notifications.warn(`Empower sem transferência. Máximo atual: ${maxTransfer} Ki.`);
 
   const capacityCost = Math.max(0, Math.ceil(amount * rules.capacityMultiplier));
-  const { cts, round } = getCurrentRoundData(actor);
-  round.actions.push({ type: "empower", dbuStandardKey: "empower", ...roundTrackingMeta(actor), actionCost: result.actions, kiCost: 0, description: `Empower → ${target.name}: ${amount} Ki${result.miracle ? " · Miracle" : ""}`, dbuEmpowerTargetId: target.id, dbuEmpowerAmount: amount, dbuMiracleEmpowerment: !!result.miracle });
+  const cts = empowerRoundState(actor, target, amount, result.actions, result.miracle);
   await applyEmpowerTransaction(actor, target, {
     amount,
     capacityCost,
@@ -1010,6 +1021,7 @@ async function empower(context = {}) {
     sourceKiBefore: srcKi,
     sourceCapacityBefore: cap.spent,
     targetKiBefore: targetKi,
+    miracle: result.miracle, sourceToken, targetToken,
     combatTabState: cts
   });
   let miracleResult = null;
@@ -1055,7 +1067,9 @@ async function preparedDodge(actor) {
   };
 }
 
-async function evaluateGrappleCheck(actor, prepared) {
+async function evaluateGrappleCheck(actor, prepared, opponent = null) {
+  const bonus = Math.min(3, Math.max(0, sizeLead(actor, opponent))) * tier(actor);
+  if (bonus) prepared = { ...prepared, formula: `(${prepared.formula})+${bonus}` };
   const roll = await (new Roll(prepared.formula || "1d10")).evaluate();
   const natural = num(roll.dice?.[0]?.results?.[0]?.result, 0);
   const ct = num(prepared.ct, 10);
@@ -1104,7 +1118,10 @@ function saiyanTailWeaknessApplies(actor) {
 }
 
 async function startNativeClash(actor, targetActor, opts, pendingMeta) {
-  if (actor?.isToken || targetActor?.isToken) {
+  if (["grapple-init","launch"].includes(pendingMeta.kind) && sizeLead(actor, targetActor) > 0) {
+    opts = { ...opts, formula: `(${opts.formula})+${Math.min(3, sizeLead(actor, targetActor)) * tier(actor)}` };
+  }
+  if (actor?.isToken || targetActor?.isToken || (sizeLead(targetActor, actor) > 0 && opts.responderKind === "strike-or-dodge")) {
     const clashId = foundry.utils.randomID(12);
     const initiatorRoll = await evaluateGrappleCheck(actor, { formula: opts.formula, ct: opts.ct });
     const all = foundry.utils.deepClone(readAutomationFlag(targetActor, `${STATE_FLAG}.pendingActions`) || {});
@@ -1160,6 +1177,7 @@ async function grapple(context = {}) {
   const targetToken = targetOne(context, "Grapple");
   if (!targetToken) return null;
   const target = targetToken.actor;
+  if (sizeLead(target, actor) >= 3) return ui.notifications.warn("Gigantic Grip: alvo grande demais para Grapple.");
   const actorToken = tokenFromContext(context, actor);
   if (gridDistanceSquares(actorToken, targetToken) > meleeSquares(actor) + 0.001) return ui.notifications.warn(`${target.name} está fora do Melee Range.`);
   if (currentGrapple(target)) {
@@ -1248,6 +1266,7 @@ async function pin(context = {}) {
   if (!actor || !gr || gr.role !== "grappler") return ui.notifications.warn("Pin só pode ser usado pelo Grappler.");
   if (roundUses(actor, "pin") > 0) return ui.notifications.warn(`${actor.name}: Pin já usado neste Round.`);
   const target = grappleActor(gr, "grappled");
+  if (sizeLead(target, actor) >= 3) return ui.notifications.warn("Gigantic Grip: alvo grande demais para Pin.");
   if (!target) return ui.notifications.warn("Grappled não encontrado.");
   const might = Math.max(0, num(actor.system?.status?.mightForClashes ?? actor.system?.status?.might, 0));
   const { cts, round } = getCurrentRoundData(actor);
@@ -1851,7 +1870,7 @@ async function establishGrapple(grappler, grappled, pending) {
   const grappledRef = pending?.target || participantRef(grappled);
   const sceneId = grapplerRef.sceneId || grappledRef.sceneId || canvas?.scene?.id || null;
   const conditionSources = {
-    grapplerGuardDown: grappleConditionSource(id, "grappler-guardDown"),
+    grapplerGuardDown: sizeLead(grappler, grappled) >= 3 ? null : grappleConditionSource(id, "grappler-guardDown"),
     grappledGuardDown: grappleConditionSource(id, "grappled-guardDown"),
     pinned: grappleConditionSource(id, "pinned"),
     prone: grappleConditionSource(id, "prone")
@@ -1875,7 +1894,7 @@ async function establishGrapple(grappler, grappled, pending) {
   };
   await gmOrOwnerSetFlag(grappler, `${STATE_FLAG}.grapple`, { ...common, role: "grappler" }, { authorityActor: grappler });
   await gmOrOwnerSetFlag(grappled, `${STATE_FLAG}.grapple`, { ...common, role: "grappled" }, { authorityActor: grappler });
-  await setConditionSource(grappler, "guardDown", conditionSources.grapplerGuardDown, true, { authorityActor: grappler });
+  if (conditionSources.grapplerGuardDown) await setConditionSource(grappler, "guardDown", conditionSources.grapplerGuardDown, true, { authorityActor: grappler });
   await setConditionSource(grappled, "guardDown", conditionSources.grappledGuardDown, true, { authorityActor: grappler });
   if (tailProneApplied) await setConditionSource(grappled, "prone", conditionSources.prone, true, { authorityActor: grappler });
   if (pending.tail) {
@@ -1900,7 +1919,7 @@ async function endGrapple(grapple) {
     await gmOrOwnerSetFlag(actor, `${STATE_FLAG}.launchReady`, null, { authorityActor }).catch(() => {});
     const guardSource = own?.role === "grappler" ? sources.grapplerGuardDown : sources.grappledGuardDown;
     if (guardSource) await setConditionSource(actor, "guardDown", guardSource, false, { authorityActor });
-    else if (!own?.guardDownPreexisting) await setCondition(actor, "guardDown", false, { authorityActor });
+    else if (!own?.conditionSources && !own?.guardDownPreexisting) await setCondition(actor, "guardDown", false, { authorityActor });
   }
   if (grappled && sources.pinned) await setConditionSource(grappled, "pinned", sources.pinned, false, { authorityActor });
   else if (grappled && grappledState?.pinned && !grappledState?.pinnedPreexisting) await setCondition(grappled, "pinned", false, { authorityActor });
@@ -1924,8 +1943,10 @@ async function resolvePendingClash(initiator, responder, clashId, initSt, respSt
     } else if (pending.kind === "launch") {
       const gr = currentGrapple(initiator);
       if (win) {
-        await gmOrOwnerSetFlag(initiator, `${STATE_FLAG}.launchReady`, { active: true, grappleId: gr?.id, targetId: responder.id, maxSquares: Math.max(0, num(initiator.system?.status?.might, 0)), createdAt: Date.now() });
-        await ChatMessage.create({ speaker: ChatMessage.getSpeaker({ actor: initiator }), content: `<div class="dbu-attack-roll"><div class="dbu-card-body"><div class="dbu-defend-guide"><b>Launch venceu.</b> ${esc(initiator.name)} pode encerrar o Grapple e lançar ${esc(responder.name)} até <b>${Math.max(0, num(initiator.system?.status?.might, 0))} Squares</b>. A posição final continua manual nesta etapa Standard para respeitar Walls/Collision.</div></div></div>` });
+        const sizeAdjustment = Math.max(-3, Math.min(3, sizeLead(initiator, responder))) * baseTier(responder);
+        const maxSquares = Math.max(0, num(initiator.system?.status?.might, 0) + sizeAdjustment);
+        await gmOrOwnerSetFlag(initiator, `${STATE_FLAG}.launchReady`, { active: true, grappleId: gr?.id, targetId: responder.id, maxSquares, createdAt: Date.now() });
+        await ChatMessage.create({ speaker: ChatMessage.getSpeaker({ actor: initiator }), content: `<div class="dbu-attack-roll"><div class="dbu-card-body"><div class="dbu-defend-guide"><b>Launch venceu.</b> ${esc(initiator.name)} pode encerrar o Grapple e lançar ${esc(responder.name)} até <b>${maxSquares} Squares</b>. A posição final continua manual nesta etapa Standard para respeitar Walls/Collision.</div></div></div>` });
       } else if (gr) await endGrapple(gr);
     } else if (pending.kind === "pin") {
       const gr = currentGrapple(initiator);
@@ -2167,9 +2188,10 @@ async function expireRecoveryAtTurnStart(combat, changes) {
   await gmOrOwnerSetFlag(actor, `${STATE_FLAG}.combatRecovery`, { ...rec, active: false, expiredAt: Date.now() });
 }
 
-async function standardSocketHandler(data) {
+async function standardSocketHandler(data, sender) {
   if (!data) return;
   if (data.type === "dbuaStandardResponse" && data.requesterId === game.user.id) {
+    if (!sender?.isGM || sender.id !== primaryGM()?.id) return;
     const pending = state.pendingRequests.get(data.requestId);
     if (!pending) return;
     clearTimeout(pending.timeout);
@@ -2179,17 +2201,17 @@ async function standardSocketHandler(data) {
   }
   if (!isPrimaryGM() || !String(data.type || "").endsWith("Request")) return;
 
-  const respond = (ok, error = null, result = null) => game.socket.emit(SOCKET, {
+  const respond = (ok, error = null, result = null) => sendRequest("standard", {
     type: "dbuaStandardResponse",
     requestId: data.requestId,
-    requesterId: data.requesterId,
+    requesterId: sender.id,
     ok,
     error,
     result
-  });
+  }, sender.id);
 
   try {
-    const requester = game.users?.get?.(data.requesterId);
+    const requester = sender;
     if (!requester?.active) throw new Error("Solicitante inválido ou desconectado.");
     if (data.type === "dbuaStandardResolveSyntheticClashRequest") {
       const responder = resolveParticipantActor(data.responderRef || {});
@@ -2204,8 +2226,22 @@ async function standardSocketHandler(data) {
       if (!source || !target) throw new Error("Actor de origem ou alvo do Empower não foi encontrado.");
       if (!userOwnsActor(requester, source)) throw new Error("O solicitante não controla a origem do Empower.");
       const amount = Math.max(0, Math.trunc(num(data.amount, 0)));
-      const capacityCost = Math.max(0, Math.trunc(num(data.capacityCost, 0)));
+      const rules = empowerRules(source);
+      const capacityCost = Math.ceil(amount * rules.capacityMultiplier);
       const actions = Math.max(1, Math.trunc(num(data.actions, 1)));
+      const sourceToken = resolveParticipantToken(data.sourceRef);
+      const targetToken = resolveParticipantToken(data.targetRef);
+      if (!sourceToken || !targetToken || source.uuid === target.uuid || target.type !== "character"
+          || data.sourceRef.sceneId !== data.targetRef.sceneId || !isAllyToken(sourceToken, targetToken))
+        throw new Error("Empower requer dois aliados na mesma cena.");
+      const miracle = data.miracle === true;
+      const fatigue = source.system.conditions?.find(condition => condition.id === "fatigued");
+      if (miracle && !rules.miracleFatigueFree && fatigue?.active && fatigue.stacks >= (fatigue.maxStacks || 2))
+        throw new Error("Miracle Empowerment indisponível.");
+      const inMelee = miracle || gridDistanceSquares(sourceToken, targetToken) <= meleeSquares(source) + 0.001;
+      const limit = 2 * num(source.system.status?.might, 0) * actions * (inMelee ? 2 : 1);
+      if ((rules.maxActions != null && actions > rules.maxActions) || amount > limit)
+        throw new Error("A transferência excede o limite do Empower.");
       const sourceKi = Math.max(0, num(source.system?.kiPool?.value, 0));
       const sourceCapacity = Math.max(0, num(source.system?.status?.capacitySpent, 0));
       const targetKi = Math.max(0, num(target.system?.kiPool?.value, 0));
@@ -2225,7 +2261,7 @@ async function standardSocketHandler(data) {
         await source.update({
           "system.kiPool.value": sourceKi - amount,
           "system.status.capacitySpent": sourceCapacity + capacityCost,
-          "system.combatTabState": data.combatTabState
+          "system.combatTabState": empowerRoundState(source, target, amount, actions, miracle)
         });
       } catch (error) {
         await target.update({ "system.kiPool.value": targetKi }).catch(() => {});
@@ -2239,6 +2275,17 @@ async function standardSocketHandler(data) {
     if (!actor) throw new Error("Actor de destino não encontrado pelo GM.");
     if (!userOwnsActor(requester, actor) && !userOwnsActor(requester, authority)) {
       throw new Error("O solicitante não controla o Actor que autorizou a operação.");
+    }
+
+    if (!userOwnsActor(requester, actor)) {
+      const details = JSON.stringify(data.updates || { [data.path]: data.value }, null, 2);
+      const accepted = await Dialog.confirm({
+        title: "Autorizar alteração de combate",
+        content: `<p>${esc(requester.name)} · ${esc(authority.name)} → ${esc(actor.name)}</p><pre>${esc(details)}</pre>`,
+        defaultYes: false
+      });
+      if (Date.now() >= data.expiresAt) throw new Error("A solicitação expirou.");
+      if (!accepted) throw new Error("Alteração recusada pelo mestre.");
     }
 
     if (data.type === "dbuaStandardActorUpdateRequest") {
@@ -2281,9 +2328,8 @@ export function registerStandardActionSettings() {
 export function initializeStandardActionsAutomation() {
   if (state.initialized) return state;
   state.initialized = true;
-  if (state.socketHandler) try { game.socket.off(SOCKET, state.socketHandler); } catch {}
-  state.socketHandler = standardSocketHandler;
-  game.socket.on(SOCKET, state.socketHandler);
+  if (state.socketHandler) try { Hooks.off("createChatMessage", state.socketHandler); } catch {}
+  state.socketHandler = listenRequests("standard", standardSocketHandler);
   state.hooks.updateActor = Hooks.on("updateActor", (actor, changes) => {
     const keys = Object.keys(changes || {}).join(" ");
     if (foundry.utils.hasProperty(changes || {}, "system.tracking.powerStacks")) {

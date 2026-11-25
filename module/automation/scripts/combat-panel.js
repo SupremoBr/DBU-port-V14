@@ -10,7 +10,7 @@ import { eligibleInterveners, canReflect, startIntervene, startReflect } from ".
 import { getTerrainLiftState, getSurgeUsage } from "./maneuvers.js";
 import { getStandardPendingActions, respondExploitPending, respondGrappleEscape, respondSyntheticGrappleClash } from "./standard-actions.js";
 import { conditionActive, standardActionBudget, actorInActiveCombat } from "./action-economy.js";
-import { actorIdentity, combatantForIdentity, resolveSceneToken, resolveParticipant, participantKeyForAttack, tokenForActor as findActorToken, tokenIdentity, tokenSceneId } from "./core/token-identity.js";
+import { participantReference, actorIdentity, combatantForIdentity, resolveSceneToken, resolveParticipant, participantKeyForAttack, tokenForActor as findActorToken, tokenIdentity, tokenSceneId } from "./core/token-identity.js";
 
 const PANEL_VERSION = "2.4";
 const MODULE_VERSION = "1.9.18 DEV";
@@ -167,15 +167,15 @@ function pendingReflects(actor,messages=recentAttackMessages()){
     const attack=message.getFlag("world","dbuAttackData")||{};
     if(!canReflect(attack))continue;
     const uses=message.getFlag("world","dbuReflectUses")||{};
-    const reflectorKey=actorIdentity(actor);
+    const reflectorKey=participantKeyForAttack(actor,attack)||participantReference(actor).key;
     if(uses?.[reflectorKey]?.used||uses?.[actor.id]?.used)continue;
     const states=message.getFlag("world","dbuDefenseStates")||{};
     const key=participantKeyForAttack(actor,attack);
     const st=key?states?.[key]:null;
     const parry=st?.hiddenOutcome?.defenseType==="parry"&&!!st.hiddenOutcome?.success;
     const reflectorId=message.getFlag("world","dbuDeflectReflectOpportunity")?.reflectorId;
-    const deflect=reflectorId===actorIdentity(actor)||reflectorId===actor.id;
-    if(parry||deflect)out.push({type:"reflect",message,attack,targetId:actor.id,source:parry?"Parry":"Deflect"});
+    const deflect=reflectorId===reflectorKey;
+    if(parry||deflect)out.push({type:"reflect",message,attack,targetId:reflectorKey,source:parry?"Parry":"Deflect"});
     if(out.length>=5)break;
   }
   return out;
@@ -466,7 +466,7 @@ export function initializeCombatPanelAutomation(){
   const old=globalThis.DBU_COMBAT_PANEL_AUTOMATION||{};
   for(const [hook,id] of Object.entries(old.hooks||{}))try{Hooks.off(hook,id);}catch{}
   if(old.tokenHudHookId)try{Hooks.off("renderTokenHUD",old.tokenHudHookId);}catch{}
-  const tokenHudHookId=Hooks.on("renderTokenHUD",(app,html,data)=>{try{const tokenId=data?._id||data?.id||app?.object?.id||app?.object?.document?.id;const token=tokenId?canvas?.tokens?.get?.(tokenId):app?.object;const actor=token?.actor;if(!actor||!canControl(actor))return;const root=html instanceof HTMLElement?html:(html?.[0]||null);if(!root||root.querySelector("[data-dbu-combat-panel-hud]"))return;const col=root.querySelector(".col.right")||root.querySelector(".right")||root;const c=document.createElement("div");c.className="control-icon";c.dataset.dbuCombatPanelHud="1";c.title="DBU — Painel de Combate 2.0";c.innerHTML='<i class="fas fa-dragon"></i>';c.addEventListener("click",async e=>{e.preventDefault();e.stopPropagation();await openCombatPanel({actor,token});});col.appendChild(c);}catch(err){console.error("DBU Token HUD:",err);}});
+  const tokenHudHookId=Hooks.on("renderTokenHUD",(app,html,data)=>{try{const tokenId=data?._id||data?.id||app?.object?.id||app?.object?.document?.id;const token=tokenId?canvas?.tokens?.get?.(tokenId):app?.object;const actor=token?.actor;if(!actor||!canControl(actor))return;const root=html instanceof HTMLElement?html:(html?.[0]||null);if(!root||root.querySelector("[data-dbu-combat-panel-hud]"))return;const col=root.querySelector(".col.right")||root.querySelector(".right")||root;const c=document.createElement("button");c.type="button";c.className="control-icon";c.dataset.dbuCombatPanelHud="1";c.title="DBU — Painel de Combate 2.0";c.innerHTML='<i class="fas fa-dragon"></i>';c.addEventListener("click",async e=>{e.preventDefault();e.stopPropagation();await openCombatPanel({actor,token});});col.appendChild(c);}catch(err){console.error("DBU Token HUD:",err);}});
   const hooks={
     createChatMessage:Hooks.on("createChatMessage",message=>{
       if(isRelevantCombatMessage(message))scheduleRefreshAll(90,{invalidateMessages:true});

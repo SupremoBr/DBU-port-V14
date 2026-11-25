@@ -123,6 +123,8 @@ export function resolveParticipant(key, attack = null) {
     const token = resolveSceneToken(ref.sceneId, ref.tokenId);
     return token?.actor || null;
   }
+  const tokenKey = /^tok_([a-zA-Z0-9]+)_([a-zA-Z0-9]+)$/.exec(value);
+  if (tokenKey) return resolveSceneToken(tokenKey[1], tokenKey[2])?.actor || null;
   const match = /^Scene\.([^.]+)\.Token\.([^.]+)$/.exec(value);
   if (match) return resolveSceneToken(match[1], match[2])?.actor || null;
   return game.actors?.get?.(ref?.actorId || value) || null;

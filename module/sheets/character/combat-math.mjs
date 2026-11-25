@@ -1,3 +1,4 @@
+import { stateLevel } from "../../rules/states-v093.mjs";
 import { attackWeapon093, weaponRollModifiers093, wieldingStrikePenalty093 } from "../../helpers/weapon-state.mjs";
 import { martialDie, martialEnergyCharges } from "../../rules/path-to-power-v093.mjs";
 import { energyChargeDie, greaterDiceCategoryBonus, shiftAttackDamageCategory } from "../../helpers/custom-buffs.mjs";
@@ -60,6 +61,7 @@ export const combatMathMethods = {
    */
   _ragingWoundDice(system, tier) {
     if (!system.combatStates?.raging) return "";
+    if (uses093(system)) return `+${stateLevel(system, "raging") * tier}`;
     const catBonus = (system.aptitudes?.ragingExtraDiceCatBonus || 0)
       + (system.aptitudes?.ragingDiceSize || 0);
     // Base 1d4 sits at chain index 0; the aspect/buff bumps it up the ladder.
@@ -93,7 +95,7 @@ export const combatMathMethods = {
   _calcCombatCTs(system, { isWeapon = false, foundation = "", profile = "", isSignature = false } = {}) {
     const talents = system.talents || [];
     const apt = system.aptitudes || {};
-    const mindful = system.combatStates?.mindful ? 1 : 0;
+    const mindful = stateLevel(system, "mindful");
     const clamp = (v) => Math.max(7, Math.min(10, v));
 
     let strikeCT = 10 - mindful - (Number(apt.strikeCTBonus) || 0);
@@ -186,13 +188,13 @@ export const combatMathMethods = {
     stateWoundExtra += this._ragingWoundDice(system, tier);
     // Surging: +1d4(T) Strike & Wound Rolls (vs targeted opponent) — die
     // category/count adjustable via the Surging buffs (_surgingWoundDice)
-    if (combatStates.surging) {
+    if (combatStates.surging && !uses093(system)) {
       const surgingDice = this._surgingWoundDice(system, tier);
       stateStrikeExtra += `+${surgingDice}`;
       stateWoundExtra += `+${surgingDice}`;
     }
     // Mindful: -1(T) Wound Rolls
-    if (combatStates.mindful) stateWoundMod -= tier;
+    stateWoundMod -= stateLevel(system, "mindful") * tier;
     // Undying: -1(T) all Combat Rolls
     if (combatStates.undying) stateAllMod -= tier;
     // Combat Critical Target — unified (talents, Mindful, CT buffs)
@@ -497,6 +499,7 @@ export const combatMathMethods = {
         primaryWeaponId: resolveSavedWeapon(ref.weaponEquipped),
         offHandId: resolveSavedWeapon(ref.offHand),
         selectedWeapon: wItem,
+        targetingBonus: revised && wItem ? eqFlags.weaponTargetingSystem?.[wItem.id] || 0 : 0,
         weaponIssue: selection.issue,
         offHandLabel: ref.offHand || "Unarmed",
         defense: system.defense ?? 0,

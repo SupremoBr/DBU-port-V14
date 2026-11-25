@@ -161,9 +161,9 @@
         </div>
       </div>
       {{!-- Qualities expandable section --}}
-      <div class="eq-card-qualities-toggle" data-action="toggle-qualities-card" data-item-id="{{_id}}">
+      <button type="button" aria-expanded="{{#if expanded}}true{{else}}false{{/if}}" class="eq-card-qualities-toggle" data-action="toggle-qualities-card" data-item-id="{{_id}}">
         <i class="fas fa-chevron-{{#if expanded}}up{{else}}down{{/if}}"></i> Qualities ({{qualitySlotsUsed}} / {{qualitySlotsMax}} slots)
-      </div>
+      </button>
       {{#if expanded}}
       <div class="eq-card-qualities-section">
         <table class="eq-qualities-table">
@@ -323,9 +323,9 @@
         </div>
       </div>
       {{!-- Qualities expandable section --}}
-      <div class="eq-card-qualities-toggle" data-action="toggle-qualities-card" data-item-id="{{_id}}">
+      <button type="button" aria-expanded="{{#if expanded}}true{{else}}false{{/if}}" class="eq-card-qualities-toggle" data-action="toggle-qualities-card" data-item-id="{{_id}}">
         <i class="fas fa-chevron-{{#if expanded}}up{{else}}down{{/if}}"></i> Qualities ({{qualitySlotsUsed}} / {{qualitySlotsMax}} slots)
-      </div>
+      </button>
       {{#if expanded}}
       <div class="eq-card-qualities-section">
         <table class="eq-qualities-table">

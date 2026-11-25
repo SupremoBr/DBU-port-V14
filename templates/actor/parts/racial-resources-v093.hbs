@@ -49,12 +49,6 @@
   {{#if dr}}<span class="bb-bonus">Demonic Resilience · +{{dr}} Damage Reduction</span>{{/if}}
   {{#if ../editable}}
   <div class="bb-row dbu-racial-resource-actions">
-    {{#if hasAttackCheck}}
-    <button type="button" data-rules093-pressure="attack" {{#unless canAttack}}disabled{{/unless}}>Pressure Check · Após atacar {{attackChecks}}/3</button>
-    {{/if}}
-    {{#if hasDefenseCheck}}
-    <button type="button" data-rules093-pressure="defense" {{#unless canDefend}}disabled{{/unless}}>Pressure Check · Ao ser alvo {{defenseChecks}}/2</button>
-    {{/if}}
     {{#if hasPhantomSteadfast}}
     <button type="button" data-rules093-resource="steadfast">Steadfast · Fallen Idol +{{steadfast}}</button>
     {{/if}}
@@ -64,9 +58,6 @@
     {{#if makyanPower}}
     <button type="button" data-rules093-resource="makyanPower" {{#unless canUseMakyanPower}}disabled{{/unless}}>Makyan · Após Power Up</button>
     {{/if}}
-    {{#unless inCombat}}
-    <button type="button" data-rules093-resource="turn">Novo turno</button>
-    {{/unless}}
   </div>
   {{/if}}
 </div>

@@ -296,9 +296,15 @@ test('actual native roll applies Clearing natural minimum and records the execut
   const sheet=new DBUCharacterSheet(actor);
   sheet._trackerSourceGroups=[{sources:[{key:'ref_0',name:'Clearing',profile:'Clearing',foundation:'Energy',damageCat:'Standard',strikeFormula:'1d10+10',woundFormula:'1d10+10',strikeCT:10,woundCT:10}]}];
   const event={preventDefault(){},currentTarget:{dataset:{round:'1',actionIndex:'0'}}};
+  game.user.id = 'gm';
+  let page;
+  game.journal = [{ id: 'journal', ownership: { default: 0, gm: 3 }, getFlag: () => 'gm',
+    async createEmbeddedDocuments(_, [data]) { page = data; return [{ id: data._id }]; } }];
+  foundry.utils.randomID = () => 'NativeAttackCard';
   await sheet._onRollTrackerAttack(event);
   assert.equal(messages.length,1);
-  assert.equal(messages[0].flags['DBU-MRR-OLD'].attackReveal.strikeTotal,15);
+  assert.equal(messages[0].flags['DBU-MRR-OLD'].attackReveal.strikeTotal, undefined);
+  assert.equal(JSON.parse(decodeURIComponent(page.text.content)).reveal.strikeTotal, 15);
   assert.equal(actor.system.combatTabState.rounds[0].actions[0].rules093Executed,true);
   await sheet._onRollTrackerAttack(event);
   assert.equal(messages.length,1);
@@ -656,7 +662,13 @@ test('an automated attack publishes one card with the native roll and the defens
     let visuals = 0;
     actor.getFlag = (scope, key) => scope === 'DBU-MRR-OLD' && key === 'visualConfig'
       ? { attacks: { ref_0: { visualMode: 'custom', visualMacro: 'Visual Beam' } } } : undefined;
-    globalThis.game = { combat: null, user: { isGM: true, targets: new Set() }, actors: new Map(),
+    let savedPage;
+    const journal = { id: 'journal', ownership: { gm: 3, default: 0 }, getFlag: () => 'gm',
+      async createEmbeddedDocuments(_type, [page]) {
+        savedPage = page;
+        return [{ id: page._id }];
+      } };
+    globalThis.game = { combat: null, user: { id: 'gm', isGM: true, targets: new Set() }, actors: new Map(), journal: [journal],
       macros: { getName: () => ({ execute: async data => {
         assert.equal(messages[0]?.data._id, data.attackData.originalAttackMessageId);
         visuals++;
@@ -685,8 +697,11 @@ test('an automated attack publishes one card with the native roll and the defens
     assert.equal(data._id, result.originalAttackMessageId);
     assert.equal(data._id, result.messageId);
     assert.equal(data.flags.world.dbuUnifiedAttackCard, true);
-    assert.equal(data.flags['DBU-MRR-OLD'].attackReveal.revealed, false);
-    assert.match(data.flags['DBU-MRR-OLD'].attackReveal.revealedHtml, /data-dbu-pay="combined"/);
+    assert.equal(data.flags['DBU-MRR-OLD']?.attackReveal, undefined);
+    assert.equal(data.flags.world.dbuAttackData.strikeTotal, undefined);
+    assert.equal(data.flags.world.dbuAttackData.woundTotal, undefined);
+    assert.equal(savedPage._id, data._id);
+    assert.match(JSON.parse(decodeURIComponent(savedPage.text.content)).reveal.revealedHtml, /data-dbu-pay="combined"/);
     assert.match(data.content, /data-dbu-secret-attack-results/);
     assert.match(data.content, /data-target-row/);
     assert.doesNotMatch(data.content, /data-dbu-pay="combined"/);

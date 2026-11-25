@@ -1,8 +1,9 @@
+import { stateLevel } from "../../rules/states-v093.mjs";
 import { attackWeapon093, weaponRollModifiers093, wieldingStrikePenalty093 } from '../../helpers/weapon-state.mjs';
 import { limitedMartialPower } from "../../rules/path-to-power-v093.mjs";
 import { energyChargeDie, greaterDiceCategoryBonus, shiftAttackDamageCategory, signatureBuffDice } from "../../helpers/custom-buffs.mjs";
-import { techniqueKiCost093, signatureEnergyCharges093, martialTechnique, martialTechniqueTPCap, startingTechniqueAvailable093, startingTechniqueEligible093 } from "../../rules/techniques-v093.mjs";
-import { isLegacyLimitBreakType, uses093, techniquePointCost, paidAdvantageTP093, signatureModifierTP093 } from "../../rules/v093.mjs";
+import { modifierProfileIssue093, techniqueKiCost093, signatureEnergyCharges093, martialTechnique, martialTechniqueTPCap, startingTechniqueAvailable093, startingTechniqueEligible093 } from "../../rules/techniques-v093.mjs";
+import { isLegacyLimitBreakType, uses093, techniqueCapUsage093, techniquePointCost, paidAdvantageTP093, signatureModifierTP093 } from "../../rules/v093.mjs";
 import { progression093 } from "../../rules/progression-v093.mjs";
 
 /** Character sheet domain: techniques. Methods run with the sheet as this. */
@@ -28,14 +29,18 @@ export const techniquesMethods = {
     // Helper: get attribute modifier
     const getAttrMod = (key) => system.attributes?.[key]?.modifier ?? 0;
 
-    const enrichModifier = (row, group, definitions) => {
+    const enrichModifier = (row, group, definitions, profile) => {
       const { requirement = "", effect, source } = definitions[row.name] || {};
       const tpCost = currentRules ? signatureModifierTP093(row, group) : row.tpCost;
-      const paidTP = currentRules && group === 'Advantages' ? paidAdvantageTP093(row) : tpCost;
+      const paidTP = currentRules && group === 'Advantages' ? paidAdvantageTP093(row, profile) : tpCost;
       return { ...row, tpCost, paidTP, requirement, effect, source };
     };
-    const enrichAdvantages = rows => (rows || []).map(row => enrichModifier(row, 'Advantages', advData));
+    const enrichAdvantages = technique => (technique.advantages || []).map(row => enrichModifier(row, 'Advantages', advData, technique.profile));
     const enrichDisadvantages = rows => (rows || []).map(row => enrichModifier(row, 'Disadvantages', disadvData));
+
+    const optionsFor = (t, rows, definitions) => rows.map(row => ({ ...row, options: Object.keys(definitions).filter(name =>
+        name === row.name || ((!currentRules || !modifierProfileIssue093(martialTechnique(t, system), name)) &&
+          !rows.some(other => other !== row && other.name === name))).sort() }));
 
     // Calculate enriched data for each technique
     const preparedTechniques = techniques.map(t => {
@@ -62,7 +67,7 @@ export const techniquesMethods = {
       // Available profiles for selected foundation
       const availableProfiles = foundations[t.foundation] || Object.keys(profileDataMap);
 
-      const enrichedAdvantages = enrichAdvantages(t.advantages);
+      const enrichedAdvantages = enrichAdvantages(t);
       const enrichedDisadvantages = enrichDisadvantages(t.disadvantages);
 
       // Strike formula
@@ -76,7 +81,9 @@ export const techniquesMethods = {
         ...t,
         tpCost,
         tpMax: techniqueCap,
-        tpOverLimit: (currentRules ? tpFull : tpCost) > techniqueCap,
+        tpCapUsage: currentRules ? techniqueCapUsage093(t) : tpCost,
+        targetingBonus: currentRules && t.isWeapon ? system.equipmentFlags?.weaponTargetingSystem?.[attackWeapon093(this.actor, t).item?.id] || 0 : 0,
+        tpOverLimit: (currentRules ? techniqueCapUsage093(t) : tpCost) > techniqueCap,
         tpDiscounted: currentRules && tpFull !== tpCost,
         ...(currentRules && t.startingTechnique ? { startingTechniqueNeedsReview: !isFreeStarter } : {}),
         tpFull,
@@ -95,8 +102,8 @@ export const techniquesMethods = {
         profileBaseKP,
         profileInfo,
         availableProfiles,
-        advantages: enrichedAdvantages,
-        disadvantages: enrichedDisadvantages,
+        advantages: optionsFor(t, enrichedAdvantages, advData),
+        disadvantages: optionsFor(t, enrichedDisadvantages, disadvData),
         strikeFormula: strikeInfo.formula,
         strikeCT: ctInfo.strikeCT,
         woundFormula: woundInfo.formula,
@@ -157,7 +164,7 @@ export const techniquesMethods = {
           for (const adv of (cloned.advantages || [])) dynamicKi += (adv.dynamicTP || 0);
           for (const dis of (cloned.disadvantages || [])) dynamicKi += (dis.dynamicTP || 0);
           const availableProfiles = foundations[cloned.foundation] || Object.keys(profileDataMap);
-          const enrichedAdvantages = enrichAdvantages(cloned.advantages);
+          const enrichedAdvantages = enrichAdvantages(cloned);
           const enrichedDisadvantages = enrichDisadvantages(cloned.disadvantages);
           const strikeInfo = this._calcTechStrike(cloned, system, tier);
           const woundInfo = this._calcTechWound(cloned, system, tier);
@@ -166,12 +173,12 @@ export const techniquesMethods = {
             ...cloned,
             isGained: true,
             gainedFrom: suppActor.name,
-            tpMax: tpLimit,
+            tpMax: tpLimit, tpCapUsage: currentRules ? techniqueCapUsage093(cloned) : tpCost,
             tpCost, kpCost, kpReduction, dynamicKi, finalKP,
             maintenanceKP: Math.ceil(finalKP / 2),
             profileBaseKP, profileInfo, availableProfiles,
-            advantages: enrichedAdvantages,
-            disadvantages: enrichedDisadvantages,
+            advantages: optionsFor(cloned, enrichedAdvantages, advData),
+            disadvantages: optionsFor(cloned, enrichedDisadvantages, disadvData),
             strikeFormula: strikeInfo.formula, strikeCT: ctInfo.strikeCT,
             woundFormula: woundInfo.formula, woundCT: ctInfo.woundCT,
             dodgeCT: ctInfo.dodgeCT, damageCat: woundInfo.damageCat,
@@ -213,7 +220,7 @@ export const techniquesMethods = {
         // Rule: "Reduce their Ki Point Cost by 1/2."
         const finalKP = Math.ceil(baseFinalKP / 2);
         const availableProfiles = foundations[cloned.foundation] || Object.keys(profileDataMap);
-        const enrichedAdvantages = enrichAdvantages(cloned.advantages);
+        const enrichedAdvantages = enrichAdvantages(cloned);
         const enrichedDisadvantages = enrichDisadvantages(cloned.disadvantages);
         const strikeInfo = this._calcTechStrike(cloned, system, tier);
         const woundInfo  = this._calcTechWound(cloned, system, tier);
@@ -223,12 +230,12 @@ export const techniquesMethods = {
           isGained: true,
           gainedFrom: "Evil Aura",
           gainedSource: "evil_aura",
-          tpMax: tpLimit,
+          tpMax: tpLimit, tpCapUsage: currentRules ? techniqueCapUsage093(cloned) : tpCost,
           tpCost, kpCost, kpReduction, dynamicKi, finalKP,
           maintenanceKP: Math.ceil(finalKP / 2),
           profileBaseKP, profileInfo, availableProfiles,
-          advantages: enrichedAdvantages,
-          disadvantages: enrichedDisadvantages,
+          advantages: optionsFor(cloned, enrichedAdvantages, advData),
+          disadvantages: optionsFor(cloned, enrichedDisadvantages, disadvData),
           strikeFormula: strikeInfo.formula, strikeCT: ctInfo.strikeCT,
           woundFormula: woundInfo.formula, woundCT: ctInfo.woundCT,
           dodgeCT: ctInfo.dodgeCT, damageCat: woundInfo.damageCat,
@@ -544,7 +551,8 @@ export const techniquesMethods = {
     // Maneuvers, so the Raging (+1d4(T), Aspect-bumped) and Surging (+1d4(T))
     // states apply to their Wound Rolls just like Basic Attacks.
     const ragingExtra = this._ragingWoundDice(system, tier);
-    const surgingExtra = combatStates.surging ? `+${this._surgingWoundDice(system, tier)}` : "";
+    if (uses093(system)) totalMod -= stateLevel(system, "mindful") * tier;
+    const surgingExtra = combatStates.surging && !uses093(system) ? `+${this._surgingWoundDice(system, tier)}` : "";
     // Synthetic Muscle (cybernetic trait): +1d4(T) Wound on Physical/Energy attacks
     const synthExtra = (system._cyberSynthWoundDice && (tech.foundation === "Physical" || tech.foundation === "Energy"))
       ? `+${this._scaleDiceByTier("1d4", tier)}` : "";

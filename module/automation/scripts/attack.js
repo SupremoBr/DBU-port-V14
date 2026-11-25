@@ -1,3 +1,6 @@
+import { sizeLead } from "../../rules/size-v093.mjs";
+import { surgingCharge093, surgingTargetsAllowed093, ragingBotch } from "../../rules/states-v093.mjs";
+import { privateRollJournal, sealRoll } from "./core/private-rolls.js";
 import { attackWeapon093 } from '../../helpers/weapon-state.mjs';
 import { inCombat093 } from "../../rules/actions-v093.mjs";
 import { profileRoll093 } from "../../rules/profiles-v093.mjs";
@@ -790,7 +793,7 @@ const preExistingDimPenalty = preExistingDimStacks * baseTier;
 // ============================================================
 // O detector é apenas um auxílio. O jogador sempre pode marcar/desmarcar e
 // corrigir Tipo/Magnitude manualmente para Traits/Talents opcionais.
-const initialAreaSpec = getAreaSpec(sources[initialSourceIndex]?.source || {});
+const initialAreaSpec = getAreaSpec(sources[initialSourceIndex]?.source || {}, actor, Array.from(game.user.targets || []));
 const initialAreaEnabled = !!initialAreaSpec?.isAoE;
 const initialAreaShape = initialAreaSpec?.shape === "choose"
   ? "cone"
@@ -862,6 +865,7 @@ const selection = await Dialog.wait({
         ${selectHTML}
       </div>
 
+      ${uses093(actor.system) && (!context.effectiveType || context.effectiveType === "standard") ? '<label><input type="checkbox" id="dbu-called-shot"> Called Shot · 1 Action + 2(T) KP</label><input type="text" id="dbu-called-location" aria-label="Local visado" placeholder="Local visado">' : ""}
       <div class="dbu-auto-damage-category" style="margin-bottom:10px;">
         <div class="form-group">
           <label><b>Categoria do dano</b></label>
@@ -914,7 +918,7 @@ const selection = await Dialog.wait({
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
         <div class="form-group">
           <label><b>Strike Botch até</b></label>
-          <input id="dbu-strike-botch" type="number" value="1" min="0" max="10" step="1" style="width:100%;">
+          <input id="dbu-strike-botch" type="number" value="${ragingBotch(actor.system)}" min="0" max="10" step="1" style="width:100%;">
           <p class="notes">1 = padrão; 0 = desliga; 2 = natural 1-2.</p>
         </div>
 
@@ -1028,6 +1032,8 @@ const selection = await Dialog.wait({
         woundCTMod: Math.trunc(Number(html.find("#dbu-wound-ct-mod").val()) || 0),
         strikeBotch: dbuClampInt(html.find("#dbu-strike-botch").val(), 0, 10),
         woundBotch: dbuClampInt(html.find("#dbu-wound-botch").val(), 0, 10),
+        calledShot: !!html.find("#dbu-called-shot").prop("checked"),
+        calledLocation: String(html.find("#dbu-called-location").val() || "").trim(),
         chargingAssault: !!html.find("#dbu-charging-assault").prop("checked"),
         hasArea: !!html.find("#dbu-has-area").prop("checked"),
         areaShape: String(html.find("#dbu-area-shape").val() || "circle"),
@@ -1096,7 +1102,7 @@ const selection = await Dialog.wait({
     const markManualChange = () => {
       if (applyingAuto || !enabled?.checked) return;
       const idx = Number(sourceSelect?.value || 0);
-      const auto = getAreaSpec(sources[idx]?.source || {});
+      const auto = getAreaSpec(sources[idx]?.source || {}, actor, Array.from(game.user.targets || []));
       if (modeChip) {
         modeChip.textContent = auto?.isAoE ? "AUTO + AJUSTE" : "MANUAL";
         modeChip.classList.add("warn");
@@ -1106,7 +1112,7 @@ const selection = await Dialog.wait({
 
     const applySourceArea = () => {
       const idx = Number(sourceSelect?.value || 0);
-      const auto = getAreaSpec(sources[idx]?.source || {});
+      const auto = getAreaSpec(sources[idx]?.source || {}, actor, Array.from(game.user.targets || []));
       applyingAuto = true;
       enabled.checked = !!auto?.isAoE;
       if (optionsBox) optionsBox.style.display = enabled.checked ? "block" : "none";
@@ -1180,7 +1186,7 @@ const damageCategoryAdjusted = chosenDamageCategory !== originalDamageCategory;
 // ============================================================
 // AREA ATTACK v11.11 — DBU 0.9.2: Tipo + Magnitude + override manual
 // ============================================================
-const areaSpec = getAreaSpec(source);
+const areaSpec = getAreaSpec(source, actor, targetTokens);
 const chosenShape = ["circle", "cone", "ray"].includes(selection.areaShape) ? selection.areaShape : "circle";
 let chosenMagnitude = Math.max(0, Math.min(5, Number(selection.areaMagnitude ?? 1)));
 if (chosenShape !== "circle" && chosenMagnitude === 0) chosenMagnitude = 1;
@@ -1236,6 +1242,20 @@ if (
   );
 }
 
+const targetKeys = targetTokens.map(token => token.document?.uuid);
+if (!surgingTargetsAllowed093(actor.system, targetKeys, areaEnabled)) return ui.notifications.warn("Surging: inclua o Focus selecionado na ficha. Outros alvos exigem área.");
+const focusCharge = surgingCharge093(actor.system, source);
+let calledStrikePenalty = 0;
+let calledWoundBonus = 0;
+if (selection.calledShot) {
+  if (areaEnabled || areaSpec.isAoE || targetTokens.length !== 1 || !selection.calledLocation) return ui.notifications.warn("Called Shot exige um ataque sem área, um alvo e o local visado.");
+  if (actor.system.combatTabState?.rounds?.at(-1)?.actions?.some(row => row.dbuCalledShot)) return ui.notifications.warn("Called Shot já usado nesta rodada.");
+  if (!validateActionUse(actor, { label: "Called Shot + Ataque", actionCost: 2, attacking: true }).ok) return;
+  const difference = sizeLead(targetTokens[0].actor, actor);
+  calledStrikePenalty = difference >= 2 ? 0 : 2 * tier;
+  calledWoundBonus = difference >= 2 ? difference * tier : 0;
+  chosenDamageCategory = chosenDamageCategory === "Standard" ? "Direct" : "Lethal";
+}
 const wager = Number(selection.wager || 0);
 
 // ============================================================
@@ -1251,7 +1271,7 @@ const wager = Number(selection.wager || 0);
 // fluxo original do DBU e o interceptor Ki + Capacity do módulo.
 // ============================================================
 
-const attackKiCost = Math.max(0, Number(source.kiCost || 0));
+const attackKiCost = Math.max(0, Number(source.kiCost || 0)) + (selection.calledShot ? 2 * tier : 0);
 const attackTotalCost = attackKiCost + Math.max(0, wager);
 if (uses093(actor.system)) {
   const technique = (actor.system.signatureTechniques || []).find(t => 'tech_'+t.id === source.key);
@@ -1340,6 +1360,7 @@ try {
 // ROUND TRACKER — MESMO FORMATO DO DBU
 // ============================================================
 
+const rollJournal = await privateRollJournal();
 const cts = foundry.utils.deepClone(actor.system.combatTabState || {});
 if (!Array.isArray(cts.rounds)) cts.rounds = [];
 
@@ -1361,7 +1382,8 @@ currentRound.actions.push({
   type: "attack",
   effectiveType: context?.effectiveType || "standard",
   source: source.key,
-  kiCost: Number(source.kiCost || 0),
+  ...(selection.calledShot ? { dbuCalledShot: selection.calledLocation, actionCost: 2, calledStrikePenalty, calledWoundBonus } : {}),
+  kiCost: attackKiCost,
   dkpCost: 0,
   kiWager: wager,
   description: source.name || "",
@@ -1403,7 +1425,7 @@ try {
   nativeMessage = await sheet._onRollTrackerAttack({
     preventDefault() {},
     currentTarget: { dataset: { round: String(currentRound.roundNumber), actionIndex: String(actionIndex) } }
-  }, { prepareOnly: true });
+  }, { prepareOnly: true, focusCharge });
 } catch (error) {
   console.error("DBU | _onRollTrackerAttack:", error);
   return ui.notifications.error("Erro executando a rolagem original do DBU.");
@@ -1469,7 +1491,7 @@ const woundCT = Math.max(1, defaultWoundCT + Number(selection.woundCTMod || 0));
 const strikeBotchThreshold = dbuClampInt(selection.strikeBotch, 0, 10);
 const woundBotchThreshold = dbuClampInt(selection.woundBotch, 0, 10);
 
-const profileRoll = uses093(actor.system) ? profileRoll093(source.profile, { strikeNatural: strikeNat, strikeCT, strikeBotchThreshold, damageCat: chosenDamageCategory }) : null;
+const profileRoll = uses093(actor.system) ? profileRoll093(source.profile, { strikeNatural: strikeNat, faces: strikeRoll.dice[0]?.faces || 10, targetingBonus: source.targetingBonus || 0, strikeCT, strikeBotchThreshold, damageCat: chosenDamageCategory }) : null;
 if (profileRoll) chosenDamageCategory = profileRoll.damageCat;
 const strikeCrit = profileRoll ? profileRoll.critical : strikeNat >= strikeCT;
 const woundCrit = woundNat >= woundCT;
@@ -1561,7 +1583,7 @@ const patchedRevealHtml = dbuPatchOriginalRevealHtml(
   {
     attackNum: actualAttackNum,
     wager,
-    strikeNat,
+    strikeNat: profileRoll?.natural ?? strikeNat,
     woundNat,
     defaultStrikeCT,
     defaultWoundCT,
@@ -1669,7 +1691,7 @@ const attackData = {
 
   originalAttackMessageId: messageId,
 
-  strikeNatural: strikeNat,
+  strikeNatural: profileRoll?.natural ?? strikeNat,
   woundNatural: woundNat,
 
   foundation: source.foundation || "",
@@ -1680,10 +1702,11 @@ const attackData = {
   originalDamageCategory,
   damageCategoryAdjusted,
 
-  energyCharges: Number(source.energyCharges || 0),
+  energyCharges: Number(source.energyCharges || 0) + focusCharge,
+  determined: uses093(actor.system) && !!actor.system.combatStates?.determined,
   powerShot: Number(source.powerShot || 0),
 
-  kiCost: Number(source.kiCost || 0),
+  kiCost: attackKiCost,
   wager,
 
   gif: attackGif,
@@ -1736,6 +1759,7 @@ const attackData = {
 
   // v11.6 — dados necessários para revelar a carta somente após todas as defesas.
   strikeDisplayFormula,
+  woundBaseFormula: woundOriginalFormula,
   woundDisplayFormula: woundBonus.raw
     ? `${woundOriginalFormula} [Extra ${woundBonus.raw}]`
     : woundOriginalFormula,
@@ -1866,6 +1890,7 @@ const metaChips = [
   source.energyCharges ? `EC ${source.energyCharges}` : "",
   source.powerShot ? `Power Shot ${source.powerShot}` : "",
   areaEnabled ? `🎯 ${areaResolution?.areaData?.label || `${magnitudeLabel(chosenMagnitude)} ${chosenShape === "circle" ? "Sphere" : chosenShape === "cone" ? "Cone" : "Line"} AoE`} · ${areaMode === "auto" ? "AUTO" : areaMode === "auto-adjusted" ? "AUTO + AJUSTE" : "MANUAL"}` : "",
+  selection.calledShot ? "Called Shot · " + dbuEsc(selection.calledLocation) : "",
   selection.chargingAssault ? "🏃 Charging Assault" : "",
   chargeState
     ? `⚡ Charge +${Number(chargeState.gatheredCharges || 0)} EC${chargeReleaseActive ? " · LIBERANDO" : ""}`
@@ -1952,16 +1977,17 @@ const woundStatusTags = [
 // CARTA DE DEFESA
 // ============================================================
 
+const publicAttack = await sealRoll(rollJournal, messageId, attackData, updatedReveal);
 await ChatMessage.create({
   _id: messageId,
   speaker: nativeMessage.speaker,
 
   flags: {
-    "DBU-MRR-OLD": { attackReveal: updatedReveal },
+
     world: {
       dbuUnifiedAttackCard: true,
       dbuAttackPaymentRef: attackData.attackerRef,
-      dbuAttackData: { ...attackData, messageId },
+      dbuAttackData: publicAttack,
       dbuDefenseStates: defenseStates,
       dbuUnitedAttackLocked: false,
       dbuUnitedAttackContributions: [],

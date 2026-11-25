@@ -421,8 +421,12 @@ export default class DBUCharacterData extends foundry.abstract.TypeDataModel {
 
       // ---- Combat states (boolean toggles) ----
       combatStates: new SchemaField({
+        determined: new BooleanField({ initial: false }),
+        ragingLevel: new NumberField({ initial: 1, integer: true, min: 1, max: 3 }),
+        mindfulLevel: new NumberField({ initial: 1, integer: true, min: 1, max: 3 }),
         raging: new BooleanField({ initial: false }),
         surging: new BooleanField({ initial: false }),
+        surgingFocus: new StringField({ initial: "", blank: true }),
         mindful: new BooleanField({ initial: false }),
         superior: new BooleanField({ initial: false }),
         undying: new BooleanField({ initial: false }),

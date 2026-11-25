@@ -61,7 +61,7 @@ export function weaponRollModifiers093(system, item, profile, targetRange = 0) {
   const flags = system.equipmentFlags || {};
   const size = ({ small: 1, big: -1 }[weapon.weaponSize] || 0) * tier;
   let strike = size + (flags.weaponStrikePenalty?.[item.id] || 0);
-  if (targetRange >= 9) strike += flags.weaponLongRangeStrikeBonus?.[item.id] || 0;
+  if (targetRange >= (system.status?.longRangeNumeric ?? 9)) strike += flags.weaponLongRangeStrikeBonus?.[item.id] || 0;
   let wound = -2 * size + (flags.weaponWoundBonus?.[item.id] || 0);
   if (['slashing', 'magic_orb'].includes(weapon.weaponCategory)
     || (weapon.weaponCategory === 'efficient' && profile === 'Simple')) wound += 2 * tier;

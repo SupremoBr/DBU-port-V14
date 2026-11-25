@@ -717,28 +717,27 @@ export const fusionMethods = {
                     close: () => false
                   });
                   if (accept) {
-                    // Destroy existing absorbed apparel if any
-                    if (hasExisting && this.actor.items.get(existing.itemId)) {
-                      await this.actor.deleteEmbeddedDocuments("Item", [existing.itemId]);
-                    }
-                    // Count current worn apparel layers
                     const slots = this.actor.system.wornApparelSlots || {};
                     const wornCount = [slots.topLayer, slots.middleLayer, slots.bottomLayer].filter(Boolean).length;
-                    // If 3 apparel worn, destroy current top layer to make room
-                    if (wornCount >= 3 && slots.topLayer) {
-                      const oldTop = this.actor.items.get(slots.topLayer);
-                      if (oldTop) await this.actor.deleteEmbeddedDocuments("Item", [slots.topLayer]);
-                    }
+                    const obsolete = [...new Set([existing.itemId, wornCount >= 3 && slots.topLayer])]
+                      .filter(id => id && this.actor.items.has(id));
                     // Clone and create new item
                     const itemData = suppTopItem.toObject();
                     delete itemData._id;
                     const created = await this.actor.createEmbeddedDocuments("Item", [itemData]);
                     const newId = created[0]?.id || "";
                     // Equip as top layer and track
-                    await this.actor.update({
-                      "system.wornApparelSlots.topLayer": newId,
-                      "system.fusion.absorbedApparel": { itemId: newId, sourceActorId: actorId }
-                    });
+                    if (!newId) throw new Error("Falha ao criar a vestimenta.");
+                    try {
+                      await this.actor.update({
+                        "system.wornApparelSlots.topLayer": newId,
+                        "system.fusion.absorbedApparel": { itemId: newId, sourceActorId: actorId }
+                      });
+                    } catch (error) {
+                      await created[0].delete();
+                      throw error;
+                    }
+                    if (obsolete.length) await this.actor.deleteEmbeddedDocuments("Item", obsolete);
                     ui.notifications.info(`Gained Absorbed Apparel: ${suppTopItem.name}`);
                   }
                 }

@@ -24,17 +24,19 @@ export const PROFILES_093 = Object.freeze({
   'Elemental (Ice)': profile(['Magic'], 'Direct', 8, { thresholdCondition: 'slowed', environment: 'frozen' }),
   'Elemental (Light)': profile(['Magic'], 'Standard', 2, { freeAdvantages: ['Full Wager'], lightLevelChange: 1 }),
   'Elemental (Lightning)': profile(['Magic'], 'Direct', 8, { thresholdCondition: 'impediment', environment: 'electrified' }),
-  'Elemental (Metal)': profile(['Magic'], 'Direct', 8, { createsFeature: { hardness: 1, quality: 'Splintering' } }),
+  'Elemental (Metal)': profile(['Magic'], 'Lethal', 8),
+  'Elemental (Plantlife)': profile(['Magic'], 'Standard', 3, { freeAdvantages: ['Staggering Attack'], createsFeature: { hardness: 1, quality: 'Splintering' } }),
   'Elemental (Poison)': profile(['Magic'], 'Direct', 8, { thresholdCondition: 'poisoned', environment: 'poisoned' }),
   'Elemental (Water)': profile(['Magic'], 'Direct', 8, { thresholdCondition: 'prone', environment: 'bog' }),
   'Elemental (Wind)': profile(['Magic'], 'Direct', 4, { weaponCategory: 'Slashing' })
 });
 
-// Plantlife is available as a Favored Element even before its combat rules are implemented.
-export const ELEMENTAL_PROFILES_093 = Object.freeze([
-  ...Object.keys(PROFILES_093).filter(name => name.startsWith('Elemental (')),
-  'Elemental (Plantlife)'
-].sort());
+export const ELEMENTAL_PROFILES_093 = Object.freeze(Object.keys(PROFILES_093).filter(name => name.startsWith('Elemental (')).sort());
+
+export function profileAdvantages093(attack, rows = []) {
+  const grants = PROFILES_093[attack.profile]?.freeAdvantages || [];
+  return [...rows, ...grants.filter(name => !rows.some(row => row.name === name)).map(name => ({ name, ranks: 1, freeRanks: 1 }))];
+}
 
 export function profileKiUnits(profileName) { return PROFILES_093[profileName]?.kpCost ?? null; }
 export function minimumAttackKiUnits(profileName) {
@@ -43,8 +45,9 @@ export function minimumAttackKiUnits(profileName) {
 }
 export function validFoundation(profileName, foundation) { return !!PROFILES_093[profileName]?.foundations.includes(foundation); }
 
-export function profileRoll093(profileName, { strikeNatural, strikeCT = 10, strikeBotchThreshold = 1, damageCat = 'Standard' } = {}) {
-  const natural = profileName === 'Clearing' ? Math.max(5, Number(strikeNatural)) : Number(strikeNatural);
+export function profileRoll093(profileName, { strikeNatural, targetingBonus = 0, faces = 10, strikeCT = 10, strikeBotchThreshold = 1, damageCat = 'Standard' } = {}) {
+  const adjusted = Math.min(faces, Number(strikeNatural) + targetingBonus);
+  const natural = profileName === 'Clearing' ? Math.min(faces, Math.max(5, adjusted)) : adjusted;
   const critical = natural >= strikeCT;
   const botch = profileName === 'Cutting' ? !critical : strikeBotchThreshold > 0 && natural <= strikeBotchThreshold;
   const categories = ['Standard', 'Direct', 'Lethal'];
@@ -75,7 +78,8 @@ export const PROFILE_SUMMARIES_093 = Object.freeze({
   'Elemental (Ice)': 'Ao cruzar limiar do alvo: Slowed. Área atingida recebe Frozen.',
   'Elemental (Light)': 'Full Wager gratuito; dano aumenta iluminação em 1 nível.',
   'Elemental (Lightning)': 'Ao cruzar limiar do alvo: Impediment. Área atingida recebe Electrified.',
-  'Elemental (Metal)': 'Produz Features com Hardness 1 e Splintering, conforme a fonte.',
+  'Elemental (Metal)': 'O terreno afetado torna-se Metallic, com Hardness mínima 3. Em área, aplique Dangerous ou Sharp conforme o alvo.',
+  'Elemental (Plantlife)': 'Concede Staggering Attack e permite criar Features em Squares desocupados. Produz Features com Hardness 1 e Splintering, conforme a fonte.',
   'Elemental (Poison)': 'Aplica Poisoned conforme os gatilhos da fonte.',
   'Elemental (Water)': 'Ao cruzar limiar do alvo: Prone. Área atingida recebe Bog.',
   'Elemental (Wind)': 'Aplica a categoria de arma Slashing.'

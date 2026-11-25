@@ -530,17 +530,21 @@
         <div class="combat-state-controls">
           <label>Combat States:</label>
           <div class="combat-state-checkboxes">
+            {{#if rules093}}<label class="state-toggle"><input type="checkbox" name="system.combatStates.determined" {{checked system.combatStates.determined}}> Determined</label>{{/if}}
             <label class="state-toggle">
               <input type="checkbox" name="system.combatStates.raging" {{checked system.combatStates.raging}} /> Raging
             </label>
+            {{#if rules093}}{{#if system.combatStates.raging}}<label>Nível Raging <input aria-label="Nível Raging" type="number" min="1" max="3" step="1" name="system.combatStates.ragingLevel" value="{{system.combatStates.ragingLevel}}"></label>{{/if}}{{/if}}
             <label class="state-toggle">
               <input type="checkbox" name="system.combatStates.surging" {{checked system.combatStates.surging}} />
               Surging
             </label>
+            {{#if rules093}}{{#if system.combatStates.surging}}<label>Focus <select name="system.combatStates.surgingFocus"><option value="">Escolha o oponente</option>{{#each surgingTargets}}<option value="{{id}}" {{#if selected}}selected{{/if}}>{{name}}</option>{{/each}}</select></label>{{/if}}{{/if}}
             <label class="state-toggle">
               <input type="checkbox" name="system.combatStates.mindful" {{checked system.combatStates.mindful}} />
               Mindful
             </label>
+            {{#if rules093}}{{#if system.combatStates.mindful}}<label>Nível Mindful <input aria-label="Nível Mindful" type="number" min="1" max="3" step="1" name="system.combatStates.mindfulLevel" value="{{system.combatStates.mindfulLevel}}"></label>{{/if}}{{/if}}
             <label class="state-toggle">
               <input type="checkbox" name="system.combatStates.superior" {{checked system.combatStates.superior}} />
               Superior

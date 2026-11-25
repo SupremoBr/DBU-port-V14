@@ -1,5 +1,5 @@
 import { onAutomationChatRender, chatRenderHook } from "../../package.mjs";
-import { MODULE_SOCKET } from "./module-id.js";
+import { sendRequest, listenRequests } from "./authorized-request.js";
 import { drainingForActor, upkeepTurnKey, applyTransformationTurnUpkeep } from "./transformation-upkeep.js";
 import { revertAll } from "../transformations.js";
 
@@ -95,6 +95,8 @@ async function processDecision({messageId, choice, userId}) {
   const info = findLiveDecision(message);
   if (!info || info.flag.status !== "pending") return;
   const {flag,combat,combatant,actor} = info;
+  const pending = actor.getFlag?.("world", FLAG);
+  if (pending?.messageId !== messageId || pending.status !== "pending" || pending.key !== flag.key) return;
   const user = game.users?.get?.(userId);
   if (!user?.active || String(userId) !== String(flag.ownerId) ||
       (!user.isGM && !actor.testUserPermission?.(user, "OWNER"))) return;
@@ -136,14 +138,11 @@ async function processDecision({messageId, choice, userId}) {
 
 export function initializeTransformationDecision({isPrimaryGM,onContinue}={}) {
   if (runtime) {
-    try {game.socket.off(MODULE_SOCKET,runtime.socket)} catch {}
+    try {Hooks.off("createChatMessage", runtime.requestHook)} catch {}
     try {document.removeEventListener("click",runtime.click,true)} catch {}
     try {Hooks.off(chatRenderHook(),runtime.renderHookId)} catch {}
   }
   runtime={isPrimaryGM,onContinue,pending:new Set(),locks:new Set()};
-  runtime.socket = data => {
-    if(data?.type === "dbuaTransformationChoice") void processDecision(data);
-  };
   runtime.click = event => {
     const button = event.target.closest?.("[data-dbua-trans-choice]");
     if(!button) return;
@@ -156,7 +155,7 @@ export function initializeTransformationDecision({isPrimaryGM,onContinue}={}) {
     button.disabled=true;
     const packet={type:"dbuaTransformationChoice",messageId,choice,userId:game.user.id};
     if(runtime.isPrimaryGM?.()) void processDecision(packet);
-    else game.socket.emit(MODULE_SOCKET,packet);
+    else sendRequest("transformation", packet).catch(error => { button.disabled = false; ui.notifications.error(error.message); });
   };
   runtime.renderHookId=onAutomationChatRender((msg,html)=>{
     const flag=msg.getFlag?.("world",FLAG);if(!flag)return;
@@ -165,7 +164,7 @@ export function initializeTransformationDecision({isPrimaryGM,onContinue}={}) {
       btn.disabled=flag.status!=="pending" || game.user?.id!==flag.ownerId;
     });
   });
-  game.socket.on(MODULE_SOCKET,runtime.socket);
+  runtime.requestHook = listenRequests("transformation", (packet, sender) => processDecision({ ...packet, userId: sender.id }));
   document.addEventListener("click",runtime.click,true);
   return runtime;
 }

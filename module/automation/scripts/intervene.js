@@ -1,7 +1,9 @@
+import { privateRollJournal, sealRoll } from "./core/private-rolls.js";
+import { sendRequest, listenRequests } from "./core/authorized-request.js";
 import { SYSTEM_ID as MODULE_ID, AUTOMATION_SOCKET, readAutomationFlag, onAutomationChatRender, chatRenderHook } from "../package.mjs";
 import { getCombatVisualSettings } from "./visual-config.js";
 import { prepareTerrainShield, resolveTerrainShield } from "./maneuvers.js";
-import { areAllies as areTeamAllies } from "./combat-teams.js";
+import { areEnemies, areAllies as areTeamAllies } from "./combat-teams.js";
 import { tokenForActor, participantReference, resolveParticipant, participantKeyForAttack, attackTargetKeys } from "./core/token-identity.js";
 
 const DBU_SOCKET = AUTOMATION_SOCKET;
@@ -204,6 +206,7 @@ async function rollWithCrit(actor, formula, {
     critical,
     botch,
     critTotal: Number(extra?.total || 0),
+    critRoll: extra,
     total
   };
 }
@@ -295,7 +298,7 @@ async function requestGM(payload) {
   if (game.user.isGM && isPrimaryGM()) {
     return handleGMRequest({ ...payload, userId: game.user.id });
   }
-  game.socket.emit(DBU_SOCKET, { ...payload, userId: game.user.id });
+  await sendRequest("intervene", payload);
   return true;
 }
 
@@ -709,7 +712,7 @@ async function handleGMRequest(data) {
         "flags.world.dbuAttackDeflectedBy": intervener.id,
         "flags.world.dbuIntervenePhaseComplete": true,
         "flags.world.dbuDeflectReflectOpportunity": canReflect(attack)
-          ? { reflectorId: intervener.id, createdAt: Date.now(), source: data.option }
+          ? { reflectorId: participantReference(intervener).key, createdAt: Date.now(), source: data.option }
           : null
       });
 
@@ -740,13 +743,13 @@ async function handleGMRequest(data) {
 
   if (data.type === "dbuReflectUsedV14") {
     const message = game.messages.get(data.messageId);
-    const reflector = game.actors.get(data.reflectorId);
+    const reflector = resolveParticipant(data.reflectorId, message && attackData(message));
     const requester = game.users.get(data.userId);
     if (!message || !reflector || !requester) return;
     if (!requester.isGM && !reflector.testUserPermission(requester, "OWNER")) return;
 
     const uses = foundry.utils.deepClone(message.getFlag("world", "dbuReflectUses") || {});
-    uses[reflector.id] = {
+    uses[data.reflectorId] = {
       used: true,
       targetId: data.targetId || null,
       usedAt: Date.now(),
@@ -763,8 +766,10 @@ function availableReflectTargets(reflector, attack) {
 
   for (const token of tokens) {
     const actor = token.actor;
-    if (!actor || actor.id === reflector.id || seen.has(actor.id)) continue;
-    seen.add(actor.id);
+    if (!actor) continue;
+    const key = participantReference(actor, token).key;
+    if (seen.has(key) || !areEnemies(getTokenForActor(reflector), token)) continue;
+    seen.add(key);
     entries.push({ actor, token });
   }
 
@@ -813,39 +818,19 @@ async function reflectStrikeFormula(reflector, attack) {
   return { formula, ct };
 }
 
-function urgentWoundFormulaFromAttack(attack) {
-  if (attack?.urgentWoundFormula) return String(attack.urgentWoundFormula);
+export function urgentWoundFormulaFromAttack(attack, message) {
+  if (attack.urgentWoundFormula) return attack.urgentWoundFormula;
+  const original = attack.originalAttackMessageId && game.messages.get(attack.originalAttackMessageId);
+  const reveal = message?.getFlag(DBU_SYSTEM_ID, "attackReveal") || original?.getFlag(DBU_SYSTEM_ID, "attackReveal");
+  let formula = attack.woundBaseFormula || reveal?.woundRollData?.formula || attack.woundFormula;
+  if (!formula) return null;
 
-  let formula = "";
-  const original = attack?.originalAttackMessageId
-    ? game.messages.get(attack.originalAttackMessageId)
-    : null;
-  const reveal = original?.getFlag(DBU_SYSTEM_ID, "attackReveal") || null;
-
-  try {
-    const rollData = reveal?.woundRollData;
-    if (rollData) formula = String(Roll.fromData(rollData).formula || rollData.formula || "");
-  } catch {
-    formula = String(reveal?.woundRollData?.formula || "");
-  }
-
-  if (!formula) {
-    // Fallback para cartas criadas diretamente pelo Reflect.
-    formula = String(attack?.woundBaseFormula || attack?.woundFormula || "1d10");
-  }
-
-  if (attack?.manualWoundTranslated) {
-    formula = `(${formula})+(${attack.manualWoundTranslated})`;
-  }
-
-  const united = Number(attack?.unitedAttackBonus || 0);
-  if (united) formula = `(${formula})+${united}`;
-
-  return formula;
+  if (attack.manualWoundTranslated) formula = `(${formula})+(${attack.manualWoundTranslated})`;
+  const united = Number(attack.unitedAttackBonus || 0);
+  return united ? `(${formula})+${united}` : formula;
 }
 
-function reflectTargetRow(target) {
-  const targetKey = participantReference(target).key;
+function reflectTargetRow(target, targetKey) {
   const safeId = String(targetKey).replace(/[^a-zA-Z0-9_-]/g, "");
   return `
     <div class="dbu-area-target" data-target-row="${safeId}" style="margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,0.18);">
@@ -862,7 +847,7 @@ function reflectTargetRow(target) {
   `;
 }
 
-async function createReflectAttackCard({ sourceMessage, reflector, target, attack, strike, wound, urgentFormula, reflectCost }) {
+async function createReflectAttackCard({ journal, sourceMessage, reflector, target, targetToken, attack, strike, wound, urgentFormula, reflectCost }) {
   const woundSourceId = attack.woundSourceActorId || attack.originalWoundSourceActorId || attack.attackerId;
   const reflectAttack = {
     version: `Reflect-${VERSION}`,
@@ -904,24 +889,31 @@ async function createReflectAttackCard({ sourceMessage, reflector, target, attac
     woundBotch: wound.botch,
     secretCombat: true,
     isReflect: true,
+    urgentPending: true,
+    woundSourceRef: attack.woundSourceRef || attack.attackerRef,
     reflectedFromMessageId: sourceMessage.id,
     hasAoE: false,
     isAreaAttack: false,
     reflectBlocked: false,
     attackerRef: participantReference(reflector),
-    targetRefs: [participantReference(target)],
+    targetRefs: [participantReference(target, targetToken)],
     targetActorIds: [target.id]
   };
 
+  const id = foundry.utils.randomID();
+  const publicAttack = await sealRoll(journal, id, reflectAttack, {
+    strikeRollData: strike.roll.toJSON(), strikeCritRollData: strike.critRoll?.toJSON()
+  });
   const states = {
-    [participantReference(target).key]: { resolved: false, pending: false }
+    [participantReference(target, targetToken).key]: { resolved: false, pending: false }
   };
 
   return ChatMessage.create({
+    _id: id,
     speaker: ChatMessage.getSpeaker({ actor: reflector }),
     flags: {
       world: {
-        dbuAttackData: reflectAttack,
+        dbuAttackData: publicAttack,
         dbuDefenseStates: states,
         dbuUnitedAttackLocked: true,
         dbuUnitedAttackContributions: [],
@@ -948,11 +940,25 @@ async function createReflectAttackCard({ sourceMessage, reflector, target, attac
             <div class="dbu-roll-row"><span class="dbu-roll-label">Wound</span><span class="dbu-roll-main"><code class="dbu-roll-formula">🔒 Urgent Wound</code><span class="dbu-roll-sub">Rolado pelo atacante que gerou a energia original.</span></span><span class="dbu-roll-total" data-dbu-wound-total>?</span></div>
           </div>
           <div class="dbu-attack-buffs" data-dbu-secret-wait-status><strong>🔒 Aguardando ${esc(target.name)} escolher a defesa.</strong></div>
-          ${reflectTargetRow(target)}
+          ${reflectTargetRow(target, reflectAttack.targetRefs[0].key)}
         </div>
       </div>
     `
+  }, { keepId: true }).catch(async error => {
+    await journal.pages.get(id)?.delete();
+    throw error;
   });
+}
+
+export async function resolveUrgentWound(attack) {
+  const source = resolveParticipant(attack.woundSourceRef?.key || attack.woundSourceActorId, { attackerRef: attack.woundSourceRef });
+  if (!source) throw new Error("O atacante original do Urgent Wound está indisponível.");
+  const result = await rollWithCrit(source, attack.urgentWoundFormula, {
+    ct: attack.woundCT, botchThreshold: attack.woundBotchThreshold, label: "Urgent Wound"
+  });
+  await ChatMessage.create({ rolls: [result.roll, result.critRoll].filter(Boolean), speaker: ChatMessage.getSpeaker({ actor: source }), flavor: `Reflect · Urgent Wound · ${result.total}` });
+  Object.assign(attack, { baseWoundTotal: result.total, woundTotal: result.total, woundNatural: result.natural,
+    woundCritical: result.critical, woundBotch: result.botch, urgentPending: false });
 }
 
 async function getReflectUsage(actor, sourceMessageId) {
@@ -982,9 +988,16 @@ async function startReflect(message, reflectorId) {
     return ui.notifications.warn("Você não controla o personagem que vai usar Reflect.");
   }
 
+  if (!message.getFlag("world", "dbuCombatRevealed")) return;
+  const outcome = defenseStates(message)[participantKeyForAttack(reflector, attack)]?.hiddenOutcome;
+  const deflect = message.getFlag("world", "dbuDeflectReflectOpportunity");
+  if (!(outcome?.defenseType === "parry" && outcome.success) && deflect?.reflectorId !== participantReference(reflector).key)
+    return ui.notifications.warn("Reflect exige Parry ou Deflect bem-sucedido.");
   const prior = await getReflectUsage(reflector, message.id);
   if (prior?.used) return ui.notifications.warn(`${reflector.name} já usou Reflect neste ataque.`);
 
+  const urgentFormula = urgentWoundFormulaFromAttack(attack, message);
+  if (!urgentFormula) return ui.notifications.warn("A fórmula de Wound do ataque original está indisponível para Reflect.");
   const targets = availableReflectTargets(reflector, attack);
   if (!targets.length) return ui.notifications.warn("Nenhum alvo disponível no mapa para Reflect.");
 
@@ -1021,12 +1034,15 @@ async function startReflect(message, reflectorId) {
   });
   if (!choice) return;
 
-  const target = game.actors.get(choice.targetId);
+  const opponent = availableReflectTargets(reflector, attack).find(({actor, token}) => participantReference(actor, token).key === choice.targetId);
+  const target = opponent?.actor;
   if (!target) return ui.notifications.error("Alvo do Reflect não encontrado.");
 
+  const journal = await privateRollJournal();
+  if ((await getReflectUsage(reflector, message.id))?.used) return;
   const cost = choice.free ? 0 : (choice.half ? Math.ceil(normalCost / 2) : normalCost);
   await runCombatVisual(reflector, "reflect", "start", {
-    message, attack, target, targetToken: getTokenForActor(target.id), reflectCost: cost
+    message, attack, target, targetToken: opponent.token, reflectCost: cost
   });
   if (cost > 0) {
     const payHelper = globalThis.DBU?.payKiAndCapacity;
@@ -1044,17 +1060,7 @@ async function startReflect(message, reflectorId) {
     label: "Reflect Strike"
   });
 
-  const woundSource = game.actors.get(
-    attack.woundSourceActorId || attack.originalWoundSourceActorId || attack.attackerId
-  );
-  if (!woundSource) return ui.notifications.error("Atacante original não encontrado para o Urgent Wound.");
-
-  const urgentFormula = urgentWoundFormulaFromAttack(attack);
-  const wound = await rollWithCrit(woundSource, urgentFormula, {
-    ct: Number(attack.woundCT || 10),
-    botchThreshold: Number(attack.woundBotchThreshold ?? 1),
-    label: "Urgent Wound"
-  });
+  const wound = { total: 0, natural: null, ct: attack.woundCT || 10, botchThreshold: attack.woundBotchThreshold ?? 1 };
 
   await recordReflect(reflector, attack.attackName, cost);
   await setReflectUsage(reflector, message.id, {
@@ -1065,6 +1071,7 @@ async function startReflect(message, reflectorId) {
   });
 
   await createReflectAttackCard({
+    journal, targetToken: opponent.token,
     sourceMessage: message,
     reflector,
     target,
@@ -1076,14 +1083,14 @@ async function startReflect(message, reflectorId) {
   });
 
   await runCombatVisual(reflector, "reflect", "launch", {
-    message, attack, target, targetToken: getTokenForActor(target.id),
+    message, attack, target, targetToken: opponent.token,
     strike, wound, urgentFormula, reflectCost: cost, success: true
   });
 
   await requestGM({
     type: "dbuReflectUsedV14",
     messageId: message.id,
-    reflectorId: reflector.id,
+    reflectorId: participantKeyForAttack(reflector, attack) || participantReference(reflector).key,
     targetId: target.id,
     source: "reflect"
   });
@@ -1160,13 +1167,13 @@ function renderIntervene(message, html) {
   root.querySelectorAll(".dbu-deflect-reflect-v14-panel").forEach(el => el.remove());
   const deflectReflect = message.getFlag("world", "dbuDeflectReflectOpportunity") || null;
   if (deflectReflect?.reflectorId && !reflectUses?.[deflectReflect.reflectorId]?.used) {
-    const reflector = game.actors.get(deflectReflect.reflectorId);
+    const reflector = resolveParticipant(deflectReflect.reflectorId, attack);
     if (reflector && (game.user.isGM || reflector.isOwner)) {
       const body = root.querySelector(".dbu-card-body") || root;
       const panel = document.createElement("div");
       panel.className = "dbu-deflect-reflect-v14-panel dbu-attack-actions";
       panel.style.marginTop = "8px";
-      panel.innerHTML = `<button type="button" class="dbu-pay-btn" data-dbu-reflect-v14="1" data-message-id="${message.id}" data-reflector-id="${reflector.id}"><i class="fas fa-reply"></i> Reflect após Deflect</button>`;
+      panel.innerHTML = `<button type="button" class="dbu-pay-btn" data-dbu-reflect-v14="1" data-message-id="${message.id}" data-reflector-id="${esc(deflectReflect.reflectorId)}"><i class="fas fa-reply"></i> Reflect após Deflect</button>`;
       body.appendChild(panel);
     }
   }
@@ -1222,7 +1229,7 @@ export function initializeInterveneAutomation() {
     try { Hooks.off(chatRenderHook(), old.renderHookId); } catch {}
   }
   if (old?.socketHandler) {
-    try { game.socket.off(DBU_SOCKET, old.socketHandler); } catch {}
+    try { Hooks.off("createChatMessage", old.socketHandler); } catch {}
   }
 
   const renderHookId = onAutomationChatRender((message, html) => {
@@ -1237,7 +1244,7 @@ export function initializeInterveneAutomation() {
     catch (error) { console.error("DBU | Intervene socket:", error); }
   };
 
-  game.socket.on(DBU_SOCKET, socketHandler);
+  const requestHook = listenRequests("intervene", (packet, sender) => socketHandler({ ...packet, userId: sender.id }));
   document.addEventListener("click", clickHandler, true);
 
   globalThis.DBU_INTERVENE_AUTOMATION = {
@@ -1245,7 +1252,7 @@ export function initializeInterveneAutomation() {
     initialized: true,
     clickHandler,
     renderHookId,
-    socketHandler
+    socketHandler: requestHook
   };
 
   console.log(`DBU Automation v${VERSION} | Intervene + Reflect ativo`);

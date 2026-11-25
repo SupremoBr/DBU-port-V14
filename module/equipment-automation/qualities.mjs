@@ -428,9 +428,9 @@ WEAPON_HANDLERS.long_range_weapon = (ctx) => {
 };
 
 // targeting_system: +1 Natural Strike result
-WEAPON_HANDLERS.targeting_system = (ctx) => {
+WEAPON_HANDLERS.targeting_system = (ctx, quality) => {
   const map = _ensureObj(ctx.system.equipmentFlags, "weaponTargetingSystem");
-  map[ctx.item.id] = 1;
+  map[ctx.item.id] = uses093(ctx.system) ? Math.min(2, Math.max(1, Number(quality.slotsUsed) || 1)) : 1;
 };
 
 // dimension_blade (special): +1 Damage Category for attacks with this weapon

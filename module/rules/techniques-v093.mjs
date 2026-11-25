@@ -1,7 +1,7 @@
 import { attackWeapon093 } from '../helpers/weapon-state.mjs';
 import { SUPER_PROFILES_093, superProfileKiUnits093 } from "./super-profiles-v093.mjs";
 import { limitedMartialPower, martialEnergyCharges, martialLevel } from './path-to-power-v093.mjs';
-import { isLegacyLimitBreakType, modifierPointCost, techniquePointCap, techniquePointCost, techniqueBaseKiUnits } from './v093.mjs';
+import { isLegacyLimitBreakType, modifierPointCost, techniqueCapUsage093, techniquePointCap, techniquePointCost, techniqueBaseKiUnits } from './v093.mjs';
 import { PROFILES_093, validFoundation } from './profiles-v093.mjs';
 import { CATALOGS_093 } from './catalogs-v093.mjs';
 import { talentPassiveBonus093 } from './talent-passives-v093.mjs';
@@ -40,6 +40,20 @@ export function martialTechniqueTPCap(technique, system, normalCap) {
   if (!limitedMartialPower(system)) return normalCap;
   return technique.startingTechnique && startingTechniqueAvailable093(system) ? 20 : 15;
 }
+const requiredProfile = {
+  'Hurricane Assault': 'Sweeping', 'Reinforced Plantlife': 'Elemental (Plantlife)', 'Armor-Piercing': 'Pinpoint',
+  'Brutal Blitz': 'Blitz', 'Peppering Blows': 'Combination', 'Shattering Blow': 'Crushing', 'Perfect Strike': 'Simple',
+  'Sudden Blast': 'Clearing', 'Alotta Lotta Attacks': 'Combination', 'Forceful Launch': 'Launching',
+  'Precise Strike': 'Launching', 'Low-Power Crush': 'Crushing', 'Shoot and Pray': 'Combination'
+};
+const ultimateOnly = new Set(['Maximum Charge','Final Chance','Last Legs','Power Burst','Super Advantage','Transformation Boost','Perfect Strike']);
+export function modifierProfileIssue093(technique, name) {
+  if (requiredProfile[name] && technique.profile !== requiredProfile[name]) return name + ' exige ' + requiredProfile[name] + '.';
+  if (ultimateOnly.has(name) && !/ultimate|dramatic[ _-]*finisher/i.test(technique.type || technique.techType)) return name + ' exige Ultimate.';
+  if (name === 'Throwing Technique' && (technique.foundation !== 'Physical' || !['Simple', 'Combination'].includes(technique.profile))) return name + ' exige Physical e Simple ou Combination.';
+  return '';
+}
+
 export function validateTechnique093(technique, system) {
   const legacyType = isLegacyLimitBreakType(technique.type ?? technique.techType);
   technique = martialTechnique(technique, system);
@@ -54,7 +68,7 @@ export function validateTechnique093(technique, system) {
     if (profile?.requiresProfile && technique.profile !== profile.requiresProfile) issues.push('Super Profile exige '+profile.requiresProfile+'.');
   }
   const cap = martialTechniqueTPCap(technique, system, techniquePointCap(system?.baseTier));
-  if (techniquePointCost(technique, { includeFreeTP: false }) > cap) {
+  if (techniqueCapUsage093(technique) > cap) {
     issues.push(`${limitedMartialPower(system) ? "Path to Power: " : ""}esta técnica pode ter até ${cap} TP no total.`);
   }
   if (!validFoundation(technique.profile, technique.foundation)) issues.push('Perfil incompatível ou removido: ' + technique.profile);
@@ -96,9 +110,6 @@ export function validateTechnique093(technique, system) {
     if (group.has(name) && !requiredGroup.has(required)) issues.push(`${name} exige ${required}.`);
   }
   if (technique.isWeapon && !advantages.has('Weapon Assisted')) issues.push('Técnicas armadas exigem Weapon Assisted.');
-  if (disadvantages.has('Low-Power Crush') && technique.profile !== 'Crushing') {
-    issues.push('Low-Power Crush exige o perfil Crushing.');
-  }
   const chosenRoll = row => String(row?.notes || '').trim().toLowerCase();
   const twin = chosenRoll(advantages.get('Twin-Linked'));
   if (['strike', 'wound'].includes(twin) && twin === chosenRoll(disadvantages.get('Dead-Link'))) {
@@ -109,6 +120,8 @@ export function validateTechnique093(technique, system) {
     for (const row of technique[field] || []) {
       if (row.name && seen.has(row.name)) issues.push('Use uma única linha para os ranks de ' + row.name + '.');
       seen.add(row.name);
+      const issue = modifierProfileIssue093(technique, row.name);
+      if (issue) issues.push(issue);
       const cost = modifierPointCost(definitions[row.name], row.ranks ?? 1);
       if (cost === null) issues.push('Revisar ' + field + ': ' + row.name);
     }
@@ -120,7 +133,7 @@ export function startingTechniqueEligible093(technique, system) {
   if (!startingTechniqueAvailable093(system)) return false;
   technique = martialTechnique(technique, system);
   return !/dramatic[ _-]*finisher/i.test(String(technique.type ?? technique.techType))
-    && techniquePointCost(technique, { includeFreeTP: false }) <= 20
+    && techniqueCapUsage093(technique) <= 20
     && validateTechnique093({ ...technique, startingTechnique: true }, system).ok;
 }
 /** Creation reductions stop at the full Profile floor. Usage reductions have a half-Profile floor. */

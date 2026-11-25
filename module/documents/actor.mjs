@@ -1,3 +1,4 @@
+import { stateLevel } from "../rules/states-v093.mjs";
 import { healthThresholdChanges093, pendingSteadfast093 } from "../rules/health-thresholds-v093.mjs";
 import { awakeningAMB, limitedMartialPower, martialDie, martialLevel, martialResourcePenalty, martialSkillSlots, progressionRowIsEarned, usesPathToPower } from "../rules/path-to-power-v093.mjs";
 import { applyConditionalCustomBuffs, buffAmount, buffEffectKey, conditionalBuff, linkedCatalogBuffs } from "../helpers/custom-buffs.mjs";
@@ -1440,7 +1441,7 @@ export class DBUActor extends Actor {
       // CT formula: max(7, 10 - proficiency(1) - mindful(1))
       // CT is only reduced by boolean flags (1 each), NOT by the full save bonus
       const profCT = isProficient ? 1 : 0;
-      const mindfulCT = system.combatStates?.mindful ? 1 : 0;
+      const mindfulCT = stateLevel(system, "mindful");
       const ct = Math.max(7, 10 - profCT - mindfulCT);
 
       system.savingThrows[saveKey] = {
@@ -1485,6 +1486,7 @@ export class DBUActor extends Actor {
       row.pending = uses093(system) && row.crossed && pendingSteadfast093(row);
       if (row.crossed && !row.checked && !row.pending) penaltyCount++;
     }
+    if (uses093(system) && (stateLevel(system, "mindful") === 3 || stateLevel(system, "raging") === 3 || system.combatStates?.determined)) penaltyCount = 0;
     const poisonMult = this._isConditionActive(system, "poisoned") ? 2 : 1;
     system.thresholds.penalties = penaltyCount * baseTier * poisonMult;
     system.thresholds.stressPenalty = penaltyCount * poisonMult;
@@ -1746,7 +1748,8 @@ export class DBUActor extends Actor {
     const fissionSoak = system.fusion?._fissionSoakBonus || 0;
     // "Double Base Soak" — each unit doubles the base portion (TE + size mod + auraDR)
     const doubleBaseBuff = this._getBuffTotal(system, "Double Base Soak");
-    const basePortion = teTotal + (sizeData.soakMod * tier) + auraDR;
+    const rage = stateLevel(system, "raging");
+    const basePortion = (rage >= 2 ? rage * tier : 0) + teTotal + (sizeData.soakMod * tier) + auraDR;
     const doubledPortion = basePortion * doubleBaseBuff;
     const baseSoak = basePortion + doubledPortion - brokenPenalty
       + this._getEquipmentSoakBonus() + godKiSoak + superStackSoak + customBuffSoak + fissionSoak
@@ -1854,7 +1857,7 @@ export class DBUActor extends Actor {
     // is at Long Range ... by 1" (size.txt)
     // Custom buff "Long Range Distance" — adds extra squares to the threshold
     const longRangeBuff = this._getBuffTotal(system, "Long Range Distance");
-    const longRangeNum = 9 + sizesAboveLarge + longRangeBuff;
+    const longRangeNum = 9 + sizesAboveLarge * (uses093(system) ? 2 : 1) + longRangeBuff;
     system.status.longRangeNumeric = longRangeNum;
     system.status.longRange = `${longRangeNum}+ sq.`;
 
@@ -1882,7 +1885,7 @@ export class DBUActor extends Actor {
     let defenseValue = agTotal + (sizeData.defenseMod * tier) + auraDefense + this._getEquipmentDefenseBonus() + customBuffDefense
       - (racialResources.defensePenalty || 0) + (racialBonuses.defense || 0) + (racialBonuses.defenseQuarterInsight || 0) * quarterInsight;
     // Raging state: "Reduce your Defense Value by 1(T)" (states.txt)
-    if (system.combatStates?.raging) defenseValue -= tier;
+    if (!uses093(system) && system.combatStates?.raging) defenseValue -= tier;
     // Guard Down condition: reduce Defense Value by 2(T)
     if (this._isConditionActive(system, "guardDown")) defenseValue -= 2 * tier;
     if (this._isConditionActive(system, "prone")) defenseValue = Math.floor(defenseValue / 2);
@@ -2120,7 +2123,7 @@ export class DBUActor extends Actor {
     const sizeCombatRules = [];
 
     // Gigantic Grip (Large+): +1(T) per size cat larger, max 3(T). 3+ larger = no Guard Down
-    if (sizeIndex >= largeIndex) {
+    if (uses093(system) || sizeIndex >= largeIndex) {
       sizeCombatRules.push({
         id: "gigantic_grip", name: "Gigantic Grip",
         text: `+${tier} Grapple per Size Category larger (max +${3 * tier}). If 3+ larger: no Guard Down.`
@@ -2160,7 +2163,7 @@ export class DBUActor extends Actor {
     // Punching Down (any, vs 2+ smaller)
     sizeCombatRules.push({
       id: "punching_down", name: "Punching Down",
-      text: `+${tier}d6 damage per 2+ Size Categories smaller than you.`
+      text: `+${tier}d6 damage on a hit against a target at least 2 Size Categories smaller.`
     });
 
     // Punching Up (any, vs 2+ larger)
@@ -2178,7 +2181,7 @@ export class DBUActor extends Actor {
     // Slip Through (any, vs ally 2+ larger)
     sizeCombatRules.push({
       id: "slip_through", name: "Slip Through",
-      text: `May enter squares of allies 2+ Size Categories larger than you.`
+      text: `May share a square with an ally at least 2 categories larger. Growing there must preserve this difference.`
     });
 
     // Tiny Target (any, vs opponent 2+ larger)
@@ -3978,7 +3981,7 @@ export class DBUActor extends Actor {
     if (!system.isPiloting || !system.pilotedJacketId) return;
 
     const bjActor = game.actors?.get(system.pilotedJacketId);
-    if (!bjActor || bjActor.type !== "battleJacket") return;
+    if (!bjActor || bjActor.type !== "battleJacket" || bjActor.system.pilotId !== this.id) return;
 
     const bjSys = bjActor.system;
 

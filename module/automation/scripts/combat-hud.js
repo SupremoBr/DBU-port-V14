@@ -1,3 +1,5 @@
+import { validateActionUse } from "./action-economy.js";
+import { listenRequests, sendRequest } from "./core/authorized-request.js";
 // ============================================================
 // DBU Automation v1.8.12 DEV — HUD de Combate
 // ============================================================
@@ -401,6 +403,24 @@ async function runV2Action(id, actor, token) {
   return api[entry.method](context);
 }
 
+const advancing = new Set();
+function turnRequest(actor, token) {
+  const combat = game.combat;
+  if (!combat?.started || !canControl(actor) || !combat.combatant ||
+      combatantForIdentity(actor, token, combat)?.id !== combat.combatant.id) return null;
+  return { combatId: combat.id, round: combat.round, turn: combat.turn, combatantId: combat.combatant.id };
+}
+
+async function advanceTurn(request, sender) {
+  const combat = game.combat;
+  const current = combat?.combatant;
+  if (!game.user.isGM || !combat?.started || combat.id !== request.combatId ||
+      combat.round !== request.round || combat.turn !== request.turn || current?.id !== request.combatantId ||
+      (!sender.isGM && !current.actor?.testUserPermission(sender, "OWNER")) || advancing.has(combat.id)) return;
+  advancing.add(combat.id);
+  try { await combat.nextTurn(); } finally { advancing.delete(combat.id); }
+}
+
 function hudContent(actor, token) {
   const lp = {
     value: number(actor.system?.lifePoints?.value, 0),
@@ -428,7 +448,8 @@ function hudContent(actor, token) {
     { visible: pressure.hasDefenseCheck, source: "defense", label: "Pressure Defesa", icon: "shield-alt",
       available: pressure.canDefend, title: `Ao ser alvo de um ataque · ${pressure.defenseChecks}/2 nesta rodada` }
   ].filter(action => action.visible);
-  const pending = safeCall(() => getPendingActions(actor).length, 0, "pending actions");
+  const pendingActions = safeCall(() => getPendingActions(actor), [], "pending actions");
+  const pending = pendingActions.length;
   const targets = game.user?.targets?.size || 0;
   const turn = combatLabel(actor, token);
   const activeForm = transformations.length ? transformations.join(" + ") : "Forma base";
@@ -514,7 +535,19 @@ function hudContent(actor, token) {
     </aside>`:""}
 
     <div class="dbu-hud-dock${pressureActions.length ? " dbua-pressure-dock" : ""}">
-      ${!state.collapsed?hudV2Panel({tab:state.hudTab,selected:state.hudSelected,favorites:favoriteIds,pending}):""}
+      ${!state.collapsed?hudV2Panel({tab:state.hudTab,selected:state.hudSelected,favorites:favoriteIds,pending,available:entry => {
+        if (entry.id === "aura" && actor.system.rulesVersion === "0.9.3") return false;
+        if (entry.id === "defend") return pendingActions.some(row => row.type === "defense");
+        if (entry.id === "intervene") return pendingActions.some(row => ["reflect", "intervene"].includes(row.type));
+        const key = entry.maneuver || (["attack", "transform"].includes(entry.id) ? entry.id : null);
+        if (!key) return true;
+        const def = resolveManeuverAction(key, actor);
+        if (!def || (def.available && !def.available(actor))) return false;
+        if (def.deferValidation || !Number.isFinite(def.actionCost)) return true;
+        return validateActionUse(actor, { label: def.label, actionCost: def.actionCost, effectiveType: def.effectiveType,
+          movement: def.movement, attacking: def.attacking, allowPinnedEscape: def.allowPinnedEscape,
+          limitBonus: def.modifiers?.actionLimitBonus || 0, notify: false }).ok;
+      }}):""}
       <div class="dbua-v2-dock-row" role="navigation" aria-label="Menu de combate DBU">
         <div class="dbua-v2-dock-tabs" style="--dbua-dock-actions:${4 + pressureActions.length}">
           ${hudV2Tabs(state.collapsed?null:state.hudTab,pending)}
@@ -523,6 +556,7 @@ function hudContent(actor, token) {
             <span>${action.label}</span></button>`).join("")}
         </div>
         <div class="dbua-v2-dock-tools">
+        ${turnRequest(actor, token) ? '<button type="button" class="dbua-v2-utility" data-dbu-hud-action="skip-turn" title="Pular turno" aria-label="Pular turno"><i class="fas fa-forward-step"></i></button>' : ""}
         <button type="button" class="dbua-v2-clash" data-dbu-hud-action="hud-clash" title="Clash com bônus manual">
           <i class="fas fa-dice-d10" aria-hidden="true"></i> Clash
         </button>
@@ -582,6 +616,18 @@ async function dispatchHudAction(button, actor, token) {
   }
   if (action === "hud-favorite")return toggleHudFavorite(actor,token,button.dataset.hudId);
   if (action === "hud-run")return runV2Action(button.dataset.hudId,actor,token);
+  if (action === "skip-turn") {
+    const request = turnRequest(actor, token);
+    if (!request || button.disabled) return;
+    button.disabled = true;
+    try {
+      const gm = Array.from(game.users).filter(u => u.active && u.isGM).sort((a,b) => a.id.localeCompare(b.id))[0];
+      if (gm?.id === game.user.id) await advanceTurn(request, game.user);
+      else if (gm) await sendRequest("advance-turn", request, gm.id);
+      else ui.notifications.warn("Pular turno exige um mestre conectado.");
+    } finally { button.disabled = false; }
+    return;
+  }
   if (action === "hud-clash")return rollHudClash(actor,token);
   if (action === "hud-pressure-attack") return promptPressureCheck093(actor, "attack");
   if (action === "hud-pressure-defense") return promptPressureCheck093(actor, "defense");
@@ -1037,7 +1083,8 @@ function addTokenHudButton(app, html, data) {
   const root = html instanceof HTMLElement ? html : html?.[0];
   if (!root || root.querySelector("[data-dbu-combat-hud-button]")) return;
   const column = root.querySelector(".col.right") || root.querySelector(".right") || root;
-  const control = document.createElement("div");
+  const control = document.createElement("button");
+  control.type = "button";
   control.className = "control-icon";
   control.dataset.dbuCombatHudButton = "1";
   control.title = "DBU — HUD de Combate";
@@ -1079,7 +1126,7 @@ function isHudRelevantActorId(actorId) {
 function removeOldHooks() {
   const old = globalThis.DBU_COMBAT_HUD_AUTOMATION;
   for (const [hook, id] of Object.entries(old?.hooks || {})) {
-    try { Hooks.off(hook, id); } catch {}
+    try { Hooks.off(hook === "createChatMessageTurn" ? "createChatMessage" : hook, id); } catch {}
   }
 }
 
@@ -1088,6 +1135,7 @@ export function initializeCombatHudAutomation() {
   removeOldHooks();
 
   state.hooks = {
+    createChatMessageTurn: listenRequests("advance-turn", advanceTurn),
     renderTokenHUD: Hooks.on("renderTokenHUD", addTokenHudButton),
     controlToken: Hooks.on("controlToken", (token, controlled) => {
       if (!controlled || !canControl(token?.actor)) return;

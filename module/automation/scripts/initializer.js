@@ -119,15 +119,7 @@ if (previousBootstrap?.combatHookId) {
 }
 
 if (previousBootstrap?.socketHandler) {
-  // Limpa o handler anterior do canal integrado do sistema.
-  for (const channel of [DBU_SOCKET]) {
-    try {
-      game.socket.off(
-        channel,
-        previousBootstrap.socketHandler
-      );
-    } catch {}
-  }
+  Hooks.off("createChatMessage", previousBootstrap.socketHandler);
 }
 
 // v6.5 — listeners/hooks adicionais do Duel Clash

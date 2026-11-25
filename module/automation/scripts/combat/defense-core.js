@@ -1,3 +1,6 @@
+import { sizeLead } from "../../../rules/size-v093.mjs";
+import { resolveParticipant } from "../core/token-identity.js";
+import { ragingBotch } from "../../../rules/states-v093.mjs";
 import { defendKiCost093 } from "../../../rules/defenses-v093.mjs";
 import { uses093 } from "../../../rules/v093.mjs";
 import { validateActionUse } from "../action-economy.js";
@@ -98,7 +101,7 @@ async function dbuRollDodge(defender, { silent = false } = {}) {
   const critical =
     natural >= Number(td.ct || 10);
 
-  const botch = rawNatural === 1;
+  const botch = rawNatural <= ragingBotch(defender.system);
 
   let critRoll = null;
 
@@ -164,6 +167,7 @@ async function dbuRollDodge(defender, { silent = false } = {}) {
 
   return {
     total,
+    rollData: [roll, critRoll].filter(Boolean).map(die => die.toJSON()),
     natural,
     critical,
     botch
@@ -293,7 +297,7 @@ async function dbuRollDefend(
   );
 
   const critical = natural >= rollCT;
-  const botch = natural === 1;
+  const botch = natural <= (isParry ? ragingBotch(defender.system) : 1);
 
   let critRoll = null;
 
@@ -357,6 +361,7 @@ async function dbuRollDefend(
 
   return {
     total,
+    rollData: [roll, critRoll].filter(Boolean).map(die => die.toJSON()),
     counterNum,
     penaltyRanks
   };
@@ -438,9 +443,17 @@ async function dbuApplyDamage(
     );
   }
 
+  const attacker = resolveParticipant(attack.attackerRef?.key || attack.attackerId, attack);
+  let sizeDamage = 0;
+  if (sizeLead(attacker, defender) >= 2) {
+    const roll = await new Roll(`${Math.max(1, Number(attacker.system.tier) || 1)}d6`).evaluate();
+    sizeDamage = roll.total;
+    await roll.toMessage({ speaker: ChatMessage.getSpeaker({ actor: attacker }), flavor: "Punching Down" });
+  }
   await sheet._onApplyDamage({
     preventDefault() {},
     stopPropagation() {},
+    dbuSizeDamage: sizeDamage,
     dbuAttackingManeuver: true
   });
 
@@ -519,7 +532,8 @@ async function dbuDefenseResult(
   targetLabel,
   target,
   success,
-  extra = ""
+  extra = "",
+  rolls = []
 ) {
   const defenseGif = dbuGetDefenseGif(
     defender,
@@ -545,6 +559,7 @@ async function dbuDefenseResult(
   });
 
   await ChatMessage.create({
+    rolls,
     speaker: ChatMessage.getSpeaker({
       actor: defender
     }),
@@ -615,7 +630,19 @@ async function dbuDefenseResult(
 // RESOLVER DEFESA
 // ============================================================
 
-async function dbuResolveDefense(
+async function dbuResolveDefense(defender, attack, type, context = {}) {
+  const result = await rollDefense(defender, attack, type, context);
+  if (attack.sealedRoll && result?.hiddenOutcome) {
+    result.status = "waiting";
+    result.text = "Defesa registrada.";
+    delete result.hiddenOutcome.target;
+    delete result.hiddenOutcome.success;
+    delete result.hiddenOutcome.damageDefense;
+  }
+  return result;
+}
+
+async function rollDefense(
   defender,
   attack,
   defenseType,
@@ -678,7 +705,7 @@ async function dbuResolveDefense(
         ? `✅ Dodge — ${roll.total} vs ${strike}`
         : `❌ Dodge — ${roll.total} vs ${strike}`,
       hiddenOutcome: deferReveal ? {
-        defenseType: "dodge", name: "Dodge", total: roll.total,
+        defenseType: "dodge", rollData: roll.rollData, name: "Dodge", total: roll.total,
         targetLabel: "Strike", target: strike, success, extra: "",
         damageDefense: success ? null : "none"
       } : null
@@ -719,7 +746,7 @@ async function dbuResolveDefense(
         ? `✅ Parry — ${roll.total} vs ${strike}`
         : `❌ Parry — ${roll.total} vs ${strike}`,
       hiddenOutcome: deferReveal ? {
-        defenseType: "parry", name: "Parry", total: roll.total,
+        defenseType: "parry", rollData: roll.rollData, name: "Parry", total: roll.total,
         targetLabel: "Strike", target: strike, success, extra: "",
         damageDefense: success ? null : "none"
       } : null
@@ -887,7 +914,7 @@ async function dbuResolveDefense(
         ? `✅ Power Flare — ${roll.total} vs ${wound}`
         : `❌ Power Flare — ${roll.total} vs ${wound}`,
       hiddenOutcome: deferReveal ? {
-        defenseType: "powerFlare", name: "Power Flare", total: roll.total,
+        defenseType: "powerFlare", rollData: roll.rollData, name: "Power Flare", total: roll.total,
         targetLabel: "Wound", target: wound, success,
         extra: `Cost ${cost} KP / Capacity`,
         damageDefense: success ? null : "none"

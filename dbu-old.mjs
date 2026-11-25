@@ -1,4 +1,5 @@
-import { installRulesSheet093 } from "./module/rules/sheet-v093.mjs";
+import { openRoll, registerPrivateRolls } from "./module/automation/scripts/core/private-rolls.js";
+import { registerRacialRequests, installRulesSheet093 } from "./module/rules/sheet-v093.mjs";
 import { installRules093 } from "./module/rules/config-v093.mjs";
 import { migrateWorld093, convertActor093, exportRulesBackup, waitForRules093, SYSTEM_ID, MIGRATION_KEY } from "./module/rules/migration-v093.mjs";
 import { onRenderChatMessage, registerSystemSheets } from "./module/helpers/foundry-compat.mjs";
@@ -162,7 +163,16 @@ Hooks.once("init", async () => {
 /**
  * Ready Hook — runs once after all game data is loaded.
  */
+for (const hook of ["preUpdateActor", "preUpdateItem"]) {
+  Hooks.on(hook, (_document, _changes, options) => {
+    if (!game.ready || options.dbuRulesMigration || game.settings.get(SYSTEM_ID, MIGRATION_KEY)?.complete) return;
+    ui.notifications.warn("Aguarde a conclusão da migração pelo mestre antes de editar.");
+    return false;
+  });
+}
 Hooks.once("ready", () => {
+  registerPrivateRolls();
+  registerRacialRequests();
   const alreadyMigrated = game.settings.get(SYSTEM_ID, MIGRATION_KEY)?.complete;
   game.dbu.rulesReady = migrateWorld093(game).then(async result => {
     if (result.skipped) return waitForRules093(game);
@@ -213,7 +223,7 @@ onRenderChatMessage((message, html, data) => {
   // contains the full breakdown plus a single combined Pay button — payment
   // happens there, not on reveal.
   $html.find("[data-dbu-reveal]").each((_, btn) => {
-    const reveal = message.getFlag("DBU-MRR-OLD", "attackReveal");
+    let reveal = message.getFlag("DBU-MRR-OLD", "attackReveal");
     if (!reveal || reveal.revealed) { btn.remove(); return; }
     const actor = game.actors.get(reveal.actorId);
     const canReveal = game.user.isGM || (actor && actor.isOwner);
@@ -233,10 +243,20 @@ onRenderChatMessage((message, html, data) => {
       btn.classList.add("dbu-pay-pending");
 
       // 1) Swap in the revealed content for everyone (re-render wires its Pay button).
-      await message.update({
-        content: reveal.revealedHtml,
-        "flags.DBU-MRR-OLD.attackReveal.revealed": true
-      });
+      try {
+        const secret = reveal.rollJournalId ? openRoll(reveal, message) : null;
+        reveal = secret?.reveal || reveal;
+        await message.update({
+          content: reveal.revealedHtml,
+          "flags.DBU-MRR-OLD.attackReveal": { ...reveal, revealed: true }
+        });
+        await secret?.page.delete();
+      } catch (error) {
+        btn.disabled = false;
+        btn.classList.remove("dbu-pay-pending");
+        ui.notifications.error(error.message);
+        return;
+      }
 
       // 2) Dice feedback: sound for everyone; 3D dice (Dice So Nice) if present.
       try { foundry.audio.AudioHelper.play({ src: CONFIG.sounds.dice }, true); } catch (e) { /* no-op */ }

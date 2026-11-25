@@ -1,9 +1,9 @@
 import { weaponLifeMax } from '../module/helpers/weapon-state.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { techniquePointCap, techniquePointCost, techniqueBaseKiUnits, awakeningLimits, fullAwakeningRecovery, validateTransformationStack, stackedStressRequirement, actionPools, canConvertAction, validateManeuverTiming } from '../module/rules/v093.mjs';
+import { techniqueCapUsage093, techniquePointCap, techniquePointCost, techniqueBaseKiUnits, awakeningLimits, fullAwakeningRecovery, validateTransformationStack, stackedStressRequirement, actionPools, canConvertAction, validateManeuverTiming } from '../module/rules/v093.mjs';
 import { RACES_093, validateRacialAttributes } from '../module/rules/races-v093.mjs';
-import { PROFILES_093, profileKiUnits, minimumAttackKiUnits, validFoundation } from '../module/rules/profiles-v093.mjs';
+import { profileRoll093, PROFILES_093, profileKiUnits, minimumAttackKiUnits, validFoundation } from '../module/rules/profiles-v093.mjs';
 import { techniquesMethods } from '../module/sheets/character/techniques.mjs';
 import { attackPowerShot093, attackReferenceKiCost093, validateTechnique093, signatureUseIssue093, techniqueKiCost093 } from '../module/rules/techniques-v093.mjs';
 
@@ -28,7 +28,7 @@ test('the actual sheet selects the reviewed Ultimate cost only for migrated acto
   assert.equal(techniquesMethods._calcTechTPCost.call(old, { type: 'ultimate' }), 14);
 });
 
-test('TP credits and granted ranks affect the wallet only, with the full value used for Ki and caps', () => {
+test('Granted ranks consume no cap; TP credits reduce expenditure while Ki uses nominal cost', () => {
   const system = { rulesVersion: '0.9.3', baseTier: 1 };
   const beam = { foundation: 'Energy', profile: 'Beam', advantages: [
     { name: 'Accurate', ranks: 2, freeRanks: 1, tpCost: 8 }
@@ -44,7 +44,11 @@ test('TP credits and granted ranks affect the wallet only, with the full value u
     { name: 'Power Shot', ranks: 3, freeRanks: 3, tpCost: 18 }
   ] };
   assert.equal(techniquePointCost(oversized), 0);
-  assert.ok(validateTechnique093(oversized, system).issues.some(issue => /25 TP/.test(issue)));
+  assert.equal(techniqueCapUsage093(beam), 11);
+  assert.equal(techniqueCapUsage093(oversized), 8);
+  assert.ok(!validateTechnique093(oversized, system).issues.some(issue => /25 TP/.test(issue)));
+  const purchased = { ...oversized, advantages: oversized.advantages.map(row => ({ ...row, freeRanks: 0 })) };
+  assert.ok(validateTechnique093(purchased, system).issues.some(issue => /25 TP/.test(issue)));
   assert.equal(attackPowerShot093({ powerShot: 2, grantedAdvantages: [{ name: 'Power Shot', ranks: 2 }] }), 2);
   assert.equal(attackReferenceKiCost093({ profile: 'Beam', grantedAdvantages: [
     { name: 'Efficiency', ranks: 1 }
@@ -63,7 +67,7 @@ test('racial creation facts include nineteen races, dual saves, new races and ex
   assert.equal(validateRacialAttributes('bioAndroid', { fo: 2, ma: 2, pe: 1 }).reason, 'forbidden-pair');
 });
 test('current profile costs, foundations and minimums replace removed legacy assumptions', () => {
-  assert.equal(Object.keys(PROFILES_093).length, 26);
+  assert.equal(Object.keys(PROFILES_093).length, 27);
   assert.equal(profileKiUnits('Beam'), 8);
   assert.equal(profileKiUnits('Blitz'), 4);
   assert.equal(profileKiUnits('Mega Flare'), 4);
@@ -152,4 +156,12 @@ test('signature use checks Climax and the selected Weapon Assisted weapon', () =
   assert.match(signatureUseIssue093(actor, technique), /injured/);
   assert.match(signatureUseIssue093(actor, { ...technique, isWeapon: true }), /Selecione a arma/);
   assert.match(validateTechnique093({ ...technique, isWeapon: true }).issues.join(' '), /Weapon Assisted/);
+});
+
+test('Targeting System adjusts the base die before critical and botch checks', () => {
+  assert.deepEqual(profileRoll093('Cutting', { strikeNatural: 9, targetingBonus: 1, damageCat: 'Direct' }),
+    { natural: 10, strikeAdjustment: 1, critical: true, botch: false, damageCat: 'Lethal' });
+  assert.equal(profileRoll093('Beam', { strikeNatural: 10, targetingBonus: 2 }).strikeAdjustment, 0);
+  assert.equal(profileRoll093('Beam', { strikeNatural: 5, targetingBonus: 2, faces: 6 }).natural, 6);
+  assert.equal(profileRoll093('Clearing', { strikeNatural: 1, targetingBonus: 1 }).natural, 5);
 });

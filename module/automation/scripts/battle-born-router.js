@@ -1,4 +1,5 @@
-import { SYSTEM_ID as MODULE_ID, AUTOMATION_SOCKET, readAutomationFlag } from "../package.mjs";
+import { sendRequest, listenRequests } from "./core/authorized-request.js";
+import { SYSTEM_ID as MODULE_ID, readAutomationFlag } from "../package.mjs";
 // ============================================================
 // DBU Automation v1.8.17 DEV — Battle Born owner router
 // ============================================================
@@ -12,7 +13,6 @@ import { SYSTEM_ID as MODULE_ID, AUTOMATION_SOCKET, readAutomationFlag } from ".
 
 
 const VERSION = "1.8.17 DEV";
-const SOCKET = AUTOMATION_SOCKET;
 let hookId = null;
 let socketHandler = null;
 
@@ -107,18 +107,19 @@ export async function routeBattleBornRoundGrant(actor, source) {
   const owner = preferredPlayerOwner(actor);
   if (!owner) return false;
 
-  game.socket.emit(SOCKET, {
+  await sendRequest("battle-born", {
     type: "dbuaBattleBornAllocate",
     targetUserId: owner.id,
     actorId: actor.id,
     source: String(source || "Battle Born")
-  });
+  }, owner.id);
 
   console.log(`DBU Battle Born | alocação de ${actor.name} enviada para ${owner.name}`);
   return true;
 }
 
-async function battleBornSocketHandler(data) {
+async function battleBornSocketHandler(data, sender) {
+  if (!sender?.isGM) return;
   if (!data || data.type !== "dbuaBattleBornAllocate") return;
   if (data.targetUserId !== game.user?.id || game.user?.isGM) return;
 
@@ -172,15 +173,15 @@ export function initializeBattleBornRouter() {
     try { Hooks.off("createChatMessage", hookId); } catch {}
   }
   if (socketHandler) {
-    try { game.socket?.off?.(SOCKET, socketHandler); } catch {}
+    try { Hooks.off("createChatMessage", socketHandler); } catch {}
   }
 
-  hookId = Hooks.on("createChatMessage", message => {
+  hookId = Hooks.on("createChatMessage", (message, options, senderId) => {
+    if (!game.users.get(senderId)?.isGM) return;
     forwardBattleBorn(message).catch(error => console.warn("DBU Battle Born router:", error));
   });
 
-  socketHandler = battleBornSocketHandler;
-  game.socket?.on?.(SOCKET, socketHandler);
+  socketHandler = listenRequests("battle-born", battleBornSocketHandler);
 
   const state = {
     initialized: true,

@@ -190,7 +190,7 @@ test('integrated Ki/Capacity payment rejects unaffordable actions and commits su
   assert.equal(actor.system.status.capacitySpent, 5);
 });
 
-test('real embedded graph boots on a Foundry 13 stub with settings, API, UI hooks and system sockets', async () => {
+test('real embedded graph boots on a Foundry 13 stub with settings, API, UI hooks and document-based combat requests', async () => {
   const env = automationEnvironment(); env.install();
   const life = createAutomationLifecycle();
   await life.prepare(); env.game.ready = true;
@@ -200,8 +200,8 @@ test('real embedded graph boots on a Foundry 13 stub with settings, API, UI hook
   for (const key of ['attack', 'aura', 'transform', 'energyCharge', 'hud', 'gmPanel', 'visualConfig', 'resolveAreaTargets']) assert.equal(typeof game.dbu.automation[key], 'function', key);
   assert.ok(env.registered.has(`${SYSTEM_ID}.combatHudEnabled`));
   assert.ok(env.registered.has(`${SYSTEM_ID}.combatHudFavoriteActions`));
-  assert.ok(env.hooks.size > 0); assert.ok(env.channels.length > 0);
-  assert.ok(env.channels.every(entry => entry.channel === AUTOMATION_SOCKET));
+  assert.ok([...env.hooks.values()].some(entry => entry.event === "createChatMessage"));
+  assert.equal(env.channels.length, 0);
   assert.ok([...env.hooks.values()].some(entry => entry.event === 'renderChatMessageHTML'));
   assert.ok([...env.hooks.values()].every(entry => entry.event !== 'renderChatMessage'));
   assert.ok(env.elements.has('dbu-combat-hud-launcher'));

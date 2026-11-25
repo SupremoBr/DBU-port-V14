@@ -28,9 +28,9 @@ export function hudV2Actions(tab,favorites=[]){
   return HUD_V2_ACTIONS.filter(a=>a.tab===tab);
 }
 const esc=x=>String(x??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
-export function hudV2Panel({tab,selected,favorites=[],pending=0}={}){
+export function hudV2Panel({tab,selected,favorites=[],pending=0,available=()=>true}={}){
   if(!tab)return "";
-  const actions=hudV2Actions(tab,favorites);
+  const actions=hudV2Actions(tab,favorites).filter(available);
   const active=actions.find(x=>x.id===selected)||actions[0]||null;
   const name=HUD_V2_TABS.find(x=>x.id===tab)?.label||"";
   const items=actions.map(a=>{

@@ -1,3 +1,5 @@
+import { captureSheetEdits, omitUnchangedFields, rebaseSheetRows } from "./sheet-edits.mjs";
+import { changeJacketPilot } from "./jacket-pilot.mjs";
 import { ActorSheet, Dialog } from "../helpers/foundry-compat.mjs";
 /**
  * ActorSheet for the "battleJacket" actor type.
@@ -15,13 +17,14 @@ export class DBUBattleJacketSheet extends ActorSheet {
   }
 
   async _updateObject(event, formData) {
+    omitUnchangedFields(this, formData);
     // Form rows only render visible fields (e.g. name/description). Hidden schema
     // fields like `id` must be preserved from existing actor data, otherwise the
     // schema rejects the update with "id: may not be null".
     const arrayFieldsToMerge = ["signatureTechniques", "signatureAuras", "uniqueAbilities"];
     for (const key of arrayFieldsToMerge) {
       const prefix = `system.${key}.`;
-      const formRows = {};
+      let formRows = {};
       const keysToRemove = [];
       for (const fk of Object.keys(formData)) {
         if (!fk.startsWith(prefix)) continue;
@@ -38,7 +41,12 @@ export class DBUBattleJacketSheet extends ActorSheet {
       if (Object.keys(formRows).length === 0) continue;
       for (const fk of keysToRemove) delete formData[fk];
       const existing = this.actor.system[key] || [];
-      const formIndices = Object.keys(formRows).map(Number).sort((a, b) => a - b);
+      formRows = rebaseSheetRows(this._renderedArrays?.[key], existing, formRows);
+      if (!formRows) {
+        ui.notifications.warn("Esta linha mudou em outra operação. Confira a ficha antes de salvar.");
+        throw new Error("Conflito de edição na ficha.");
+      }
+      const formIndices = [...new Set([...existing.keys(), ...Object.keys(formRows).map(Number)])].sort((a, b) => a - b);
       const mergedRows = formIndices.map(idx => {
         const base = foundry.utils.deepClone(existing[idx] || { id: idx + 1 });
         const overlay = formRows[String(idx)];
@@ -123,6 +131,7 @@ export class DBUBattleJacketSheet extends ActorSheet {
 
   activateListeners(html) {
     super.activateListeners(html);
+    captureSheetEdits(this, html, ["signatureTechniques", "signatureAuras", "uniqueAbilities"]);
     if (!this.isEditable) return;
 
     // Module add/remove
@@ -171,10 +180,10 @@ export class DBUBattleJacketSheet extends ActorSheet {
   // --- Pilot Handlers ---
 
   async _onAssignPilot(event) {
-    const characters = game.actors.filter(a => a.type === "character");
+    const characters = game.actors.filter(a => a.type === "character" && a.isOwner);
     if (characters.length === 0) return ui.notifications.warn("No character actors found.");
 
-    const options = characters.map(c => `<option value="${c.id}">${c.name}</option>`).join("");
+    const options = characters.map(c => `<option value="${c.id}">${foundry.utils.escapeHTML(c.name)}</option>`).join("");
     const content = `<form><div class="form-group"><label>Select Pilot</label><select name="pilotId">${options}</select></div></form>`;
 
     const result = await Dialog.wait({
@@ -187,38 +196,12 @@ export class DBUBattleJacketSheet extends ActorSheet {
       default: "ok"
     });
 
-    if (result) {
-      // Clear old pilot's link if this jacket already had a different pilot
-      const oldPilotId = this.actor.system.pilotId;
-      if (oldPilotId && oldPilotId !== result) {
-        const oldPilot = game.actors.get(oldPilotId);
-        if (oldPilot) await oldPilot.update({ "system.pilotedJacketId": "", "system.isPiloting": false });
-      }
-
-      const pilotActor = game.actors.get(result);
-      if (pilotActor) {
-        // Clear new pilot's old jacket link if they were linked elsewhere
-        const oldJacketId = pilotActor.system.pilotedJacketId;
-        if (oldJacketId && oldJacketId !== this.actor.id) {
-          const oldJacket = game.actors.get(oldJacketId);
-          if (oldJacket) await oldJacket.update({ "system.pilotId": "" });
-        }
-        await pilotActor.update({ "system.pilotedJacketId": this.actor.id });
-      }
-
-      await this.actor.update({ "system.pilotId": result });
-    }
+    if (result) await changeJacketPilot(this.actor, game.actors.get(result));
   }
 
   async _onUnassignPilot(event) {
     const pilotId = this.actor.system.pilotId;
-    if (pilotId) {
-      const pilotActor = game.actors.get(pilotId);
-      if (pilotActor) {
-        await pilotActor.update({ "system.pilotedJacketId": "", "system.isPiloting": false });
-      }
-    }
-    await this.actor.update({ "system.pilotId": "" });
+    await changeJacketPilot(this.actor, game.actors.get(pilotId), { unlink: true });
   }
 
   // --- Weak Point Handlers ---

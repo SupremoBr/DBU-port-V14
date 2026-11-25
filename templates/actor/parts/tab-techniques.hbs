@@ -58,7 +58,7 @@
         <span class="tech-name-display">{{name}}</span>
         {{#if isGained}}<span class="gained-badge"><i class="fas fa-link"></i> Gained from: {{gainedFrom}}</span>{{/if}}
         <span class="tech-type-badge">{{#if ../limitedMartialPower}}Super{{else}}{{type}}{{/if}}</span>
-        <span class="tech-tp-badge {{#if tpOverLimit}}tp-badge-over{{/if}}" title="TP total / limite">TP: {{#if tpDiscounted}}{{tpFull}}{{else}}{{tpCost}}{{/if}}/{{tpMax}}</span>
+        <span class="tech-tp-badge {{#if tpOverLimit}}tp-badge-over{{/if}}" title="TP total / limite">TP: {{tpCapUsage}}/{{tpMax}}</span>
         {{#unless isGained}}
         {{#if ../canEditAttackVisual}}
         <button type="button" class="tf-expand-traits-btn dbu-edit-visual-btn" data-dbu-edit-attack-visual="tech_{{id}}"><i class="fas fa-image" aria-hidden="true"></i> Visuais</button>
@@ -214,7 +214,7 @@
         {{/unless}}{{/if}}{{/if}}
         <div class="tech-formula-row">
           <label>Strike</label>
-          <span class="formula-value">{{strikeFormula}}</span>
+          <span class="formula-value">{{strikeFormula}}{{#if targetingBonus}} · Natural +{{targetingBonus}} (Targeting System){{/if}}</span>
           <span class="formula-ct">CT: {{strikeCT}}+</span>
         </div>
         <div class="tech-formula-row">
@@ -263,7 +263,7 @@
               <td>
                 <select class="adv-input" data-tech-id="{{../id}}" data-adv-index="{{@index}}" data-field="name" aria-label="Nome da vantagem">
                   <option value="">-- Select --</option>
-                  {{#each ../../advantageOptions}}
+                  {{#each options}}
                   <option value="{{this}}" {{#if (eq this ../name)}}selected{{/if}}>{{this}}</option>
                   {{/each}}
                 </select>
@@ -287,7 +287,7 @@
                 <input type="text" class="adv-input" data-tech-id="{{../id}}" data-adv-index="{{@index}}" data-field="notes" value="{{notes}}" />
                 {{/if}}
               </td>
-              <td class="adv-tp">{{#if freeRanks}}{{paidTP}}{{else}}{{tpCost}}{{/if}}</td>
+              <td class="adv-tp">{{paidTP}}</td>
               {{#if @root.rules093}}
               <td>
                 <input type="number" class="adv-input" data-tech-id="{{../id}}" data-adv-index="{{@index}}" data-field="freeRanks" value="{{freeRanks}}" min="0" max="{{ranks}}" aria-label="Ranks grátis" />
@@ -337,7 +337,7 @@
               <td>
                 <select class="disadv-input" data-tech-id="{{../id}}" data-disadv-index="{{@index}}" data-field="name" aria-label="Nome da desvantagem">
                   <option value="">-- Select --</option>
-                  {{#each ../../disadvantageOptions}}
+                  {{#each options}}
                   <option value="{{this}}" {{#if (eq this ../name)}}selected{{/if}}>{{this}}</option>
                   {{/each}}
                 </select>

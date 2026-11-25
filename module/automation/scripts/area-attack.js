@@ -1,6 +1,7 @@
+import { sizeRank } from "../../rules/size-v093.mjs";
 import { PROFILES_093 } from "../../rules/profiles-v093.mjs";
 import { SYSTEM_ID as MODULE_ID } from "../package.mjs";
-import { previewMeasuredTemplate } from "./area-preview.js";
+import { areaRegionData, previewMeasuredTemplate } from "./area-preview.js";
 
 // ============================================================
 // DBU Automation v1.9.20 DEV — Area Attack / cursor preview (DBU 0.9.2)
@@ -65,7 +66,7 @@ export function controlledBlastOriginAllowed(attackerToken, point) {
   const endRow = startRow + Math.max(1, Math.ceil(num(d.height, 1))) - 1;
   const dx = Math.max(startCol - col, 0, col - endCol);
   const dy = Math.max(startRow - row, 0, row - endRow);
-  return Math.max(dx, dy) < 9;
+  return Math.max(dx, dy) < (attackerToken.actor?.system?.status?.longRangeNumeric || 9);
 }
 
 function advantageEntries(source) {
@@ -116,7 +117,7 @@ function shapeFromText(text) {
  * We deliberately do not attempt to guess every triggered Trait/Talent because
  * many 0.9.2 effects are optional and/or paid at the moment of the maneuver.
  */
-export function getAreaSpec(source) {
+export function getAreaSpec(source, actor = null, targets = []) {
   const profile = String(source?.profile || "").trim();
   const pinfo = CONFIG.DBU?.profileData?.[profile] || source?.profileInfo || {};
   const range = String(pinfo?.range || source?.profileRange || "");
@@ -203,13 +204,24 @@ export function getAreaSpec(source) {
     spec.reasons.push("All Consuming: Cataclysmic Sphere");
   }
 
+  if (actor?.system?.rulesVersion === "0.9.3") {
+    const rank = sizeRank(actor);
+    if (spec.isAoE && rank > 4) {
+      spec.magnitude = spec.magnitude === 5 ? 5 : Math.min(4, spec.magnitude + rank - 4);
+      if (PROFILES_093[profile]?.area?.maxMagnitude === "Standard") spec.magnitude = Math.min(1, spec.magnitude);
+      spec.reasons.push("Giant Magnitude");
+    } else if (!spec.isAoE && rank >= 6 && targets.length && targets.every(t => sizeRank(t.actor) >= 0 && sizeRank(t.actor) < 6)) {
+      Object.assign(spec, { isAoE: true, shape: "circle", magnitude: rank - 6, source: "giant-strike", centeredOnAttacker: false });
+      spec.reasons.push("Giant Strike");
+    }
+  }
   if (!spec.isAoE) return spec;
   spec.label = `${magnitudeLabel(spec.magnitude)} ${shapeLabel(spec.shape === "choose" ? "" : spec.shape)} AoE`.replace(/\s+AoE$/, " AoE");
   return spec;
 }
 
-export function normalizeAreaConfig(config = {}, source = null) {
-  const auto = getAreaSpec(source);
+export function normalizeAreaConfig(config = {}, source = null, actor = null, targets = []) {
+  const auto = getAreaSpec(source, actor, targets);
   const enabled = config.enabled ?? auto.isAoE;
   let shape = String(config.shape || auto.shape || "circle");
   if (!['circle','cone','ray'].includes(shape)) shape = "circle";
@@ -297,13 +309,14 @@ function buildTemplateData({ config, start, end, source, actor }) {
 }
 
 async function createTemplate(data) {
-  const created = await canvas.scene.createEmbeddedDocuments("MeasuredTemplate", [data]);
+  const region = Number(game.release?.generation) >= 14;
+  const created = await canvas.scene.createEmbeddedDocuments(region ? "Region" : "MeasuredTemplate", [region ? areaRegionData(data) : data]);
   const doc = created?.[0] || null;
   if (!doc) return null;
   await new Promise(r => setTimeout(r, 80));
   return {
     doc,
-    object: canvas.templates?.get?.(doc.id)
+    object: region ? doc.object : canvas.templates?.get?.(doc.id)
       || canvas.templates?.placeables?.find?.(o => o.id === doc.id)
       || doc.object
       || null
@@ -351,7 +364,11 @@ function targetsInTemplate(template, attackerToken, config) {
     if (!token?.actor) continue;
     if (token.id === attackerToken?.id) continue;
     if (config?.excludeAllies && sameSide(token, attackerToken)) continue;
-    if (tokenSamplePoints(token).some(pt => templateContains(template.object, template.doc, pt))) out.push(token);
+    if (template.doc.documentName === "Region") {
+      if (canvas.level && !token.document.includedInLevel(canvas.level)) continue;
+      const region = typeof template.doc.testPoint === "function" ? template.doc : template.object;
+      if (tokenSamplePoints(token).some(pt => region?.testPoint({ ...pt, elevation: token.document.elevation }))) out.push(token);
+    } else if (tokenSamplePoints(token).some(pt => templateContains(template.object, template.doc, pt))) out.push(token);
   }
   return out;
 }
@@ -378,7 +395,7 @@ async function syncUserTargets(tokens) {
 }
 
 export async function resolveAreaTargets({ actor, attackerToken, source, existingTargets = [], config = null } = {}) {
-  const cfg = normalizeAreaConfig(config || {}, source);
+  const cfg = normalizeAreaConfig(config || {}, source, actor, Array.from(existingTargets));
   if (!cfg.enabled) {
     return { isAoE: false, targets: Array.from(existingTargets || []), spec: cfg.autoSpec, config: cfg, template: null };
   }
@@ -437,18 +454,21 @@ export async function resolveAreaTargets({ actor, attackerToken, source, existin
 
   // Local-only preview. No Scene document or attack Action before confirmation.
   const remoteCone = cfg.shape === "cone" && cfg.controlledBlast;
-  const forceAttackerOrigin = (cfg.shape === "cone" && !remoteCone) || cfg.shape === "ray";
+  const remoteProfile = actor?.system?.rulesVersion === "0.9.3" && PROFILES_093[source?.profile]?.area?.remoteOrigin;
+  const remoteLine = remoteProfile && cfg.shape === "ray";
+  const forceAttackerOrigin = (cfg.shape === "cone" && !remoteCone) || (cfg.shape === "ray" && !remoteLine);
   const fixed = forceAttackerOrigin || cfg.centeredOnAttacker;
   if (!attackerToken) {
     ui.notifications.warn("DBU Area: selecione o token do atacante antes de posicionar a área.");
     return { cancelled: true, isAoE: true, targets: [], spec: cfg.autoSpec, config: cfg };
   }
   const start = tokenCenter(attackerToken);
-  const mode = remoteCone ? "origin-aim" : forceAttackerOrigin ? "aim" : fixed ? "center" : "place";
+  const mode = remoteCone || remoteLine ? "origin-aim" : forceAttackerOrigin ? "aim" : fixed ? "center" : "place";
   const planned = buildTemplateData({ config: cfg, start, end: null, source, actor });
   const placement = await previewMeasuredTemplate({
     data: planned, mode,
-    originAllowed: remoteCone ? point => controlledBlastOriginAllowed(attackerToken, point) : null
+    cardinal: remoteLine,
+    originAllowed: remoteCone || remoteProfile ? point => controlledBlastOriginAllowed(attackerToken, point) : null
   });
   if (!placement?.confirmed || !placement.data) {
     return { cancelled: true, isAoE: true, targets: [], spec: cfg.autoSpec, config: cfg };
@@ -464,12 +484,23 @@ export async function resolveAreaTargets({ actor, attackerToken, source, existin
   }
   if (!template) return { cancelled: true, isAoE: true, targets: [], spec: cfg.autoSpec, config: cfg };
 
-  const targets = targetsInTemplate(template, attackerToken, cfg);
+  let targets = targetsInTemplate(template, attackerToken, cfg);
+  if (actor?.system?.rulesVersion === "0.9.3" && sizeRank(actor) >= 5 && cfg.shape === "circle" && canvas.scene.grid.type === 1) {
+    const occupied = tokenSamplePoints(attackerToken).slice(0, -1);
+    const { x, y, distance } = placement.data;
+    const half = gridSize() / 2;
+    if (occupied.some(p => Math.abs(p.x - x) <= half && Math.abs(p.y - y) <= half)) {
+      const radius = distance * gridSize() / gridDistance();
+      targets = allBattlefieldTargets(attackerToken, cfg).filter(t =>
+        (!canvas.level || !t.document.includedInLevel || t.document.includedInLevel(canvas.level)) &&
+        tokenSamplePoints(t).slice(0, -1).some(q => occupied.some(p => Math.hypot(q.x-p.x, q.y-p.y) <= radius)));
+    }
+  }
   await syncUserTargets(targets);
 
   if (!cfg.keep) {
     setTimeout(async () => {
-      try { await canvas.scene.deleteEmbeddedDocuments("MeasuredTemplate", [template.doc.id]); } catch {}
+      try { await template.doc.delete(); } catch {}
     }, 1200);
   }
 

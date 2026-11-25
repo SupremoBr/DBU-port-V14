@@ -61,6 +61,19 @@ function aimDegrees(origin, p) {
   return (Math.atan2(dy, dx) * 180 / Math.PI + 360) % 360;
 }
 
+export function areaRegionData(data, sceneLevel = canvas.level?.id) {
+  const scale = canvas.dimensions.distancePixels ?? canvas.dimensions.size / canvas.dimensions.distance;
+  const length = data.distance * scale;
+  const origin = { x: data.x, y: data.y };
+  let shape;
+  if (data.t === "circle") shape = { type: "circle", ...origin, radius: length };
+  else if (data.t === "cone") shape = { type: "cone", ...origin, radius: length, angle: data.angle, rotation: data.direction };
+  else shape = { type: "line", ...origin, length, width: data.width * scale, rotation: data.direction };
+  return { name: data.flags?.["DBU-MRR-OLD"]?.sourceName || "DBU · Area Attack", color: data.fillColor,
+    highlightMode: "coverage", visibility: CONST.REGION_VISIBILITY.ALWAYS,
+    ownership: { [game.user.id]: 3 }, shapes: [shape], levels: sceneLevel ? [sceneLevel] : [], flags: data.flags };
+}
+
 /**
  * Displays the exact MeasuredTemplate with the attack's existing geometry.
  * mode: "aim" (attacker-origin cone/ray), "center" (fixed Sphere),
@@ -69,15 +82,16 @@ function aimDegrees(origin, p) {
  *
  * @returns {Promise<{confirmed:boolean, data?:object}>}
  */
-export async function previewMeasuredTemplate({ data, mode = "place", originAllowed = null } = {}) {
+export async function previewMeasuredTemplate({ data, mode = "place", originAllowed = null, cardinal = false } = {}) {
   // Avoid two queued listeners and two Canvas previews on the same client.
   activePlacement?.cancel?.();
-  const scene = canvas?.scene, stage = canvas?.stage, layer = canvas?.templates;
+  const useRegions = Number(game.release?.generation) >= 14;
+  const scene = canvas?.scene, stage = canvas?.stage, layer = useRegions ? canvas.regions : canvas.templates;
   const previewLayer = layer?.preview;
-  const DocClass = CONFIG?.MeasuredTemplate?.documentClass
+  const DocClass = useRegions ? CONFIG.Region?.documentClass : CONFIG?.MeasuredTemplate?.documentClass
     ?? globalThis.getDocumentClass?.("MeasuredTemplate")
     ?? globalThis.MeasuredTemplateDocument;
-  const PlaceableClass = CONFIG?.MeasuredTemplate?.objectClass
+  const PlaceableClass = useRegions ? CONFIG.Region?.objectClass : CONFIG?.MeasuredTemplate?.objectClass
     ?? globalThis.MeasuredTemplate
     ?? globalThis.foundry?.canvas?.placeables?.MeasuredTemplate;
   if (!scene || !stage || !previewLayer?.addChild || !DocClass || !PlaceableClass) {
@@ -87,7 +101,7 @@ export async function previewMeasuredTemplate({ data, mode = "place", originAllo
 
   const sceneId = scene.id;
   const initial = { ...data };
-  const document = new DocClass(initial, { parent: scene });
+  const document = new DocClass(useRegions ? areaRegionData(initial) : initial, { parent: scene });
   const object = new PlaceableClass(document);
   let done = false, resolveChoice;
   const choice = new Promise(resolve => { resolveChoice = resolve; });
@@ -126,7 +140,7 @@ export async function previewMeasuredTemplate({ data, mode = "place", originAllo
     const updates = {};
     if (mode === "place") {
       const snapped = snapTargetSquare(point, canvas?.grid, canvas?.dimensions, scene);
-      if (!withinScene(snapped, canvas?.dimensions)) { canConfirm = false; return; }
+      if (!withinScene(snapped, canvas?.dimensions) || (originAllowed && !originAllowed(snapped))) { canConfirm = false; return; }
       updates.x = snapped.x;
       updates.y = snapped.y;
     } else if (mode === "origin-aim") {
@@ -140,19 +154,20 @@ export async function previewMeasuredTemplate({ data, mode = "place", originAllo
       } else {
         const degrees = aimDegrees(fixedOrigin, point);
         if (degrees === null) { canConfirm = false; return; }
-        updates.direction = degrees;
+        updates.direction = cardinal ? (Math.round(degrees / 90) * 90) % 360 : degrees;
       }
     } else if (mode === "aim") {
       const degrees = aimDegrees(initial, point);
       if (degrees === null) { canConfirm = false; return; }
-      updates.direction = degrees;
+      updates.direction = cardinal ? (Math.round(degrees / 90) * 90) % 360 : degrees;
     }
     canConfirm = true;
     if (Object.keys(updates).length) {
       last = { ...last, ...updates };
-      document.updateSource(updates);
-      // RefreshShape is needed for cone/ray rotation in both Foundry versions.
-      if (object.renderFlags?.set) object.renderFlags.set({ refresh: true });
+      document.updateSource(useRegions ? { shapes: areaRegionData(last).shapes } : updates);
+      // Rebuild Region geometry when its source shape changes.
+      if (useRegions) object.renderFlags?.set({ redraw: true });
+      else if (object.renderFlags?.set) object.renderFlags.set({ refresh: true });
       else object.refresh?.();
     }
   }
