@@ -4,7 +4,7 @@ import { surgingCharge093, surgingTargetsAllowed093, ragingBotch } from "../../r
 import { createHiddenTrackerCard, privateRollJournal } from "../../automation/scripts/core/private-rolls.js";
 import { defendKiCost093 } from "../../rules/defenses-v093.mjs";
 import { uses093 } from "../../rules/v093.mjs";
-import { profileRoll093 } from "../../rules/profiles-v093.mjs";
+import { profileRoll093, validFoundation } from "../../rules/profiles-v093.mjs";
 import { initiateDuel, initiateClash } from "../../helpers/duel.mjs";
 
 /** Character sheet domain: combat-tracker. Methods run with the sheet as this. */
@@ -305,6 +305,11 @@ export const combatTrackerMethods = {
       return;
     }
 
+    if (uses093(this.actor.system) && String(action.source).startsWith("ref_")) {
+      if (sd.weaponIssue) return ui.notifications.warn(sd.weaponIssue);
+      if (!validFoundation(sd.profile, sd.foundation)) return ui.notifications.warn("Selecione um Profile compatível com a Foundation.");
+    }
+
     // Broken weapon guard (weapons.txt "Damaging Weapons"): a Weapon at 0 LP
     // cannot be used for any Attacking Maneuvers. Matches the attack ref's
     // free-text "Weapon Equipped" against owned weapon items by name.
@@ -536,7 +541,7 @@ export const combatTrackerMethods = {
           <span class="dbu-roll-label">Strike</span>
           <span class="dbu-roll-main">
             <code class="dbu-roll-formula">${strikeFormulaRaw}</code>
-            <span class="dbu-roll-sub">Nat ${profileRoll?.natural ?? strikeNat} · CT ${strikeCT}+</span>${strikeTag}
+            <span class="dbu-roll-sub">Nat ${profileRoll?.natural ?? strikeNat}${sd.targetingBonus ? ` · Targeting System +${sd.targetingBonus} natural` : ""} · CT ${strikeCT}+</span>${strikeTag}
           </span>
           <span class="dbu-roll-total">${strikeTotal}</span>
         </div>

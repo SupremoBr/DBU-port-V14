@@ -266,7 +266,9 @@
 }
 
 .dbua-hud-v2 .dbua-v2-dock-tools {
-  grid-template-columns: minmax(64px, auto) repeat(4, 36px);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
 }
 
 .dbua-hud-v2 .dbua-v2-dock-row button {
@@ -377,7 +379,7 @@
   }
 
   .dbua-hud-v2 .dbua-v2-dock-tools {
-    grid-template-columns: minmax(64px, 1.5fr) repeat(4, minmax(0, 1fr));
+    justify-content: center;
   }
 }
 

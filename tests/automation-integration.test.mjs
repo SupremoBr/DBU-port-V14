@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, existsSync } from 'node:fs';
 import { SYSTEM_ID, AUTOMATION_SOCKET, activeLegacyModules, getAutomationPackage, readAutomationFlag, chatRenderHook, onAutomationChatRender } from '../module/automation/package.mjs';
+import { chooseAttackTargets } from '../module/automation/scripts/attack.js';
 import { createAutomationLifecycle, ENABLED_SETTING } from '../module/automation/lifecycle.mjs';
 import { legacyFlagUpdates, automationDocuments, migrateLegacyAutomation, migrateAutomationSettings, unsetAutomationFlag } from '../module/automation/migration.mjs';
 import { automationEnvironment, documentWithFlags, Collection } from './helpers/automation-environment.mjs';
@@ -208,4 +209,31 @@ test('real embedded graph boots on a Foundry 13 stub with settings, API, UI hook
   const before = [env.hooks.size, env.channels.length]; await life.ready(); await life.prepare();
   assert.deepEqual([env.hooks.size, env.channels.length], before);
   assert.equal(env.notices.filter(n => n.type === 'error').length, 0);
+  assert.equal(env.notices.some(n => /DBU Inicializador.*ativo/.test(n.args[0])), false);
+});
+
+test('attack target picker confirms visible scene tokens and handles cancellation', async () => {
+  const token = (id, name, hidden = false) => ({ id, name, visible: true, actor: {}, document: { hidden } });
+  const attacker = token('self', 'Atacante');
+  const enemy = token('enemy', '<Inimigo>');
+  globalThis.canvas = { scene: {}, tokens: { placeables: [attacker, enemy, token('hidden', 'Invisível', true)] } };
+  globalThis.game = { user: { isGM: false } };
+  globalThis.ui = { notifications: { warn() {} } };
+  globalThis.Dialog = {
+    async wait({ content, buttons, close }) {
+      assert.match(content, /value="enemy" checked/);
+      assert.match(content, /&lt;Inimigo&gt;/);
+      assert.doesNotMatch(content, /Atacante|Invisível/);
+      assert.equal(close(), null);
+      return buttons.confirm.callback({ find: () => [{ value: 'enemy' }] });
+    }
+  };
+  assert.deepEqual(await chooseAttackTargets(attacker, [enemy]), [enemy]);
+  Dialog.wait = async ({ buttons }) => buttons.cancel.callback();
+  assert.equal(await chooseAttackTargets(attacker, []), null);
+  Dialog.wait = async () => {
+    canvas.tokens.placeables = [attacker];
+    return ['enemy'];
+  };
+  assert.equal(await chooseAttackTargets(attacker, []), null);
 });

@@ -1,0 +1,264 @@
+# Inventário de passivas de talentos da 0.9.3
+
+A lista cobre efeitos rotulados como Passive no catálogo local. A classificação segue os cálculos estruturados e o marcador de compatibilidade legada. Efeitos pendentes podem ter tratamento em fluxos específicos. A validação individual no Foundry permanece pendente. [Fonte oficial](https://dbu-rpg.com/talents/)
+
+## Com automação estruturada na 0.9.3
+
+- Focused Strike, nível 1
+- Balanced Defender, nível 1
+- Injuring Wound, nível 1
+- Instinctual Dodge, nível 1
+- Agile Warrior, nível 1
+- Effective Defenses, nível 1
+- Resilience, nível 1
+- Risky Bet, nível 1
+- Superior Durability, nível 1
+- Enhanced Shot, nível 1
+- Alert, nível 1
+- Speedblitz, nível 1
+- Magic Blaster, nível 1
+- Enhanced Fist, nível 1
+- Iron Fist, nível 1
+- Rapid Fist, nível 1
+- Supreme Fist, nível 1
+- Unflinching Resilience, nível 1
+- Honorbound, nível 1
+- Angelic Technique, nível 1
+- Mystical Gaze, nível 1
+- Iron Guard, nível 1
+- Mystic Power, nível 1
+- Sorcering Corsair, nível 1
+- Style and Greed, nível 1
+- Weapon Arts, nível 1
+- AIIIEEEEEEE, nível 2
+- Roomy Biology, nível 1
+- Namekian Progenitor, nível 1
+- Namekian Finger, nível 1
+- Saiyan Tail Resistance, nível 1
+- Tail Proficiency, nível 1
+- Saiyan Soul, nível 1
+- Second Wind, nível 1
+- Never Surrender, nível 1
+- Vigor, nível 1, 2
+- High Risk Battler, nível 1
+- Battle at the Edge, nível 1
+- Steady Momentum, nível 1
+- Desperate Transformation, nível 1
+- Enhanced Transformation, nível 1
+- Forceful Transformation, nível 1
+- Weapon Specialist, nível 1
+- Light Weapons Specialist, nível 1
+- Heavy Weapons Specialist, nível 1
+- Iaijutsu Specialist, nível 1
+- Dual Wielding Specialist, nível 1
+- Twin Weapon Specialist, nível 1
+- Critical Specialist, nível 1
+- Variable Fighter, nível 1
+- Variable Champion, nível 1
+- Steel Muscle, nível 1, 2
+- Compact Muscle, nível 1, 2
+- Flexible Muscle, nível 1
+- Hefty Muscle, nível 1
+- Relax to Recover, nível 1
+
+## Com lógica legada a verificar
+
+- Power of the Z-Warrior, nível 1
+- Master of Openings, nível 1
+- Power of Movement, nível 1
+- Terrifying Presence, nível 1
+- Desperate Distraction, nível 1
+- Survivalist, nível 1, 2
+- Slow Starter, nível 1, 2
+- Conserving Strength, nível 1, 2, 3
+- Mental Warfare, nível 1
+- Improved Taunt, nível 1
+- Dueling Specialist, nível 1
+- Practiced Charger, nível 1
+
+## Sem automação estruturada identificada
+
+- Artful Strike, nível 1
+- Masterful Strike, nível 1
+- Balanced Warrior, nível 1, 2
+- Balanced Mind, nível 1, 2
+- Balanced in Yin and Yang, nível 1, 2
+- Jack of All Styles, nível 1
+- Lord of Balance, nível 1
+- Buddy Collector, nível 1
+- Buddy to Buddies, nível 1
+- Buddy System, nível 1
+- Combat Tactician, nível 1
+- Perfected Tactics, nível 1
+- Beat-down Tactics, nível 1
+- Fierce Counter, nível 1
+- Perfect Counter, nível 1
+- Jolt Counter, nível 1
+- Full Counter, nível 1
+- Exploit Expert, nível 1
+- Bruising Wound, nível 1
+- Critical Wound, nível 1
+- Cunning Dodge, nível 1
+- Masterful Dodge, nível 1
+- Free Flowing Stance, nível 2
+- Effective Defenses, nível 2
+- Resilience, nível 2
+- Tough Warrior, nível 1
+- Superior Durability, nível 2
+- Enhanced Shot, nível 2, 3
+- Point Blank Shot, nível 1
+- Artillery Shot, nível 1
+- Brawler, nível 1
+- Wrestler, nível 1
+- Judo Training, nível 1
+- Heel, nível 1
+- Human Shield, nível 1
+- Personal Space, nível 1
+- Improved Initiative, nível 1
+- Alert, nível 2, 3
+- Attentive Warrior, nível 1, 2
+- Speedblitz, nível 2
+- Lightning Initiative, nível 1, 2
+- Insightful Warrior, nível 1
+- Combat Wisdom, nível 1
+- Tai Chi Expert, nível 1
+- Tai Chi Master, nível 1, 2
+- Magic Caster, nível 1
+- Elementalist, nível 1
+- Magic Master, nível 1
+- Magic Warrior, nível 1, 2
+- Calm Mind, nível 1
+- Combat Zen, nível 1
+- Zen Counter, nível 1
+- Tranquil Warrior, nível 1
+- Master of Minions, nível 1, 2
+- Minion Coordinator, nível 1, 3
+- Minion Mark, nível 2, 3
+- Sacrificial Minion, nível 1
+- Minion Army, nível 1
+- Minion Supporter, nível 1
+- Fleet of Foot, nível 1
+- High Speed Ace, nível 1, 2
+- Multi-Type Specialist, nível 1
+- Multi-Type Gambit, nível 1
+- Android Fusion, nível 1, 2, 3
+- Honorbound, nível 2
+- 3D Scan Mode, nível 1, 2, 3, 4
+- Metallic Movement, nível 1, 2
+- Angelic Guidance, nível 1
+- Watchful Gaze, nível 2
+- Attendant’s Focus, nível 1, 2, 3
+- Reserved Tail, nível 2, 3
+- Dedicated Spotter, nível 1
+- Honorable Demon, nível 1
+- Versatile Demon, nível 1
+- Way of the Champion, nível 1
+- Zooming Third Eye, nível 1, 2, 3
+- Autonomous Glass Soldiers, nível 2, 3
+- Copy in the Mirror, nível 2
+- Glass Decorations, nível 1
+- Marauding Captain, nível 1, 2
+- Party Tactics, nível 1
+- Goop Throw, nível 1, 2
+- Battle Goo, nível 1, 2, 3
+- Detached Limbs, nível 1
+- AIIIEEEEEEE, nível 1
+- Roomy Biology, nível 2
+- Telepathic Teamwork, nível 1
+- Namekian Finger, nível 2, 3
+- Feline Rally, nível 1
+- Will of Nine Lives, nível 1
+- Cat Burglar, nível 1, 2
+- Tuffle Fusion, nível 1
+- Mutualism, nível 2, 3
+- Tuffle Parasite, nível 1
+- Scholar’s Intellect, nível 1
+- Saiyan Tail Resistance, nível 2
+- Tail Proficiency, nível 2
+- Kindhearted Saiyan, nível 1
+- Primal Rage, nível 1
+- Saiyan Soul, nível 2
+- Dedicated Watcher, nível 1
+- Spiritual Leadership, nível 1, 2, 3
+- Twinned Spirits, nível 1, 2
+- Yaki Swarm, nível 2, 3
+- Yaki Master, nível 1
+- Angry Warrior, nível 1
+- Burning Fury, nível 1
+- Furious Berserker, nível 1
+- Apoplectic Beast, nível 1
+- Tremendous Warrior, nível 1
+- Size Matters, nível 1
+- Miniature Warrior, nível 1
+- Size Doesn’t Matter, nível 1, 2
+- All Sizes Fit Me, nível 1
+- Practiced, nível 1, 2
+- Dynamic Hype, nível 1
+- Flexible Planning, nível 1
+- Silent Footsteps, nível 2
+- Stealth Strike, nível 1
+- Assassinate, nível 1
+- Master Assassin, nível 1, 2
+- Acrobat Star, nível 1, 2
+- Expert Pilot, nível 1, 2, 3
+- Yoink, nível 1
+- Enhanced Search, nível 1, 3, 4
+- Terrifying Speed, nível 1
+- Last Ditch Effort, nível 1
+- Team Survivalist, nível 1, 2
+- Feint Master, nível 1, 2
+- Frequent Flyer, nível 2
+- Instant Craft, nível 1
+- Archetype Defense, nível 1, 2, 3
+- Precision Kata, nível 1
+- Brutal Kata, nível 1
+- Profile Focus, nível 1
+- Muscular Warrior, nível 1, 2
+- Herculean Power, nível 1, 2
+- Adamantine Muscle, nível 1
+- Second Wind, nível 2
+- Lion’s Heart, nível 1
+- Taunt, nível 1
+- Flexible Flanker, nível 1
+- Supporting Defender, nível 1
+- Power Gifter, nível 1
+- Teamwork, nível 1
+- Synchronized Combatants, nível 2
+- Superior Synchronization, nível 1
+- Chosen Rival, nível 2, 3, 4
+- Eternal Rival, nível 1, 2
+- Bag of Tricks, nível 1, 2
+- Technique Master, nível 1, 2
+- Favored Technique, nível 1, 2
+- Powerful Technique, nível 1, 2, 3
+- Terrifying Technique, nível 1
+- Quick Learner, nível 3
+- Perfect Mimicry, nível 1
+- Copy Index, nível 1
+- Advanced Learner, nível 1
+- Technique Armory, nível 1
+- Diehard, nível 1, 2
+- Fortitude, nível 1
+- Steadfast Warrior, nível 1, 2
+- Bursting Transformation, nível 1
+- Under Pressure, nível 1
+- Specialized Transformation, nível 2
+- Inspiring Transformation, nível 1
+- Overwhelming Transformation, nível 1
+- Powerful Heartbeat, nível 1, 2
+- Self Control, nível 1
+- Weapon Specialist, nível 2
+- Category Specialist, nível 2
+- Variety Specialist, nível 1
+- Weapon Master, nível 1
+- Concentrated Energy, nível 2
+- Experienced Drunk, nível 1
+- Ferocious Fighter, nível 1
+- Furious Flex, nível 1
+- Lucky, nível 2
+- Naturist, nível 1, 2
+- Au Naturel, nível 1, 2
+- Superhuman Physique, nível 1
+- God-like Physique, nível 1, 2
+- Willpower, nível 1, 2
+- Arrogance, nível 1, 2

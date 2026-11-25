@@ -3,7 +3,7 @@ import { surgingCharge093, surgingTargetsAllowed093, ragingBotch } from "../../r
 import { privateRollJournal, sealRoll } from "./core/private-rolls.js";
 import { attackWeapon093 } from '../../helpers/weapon-state.mjs';
 import { inCombat093 } from "../../rules/actions-v093.mjs";
-import { profileRoll093 } from "../../rules/profiles-v093.mjs";
+import { profileRoll093, validFoundation } from "../../rules/profiles-v093.mjs";
 import { uses093 } from "../../rules/v093.mjs";
 import { validateTechnique093, validateTechniqueUsage093, signatureUseIssue093, maximumWager093 } from "../../rules/techniques-v093.mjs";
 // DBU Automation v1.8.12 DEV — Attack Core
@@ -12,6 +12,63 @@ import { getAreaSpec, resolveAreaTargets, magnitudeLabel } from "./area-attack.j
 import { validateActionUse } from "./action-economy.js";
 import { participantReference } from "./core/token-identity.js";
 // Migrado do DBU - Ataque v11.5 sem alterar a lógica de rolagem.
+
+function dbuEsc(value) {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+export async function chooseAttackTargets(attacker, selected) {
+  const scene = canvas.scene;
+  const candidates = () => (canvas.tokens?.placeables || []).filter(token =>
+    token.id !== attacker.id && token.actor && (game.user.isGM || (token.visible && !token.document.hidden)) &&
+    (!canvas.level || !token.document.includedInLevel || token.document.includedInLevel(canvas.level)));
+  const tokens = candidates();
+  if (!tokens.length) {
+    ui.notifications.warn("Nenhum alvo disponível nesta cena.");
+    return null;
+  }
+
+  const selectedIds = new Set(selected.map(token => token.id));
+  const ids = await Dialog.wait({
+    title: "Confirmar alvos",
+    content: `<div class="dbua-system-dialog-content">
+      <p>Marque os alvos deste ataque.</p>
+      <fieldset style="max-height: 45vh; overflow-y: auto">
+        <legend>Alvos na cena</legend>
+        ${tokens.map(token => `<label style="display: flex; align-items: center; gap: .4rem">
+          <input type="checkbox" name="target" value="${dbuEsc(token.id)}" ${selectedIds.has(token.id) ? "checked" : ""}>
+          ${dbuEsc(token.name || token.actor.name)}
+        </label>`).join("")}
+      </fieldset>
+    </div>`,
+    buttons: {
+      confirm: { label: "Confirmar alvos", callback: html => Array.from(html.find('[name="target"]:checked'), input => input.value) },
+      cancel: { label: "Cancelar", callback: () => null }
+    },
+    default: "confirm",
+    close: () => null,
+    render: html => {
+      const inputs = html.find('[name="target"]');
+      const confirm = html.closest(".dialog").find('[data-button="confirm"]');
+      const update = () => confirm.prop("disabled", !inputs.is(":checked"));
+      inputs.on("change", update);
+      update();
+    }
+  }, { classes: ["dbua-system-dialog"], width: 360 });
+
+  if (!ids) return null;
+  const available = new Map((canvas.scene === scene ? candidates() : []).map(token => [token.id, token]));
+  const confirmed = ids.map(id => available.get(id));
+  if (!confirmed.length || confirmed.some(token => !token)) {
+    ui.notifications.warn("A seleção de alvos mudou. Selecione novamente.");
+    return null;
+  }
+  return confirmed;
+}
 
 export async function attack(context = {}) {
 // ============================================================
@@ -82,14 +139,6 @@ const ATTACK_VISUAL_FALLBACK = {
 // ============================================================
 // HELPERS BÁSICOS
 // ============================================================
-
-function dbuEsc(value) {
-  return String(value ?? "")
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
-}
 
 function dbuSigned(value) {
   const n = Number(value) || 0;
@@ -541,7 +590,7 @@ function dbuPatchOriginalRevealHtml(originalHtml, data) {
     if (label === "strike") {
       if (formulaEl) formulaEl.textContent = data.strikeDisplayFormula;
       if (subEl) {
-        subEl.textContent = `Nat ${data.strikeNat} · CT ${data.strikeCT}+ · Botch ${data.strikeBotchThreshold === 0 ? "OFF" : `1-${data.strikeBotchThreshold}`}`;
+        subEl.textContent = `Nat ${data.strikeNat}${data.targetingBonus ? ` · Targeting System +${data.targetingBonus} natural` : ""} · CT ${data.strikeCT}+ · Botch ${data.strikeBotchThreshold === 0 ? "OFF" : `1-${data.strikeBotchThreshold}`}`;
       }
       if (totalEl) totalEl.textContent = String(data.strikeTotal);
 
@@ -793,7 +842,7 @@ const preExistingDimPenalty = preExistingDimStacks * baseTier;
 // ============================================================
 // O detector é apenas um auxílio. O jogador sempre pode marcar/desmarcar e
 // corrigir Tipo/Magnitude manualmente para Traits/Talents opcionais.
-const initialAreaSpec = getAreaSpec(sources[initialSourceIndex]?.source || {}, actor, Array.from(game.user.targets || []));
+const initialAreaSpec = getAreaSpec(sources[initialSourceIndex]?.source || {}, actor, targetTokens);
 const initialAreaEnabled = !!initialAreaSpec?.isAoE;
 const initialAreaShape = initialAreaSpec?.shape === "choose"
   ? "cone"
@@ -1102,7 +1151,7 @@ const selection = await Dialog.wait({
     const markManualChange = () => {
       if (applyingAuto || !enabled?.checked) return;
       const idx = Number(sourceSelect?.value || 0);
-      const auto = getAreaSpec(sources[idx]?.source || {}, actor, Array.from(game.user.targets || []));
+      const auto = getAreaSpec(sources[idx]?.source || {}, actor, targetTokens);
       if (modeChip) {
         modeChip.textContent = auto?.isAoE ? "AUTO + AJUSTE" : "MANUAL";
         modeChip.classList.add("warn");
@@ -1112,7 +1161,7 @@ const selection = await Dialog.wait({
 
     const applySourceArea = () => {
       const idx = Number(sourceSelect?.value || 0);
-      const auto = getAreaSpec(sources[idx]?.source || {}, actor, Array.from(game.user.targets || []));
+      const auto = getAreaSpec(sources[idx]?.source || {}, actor, targetTokens);
       applyingAuto = true;
       enabled.checked = !!auto?.isAoE;
       if (optionsBox) optionsBox.style.display = enabled.checked ? "block" : "none";
@@ -1161,6 +1210,7 @@ if (!selected) return ui.notifications.error("Ataque selecionado não encontrado
 const source = selected.source;
 if (uses093(actor.system) && source.key?.startsWith("ref_")) {
   const ref = actor.system.attackRefs?.[Number(source.key.slice(4))];
+  if (ref && !validFoundation(ref.profile, ref.foundation)) return ui.notifications.warn("Selecione um Profile compatível com a Foundation.");
   const issue = ref && attackWeapon093(actor, ref).issue;
   if (issue) return ui.notifications.warn(issue);
 }
@@ -1186,9 +1236,17 @@ const damageCategoryAdjusted = chosenDamageCategory !== originalDamageCategory;
 // ============================================================
 // AREA ATTACK v11.11 — DBU 0.9.2: Tipo + Magnitude + override manual
 // ============================================================
-const areaSpec = getAreaSpec(source, actor, targetTokens);
-const chosenShape = ["circle", "cone", "ray"].includes(selection.areaShape) ? selection.areaShape : "circle";
-let chosenMagnitude = Math.max(0, Math.min(5, Number(selection.areaMagnitude ?? 1)));
+let areaSpec = getAreaSpec(source, actor, targetTokens);
+let newGiantStrike = false;
+if (!explicitTargets && !singleTarget && (!selection.hasArea || selection.areaUseTargets || context.skipAreaTemplate)) {
+  const declaredArea = areaSpec;
+  targetTokens = await chooseAttackTargets(attackerToken, targetTokens);
+  if (!targetTokens) return null;
+  areaSpec = getAreaSpec(source, actor, targetTokens);
+  newGiantStrike = !declaredArea.isAoE && areaSpec.source === "giant-strike";
+}
+const chosenShape = !newGiantStrike && ["cone", "ray"].includes(selection.areaShape) ? selection.areaShape : "circle";
+let chosenMagnitude = newGiantStrike ? areaSpec.magnitude : Math.max(0, Math.min(5, Number(selection.areaMagnitude ?? 1)));
 if (chosenShape !== "circle" && chosenMagnitude === 0) chosenMagnitude = 1;
 
 const autoShape = ["circle", "cone", "ray"].includes(areaSpec?.shape) ? areaSpec.shape : null;
@@ -1199,7 +1257,7 @@ const areaAdjusted = !!areaSpec?.isAoE && (
   || (chosenShape === "circle" && String(selection.areaPosition || "map") !== autoPosition)
 );
 const areaMode = !areaSpec?.isAoE ? "manual" : areaAdjusted ? "auto-adjusted" : "auto";
-const areaEnabled = !!selection.hasArea;
+const areaEnabled = !!selection.hasArea || newGiantStrike;
 let areaResolution = null;
 
 if (areaEnabled && !context?.skipAreaTemplate) {
@@ -1584,6 +1642,7 @@ const patchedRevealHtml = dbuPatchOriginalRevealHtml(
     attackNum: actualAttackNum,
     wager,
     strikeNat: profileRoll?.natural ?? strikeNat,
+    targetingBonus: source.targetingBonus || 0,
     woundNat,
     defaultStrikeCT,
     defaultWoundCT,
@@ -1692,6 +1751,7 @@ const attackData = {
   originalAttackMessageId: messageId,
 
   strikeNatural: profileRoll?.natural ?? strikeNat,
+  targetingBonus: source.targetingBonus || 0,
   woundNatural: woundNat,
 
   foundation: source.foundation || "",

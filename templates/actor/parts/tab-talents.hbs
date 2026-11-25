@@ -36,16 +36,18 @@
           <div class="talent-header">
             <span class="talent-category-badge">{{category}}</span>
             <span class="talent-name">{{name}}</span>
-            {{#if @root.rules093}}
             {{#if @root.editable}}
+            <div class="dbu-talent-actions">
+            {{#if @root.rules093}}
             <button type="button" class="dbu-edit-catalog-description" data-dbu-edit-description="talents" data-entry-id="{{id}}" title="Editar descrição e buffs" aria-label="Editar descrição e buffs de {{name}}">
               <i class="fas fa-pen" aria-hidden="true"></i>
             </button>
             {{/if}}
-            {{/if}}
-            <button type="button" class="delete-btn item-delete" data-action="delete-talent" data-talent-id="{{id}}" title="Remove Talent">
-              <i class="fas fa-trash"></i>
+            <button type="button" class="delete-btn item-delete" data-action="delete-talent" data-talent-id="{{id}}" title="Remover talento" aria-label="Remover {{name}}">
+              <i class="fas fa-trash" aria-hidden="true"></i>
             </button>
+            </div>
+            {{/if}}
           </div>
           {{#if prerequisites}}
           <div class="talent-prerequisites"><strong>Prerequisites:</strong> {{prerequisites}}</div>

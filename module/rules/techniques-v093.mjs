@@ -2,7 +2,7 @@ import { attackWeapon093 } from '../helpers/weapon-state.mjs';
 import { SUPER_PROFILES_093, superProfileKiUnits093 } from "./super-profiles-v093.mjs";
 import { limitedMartialPower, martialEnergyCharges, martialLevel } from './path-to-power-v093.mjs';
 import { isLegacyLimitBreakType, modifierPointCost, techniqueCapUsage093, techniquePointCap, techniquePointCost, techniqueBaseKiUnits } from './v093.mjs';
-import { PROFILES_093, validFoundation } from './profiles-v093.mjs';
+import { PROFILES_093, validFoundation, profileAdvantages093 } from './profiles-v093.mjs';
 import { CATALOGS_093 } from './catalogs-v093.mjs';
 import { talentPassiveBonus093 } from './talent-passives-v093.mjs';
 import { attackKiWithBuffs } from '../helpers/custom-buffs.mjs';
@@ -50,6 +50,12 @@ const ultimateOnly = new Set(['Maximum Charge','Final Chance','Last Legs','Power
 export function modifierProfileIssue093(technique, name) {
   if (requiredProfile[name] && technique.profile !== requiredProfile[name]) return name + ' exige ' + requiredProfile[name] + '.';
   if (ultimateOnly.has(name) && !/ultimate|dramatic[ _-]*finisher/i.test(technique.type || technique.techType)) return name + ' exige Ultimate.';
+  const energyOrMagic = ['Energy', 'Magic'].includes(technique.foundation);
+  if (['Sky Assault', 'Splitting', 'Short Range', 'Hostile Chase'].includes(name) && !energyOrMagic) return name + ' exige Energy ou Magic.';
+  if (['Splitting', 'Short Range'].includes(name) && PROFILES_093[technique.profile]?.area) return name + ' exige um ataque sem área.';
+  if (name === 'Condition' && /^Elemental \((?:Fire|Ice|Water|Lightning|Poison)\)$/.test(technique.profile)) {
+    return name + ' é incompatível com este subperfil Elemental.';
+  }
   if (name === 'Throwing Technique' && (technique.foundation !== 'Physical' || !['Simple', 'Combination'].includes(technique.profile))) return name + ' exige Physical e Simple ou Combination.';
   return '';
 }
@@ -72,7 +78,7 @@ export function validateTechnique093(technique, system) {
     issues.push(`${limitedMartialPower(system) ? "Path to Power: " : ""}esta técnica pode ter até ${cap} TP no total.`);
   }
   if (!validFoundation(technique.profile, technique.foundation)) issues.push('Perfil incompatível ou removido: ' + technique.profile);
-  const advantages = new Map((technique.advantages || []).map(row => [row.name, row]));
+  const advantages = new Map(profileAdvantages093(technique, technique.advantages || []).map(row => [row.name, row]));
   const disadvantages = new Map((technique.disadvantages || []).map(row => [row.name, row]));
   const conflicts = [
     [advantages, 'Efficiency', disadvantages, 'Inefficiency'],

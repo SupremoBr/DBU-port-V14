@@ -62,7 +62,19 @@
                             {{!-- Row 3: Strike formula and strike dice --}}
                             <tr>
                                 <td class="ar-lbl">Strike</td>
-                                <td class="ar-val ar-formula ar-strike" colspan="3">{{strikeFormula}} ({{strikeCT}}+){{#if targetingBonus}} · Natural +{{targetingBonus}} (Targeting System){{/if}}</td>
+                                <td class="ar-val ar-formula ar-strike" colspan="3">{{strikeFormula}} ({{strikeCT}}+)
+                                  {{#if targetingBonus}}<span class="dbu-strike-natural" title="Targeting System altera o valor natural do dado" aria-label="Targeting System: natural de Strike mais {{targetingBonus}}">Nat +{{targetingBonus}}</span>{{/if}}
+                                  <button type="button" class="dbu-attack-modifiers-toggle" popovertarget="attack-modifiers-{{@root.actor.uuid}}-{{_idx}}">Modificadores</button>
+                                  <section class="dbu-attack-modifiers" popover id="attack-modifiers-{{@root.actor.uuid}}-{{_idx}}" aria-label="Modificadores do ataque">
+                                    <header>
+                                      <strong>Modificadores do ataque</strong>
+                                      <button type="button" popovertarget="attack-modifiers-{{@root.actor.uuid}}-{{_idx}}" popovertargetaction="hide">Fechar</button>
+                                    </header>
+                                    {{#if attackModifiers.length}}
+                                    <ul>{{#each attackModifiers}}<li><strong>{{name}}</strong> · {{effect}} <small>({{source}})</small></li>{{/each}}</ul>
+                                    {{else}}<p>Sem modificadores listados para este ataque.</p>{{/if}}
+                                  </section>
+                                </td>
                                 <td class="ar-lbl">Strike Crit</td>
                                 <td class="ar-val">{{#if strikeCritical}}{{strikeCritical}}{{else}}-{{/if}}</td>
                                 <td class="ar-lbl">In Melee?</td>

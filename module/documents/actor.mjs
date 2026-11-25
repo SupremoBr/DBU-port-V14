@@ -1300,7 +1300,9 @@ export class DBUActor extends Actor {
     const insight = Math.max(1, system.attributes.in?.totalScore ?? 0);
     const racialSurgency = (racialBonuses.surgency || 0) + (racialBonuses.surgencyHalfInsight || 0) * Math.ceil(insight / 2);
     const surgency = foTotal + (talents.includes("archetype_focus") ? 2 * tier : 0)
-      + talentPassiveBonus093(system, "surgency", tier) + racialSurgency;
+      + talentPassiveBonus093(system, "surgency", tier)
+      + (!(system.transformations || []).some(row => row.active && /^(form|enhancement)/.test(row.transformationType || ''))
+        ? talentPassiveBonus093(system, "normalStateSurgency", tier) : 0) + racialSurgency;
     if (uses093(system)) system.status.surgency = surgency;
 
     // --- Healing Surge ---
@@ -1885,6 +1887,7 @@ export class DBUActor extends Actor {
     let defenseValue = agTotal + (sizeData.defenseMod * tier) + auraDefense + this._getEquipmentDefenseBonus() + customBuffDefense
       - (racialResources.defensePenalty || 0) + (racialBonuses.defense || 0) + (racialBonuses.defenseQuarterInsight || 0) * quarterInsight;
     // Raging state: "Reduce your Defense Value by 1(T)" (states.txt)
+    defenseValue += talentPassiveBonus093(system, "defenseValue");
     if (!uses093(system) && system.combatStates?.raging) defenseValue -= tier;
     // Guard Down condition: reduce Defense Value by 2(T)
     if (this._isConditionActive(system, "guardDown")) defenseValue -= 2 * tier;

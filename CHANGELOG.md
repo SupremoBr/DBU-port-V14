@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.0.12-rules093-alpha.30] — alvos, modificadores e ficha
+
+- Ataques com seleção manual permitem escolher e confirmar os alvos. Tokens já selecionados aparecem marcados. A inicialização da automação integrada dispensa o aviso informativo do módulo antigo.
+- Referências de Ataque exibem os modificadores em uma janela de consulta e destacam o bônus de Targeting System ao resultado natural. Profiles e armas incompatíveis são bloqueados antes da rolagem.
+- Técnicas Assinatura reconhecem vantagens concedidas pelo Profile na validação de dependências. Limited Line limita o alcance do molde a 8 ou 4 casas, conforme o rank.
+- Novas passivas condicionais usam dados da ficha, incluindo limiares de saúde e Super Stacks. [Inventário de passivas](docs/inventario-passivas-talentos-093.md)
+- Cartões de talentos, Active Effects, Custom Buffs, Pressure Check e controles do HUD receberam ajustes de layout e acessibilidade. Na 0.9.3, a verificação de energia para entrar numa transformação usa o Ki atual.
+
+A validação no Foundry com Dice So Nice e Dice Tray segue pendente.
+
 ## [1.0.12-rules093-alpha.29] — combate, técnicas e ficha
 
 - Ranks gratuitos ficam fora do TP pago e do limite da técnica. **Free TP** continua como crédito separado. Targeting System ajusta o dado natural de Strike e pode gerar crítico.

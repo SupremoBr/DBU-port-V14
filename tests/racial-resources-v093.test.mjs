@@ -303,3 +303,34 @@ test('two simultaneous clicks on the same actor resolve one Pressure Check', asy
   assert.equal(demon.system.rules093State.racialResources.demonicPower, 1);
   assert.equal(demon.system.rules093State.racialResources.attackChecks, 1);
 });
+
+test('threshold talent passives change with thresholds and talent ownership', () => {
+  const system = { rulesVersion: '0.9.3', tier: 3, baseTier: 2,
+    talents: ['r093_vigor', 'r093_vigor', 'r093_high_risk_battler', 'r093_steady_momentum'],
+    thresholds: { crossedCount: 2, bruised: { crossed: true }, injured: { crossed: true }, penalties: 0 } };
+  assert.equal(talentPassiveBonus093(system, 'soak'), 6);
+  assert.equal(talentPassiveBonus093(system, 'woundBuffTotal'), 6);
+  assert.equal(talentPassiveBonus093(system, 'strikeBuffTotal'), 2);
+  system.thresholds.penalties = 2;
+  assert.equal(talentPassiveBonus093(system, 'soak'), 4);
+  system.talents = [];
+  assert.equal(talentPassiveBonus093(system, 'soak'), 0);
+});
+
+test('muscle talents use the exact Super Stack count and respect individual toggles', () => {
+  const system = { rulesVersion: '0.9.3', tier: 3, baseTier: 2,
+    talents: ['r093_steel_muscle', 'r093_compact_muscle', 'r093_flexible_muscle', 'r093_hefty_muscle'],
+    status: { superStacks: 1 }, effectTracking: { enabledPassives: {} } };
+  assert.equal(talentPassiveBonus093(system, 'defenseValue'), 3);
+  assert.equal(talentPassiveBonus093(system, 'steadfastBonus'), 1);
+  assert.equal(talentPassiveBonus093(system, 'strikeBuffTotal'), 3);
+  assert.equal(talentPassiveBonus093(system, 'soak'), 3);
+  assert.equal(talentPassiveBonus093(system, 'dr'), 0);
+  system.status.superStacks = 3;
+  assert.equal(talentPassiveBonus093(system, 'defenseValue'), 0);
+  assert.equal(talentPassiveBonus093(system, 'woundEnergy'), 6);
+  assert.equal(talentPassiveBonus093(system, 'soak'), 6);
+  assert.equal(talentPassiveBonus093(system, 'dr'), 3);
+  system.effectTracking.enabledPassives.talent_r093_steel_muscle_2 = false;
+  assert.equal(talentPassiveBonus093(system, 'dr'), 0);
+});

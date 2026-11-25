@@ -38,9 +38,40 @@ export const TALENT_PASSIVES_093 = {
   r093_critical_specialist: { 1: { armedStrikeCT: { amount: 1, scale: 'flat' } } },
   r093_variable_fighter: { 1: { unarmedAttackStrike: { amount: 1, when: 'wielding' } } },
   r093_variable_champion: { 1: { armedStrike: { amount: 1, when: 'singleWeapon' } } },
+  r093_balanced_defender: { 1: { defenseValue: { amount: 1, when: 'balancedDefense' }, soak: { amount: 1, when: 'balancedDefense' } } },
+  r093_vigor: {
+    1: { soak: { amount: 1, scale: 'bT', perThreshold: true } },
+    2: { strikeBuffTotal: { amount: 1, scale: 'bT', when: 'injured' }, dodgeBuffTotal: { amount: 1, scale: 'bT', when: 'injured' } }
+  },
+  r093_steel_muscle: {
+    1: { soak: { amount: 1, doubleAtThreeStacks: true } },
+    2: { dr: { amount: 1, when: 'twoOrMoreStacks' } }
+  },
+  r093_compact_muscle: {
+    1: { defenseValue: { amount: 1, when: 'oneStack' } },
+    2: { steadfastBonus: { amount: 1, scale: 'flat', when: 'oneStack' } }
+  },
+  r093_flexible_muscle: { 1: { strikeBuffTotal: { amount: 1, when: 'oneStack' } } },
+  r093_hefty_muscle: { 1: { woundPhysical: { amount: 1, doubleAtThreeStacks: true }, woundEnergy: { amount: 1, doubleAtThreeStacks: true } } },
+  r093_relax_to_recover: { 1: { normalStateSurgency: 1 } },
+  r093_high_risk_battler: { 1: { woundBuffTotal: { amount: 1, scale: 'bT', perThreshold: true } } },
+  r093_battle_at_the_edge: { 1: Object.fromEntries(['strikeBuffTotal', 'dodgeBuffTotal', 'woundBuffTotal', 'soak']
+    .map(stat => [stat, { amount: 1, scale: 'bT', when: 'critical' }])) },
+  r093_steady_momentum: { 1: {
+    soak: { amount: 1, scale: 'bT', when: 'steady' }, woundBuffTotal: { amount: 1, scale: 'bT', when: 'steady' }
+  } },
+
 };
 
 function applies(system, when, weapons) {
+  if (when === 'balancedDefense') {
+    const agility = system.attributes?.ag?.score;
+    return agility >= 4 && agility === system.attributes?.te?.score;
+  }
+  if (when === 'oneStack') return system.status?.superStacks === 1;
+  if (when === 'twoOrMoreStacks') return system.status?.superStacks >= 2;
+  if (when === 'critical') return !!system.thresholds?.critical?.crossed;
+  if (when === 'steady') return !!system.thresholds?.bruised?.crossed && !system.thresholds.penalties;
   if (when === 'injured') return !!system.thresholds?.injured?.crossed;
   if (when === 'transformed') return (system.transformations || []).some(row =>
     row.active && /^(form|enhancement)/.test(row.transformationType || ''));
@@ -69,7 +100,9 @@ function talentEffects(system) {
 function value(system, entry, tier, baseTier, weapons = []) {
   if (typeof entry === 'number') return entry * tier;
   if (!applies(system, entry.when, weapons)) return 0;
-  return entry.amount * (entry.scale === 'flat' ? 1 : entry.scale === 'bT' ? baseTier : tier);
+  const thresholds = entry.perThreshold ? (system.thresholds?.crossedCount || 0) : 1;
+  const multiplier = entry.doubleAtThreeStacks && system.status?.superStacks === 3 ? 2 : 1;
+  return multiplier * thresholds * entry.amount * (entry.scale === 'flat' ? 1 : entry.scale === 'bT' ? baseTier : tier);
 }
 
 export function talentPassiveBonus093(system, stat, tier = system?.tier || 1, baseTier = system?.baseTier || 1) {
@@ -82,11 +115,11 @@ export function applyTalentPassives093(system, tier, baseTier, items = []) {
   for (const [stat, entry] of talentEffects(system)) {
     const amount = value(system, entry, tier, baseTier, weapons);
     if (!amount) continue;
-    if (stat === 'soak') system.status.soak += amount;
+    if (stat === 'soak' || stat === 'dr') system.status[stat] = (system.status[stat] || 0) + amount;
     else if (stat === 'might') {
       system.status.might += amount;
       system.status.mightForClashes += amount;
-    } else if (!['racialLife', 'surgency', 'tpPerSkillImprovement', 'physicalSignatureKiDiscount'].includes(stat)) {
+    } else if (!['defenseValue', 'racialLife', 'surgency', 'normalStateSurgency', 'tpPerSkillImprovement', 'physicalSignatureKiDiscount'].includes(stat)) {
       system.aptitudes[stat] = (system.aptitudes[stat] || 0) + amount;
     }
   }

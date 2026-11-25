@@ -1,3 +1,4 @@
+import { normalizeAreaConfig } from '../module/automation/scripts/area-attack.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { finishDefense, openRoll, sealRoll } from '../module/automation/scripts/core/private-rolls.js';
@@ -89,4 +90,15 @@ test('Reflect preserves the original Wound formula with charges and wager exactl
   assert.equal(urgentWoundFormulaFromAttack({ urgentWoundFormula: urgent }), urgent);
   assert.equal(urgentWoundFormulaFromAttack({}, { getFlag: () => ({ woundRollData: { formula } }) }), formula);
   assert.equal(urgentWoundFormulaFromAttack({}), null);
+});
+
+test('Limited Line caps only current Line techniques by rank', () => {
+  globalThis.CONFIG = { DBU: { rulesVersion: '0.9.3' } };
+  const actor = { system: { rulesVersion: '0.9.3' } };
+  const source = { profile: 'Wave', disadvantages: [{ name: 'Limited Line', ranks: 1 }] };
+  assert.equal(normalizeAreaConfig({}, source, actor).lineLimit, 8);
+  source.disadvantages[0].ranks = 2;
+  assert.equal(normalizeAreaConfig({}, source, actor).lineLimit, 4);
+  assert.equal(normalizeAreaConfig({ shape: 'circle' }, source, actor).lineLimit, null);
+  assert.equal(normalizeAreaConfig({}, source, {}).lineLimit, null);
 });

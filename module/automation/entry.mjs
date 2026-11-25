@@ -13,7 +13,7 @@ Hooks.once('ready', async () => {
   try {
     const status = await lifecycle.ready();
     if (status.mode === 'external-module' && game.user?.isGM) {
-      ui.notifications.info(`DBU Automation: usando o módulo externo (${status.legacyModules.join(', ')}). Para usar a automação incluída no sistema, desative esse módulo e recarregue o mundo.`);
+      console.info(`DBU Automation: usando o módulo externo (${status.legacyModules.join(', ')}). Para usar a automação incluída no sistema, desative esse módulo e recarregue o mundo.`);
     }
   } catch (error) { report(error); }
 });

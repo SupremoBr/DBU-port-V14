@@ -414,6 +414,7 @@ export const combatDataMethods = {
         energyCharges: uses093(system) ? signatureEnergyCharges093(tech, system) : (tech.baseEnergyCharges || 0) + (tech.extraEnergyCharges || 0),
         powerShot: (tech.advantages || []).find(a => a.name === "Power Shot")?.ranks || 0,
         advantages: uses093(system) ? profileAdvantages093(tech, tech.advantages || []) : tech.advantages || [],
+        disadvantages: tech.disadvantages || [],
         defaultWager: 0,
         twinLinked,
         deadLinked,

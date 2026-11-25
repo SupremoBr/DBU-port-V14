@@ -232,7 +232,11 @@ export function normalizeAreaConfig(config = {}, source = null, actor = null, ta
     : config.position === "map"
       ? false
       : !!auto.centeredOnAttacker;
+  const limitedLine = actor?.system?.rulesVersion === "0.9.3" && shape === "ray"
+    ? source?.disadvantages?.find(row => row.name === "Limited Line")
+    : null;
   return {
+    lineLimit: limitedLine ? (limitedLine.ranks >= 2 ? 4 : 8) : null,
     enabled: !!enabled,
     shape,
     magnitude,
@@ -271,7 +275,7 @@ function geometryFor(config) {
   }
   // Line extends to the battlefield edge; magnitude controls width.
   const widthByMagnitude = { 1: 1, 2: 3, 3: 5, 4: 7 };
-  return { cataclysmic: false, squares: sceneEdgeSquares(), widthSquares: widthByMagnitude[Math.max(1, mag)] ?? 1, angle: 0 };
+  return { cataclysmic: false, squares: Math.min(sceneEdgeSquares(), config.lineLimit ?? Infinity), widthSquares: widthByMagnitude[Math.max(1, mag)] ?? 1, angle: 0 };
 }
 
 function directionDegrees(start, end) {

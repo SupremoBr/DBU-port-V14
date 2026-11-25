@@ -143,15 +143,15 @@ export async function promptPressureCheck093(actor, source, combat = globalThis.
   ].filter(([enabled]) => enabled);
   const thresholds = source === 'steadfast' ? healthThresholds.filter(key => failedThreshold(system, key)) : [];
   const chooseTrigger = !source;
-  const selection = chooseTrigger || modifiers.length || thresholds.length ? await Dialog.wait({
+  const selection = chooseTrigger || modifiers.length || source === 'steadfast' ? await Dialog.wait({
     title: 'Pressure Check',
-    content: [
+    content: `<div class="dbua-system-dialog-content dbu-pressure-options">${[
       ...(chooseTrigger ? [`<label>Gatilho <select name="trigger">${triggers.map(([key, label]) =>
         `<option value="${key}">${label}</option>`).join('')}</select></label>`] : []),
       ...(thresholds.length ? [`<label>Steadfast <select name="threshold"><option value="">Outro teste</option>${thresholds.map(key =>
         `<option value="${key}">${key}</option>`).join('')}</select></label>`] : []),
       ...modifiers.map(([, name, label]) => `<div><label><input type="checkbox" name="${name}"> ${label}</label></div>`)
-    ].join(''),
+    ].join('')}</div>`,
     buttons: {
       roll: { label: 'Rolar', callback: root => ({
         trigger: source || root.find('[name="trigger"]').val(),
@@ -162,7 +162,7 @@ export async function promptPressureCheck093(actor, source, combat = globalThis.
     },
     default: 'roll',
     close: () => null
-  }) : { trigger: source, options: {} };
+  }, { classes: ['dbua-system-dialog'], width: 420 }) : { trigger: source, options: {} };
   if (!selection) return;
   const owner = resolutionOwner(actor);
   if (owner && owner.id !== game.user.id) {

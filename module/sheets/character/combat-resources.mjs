@@ -209,7 +209,9 @@ export const combatResourcesMethods = {
     event.preventDefault();
     const header = event.currentTarget;
     const group = header.closest(".effect-group");
-    if (group) group.classList.toggle("collapsed");
+    if (!group) return;
+    const collapsed = group.classList.toggle("collapsed");
+    header.setAttribute("aria-expanded", String(!collapsed));
   },
 
   async _onPassiveToggle(event) {

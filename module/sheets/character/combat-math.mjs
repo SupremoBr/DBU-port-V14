@@ -457,6 +457,23 @@ export const combatMathMethods = {
       const clashFormula = this._buildFormula(strikeTopDice, strikeGreaterDice, clashMod);
 
       // Available profiles for this foundation
+      const targetingBonus = revised && wItem ? eqFlags.weaponTargetingSystem?.[wItem.id] || 0 : 0;
+      const signed = value => value > 0 ? `+${value}` : String(value);
+      const attackModifiers = [
+        ["Targeting System", wItem?.name, targetingBonus, "Natural de Strike"],
+        ["Arma", wItem?.name, weaponStrikeMod, "Strike"],
+        ["Arma", wItem?.name, weaponWoundMod, "Wound"],
+        ["Penalidade de equipamento", "Equipamento", -eqPenalty, "Strike"],
+        ["Shaken", "Condição", -strikePenShaken, "Strike"],
+        ["Long Range", "Distância", -strikePenLR, "Strike"],
+        ["Estados ativos", "Estado", stateAllMod, "Strike e Wound"],
+        ["Estados ativos", "Estado", stateWoundMod, "Wound"],
+        ["Accurate", "Vantagem concedida", grantedAccurate, "Strike"],
+        ["Long Shot", "Vantagem concedida", grantedLongShot, "Strike e Wound"],
+        ["Ki Wager", "Referência de Ataque", wager, "Wound"],
+        ["Bônus de Strike", "Talentos, traços e buffs", strikeBuffTotal + foundationStrikeBuff + unarmedStrikeBuff + armedStrikeBuff, "Strike"],
+        ["Bônus de Wound", "Talentos, traços e buffs", woundBuffTotal + foundationWoundBuff + unarmedWoundBuff + armedWoundBuff, "Wound"]
+      ].filter(([, , value]) => value).map(([name, source, value, label]) => ({ name, source, effect: `${signed(value)} ${label}` }));
       const availableProfiles = foundationProfiles[ref.foundation] || Object.keys(profileData);
       const { strikeCT, woundCT } = this._calcCombatCTs(system, {
         isWeapon: revised ? !!wItem : !!wKey && wKey !== "unarmed", foundation: ref.foundation, profile: ref.profile
@@ -499,7 +516,7 @@ export const combatMathMethods = {
         primaryWeaponId: resolveSavedWeapon(ref.weaponEquipped),
         offHandId: resolveSavedWeapon(ref.offHand),
         selectedWeapon: wItem,
-        targetingBonus: revised && wItem ? eqFlags.weaponTargetingSystem?.[wItem.id] || 0 : 0,
+        targetingBonus, attackModifiers,
         weaponIssue: selection.issue,
         offHandLabel: ref.offHand || "Unarmed",
         defense: system.defense ?? 0,

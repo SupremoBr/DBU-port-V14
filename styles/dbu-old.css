@@ -15534,3 +15534,37 @@
 .dbu-old.sheet .dbu-path-options :is(label, p, a) { margin: 0; }
 .dbu-old.sheet .dbu-path-options label { display: inline-flex; align-items: center; gap: .3rem; }
 .dbu-old.sheet .dbu-path-options select { width: auto; }
+
+.dbu-old.sheet .talent-header { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 10px; }
+.dbu-old.sheet .talent-header .talent-category-badge { grid-column: 1; justify-self: start; max-width: 100%; white-space: normal; }
+.dbu-old.sheet .talent-header .talent-name { grid-column: 1; overflow-wrap: anywhere; }
+.dbu-old.sheet .dbu-talent-actions { display: flex; gap: 4px; grid-column: 2; grid-row: 1 / span 2; }
+.dbu-old.sheet .dbu-talent-actions button { min-width: 24px; min-height: 24px; }
+.dbu-old.sheet .effect-group-header { width: 100%; text-align: left; line-height: 1.3; }
+.dbu-old.sheet :is(.effect-name, .effect-text) { white-space: normal; overflow-wrap: anywhere; }
+.dbu-old.sheet .combat-state-checkboxes > label { display: inline-flex; align-items: center; gap: 4px; }
+.dbu-old.sheet .combat-state-checkboxes input[type="number"] { max-width: 3.5rem; }
+.dbu-old.sheet .dbu-racial-resource-actions { display: flex; flex-wrap: wrap; gap: 6px; }
+.dbu-old.sheet .dbu-pressure-steadfast { white-space: normal; color: #fff; }
+.dbua-system-dialog .dbu-pressure-options { display: grid; gap: .5rem; }
+.dbu-old.sheet .dbu-strike-natural { display: inline-block; border: 1px solid currentColor; border-radius: 4px; padding: 1px 4px; white-space: nowrap; }
+.dbu-old.sheet .dbu-attack-modifiers-toggle { width: auto; min-height: 24px; margin-inline-start: .35rem; }
+.dbu-old.sheet .dbu-attack-modifiers {
+  width: min(460px, 92vw);
+  max-height: 65vh;
+  padding: .75rem;
+  overflow: auto;
+  white-space: normal;
+  text-align: left;
+  color: var(--text-primary, #fff);
+  background: var(--bg-darker, #111827);
+  border: 1px solid var(--border-color, #49738a);
+  border-radius: 6px;
+}
+.dbu-old.sheet .dbu-attack-modifiers header { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 6px; }
+.dbu-old.sheet .dbu-attack-modifiers header button { width: auto; }
+.dbu-old.sheet .dbu-attack-modifiers li + li { margin-top: .3rem; }
+.dbu-old.sheet .dbu-attack-modifiers li { overflow-wrap: anywhere; }
+.dbu-old.sheet .dbu-racial-combat { display: grid; gap: .45rem; margin-block-start: .65rem; min-width: 0; }
+.dbu-old.sheet .dbu-racial-combat :is(.bb-header, .bb-row) { flex-wrap: wrap; }
+.dbu-old.sheet .dbu-racial-combat :is(.bb-label, .bb-bonus) { overflow-wrap: anywhere; }

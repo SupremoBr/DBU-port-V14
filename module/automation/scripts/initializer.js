@@ -814,10 +814,5 @@ console.log(
   "=========================================="
 );
 
-ui.notifications.info(
-  `DBU Inicializador v${DBU_INIT_VERSION} ativo.`
-);
-
-
 return globalThis.DBU;
 }

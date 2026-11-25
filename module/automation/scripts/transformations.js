@@ -882,9 +882,8 @@ async function activateTransformation(actor, transIndex, options = {}) {
     ui.notifications.warn(`${actor.name}: Stress Exhaustion impede usar o Transformation Maneuver.`);
     return false;
   }
-  // 0.9.2: Transformation itself has no Ki Point Cost, but a character
-  // with No Energy cannot enter a Form/Enhancement.
-  const isGodKiForm = (trans.aspects || []).some(a => /^God Ki(?:\\s|$)/i.test(String(a)));
+  // The 0.9.3 entry requirement is current Ki; the God Ki Aspect grants its state after entry.
+  const isGodKiForm = !uses093(actor.system) && (trans.aspects || []).some(a => /^God Ki(?:\s|$)/i.test(String(a)));
   const availableEnergy = isGodKiForm
     ? Number(actor.system.divineKiPoints?.value || 0)
     : Number(actor.system.kiPool?.value || 0);

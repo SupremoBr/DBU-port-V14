@@ -116,7 +116,7 @@ function dbuAttackRevealHTML(attack) {
       <span class="dbu-roll-main">
         <code class="dbu-roll-formula">${dbuEsc(attack?.strikeDisplayFormula || "")}</code>
         <span class="dbu-roll-sub">
-          Nat ${Number(attack?.strikeNatural || 0)} · CT ${Number(attack?.strikeCT || 10)}+ · Botch ${Number(attack?.strikeBotchThreshold || 0) === 0 ? "OFF" : `1-${Number(attack?.strikeBotchThreshold || 1)}`}
+          Nat ${Number(attack?.strikeNatural || 0)}${attack?.targetingBonus ? ` · Targeting System +${Number(attack.targetingBonus)} natural` : ""} · CT ${Number(attack?.strikeCT || 10)}+ · Botch ${Number(attack?.strikeBotchThreshold || 0) === 0 ? "OFF" : `1-${Number(attack?.strikeBotchThreshold || 1)}`}
         </span>
         ${strikeTags}
       </span>

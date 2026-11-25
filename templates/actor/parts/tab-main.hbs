@@ -445,11 +445,10 @@
     {{!-- CUSTOM BUFFS/DEBUFFS --}}
     <div class="section custom-buffs-section">
       <div class="section-header custom-buffs-header">
-        Custom Buffs &amp; Debuffs
-        <button type="button" class="add-btn" data-action="add-custom-buff"><i class="fas fa-plus"></i></button>
+        <span>Custom Buffs &amp; Debuffs</span>
+        <button type="button" class="add-btn" data-action="add-custom-buff" aria-label="Adicionar buff ou debuff"><i class="fas fa-plus" aria-hidden="true"></i></button>
       </div>
-      <p class="notes">Use valores negativos para reduzir bônus, custos ou quantidades. Para CT, um valor positivo reduz o alvo de crítico. Greater Dice ajusta a categoria quando a rolagem já recebe esses dados.</p>
-      <p class="notes">A condição de LP usa o máximo atual. Bônus que alteram recursos ou atributos base exigem a opção Sempre.</p>
+      <p class="notes">Negativos reduzem bônus, custos ou quantidades. CT positivo reduz o alvo de crítico. Greater Dice ajusta a categoria dos dados existentes. Condições de LP usam o máximo atual. Recursos e atributos-base exigem <strong>Sempre</strong>.</p>
       <datalist id="buff-effect-options">
         {{#each automaticBuffOptions}}
         <option value="{{this}}"></option>
@@ -569,11 +568,11 @@
         {{#if hasActiveEffects}}
           {{#each effectGroups}}
           <div class="effect-group" data-source="{{key}}">
-            <div class="effect-group-header" data-action="toggle-effect-group">
+            <button type="button" class="effect-group-header" data-action="toggle-effect-group" aria-expanded="true">
               <i class="fas fa-chevron-down group-toggle"></i>
               <span class="group-label">{{label}}</span>
               <span class="effect-count">({{count}})</span>
-            </div>
+            </button>
             <div class="effect-group-content">
               {{#each effects}}
               <div class="effect-item type-{{type}}" data-effect-id="{{id}}">
