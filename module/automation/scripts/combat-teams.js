@@ -1,4 +1,3 @@
-import { unsetAutomationFlag } from "../migration.mjs";
 import { readAutomationFlag } from "../package.mjs";
 // ============================================================
 // DBU Automation v1.8.12 DEV — Times por Encounter
@@ -13,6 +12,7 @@ import { readAutomationFlag } from "../package.mjs";
 import { MODULE_ID } from "./core/module-id.js";
 import { combatantForIdentity, sameToken, tokenIdentity } from "./core/token-identity.js";
 const TEAM_FLAG = "combatTeam";
+const canAssignDefaults = () => game.user?.isGM && (!game.users?.activeGM || game.users.activeGM.id === game.user.id);
 
 export const DEFAULT_COMBAT_TEAMS = [
   { id: "team-a", label: "Time A" },
@@ -29,12 +29,9 @@ globalThis.DBU_COMBAT_TEAMS_AUTOMATION = teamState;
 
 function disposition(token) {
   const raw = token?.document?.disposition ?? token?.disposition ?? null;
+  if (raw == null) return null;
   const value = Number(raw);
   return Number.isFinite(value) ? value : null;
-}
-
-function tokenActorId(token) {
-  return token?.actor?.id || token?.document?.actorId || null;
 }
 
 function usersArray() {
@@ -92,8 +89,8 @@ export async function setCombatantTeam(combatant, teamId) {
     return false;
   }
   const value = String(teamId || "").trim();
-  if (value) await combatant.setFlag(MODULE_ID, TEAM_FLAG, value);
-  else await unsetAutomationFlag(combatant, MODULE_ID, TEAM_FLAG).catch(() => {});
+  // A saved false distinguishes the GM’s explicit Disposition fallback from an unassigned combatant.
+  await combatant.setFlag(MODULE_ID, TEAM_FLAG, value || false);
   return true;
 }
 
@@ -102,19 +99,17 @@ export async function setCombatantTeam(combatant, teamId) {
  * já existe, inclusive Time A/B escolhido manualmente pelo GM.
  */
 export async function assignDefaultCombatantTeam(combatant) {
-  if (!combatant || !game.user?.isGM) return getCombatantTeam(combatant);
-  const existing = getCombatantTeam(combatant);
-  if (existing) return existing;
+  if (!combatant || !canAssignDefaults() || readAutomationFlag(combatant, TEAM_FLAG) !== undefined) return getCombatantTeam(combatant);
   const teamId = defaultTeamForCombatant(combatant);
   await combatant.setFlag(MODULE_ID, TEAM_FLAG, teamId);
   return teamId;
 }
 
 export async function assignDefaultCombatTeams(combat = game.combat) {
-  if (!combat || !game.user?.isGM) return { assigned: 0, total: 0 };
+  if (!combat || !canAssignDefaults()) return { assigned: 0, total: 0 };
   const combatants = Array.from(combat.combatants?.contents || combat.combatants || []);
   const updates = combatants
-    .filter(combatant => !getCombatantTeam(combatant))
+    .filter(combatant => readAutomationFlag(combatant, TEAM_FLAG) === undefined)
     .map(combatant => ({
       _id: combatant.id,
       [`flags.${MODULE_ID}.${TEAM_FLAG}`]: defaultTeamForCombatant(combatant)
@@ -137,23 +132,23 @@ export async function assignDefaultCombatTeams(combat = game.combat) {
 
 export function initializeCombatTeamsAutomation() {
   if (teamState.initialized) {
-    if (game.user?.isGM) queueMicrotask(() => assignDefaultCombatTeams(game.combat).catch(error => console.warn("DBU Times | preenchimento inicial:", error)));
+    if (canAssignDefaults()) queueMicrotask(() => assignDefaultCombatTeams(game.combat).catch(error => console.warn("DBU Times | preenchimento inicial:", error)));
     return teamState;
   }
   teamState.initialized = true;
 
   teamState.hooks.createCombatant = Hooks.on("createCombatant", combatant => {
-    if (!game.user?.isGM) return;
+    if (!canAssignDefaults()) return;
     queueMicrotask(() => assignDefaultCombatantTeam(combatant).catch(error => console.warn("DBU Times | novo combatente:", error)));
   });
 
   teamState.hooks.createCombat = Hooks.on("createCombat", combat => {
-    if (!game.user?.isGM) return;
+    if (!canAssignDefaults()) return;
     queueMicrotask(() => assignDefaultCombatTeams(combat).catch(error => console.warn("DBU Times | novo Encounter:", error)));
   });
 
   teamState.hooks.updateCombat = Hooks.on("updateCombat", (combat, changes) => {
-    if (!game.user?.isGM) return;
+    if (!canAssignDefaults()) return;
     // Ao iniciar o Encounter, garante que qualquer participante antigo também
     // recebeu o padrão Player=A / sem Player=B.
     if (Object.prototype.hasOwnProperty.call(changes || {}, "started") || Object.prototype.hasOwnProperty.call(changes || {}, "round")) {
@@ -161,7 +156,7 @@ export function initializeCombatTeamsAutomation() {
     }
   });
 
-  if (game.user?.isGM) {
+  if (canAssignDefaults()) {
     queueMicrotask(() => assignDefaultCombatTeams(game.combat).catch(error => console.warn("DBU Times | Encounter atual:", error)));
   }
 

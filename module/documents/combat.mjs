@@ -1,3 +1,4 @@
+import { areEnemies, getCombatantTeam } from "../automation/scripts/combat-teams.js";
 import { clearCombatRacialResources093, updateRacialTurn093 } from "../rules/racial-resources-v093.mjs";
 
 /**
@@ -39,7 +40,7 @@ export class DBUCombat extends Combat {
     }
 
     // Evaluate Initiative Advantage after all rolls
-    await this._evaluateInitiativeAdvantage();
+    if (game.user?.isGM && game.users?.activeGM?.id === game.user.id) await this._evaluateInitiativeAdvantage();
     return this;
   }
 
@@ -58,7 +59,6 @@ export class DBUCombat extends Combat {
       const actor = c.actor;
       if (!actor) continue;
       const system = actor.system;
-      const tier = system?.tier ?? 1;
       const baseTier = system?.baseTier ?? 1;
       const myInit = c.initiative;
 
@@ -66,12 +66,11 @@ export class DBUCombat extends Combat {
       // Added on top of rolled initiative ONLY for IA comparison, not for turn order.
       const myInitValue = system?.aptitudes?.initiativeValue ?? 0;
 
-      // Find opponents (different token disposition)
+      const team = getCombatantTeam(c);
       const opponents = combatants.filter(opp => {
         if (opp.id === c.id) return false;
-        const myDisp = c.token?.disposition ?? 1;
-        const oppDisp = opp.token?.disposition ?? 1;
-        return myDisp !== oppDisp;
+        const otherTeam = getCombatantTeam(opp);
+        return team && otherTeam ? team !== otherTeam : areEnemies(c.token, opp.token, this);
       });
 
       let ia = false;
@@ -125,17 +124,18 @@ export class DBUCombat extends Combat {
       if (isPrimaryGM()) await clearCombatRacialResources093(combat);
     });
     Hooks.on("updateCombatant", async (combatant, change, options, userId) => {
-      if ("initiative" in change && combatant.combat) {
+      if (isPrimaryGM() && combatant.combat && ("initiative" in change ||
+          change.flags?.["DBU-MRR-OLD"]?.combatTeam !== undefined || "flags.DBU-MRR-OLD.combatTeam" in change)) {
         await combatant.combat._evaluateInitiativeAdvantage();
       }
     });
     Hooks.on("createCombatant", async (combatant, options, userId) => {
-      if (combatant.combat) {
+      if (isPrimaryGM() && combatant.combat) {
         await combatant.combat._evaluateInitiativeAdvantage();
       }
     });
     Hooks.on("deleteCombatant", async (combatant, options, userId) => {
-      if (combatant.combat) {
+      if (isPrimaryGM() && combatant.combat) {
         await combatant.combat._evaluateInitiativeAdvantage();
       }
     });

@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.0.12-rules093-alpha.31] — equipes de combate
+
+- A escolha Sem Time permanece salva no encontro. A disposição do token passa a definir a relação nesse caso.
+- HUD, filtros de área e vantagem de iniciativa respeitam as equipes do encontro. O HUD oculta tokens escondidos para jogadores.
+- O preenchimento automático é delegado ao GM principal quando há mais de um mestre conectado.
+
 ## [1.0.12-rules093-alpha.30] — alvos, modificadores e ficha
 
 - Ataques com seleção manual permitem escolher e confirmar os alvos. Tokens já selecionados aparecem marcados. A inicialização da automação integrada dispensa o aviso informativo do módulo antigo.

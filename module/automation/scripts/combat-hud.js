@@ -102,21 +102,24 @@ function alliedActorEntries(subjectActor, selectedToken = null) {
   const subjectCombatant = safeCall(() => combatantForIdentity(subjectActor, subjectToken, combat), null, "combatant lookup");
   const subjectTeam = safeCall(() => getCombatantTeam(subjectCombatant), "", "team lookup");
 
-  // Durante um Encounter com Time definido, a HUD usa diretamente os
-  // Combatants do mesmo Time. Isso inclui PCs e NPCs aliados e ignora quem
-  // estiver em outro Time, independentemente da Disposition do token.
-  if (combat && subjectCombatant && subjectTeam) {
+  // During an Encounter, use the same relation as combat reactions.
+  if (combat && subjectCombatant) {
     const seen = new Set();
     const result = [];
     const combatants = Array.from(combat.combatants?.contents || combat.combatants || []);
 
     for (const combatant of combatants) {
-      if (safeCall(() => getCombatantTeam(combatant), "", "ally team lookup") !== subjectTeam) continue;
+      if (combatant.id === subjectCombatant.id) continue;
 
       const combatTokenId = combatant.tokenId || combatant.token?.id || null;
       const token = combatTokenId
         ? sceneTokens.find(entry => entry?.id === combatTokenId || entry?.document?.id === combatTokenId) || null
         : tokenForActor(combatant?.actor);
+      const team = getCombatantTeam(combatant);
+      const allied = subjectTeam && team
+        ? subjectTeam === team
+        : areTeamAllies(subjectToken || subjectCombatant.token, token || combatant.token, combat);
+      if (!allied) continue;
       const actor = token?.actor || combatant?.actor;
       if (!actor) continue;
       const key = actorIdentity(actor, token);
@@ -127,14 +130,13 @@ function alliedActorEntries(subjectActor, selectedToken = null) {
       if (!game.user?.isGM && token?.document?.hidden) continue;
 
       seen.add(key);
-      result.push({ actor, token, user: null, team: subjectTeam });
+      result.push({ actor, token, user: null, team });
     }
 
     return result;
   }
 
-  // Fora de Encounter (ou em mundos legados ainda sem Time), preserva o
-  // comportamento anterior de mostrar personagens de jogadores presentes.
+  // Outside the Encounter, show player characters present in the scene.
   const users = Array.from(game.users?.contents || game.users || []).filter(user => !user?.isGM);
   const seen = new Set();
   const result = [];
@@ -148,6 +150,7 @@ function alliedActorEntries(subjectActor, selectedToken = null) {
 
     const token = sceneTokens.find(entry => entry?.actor?.id === actor.id) || null;
     if (canvas?.ready && sceneTokens.length && !token) continue;
+    if (!game.user?.isGM && token?.document?.hidden) continue;
     if (subjectToken && token && !areTeamAllies(subjectToken, token, combat)) continue;
 
     seen.add(actorIdentity(token?.actor || actor, token));

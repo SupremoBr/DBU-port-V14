@@ -1,3 +1,4 @@
+import { areAllies } from "./combat-teams.js";
 import { sizeRank } from "../../rules/size-v093.mjs";
 import { PROFILES_093 } from "../../rules/profiles-v093.mjs";
 import { SYSTEM_ID as MODULE_ID } from "../package.mjs";
@@ -356,18 +357,12 @@ function templateContains(templateObject, templateDoc, point) {
   return false;
 }
 
-function sameSide(a, b) {
-  const ad = num(a?.document?.disposition ?? a?.disposition, 0);
-  const bd = num(b?.document?.disposition ?? b?.disposition, 0);
-  return ad !== 0 && ad === bd;
-}
-
 function targetsInTemplate(template, attackerToken, config) {
   const out = [];
   for (const token of canvas?.tokens?.placeables || []) {
     if (!token?.actor) continue;
     if (token.id === attackerToken?.id) continue;
-    if (config?.excludeAllies && sameSide(token, attackerToken)) continue;
+    if (config?.excludeAllies && areAllies(attackerToken, token)) continue;
     if (template.doc.documentName === "Region") {
       if (canvas.level && !token.document.includedInLevel(canvas.level)) continue;
       const region = typeof template.doc.testPoint === "function" ? template.doc : template.object;
@@ -380,7 +375,7 @@ function targetsInTemplate(template, attackerToken, config) {
 function allBattlefieldTargets(attackerToken, config) {
   return (canvas?.tokens?.placeables || []).filter(token => {
     if (!token?.actor || token.id === attackerToken?.id) return false;
-    if (config?.excludeAllies && sameSide(token, attackerToken)) return false;
+    if (config?.excludeAllies && areAllies(attackerToken, token)) return false;
     return true;
   });
 }
