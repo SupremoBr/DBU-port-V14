@@ -713,10 +713,17 @@ test('an automated attack publishes one card with the native roll and the defens
   }
 });
 
-test('the combined card reveals and attaches one native payment after the last defense', async () => {
+for (const { scenario, targetCount, combinationTargets, baseWound, expected } of [
+  { scenario: 'regular', targetCount: 2, baseWound: 12, expected: /data-dbu-wound-total>12/ },
+  { scenario: 'single Combination target', targetCount: 1, baseWound: 7,
+    combinationTargets: { first: { bonus: 6 } }, expected: /7 \+ 6 Combination[\s\S]*data-dbu-wound-total>13/ },
+  { scenario: 'multiple Combination targets', targetCount: 2, baseWound: 7,
+    combinationTargets: { first: { bonus: 6 }, last: { bonus: 2 } },
+    expected: /Wound base[\s\S]*data-dbu-wound-total>7/ }
+]) test(`the combined card reveals Wound and one payment after the last defense (${scenario})`, async () => {
   const { initializeRevealCore } = await import('../module/automation/scripts/combat/reveal-core.js');
   const saved = { game, document: globalThis.document, Hooks: globalThis.Hooks, DBU_BOOTSTRAP: globalThis.DBU_BOOTSTRAP };
-  const targets = [{ id: 'first', name: 'Primeiro' }, { id: 'last', name: 'Último' }];
+  const targets = [{ id: 'first', name: 'Primeiro' }, { id: 'last', name: 'Último' }].slice(0, targetCount);
   const gm = { id: 'gm', isGM: true, active: true };
   const card = {
     id: 'unified', content: 'secret-results defense-controls',
@@ -724,7 +731,7 @@ test('the combined card reveals and attaches one native payment after the last d
       'DBU-MRR-OLD': { attackReveal: { revealed: false, revealedHtml: 'native-payment' } },
       world: { dbuUnifiedAttackCard: true, dbuCombatRevealed: false, dbuDefenseStates: {},
         dbuAttackData: { originalAttackMessageId: 'unified', attackerId: 'attacker',
-          strikeTotal: 14, woundTotal: 12, targetActorIds: targets.map(target => target.id) } }
+          strikeTotal: 14, woundTotal: baseWound, combinationTargets, targetActorIds: targets.map(target => target.id) } }
     },
     getFlag(scope, key) { return this.flags[scope]?.[key]; },
     async update(changes) { applyUpdate(this, changes); }
@@ -749,14 +756,17 @@ test('the combined card reveals and attaches one native payment after the last d
       }
     }) };
     const reveal = initializeRevealCore({ DBU_SYSTEM_ID: 'DBU-MRR-OLD', dbuEsc: String, dbuSetDefenseState: async () => {} });
-    await reveal.dbuUpdateTargetStatus(card, targets[0], 'defended', 'Dodge');
-    assert.equal(card.flags.world.dbuCombatRevealed, false);
-    assert.equal(placements, 0);
-    await reveal.dbuUpdateTargetStatus(card, targets[1], 'defended', 'Dodge');
+    if (targetCount > 1) {
+      await reveal.dbuUpdateTargetStatus(card, targets[0], 'defended', 'Dodge');
+      assert.equal(card.flags.world.dbuCombatRevealed, false);
+      assert.equal(placements, 0);
+    }
+    await reveal.dbuUpdateTargetStatus(card, targets.at(-1), 'defended', 'Dodge');
     assert.equal(card.flags.world.dbuCombatRevealed, true);
     assert.equal(card.flags['DBU-MRR-OLD'].attackReveal.revealed, true);
     assert.match(card.content, /defense-controls/);
-    assert.match(card.content, /data-dbu-wound-total>12/);
+    assert.match(card.content, expected);
+    assert.equal(card.flags.world.dbuAttackData.woundTotal, baseWound);
     assert.equal(placements, 1);
   } finally {
     Object.assign(globalThis, saved);

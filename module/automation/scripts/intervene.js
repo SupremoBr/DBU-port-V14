@@ -600,7 +600,7 @@ async function finalizePendingDamageIfReady(message) {
     "flags.world.dbuIntervenePhaseComplete": true
   });
 
-  ui.notifications.info(`${attack.attackName || "Ataque"}: fase de Intervene concluída.`);
+  ui.notifications.info(`${baseAttack.attackName || "Ataque"}: fase de Intervene concluída.`);
 }
 
 async function handleGMRequest(data) {

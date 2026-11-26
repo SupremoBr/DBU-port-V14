@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.0.12-rules093-alpha.37] — total de Wound no chat
+
+- O card de Combination destaca o Wound com bônus para alvo único e identifica o Wound base quando há vários alvos. O encerramento de Intervene informa o ataque correto.
+
 ## [1.0.12-rules093-alpha.36] — Combination e defesa
 
 - Os Strikes adicionais de Combination são comparados com Dodge 0 em Guard, Direct Hit e Power Flare. Cada sucesso soma +2(T) antes de resolver a defesa contra o Wound.

@@ -100,7 +100,20 @@ function dbuWaitingTargetHTML(defender, progress, defenseName = "Defesa", target
   `;
 }
 
+function dbuWoundDisplay(attack) {
+  const targets = dbuCombatTargetIds(attack);
+  const hasCombination = Object.keys(attack.combinationTargets || {}).length > 0;
+  const base = Number(attack.woundTotal || 0);
+  const total = targets.length === 1 ? attackForCombinationTarget(attack, targets[0]).woundTotal ?? base : base;
+  return {
+    label: hasCombination && targets.length > 1 ? "Wound base" : "Wound",
+    total: attack.urgentPending || attack.combinationMissed ? "—" : total,
+    bonus: total - base
+  };
+}
+
 function dbuAttackRevealHTML(attack) {
+  const wound = dbuWoundDisplay(attack);
   const strikeTags = [
     attack?.strikeCritical ? '<span class="dbu-crit">CRIT</span>' : "",
     attack?.strikeBotch ? '<span class="dbu-botch">BOTCH</span>' : ""
@@ -125,15 +138,16 @@ function dbuAttackRevealHTML(attack) {
     </div>
 
     <div class="dbu-roll-row">
-      <span class="dbu-roll-label">Wound</span>
+      <span class="dbu-roll-label">${wound.label}</span>
       <span class="dbu-roll-main">
         <code class="dbu-roll-formula">${dbuEsc(attack?.woundDisplayFormula || "")}</code>
         <span class="dbu-roll-sub">
           Nat ${Number(attack?.woundNatural || 0)} · CT ${Number(attack?.woundCT || 10)}+${Number(attack?.wager || 0) > 0 ? ` · Wager +${Number(attack.wager)}` : ""} · Botch ${Number(attack?.woundBotchThreshold || 0) === 0 ? "OFF" : `1-${Number(attack?.woundBotchThreshold || 1)}`}
         </span>
+        ${wound.bonus ? `<span class="dbu-roll-sub">${Number(attack.woundTotal || 0)} + ${wound.bonus} Combination</span>` : ""}
         ${woundTags}
       </span>
-      <span class="dbu-roll-total" data-dbu-wound-total>${attack.urgentPending || attack.combinationMissed ? "—" : Number(attack?.woundTotal || 0)}</span>
+      <span class="dbu-roll-total" data-dbu-wound-total>${wound.total}</span>
     </div>
   `;
 }
@@ -542,9 +556,10 @@ function dbuRenderUnitedAttackIntoContent(
   const secretCombat = !!message.getFlag("world", "dbuCombatSecretMode");
   const combatRevealed = !!message.getFlag("world", "dbuCombatRevealed");
   const hideFinalWound = secretCombat && !combatRevealed;
+  const woundDisplay = hideFinalWound ? null : dbuWoundDisplay({ ...attack, woundTotal: finalWound });
 
   const wound = wrapper.querySelector("[data-dbu-wound-total]");
-  if (wound) wound.textContent = hideFinalWound ? "?" : String(finalWound);
+  if (wound) wound.textContent = hideFinalWound ? "?" : String(woundDisplay.total);
 
   const list = wrapper.querySelector("[data-dbu-ua-list]");
   if (list) {
@@ -571,7 +586,7 @@ function dbuRenderUnitedAttackIntoContent(
           <span class="dbu-meta-chip dbu-chip-hot">
             ${hideFinalWound
               ? `United Attack total: <b>+${totalBonus}</b> · WOUND FINAL 🔒`
-              : `WOUND: <b>${finalWound}</b> (${baseWound} + United ${totalBonus})`}
+              : `${woundDisplay.label}: <b>${woundDisplay.total}</b> (${baseWound} + United ${totalBonus}${woundDisplay.bonus ? ` + Combination ${woundDisplay.bonus}` : ""})`}
           </span>
         </div>
       `;
