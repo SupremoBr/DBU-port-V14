@@ -1,4 +1,4 @@
-/* Automation menus share the native character sheet's colors and typography. */
+/* System dialogs share the character sheet’s colors and typography. */
 :root {
   --dbua-menu-font: 'Orbitron', 'Segoe UI', Tahoma, sans-serif;
   --dbua-menu-surface: #121c29;
@@ -9,6 +9,7 @@
 
 :is(.window-app, .application):is(
   .dbu-auto-dialog, .dbu-auto-window-shell, .dbu-auto-defense-dialog, .dbua-system-dialog,
+  .dbu-old:is(.dialog, .trait-selector-dialog, .talent-selector-dialog, .tf-catalog-window, .tf-traits-window),
   .dialog:has(:is(.dbu-auto-window, .dbu-visual-config, .dbu-aura-manager,
     .dbua-action-window, .dbu-duel-defense-dialog, .dbu-united-attack-dialog, .dbua-sheet-content))
 ) {

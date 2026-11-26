@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.0.12-rules093-alpha.39] — estabilidade visual das fichas
+
+- A ficha do personagem mantém o fundo, o cabeçalho e a largura do conteúdo ao trocar de aba. As grades respondem à largura da ficha e os retratos têm tamanho estável.
+- A ficha de item usa botões de aba com o mesmo padrão da ficha do personagem. Os seletores de traços, talentos e transformações compartilham o tema dos diálogos de combate.
+
 ## [1.0.12-rules093-alpha.38] — qualidades de arma
 
 - Duelist aplica seu bônus no Parry. Giant Weapon aplica +3(T) Wound e a penalidade de Strike conforme o tamanho atual do personagem.
