@@ -1,3 +1,4 @@
+import { Dialog } from "../../helpers/foundry-compat.mjs";
 import { limitedMartialPower, martialEnergyCharges } from "../../rules/path-to-power-v093.mjs";
 import { energyChargeDie } from "../../helpers/custom-buffs.mjs";
 import { unsetAutomationFlag } from "../migration.mjs";

@@ -1,3 +1,4 @@
+import { Dialog } from "../../helpers/foundry-compat.mjs";
 import { sizeLead } from "../../rules/size-v093.mjs";
 import { surgingCharge093, surgingTargetsAllowed093, ragingBotch } from "../../rules/states-v093.mjs";
 import { privateRollJournal, sealRoll } from "./core/private-rolls.js";
@@ -877,10 +878,10 @@ const damageCategoryOptions = ["Standard", "Direct", "Lethal"]
 // ============================================================
 
 const selection = await Dialog.wait({
-  title: context?.dialogTitle || `${actor.name} — Ataque v${DBU_ATTACK_VERSION}`,
+  title: context?.dialogTitle || `${actor.name} — Ataque`,
 
   content: `
-    <div class="dbu-v114-dialog">
+    <div class="dbu-attack-dialog-body">
       ${context?.attackMode === "exploit" ? `
         <div class="dbu-attack-buffs" style="margin-bottom:10px;padding:8px;border:1px solid rgba(255,180,0,.5);border-radius:6px;">
           <strong><i class="fas fa-bolt"></i> EXPLOIT — BASIC ATTACK OOS</strong><br>
@@ -893,7 +894,6 @@ const selection = await Dialog.wait({
           ${context?.throwFeatureLabel ? `Feature: <b>${dbuEsc(context.throwFeatureLabel)}</b>${context?.throwHardness ? ` · Hardness <b>${dbuEsc(context.throwHardness)}</b>` : ""}<br>` : ""}
           ${Number(context?.flatDamageBonus) > 0 ? `Collision após o Damage normal: <b>+${Math.max(0, Math.trunc(Number(context.flatDamageBonus)))} LP</b>.` : ""}
         </div>` : ""}
-      }
       ${
         chargeState
           ? `
@@ -916,19 +916,15 @@ const selection = await Dialog.wait({
       }
 
       <div class="form-group" style="margin-bottom:10px;">
-        <label><b>Ataque</b></label>
+        <label for="dbu-source"><b>Ataque</b></label>
         ${selectHTML}
       </div>
 
-      ${uses093(actor.system) && (!context.effectiveType || context.effectiveType === "standard") ? '<label><input type="checkbox" id="dbu-called-shot"> Called Shot · 1 Action + 2(T) KP</label><input type="text" id="dbu-called-location" aria-label="Local visado" placeholder="Local visado">' : ""}
+      ${uses093(actor.system) && (!context.effectiveType || context.effectiveType === "standard") ? '<div class="dbu-called-shot"><label><input type="checkbox" id="dbu-called-shot"> Called Shot · 1 Action + 2(T) KP</label><div class="dbua-dialog-field"><label for="dbu-called-location">Local visado</label><input type="text" id="dbu-called-location"></div></div>' : ""}
       <div class="dbu-auto-damage-category" style="margin-bottom:10px;">
         <div class="form-group">
-          <label><b>Categoria do dano</b></label>
+          <label for="dbu-damage-category"><b>Categoria do dano</b></label>
           <select id="dbu-damage-category" style="width:100%;">${damageCategoryOptions}</select>
-          <p class="notes">
-            Preenchida pela técnica. Altere somente quando uma habilidade, recurso ou efeito mudar
-            a categoria deste ataque.
-          </p>
         </div>
         <div id="dbu-damage-category-state" class="dbu-auto-damage-category-state">
           ORIGINAL: ${dbuEsc(initialDamageCategory)}
@@ -936,67 +932,9 @@ const selection = await Dialog.wait({
       </div>
 
       <div class="form-group" style="margin-bottom:10px;">
-        <label><b>Ki Wager</b></label>
+        <label for="dbu-wager"><b>Ki Wager</b></label>
         <input id="dbu-wager" type="number" value="${Math.max(0, Number(context.trackerAttack?.kiWager) || 0)}" min="0" ${Number(context?.wagerMaxOverride) >= 0 ? `max="${Math.max(0, Math.trunc(Number(context.wagerMaxOverride)))}"` : ""} step="1" style="width:100%;">
         ${Number(context?.wagerMaxOverride) >= 0 ? `<p class="notes">Limite desta ação: <b>${Math.max(0, Math.trunc(Number(context.wagerMaxOverride)))}</b> Ki Wager.</p>` : ""}
-      </div>
-
-      <hr>
-
-      <h3 style="margin:6px 0;">Modificadores situacionais</h3>
-
-      <div class="form-group" style="margin-bottom:8px;">
-        <label><b>Strike Extra</b></label>
-        <input id="dbu-strike-extra" type="text" value="${dbuEsc(context?.strikeExtraDefault || "")}" placeholder="Ex.: +2, +1d6, +1d6(t), -1d4" style="width:100%;">
-        <p class="notes">Aceita dados. (t) = Tier; (bT) = Base Tier.</p>
-      </div>
-
-      <div class="form-group" style="margin-bottom:8px;">
-        <label><b>Wound / Dano Extra</b></label>
-        <input id="dbu-wound-extra" type="text" value="${dbuEsc(context?.woundExtraDefault || "")}" placeholder="Ex.: +3, +2d4+1, +1d6(bT)" style="width:100%;">
-      </div>
-
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
-        <div class="form-group">
-          <label><b>Strike CT Mod</b></label>
-          <input id="dbu-strike-ct-mod" type="number" value="0" step="1" style="width:100%;">
-          <p class="notes">-1 facilita crítico; +1 dificulta.</p>
-        </div>
-
-        <div class="form-group">
-          <label><b>Wound CT Mod</b></label>
-          <input id="dbu-wound-ct-mod" type="number" value="0" step="1" style="width:100%;">
-          <p class="notes">-1 facilita crítico; +1 dificulta.</p>
-        </div>
-      </div>
-
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
-        <div class="form-group">
-          <label><b>Strike Botch até</b></label>
-          <input id="dbu-strike-botch" type="number" value="${ragingBotch(actor.system)}" min="0" max="10" step="1" style="width:100%;">
-          <p class="notes">1 = padrão; 0 = desliga; 2 = natural 1-2.</p>
-        </div>
-
-        <div class="form-group">
-          <label><b>Wound Botch até</b></label>
-          <input id="dbu-wound-botch" type="number" value="1" min="0" max="10" step="1" style="width:100%;">
-          <p class="notes">1 = padrão; 0 = desliga; 2 = natural 1-2.</p>
-        </div>
-      </div>
-
-      <div
-        class="form-group"
-        style="margin:10px 0;padding:8px;border:1px solid rgba(255,255,255,.18);border-radius:6px;"
-      >
-        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
-          <input id="dbu-charging-assault" type="checkbox" ${context.trackerAttack?.charging ? "checked" : ""}>
-          <b>🏃 Charging Assault</b>
-        </label>
-        <p class="notes" style="margin:5px 0 0;">
-          Marque quando este Attacking Maneuver possui ou recebeu a Advantage Charging Assault.
-          O macro grava <code>charging: true</code> no Round Tracker para o DBU aplicar efeitos nativos,
-          como Impaling Horns.
-        </p>
       </div>
 
       <div class="dbu-auto-area-inline" id="dbu-area-inline">
@@ -1015,7 +953,7 @@ const selection = await Dialog.wait({
 
           <div class="dbu-auto-area-grid">
             <div class="form-group">
-              <label><b>Tipo da Área</b></label>
+              <label for="dbu-area-shape"><b>Tipo da Área</b></label>
               <select id="dbu-area-shape" style="width:100%;">
                 <option value="circle" ${initialAreaShape === "circle" ? "selected" : ""}>Sphere</option>
                 <option value="cone" ${initialAreaShape === "cone" ? "selected" : ""}>Cone</option>
@@ -1023,13 +961,13 @@ const selection = await Dialog.wait({
               </select>
             </div>
             <div class="form-group">
-              <label><b>Magnitude</b></label>
+              <label for="dbu-area-magnitude"><b>Magnitude</b></label>
               <select id="dbu-area-magnitude" style="width:100%;">${areaMagnitudeOptions}</select>
             </div>
           </div>
 
           <div class="form-group" id="dbu-area-position-row">
-            <label><b>Posição da Sphere</b></label>
+            <label for="dbu-area-position"><b>Posição da Sphere</b></label>
             <select id="dbu-area-position" style="width:100%;">
               <option value="attacker" ${initialAreaPosition === "attacker" ? "selected" : ""}>Centrada no atacante</option>
               <option value="map" ${initialAreaPosition === "map" ? "selected" : ""}>Escolher Target Square no mapa</option>
@@ -1047,26 +985,74 @@ const selection = await Dialog.wait({
           </label>
 
           <div class="dbu-auto-template-hint" id="dbu-area-hint">
-            DBU 0.9.2: Sphere, Cone e Line usam Magnitude. Se um efeito conceder uma AoE sem tamanho, use Standard.
-            Qualquer personagem dentro da área é alvo, inclusive aliados, salvo exceção do efeito (como Sweeping).
-             Após Atacar, o template acompanha o mouse; clique para confirmar, Esc ou botão direito para cancelar.
+            Posicione a área no mapa. Clique para confirmar ou pressione Esc para cancelar.
           </div>
         </div>
       </div>
 
-      <div class="form-group" style="margin-bottom:8px;">
-        <label><b>Diminishing Offense usado (bT)</b></label>
-        <input id="dbu-dim-stacks" type="number" value="${expectedDimStacks}" min="0" step="1" style="width:100%;">
-        <p class="notes">
-          Ataque esperado #${expectedAttackNum}. Padrão do DBU: ${expectedDimStacks}(bT)
-          = -${expectedDimStacks * baseTier} Strike.
-          Coloque 0 para ignorar a penalidade neste ataque.
-        </p>
-      </div>
+      <details class="dbu-attack-advanced" ${context.strikeExtraDefault || context.woundExtraDefault || context.trackerAttack?.charging ? "open" : ""}>
+        <summary>Modificadores situacionais</summary>
+        <div class="form-group" style="margin-bottom:8px;">
+          <label for="dbu-strike-extra"><b>Strike Extra</b></label>
+          <input id="dbu-strike-extra" type="text" value="${dbuEsc(context?.strikeExtraDefault || "")}" placeholder="Ex.: +2, +1d6, +1d6(t), -1d4" style="width:100%;">
+          <p class="notes">Aceita dados. (t) = Tier; (bT) = Base Tier.</p>
+        </div>
 
-      <p style="margin-top:8px;opacity:.8;font-size:.9em;">
-        🎞 GIF no chat &nbsp;|&nbsp; ✨ Macro visual &nbsp;|&nbsp; T ${tier} &nbsp;|&nbsp; bT ${baseTier}
-      </p>
+        <div class="form-group" style="margin-bottom:8px;">
+          <label for="dbu-wound-extra"><b>Wound / Dano Extra</b></label>
+          <input id="dbu-wound-extra" type="text" value="${dbuEsc(context?.woundExtraDefault || "")}" placeholder="Ex.: +3, +2d4+1, +1d6(bT)" style="width:100%;">
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
+          <div class="form-group">
+            <label for="dbu-strike-ct-mod"><b>Strike CT Mod</b></label>
+            <input id="dbu-strike-ct-mod" type="number" value="0" step="1" style="width:100%;">
+            <p class="notes">-1 facilita crítico; +1 dificulta.</p>
+          </div>
+
+          <div class="form-group">
+            <label for="dbu-wound-ct-mod"><b>Wound CT Mod</b></label>
+            <input id="dbu-wound-ct-mod" type="number" value="0" step="1" style="width:100%;">
+            <p class="notes">-1 facilita crítico; +1 dificulta.</p>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
+          <div class="form-group">
+            <label for="dbu-strike-botch"><b>Strike Botch até</b></label>
+            <input id="dbu-strike-botch" type="number" value="${ragingBotch(actor.system)}" min="0" max="10" step="1" style="width:100%;">
+            <p class="notes">1 = padrão; 0 = desliga; 2 = natural 1-2.</p>
+          </div>
+
+          <div class="form-group">
+            <label for="dbu-wound-botch"><b>Wound Botch até</b></label>
+            <input id="dbu-wound-botch" type="number" value="1" min="0" max="10" step="1" style="width:100%;">
+            <p class="notes">1 = padrão; 0 = desliga; 2 = natural 1-2.</p>
+          </div>
+        </div>
+
+        <div
+          class="form-group"
+          style="margin:10px 0;padding:8px;border:1px solid rgba(255,255,255,.18);border-radius:6px;"
+        >
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+            <input id="dbu-charging-assault" type="checkbox" ${context.trackerAttack?.charging ? "checked" : ""}>
+            <b>🏃 Charging Assault</b>
+          </label>
+          <p class="notes" style="margin:5px 0 0;">
+            Marque se este ataque recebeu a vantagem Charging Assault.
+          </p>
+        </div>
+        <div class="form-group" style="margin-bottom:8px;">
+          <label for="dbu-dim-stacks"><b>Diminishing Offense usado (bT)</b></label>
+          <input id="dbu-dim-stacks" type="number" value="${expectedDimStacks}" min="0" step="1" style="width:100%;">
+          <p class="notes">
+            Ataque esperado #${expectedAttackNum}. Padrão do DBU: ${expectedDimStacks}(bT)
+            = -${expectedDimStacks * baseTier} Strike.
+            Coloque 0 para ignorar a penalidade neste ataque.
+          </p>
+        </div>
+      </details>
     </div>
   `,
 

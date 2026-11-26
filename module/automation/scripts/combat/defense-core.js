@@ -1,3 +1,4 @@
+import { Dialog } from "../../../helpers/foundry-compat.mjs";
 import { duelistParryBonus093 } from "../../../helpers/weapon-state.mjs";
 import { sizeLead } from "../../../rules/size-v093.mjs";
 import { resolveParticipant } from "../core/token-identity.js";

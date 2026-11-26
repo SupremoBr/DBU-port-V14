@@ -1,3 +1,4 @@
+import { Dialog } from "../../../helpers/foundry-compat.mjs";
 import { sendRequest } from "../core/authorized-request.js";
 // DBU Automation — United Attack / United Duel
 import { resolveParticipant, attackTargetKeys, participantKeyForAttack, combatantForIdentity } from "../core/token-identity.js";

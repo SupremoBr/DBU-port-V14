@@ -2,7 +2,31 @@
 const f = globalThis.foundry;
 export const ActorSheet = f?.appv1?.sheets?.ActorSheet ?? globalThis.ActorSheet;
 export const ItemSheet = f?.appv1?.sheets?.ItemSheet ?? globalThis.ItemSheet;
-export const Dialog = f?.appv1?.api?.Dialog ?? globalThis.Dialog;
+function nativeDialog() {
+  return globalThis.foundry?.appv1?.api?.Dialog ?? globalThis.Dialog;
+}
+
+function systemDialogOptions(options = {}) {
+  return { ...options, classes: [...new Set(["dialog", "dbua-system-dialog", ...(options.classes || [])])] };
+}
+
+export class Dialog {
+  constructor(data, options) {
+    return new (nativeDialog())(data, systemDialogOptions(options));
+  }
+
+  static wait(data, options, renderOptions) {
+    return nativeDialog().wait(data, systemDialogOptions(options), renderOptions);
+  }
+
+  static prompt(config = {}) {
+    return nativeDialog().prompt({ ...config, options: systemDialogOptions(config.options) });
+  }
+
+  static confirm(config = {}) {
+    return nativeDialog().confirm({ ...config, options: systemDialogOptions(config.options) });
+  }
+}
 export const TextEditor = f?.applications?.ux?.TextEditor?.implementation ?? f?.applications?.ux?.TextEditor ?? globalThis.TextEditor;
 
 export function loadSystemTemplates(paths) {

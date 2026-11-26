@@ -1,3 +1,4 @@
+import { Dialog } from "../../helpers/foundry-compat.mjs";
 import { unsetAutomationFlag } from "../migration.mjs";
 import { SYSTEM_ID as MODULE_ID, readAutomationFlag } from "../package.mjs";
 // ============================================================

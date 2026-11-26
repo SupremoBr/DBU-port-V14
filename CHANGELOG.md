@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.0.12-rules093-alpha.40] — janelas de ação e seleção
+
+- Diálogos do sistema usam o mesmo tema escuro para cabeçalho, campos, botões e foco.
+- Ataque mantém as ações visíveis durante a rolagem da janela e agrupa os modificadores situacionais em uma seção expansível. Adicionar Habilidade Única usa o mesmo tema e um botão com rótulo.
+
 ## [1.0.12-rules093-alpha.39] — estabilidade visual das fichas
 
 - A ficha do personagem mantém o fundo, o cabeçalho e a largura do conteúdo ao trocar de aba. As grades respondem à largura da ficha e os retratos têm tamanho estável.

@@ -1,3 +1,4 @@
+import { Dialog } from "../../../helpers/foundry-compat.mjs";
 import { sendRequest } from "../core/authorized-request.js";
 import { onAutomationChatRender } from "../../package.mjs";
 // DBU Automation — Duel Clash core

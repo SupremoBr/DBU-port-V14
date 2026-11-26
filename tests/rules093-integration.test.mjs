@@ -678,7 +678,14 @@ test('an automated attack publishes one card with the native roll and the defens
         visuals++;
       } }) } };
     foundry.utils.randomID = () => 'UniqueAttackCard';
-    globalThis.Dialog = { wait: async () => ({ index: 0, wager: 0, strikeBotch: 1, woundBotch: 1 }) };
+    globalThis.Dialog = { wait: async (data, options) => {
+      assert.equal(data.title, 'Atacante — Ataque');
+      assert.ok(options.classes.includes('dbua-system-dialog'));
+      assert.doesNotMatch(data.content, /^\s*}\s*$/m);
+      assert.match(data.content, /<details class="dbu-attack-advanced"\s*>/);
+      assert.match(data.content, /for="dbu-source"/);
+      return { index: 0, wager: 0, strikeBotch: 1, woundBotch: 1 };
+    } };
     globalThis.ChatMessage = { getSpeaker: () => ({ actor: actor.id }), create: async (data, options) => {
       messages.push({ data, options });
       return { id: data._id };

@@ -1,3 +1,4 @@
+import { Dialog } from "../../helpers/foundry-compat.mjs";
 import { uses093 } from "../../rules/v093.mjs";
 // ============================================================
 // DBU Automation v1.8.6 TEST — Painel de Combate 2.2

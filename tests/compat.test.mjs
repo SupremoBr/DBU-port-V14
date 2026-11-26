@@ -5,13 +5,26 @@ const path = new URL('../module/helpers/foundry-compat.mjs', import.meta.url).hr
 test('modern APIs work without legacy globals', async () => {
   class ActorSheet {}
   class ItemSheet {}
-  class Dialog {}
+  class Dialog {
+    constructor(data, options) { Object.assign(this, { data, options }); }
+    static wait(data, options, renderOptions) { return { data, options, renderOptions }; }
+    static prompt(data) { return data; }
+    static confirm(data) { return data; }
+  }
   const editor = {};
   globalThis.foundry = { appv1: { sheets: { ActorSheet, ItemSheet }, api: { Dialog } }, applications: { ux: { TextEditor: { implementation: editor } } } };
   const api = await import(path + '?modern');
   assert.equal(api.ActorSheet, ActorSheet);
   assert.equal(api.ItemSheet, ItemSheet);
-  assert.equal(api.Dialog, Dialog);
+  const data = { title: 'Escolher', callback() {} };
+  const options = { width: 500, classes: ['custom-dialog', 'dialog'] };
+  const styled = { width: 500, classes: ['dialog', 'dbua-system-dialog', 'custom-dialog'] };
+  assert.ok(new api.Dialog(data, options) instanceof Dialog);
+  assert.deepEqual(new api.Dialog(data, options).options, styled);
+  assert.deepEqual(api.Dialog.wait(data, options, { focus: true }), { data, options: styled, renderOptions: { focus: true } });
+  assert.deepEqual(api.Dialog.prompt({ ...data, options }), { ...data, options: styled });
+  assert.deepEqual(api.Dialog.confirm({ ...data, options }), { ...data, options: styled });
+  assert.deepEqual(options.classes, ['custom-dialog', 'dialog']);
   assert.equal(api.TextEditor, editor);
 });
 
@@ -25,7 +38,7 @@ test('v12 aliases and template loader are preserved', async () => {
   const api = await import(path + '?legacy');
   assert.equal(api.ActorSheet, globalThis.ActorSheet);
   assert.equal(api.ItemSheet, globalThis.ItemSheet);
-  assert.equal(api.Dialog, globalThis.Dialog);
+  assert.ok(new api.Dialog() instanceof globalThis.Dialog);
   assert.equal(api.TextEditor, globalThis.TextEditor);
   assert.deepEqual(await api.loadSystemTemplates(['a.hbs']), ['a.hbs']);
 });

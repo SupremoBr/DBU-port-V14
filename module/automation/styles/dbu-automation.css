@@ -84,7 +84,6 @@
 
 /* Dialog shells containing DBU Automation UIs */
 .window-app.dialog:has(.dbu-auto-window),
-.window-app.dialog:has(.dbu-v114-dialog),
 .window-app.dialog:has(.dbu-aura-manager),
 .window-app.dialog:has(.dbu-transform-manager),
 .window-app.dialog:has(.dbu-energy-charge-dialog),
@@ -94,7 +93,6 @@
   font-family: 'Orbitron','Segoe UI',Tahoma,sans-serif;
 }
 .window-app.dialog:has(.dbu-auto-window) .window-content,
-.window-app.dialog:has(.dbu-v114-dialog) .window-content,
 .window-app.dialog:has(.dbu-aura-manager) .window-content,
 .window-app.dialog:has(.dbu-transform-manager) .window-content,
 .window-app.dialog:has(.dbu-energy-charge-dialog) .window-content,
@@ -106,7 +104,6 @@
   border-top: 1px solid var(--dbua-border);
 }
 .window-app.dialog:has(.dbu-auto-window) .window-header,
-.window-app.dialog:has(.dbu-v114-dialog) .window-header,
 .window-app.dialog:has(.dbu-aura-manager) .window-header,
 .window-app.dialog:has(.dbu-transform-manager) .window-header,
 .window-app.dialog:has(.dbu-energy-charge-dialog) .window-header,
@@ -118,7 +115,6 @@
   border-bottom:0;
 }
 .window-app.dialog:has(.dbu-auto-window) .dialog-buttons button,
-.window-app.dialog:has(.dbu-v114-dialog) .dialog-buttons button,
 .window-app.dialog:has(.dbu-aura-manager) .dialog-buttons button,
 .window-app.dialog:has(.dbu-transform-manager) .dialog-buttons button,
 .window-app.dialog:has(.dbu-energy-charge-dialog) .dialog-buttons button,
@@ -127,7 +123,6 @@
 .window-app.dbu-gm-panel-dialog .dialog-buttons button,
 .dbu-auto-btn,
 .dbu-auto-window button,
-.dbu-v114-dialog button,
 .dbu-aura-manager button,
 .dbu-transform-manager button,
 .dbu-energy-charge-dialog button,
@@ -143,7 +138,6 @@
   font-weight:700;
 }
 .dbu-auto-window button:hover,
-.dbu-v114-dialog button:hover,
 .dbu-aura-manager button:hover,
 .dbu-transform-manager button:hover,
 .dbu-energy-charge-dialog button:hover,
@@ -153,7 +147,6 @@
   box-shadow:0 0 8px rgba(0,191,255,.35);
 }
 .dbu-auto-window input,.dbu-auto-window select,.dbu-auto-window textarea,
-.dbu-v114-dialog input,.dbu-v114-dialog select,.dbu-v114-dialog textarea,
 .dbu-aura-manager input,.dbu-aura-manager select,.dbu-aura-manager textarea,
 .dbu-transform-manager input,.dbu-transform-manager select,.dbu-transform-manager textarea,
 .dbu-energy-charge-dialog input,.dbu-energy-charge-dialog select,.dbu-energy-charge-dialog textarea,
@@ -163,7 +156,7 @@
   border:1px solid var(--dbua-border) !important;
   border-radius:3px;
 }
-.dbu-auto-window .notes,.dbu-v114-dialog .notes,.dbu-aura-manager .notes,
+.dbu-auto-window .notes,.dbu-aura-manager .notes,
 .dbu-transform-manager .notes,.dbu-energy-charge-dialog .notes,.dbu-visual-config .notes {
   color:var(--dbua-muted);
 }

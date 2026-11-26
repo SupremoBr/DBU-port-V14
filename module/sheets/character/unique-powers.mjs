@@ -444,8 +444,9 @@ export const uniquePowersMethods = {
     ).join("\n");
 
     const result = await Dialog.prompt({
-      title: "Add Unique Ability",
-      content: `<form><div class="form-group"><label>Select Ability:</label><select name="abilityKey" style="width:100%;padding:4px;">${optionsHtml}</select></div></form>`,
+      title: "Adicionar Habilidade Única",
+      label: "Adicionar",
+      content: `<div class="dbua-dialog-field"><label for="dbu-unique-ability-choice">Habilidade</label><select id="dbu-unique-ability-choice" name="abilityKey">${optionsHtml}</select></div>`,
       callback: (html) => html.find('[name="abilityKey"]').val(),
       rejectClose: false
     });

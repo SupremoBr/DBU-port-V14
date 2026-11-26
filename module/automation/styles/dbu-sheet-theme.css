@@ -38,8 +38,7 @@
   }
 
   .window-content {
-    background: linear-gradient(rgba(13, 17, 23, .95), rgba(13, 17, 23, .88)),
-      url('../../../assets/bg.jpg') center / cover no-repeat !important;
+    background: var(--dbua-menu-surface) !important;
     color: var(--text-primary) !important;
     font-family: var(--dbua-menu-font);
     font-size: .8rem;
@@ -48,7 +47,8 @@
     overflow: auto;
   }
 
-  .window-content::before {
+  .window-content::before,
+  .window-content::after {
     display: none;
   }
 
@@ -136,10 +136,82 @@
     letter-spacing: normal;
   }
 
-  :is(button, select, input, textarea, a):focus-visible {
+  :is(button, select, input, textarea, a, summary):focus-visible {
     outline: 2px solid var(--accent-gold);
     outline-offset: 2px;
   }
+}
+
+/* Foundry's legacy dialog puts the content and action row side by side in the DOM. */
+.dbua-system-dialog .window-content:has(> .dialog-content + .dialog-buttons) {
+  display: flex;
+  flex-direction: column;
+  min-block-size: 0;
+  overflow: hidden;
+}
+
+.dbua-system-dialog .window-content > .dialog-content {
+  min-block-size: 0;
+  overflow: auto;
+}
+
+.dbua-system-dialog .window-content > .dialog-buttons {
+  flex: 0 0 auto;
+  padding-block-start: 6px;
+  border-block-start: 1px solid var(--border-color);
+}
+
+.dbua-system-dialog .dbua-dialog-field {
+  display: grid;
+  gap: 4px;
+  min-inline-size: 0;
+}
+
+.dbua-system-dialog .dbua-dialog-field :is(select, input) {
+  inline-size: 100%;
+}
+
+.dbu-attack-dialog-body .dbu-called-shot {
+  margin-block: 0 10px;
+}
+
+.dbu-called-shot:not(:has(#dbu-called-shot:checked)) .dbua-dialog-field {
+  display: none;
+}
+
+.dbu-attack-dialog-body :is(.dbu-attack-advanced, .dbu-auto-damage-category, .dbu-auto-area-inline) {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 5px;
+  box-shadow: none;
+}
+
+.dbu-attack-advanced {
+  padding: 8px;
+}
+
+.dbu-attack-advanced > summary {
+  cursor: pointer;
+  color: var(--accent-cyan-light);
+  font-weight: 700;
+}
+
+.dbu-attack-advanced[open] > summary {
+  margin-block-end: 8px;
+}
+
+.dbu-attack-dialog-body :is(.notes, .dbu-auto-area-inline .dbu-auto-template-hint) {
+  color: var(--dbua-menu-secondary);
+  font-size: inherit;
+}
+
+.dbu-attack-dialog-body .dbu-auto-area-inline-head {
+  flex-wrap: wrap;
+  border-color: var(--border-color);
+}
+
+.dbu-attack-dialog-body .dbu-auto-area-inline-head b {
+  color: var(--text-primary);
 }
 
 /* Action summaries use the same cyan section headers as the sheet. */

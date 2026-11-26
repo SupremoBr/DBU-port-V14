@@ -1,3 +1,4 @@
+import { Dialog } from "../../helpers/foundry-compat.mjs";
 import { uses093 } from "../../rules/v093.mjs";
 import { validateActionUse } from "./action-economy.js";
 import { listenRequests, sendRequest } from "./core/authorized-request.js";

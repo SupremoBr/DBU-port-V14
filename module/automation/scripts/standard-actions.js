@@ -1,3 +1,4 @@
+import { Dialog } from "../../helpers/foundry-compat.mjs";
 import { uses093 } from "../../rules/v093.mjs";
 import { sizeLead } from "../../rules/size-v093.mjs";
 import { sendRequest, listenRequests } from "./core/authorized-request.js";

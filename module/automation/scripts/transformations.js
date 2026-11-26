@@ -1,3 +1,4 @@
+import { Dialog } from "../../helpers/foundry-compat.mjs";
 import { limitedMartialPower } from "../../rules/path-to-power-v093.mjs";
 import { uses093 } from "../../rules/v093.mjs";
 import { applyLegendRealized093 } from "../../rules/transformations-v093.mjs";

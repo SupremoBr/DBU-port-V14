@@ -1,3 +1,4 @@
+import { Dialog } from "../../helpers/foundry-compat.mjs";
 import { SYSTEM_ID as MODULE_ID, readAutomationFlag } from "../package.mjs";
 // ============================================================
 // DBU Automation v1.8.1 — Recovery (DBU 0.9.2)

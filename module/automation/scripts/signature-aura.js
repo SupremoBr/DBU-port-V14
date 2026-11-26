@@ -1,3 +1,4 @@
+import { Dialog } from "../../helpers/foundry-compat.mjs";
 import { listenRequests, sendRequest } from "./core/authorized-request.js";
 import { AUTOMATION_SOCKET, readAutomationFlag } from "../package.mjs";
 import { getSignatureAuraVisualSettings } from "./visual-config.js";

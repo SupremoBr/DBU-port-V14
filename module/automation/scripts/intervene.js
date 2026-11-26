@@ -1,3 +1,4 @@
+import { Dialog } from "../../helpers/foundry-compat.mjs";
 import { uses093 } from "../../rules/v093.mjs";
 import { attackForCombinationTarget } from "./combat/combination.js";
 import { privateRollJournal, sealRoll } from "./core/private-rolls.js";
