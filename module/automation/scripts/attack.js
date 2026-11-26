@@ -1,7 +1,7 @@
 import { sizeLead } from "../../rules/size-v093.mjs";
 import { surgingCharge093, surgingTargetsAllowed093, ragingBotch } from "../../rules/states-v093.mjs";
 import { privateRollJournal, sealRoll } from "./core/private-rolls.js";
-import { attackWeapon093 } from '../../helpers/weapon-state.mjs';
+import { applyDimensionBladeWear093, attackWeapon093 } from '../../helpers/weapon-state.mjs';
 import { inCombat093 } from "../../rules/actions-v093.mjs";
 import { pinpointInsight093, profileRoll093, validFoundation } from "../../rules/profiles-v093.mjs";
 import { uses093 } from "../../rules/v093.mjs";
@@ -2187,6 +2187,8 @@ await ChatMessage.create({
     </div>
   `
 }, { keepId: true });
+
+await applyDimensionBladeWear093(actor, reveal.weaponId);
 
 // The visual can find the chat document by its original attack id.
 await dbuRunVisual(actor, attackerToken, targetTokens, source, attackData, visualMacroName);

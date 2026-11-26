@@ -651,9 +651,13 @@ test('an automated attack publishes one card with the native roll and the defens
   actor.sheet = new DBUCharacterSheet(actor);
   actor.sheet.getData = async () => ({});
   actor.sheet._trackerSourceGroups = [{ label: 'Attack Refs', sources: [
-    { key: 'ref_0', name: 'Beam', foundation: 'Energy', profile: 'Beam', damageCat: 'Standard',
+    { key: 'ref_0', name: 'Dimension Sword', foundation: 'Physical', profile: 'Simple', damageCat: 'Direct', weaponId: 'blade',
       strikeFormula: '1d10+10', woundFormula: '1d10+10', strikeCT: 10, woundCT: 10, kiCost: 2 }
   ] }];
+  const weapon = { id: 'blade', system: { qualities: [{ qualityKey: 'dimension_blade' }], weaponLPDamage: 0 },
+    async update(updates) { applyUpdate(this, updates); }
+  };
+  actor.items = [weapon];
   const defender = { id: 'defender', name: 'Defensor', system: {} };
   const scene = { id: 'scene' };
   const attackerToken = { id: 'attacker-token', actor, document: { parent: scene, actorLink: true } };
@@ -691,6 +695,7 @@ test('an automated attack publishes one card with the native roll and the defens
 
     const result = await attack({ attackerToken, targets: [target], __dbuaActionValidated: true });
     assert.equal(messages.length, 1);
+    assert.equal(weapon.system.weaponLPDamage, 3);
     assert.equal(visuals, 1);
     const [{ data, options }] = messages;
     assert.deepEqual(options, { keepId: true });

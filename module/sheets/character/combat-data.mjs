@@ -374,6 +374,7 @@ export const combatDataMethods = {
         strikeFormula: prep.strikeFormula || "",
         targetingBonus: prep.targetingBonus || 0,
         weaponCategory: uses093(system) ? prep.selectedWeapon?.system.weaponCategory : undefined,
+        weaponId: uses093(system) ? prep.selectedWeapon?.id : undefined,
         woundFormula: prep.woundFormula || "",
         strikeCT: refCTs.strikeCT,
         woundCT: refCTs.woundCT,
@@ -398,6 +399,8 @@ export const combatDataMethods = {
       // advancement's notes) is rolled twice keeping the highest/lowest.
       const twinLinked = linkChoice(tech.advantages, "Twin-Linked");
       const deadLinked = linkChoice(tech.disadvantages, "Dead-Link");
+      const armed = uses093(system) && tech.isWeapon;
+      const { item, issue } = armed ? attackWeapon093(this.actor, tech) : {};
       stSources.push({
         key: `tech_${tech.id}`,
         name: tech.name,
@@ -407,7 +410,9 @@ export const combatDataMethods = {
           uses093(system) ? (tech.profileBaseKP || 0) * trackerTier / 2 : 0, system.aptitudes),
         strikeFormula: tech.strikeFormula || "",
         targetingBonus: tech.targetingBonus || 0,
-        weaponCategory: uses093(system) && tech.isWeapon ? attackWeapon093(this.actor, tech).item?.system.weaponCategory : undefined,
+        weaponCategory: item?.system.weaponCategory,
+        weaponId: item?.id,
+        weaponIssue: armed ? issue || (item ? undefined : "Selecione a arma usada nesta técnica.") : undefined,
         woundFormula: tech.woundFormula || "",
         strikeCT: tech.strikeCT || 10,
         woundCT: tech.woundCT || 10,

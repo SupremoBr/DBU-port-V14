@@ -1,3 +1,4 @@
+import { duelistParryBonus093 } from "../../../helpers/weapon-state.mjs";
 import { sizeLead } from "../../../rules/size-v093.mjs";
 import { resolveParticipant } from "../core/token-identity.js";
 import { ragingBotch } from "../../../rules/states-v093.mjs";
@@ -270,7 +271,7 @@ async function dbuRollDefend(
   );
 
   const parryBonus = isParry
-    ? cyberParry + fierceCounter
+    ? cyberParry + fierceCounter + duelistParryBonus093(defender)
     : 0;
 
   if (parryBonus) {

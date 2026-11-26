@@ -1,3 +1,4 @@
+import { applyDimensionBladeWear093, duelistParryBonus093 } from "../../helpers/weapon-state.mjs";
 import { energyChargeDie } from "../../helpers/custom-buffs.mjs";
 import { getAreaSpec } from "../../automation/scripts/area-attack.js";
 import { surgingCharge093, surgingTargetsAllowed093, ragingBotch } from "../../rules/states-v093.mjs";
@@ -306,8 +307,8 @@ export const combatTrackerMethods = {
       return;
     }
 
+    if (uses093(this.actor.system) && sd.weaponIssue) return ui.notifications.warn(sd.weaponIssue);
     if (uses093(this.actor.system) && String(action.source).startsWith("ref_")) {
-      if (sd.weaponIssue) return ui.notifications.warn(sd.weaponIssue);
       if (!validFoundation(sd.profile, sd.foundation)) return ui.notifications.warn("Selecione um Profile compatível com a Foundation.");
     }
 
@@ -581,6 +582,7 @@ export const combatTrackerMethods = {
             foundation: sd.foundation || "",
             profile: sd.profile || "",
             attackName: sd.name || "",
+            weaponId: sd.weaponId,
             strikeTotal,
             woundTotal,
             strikeRollData: strikeRoll.toJSON(),
@@ -594,6 +596,7 @@ export const combatTrackerMethods = {
     };
     if (prepareOnly) return messageData;
     await createHiddenTrackerCard(messageData, journal);
+    await applyDimensionBladeWear093(this.actor, sd.weaponId);
   },
 
   /** Store the chosen transformation index on the tracker "transform" action. */
@@ -1108,9 +1111,9 @@ export const combatTrackerMethods = {
       let formula = base;
       if (penalty > 0) formula += `-${penalty}`;
       if (wager > 0) formula += `+${wager}`;
-      // Robotic Limb (cybernetic trait) + Fierce Counter (talent): +Strike on Parry
+      // Robotic Limb, Fierce Counter and Duelist contribute to Parry only.
       const parryBonus = isParry
-        ? (Number(this.actor.system._cyberParryStrike) || 0) + (Number(this.actor.system.aptitudes?.fierceCounterStrike) || 0)
+        ? (Number(this.actor.system._cyberParryStrike) || 0) + (Number(this.actor.system.aptitudes?.fierceCounterStrike) || 0) + duelistParryBonus093(this.actor)
         : 0;
       if (parryBonus > 0) formula += `+${parryBonus}`;
       const kiCost = uses093(this.actor.system) ? defendKiCost093(this.actor.system, opt.key, action.defendEC) : opt.costT * tier;

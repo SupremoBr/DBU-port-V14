@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { attackForCombinationTarget, rollCombination } from '../module/automation/scripts/combat/combination.js';
 import { applyEquipmentQualityBonuses } from '../module/equipment-automation/qualities.mjs';
+import { applyDimensionBladeWear093, attackWeapon093, duelistParryBonus093, weaponRollModifiers093 } from '../module/helpers/weapon-state.mjs';
 import { pinpointInsight093 } from '../module/rules/profiles-v093.mjs';
 
 globalThis.Actor = class {};
@@ -160,4 +161,41 @@ test('armed Bludgeoning and Piercing bypass DR and pre-category Soak respectivel
   assert.equal(piercing.healthReduction, 20);
   assert.equal(actor._calculateDamageCalc(system, 1, 1, { weaponCategory: 'bludgeoning' }).healthReduction, 19);
   assert.equal(actor._calculateDamageCalc(system, 1, 1).healthReduction, 19);
+});
+
+test('Giant Weapon uses wielder size and still applies the weapon size modifier', () => {
+  const system = { tier: 2, baseSize: 'medium', status: { currentSize: 'large' } };
+  const weapon = { system: { weaponSize: 'big', qualities: [{ qualityKey: 'giant_weapon' }] } };
+  assert.deepEqual(weaponRollModifiers093(system, weapon, 'Simple'), { strike: -4, wound: 10 });
+  system.status.currentSize = 'gigantic';
+  assert.deepEqual(weaponRollModifiers093(system, weapon, 'Simple'), { strike: -2, wound: 10 });
+  assert.deepEqual(weaponRollModifiers093(system, null, 'Simple'), { strike: 0, wound: 0 });
+});
+
+test('Duelist adds one Tier to Parry while an intact physical Duelist weapon is wielded', () => {
+  const weapon = { type: 'equipment', system: { equipmentType: 'weapon', weaponType: 'physical', worn: true,
+    qualities: [{ qualityKey: 'duelist' }] } };
+  const actor = { system: { rulesVersion: '0.9.3', tier: 3 }, items: [weapon, structuredClone(weapon)] };
+  assert.equal(duelistParryBonus093(actor), 3);
+  actor.items[0].system.worn = false;
+  actor.items[1].system.weaponLPDamage = 32;
+  assert.equal(duelistParryBonus093(actor), 0);
+});
+
+test('Dimension Blade spends its weapon LP per attack, rounds down, and caps at breakage', async () => {
+  const weapon = { id: 'blade', name: 'Blade', type: 'equipment',
+    system: { equipmentType: 'weapon', worn: true, weaponType: 'physical', weaponLPDamage: 24,
+      qualities: [{ qualityKey: 'dimension_blade' }] },
+    async update(updates) { this.system.weaponLPDamage = updates['system.weaponLPDamage']; }
+  };
+  const actor = { system: { rulesVersion: '0.9.3', level: 1, kiPool: { value: 20 } }, items: [weapon] };
+  await Promise.all([applyDimensionBladeWear093(actor, weapon.id), applyDimensionBladeWear093(actor, weapon.id)]);
+  assert.equal(weapon.system.weaponLPDamage, 30);
+  await applyDimensionBladeWear093(actor, weapon.id);
+  assert.equal(weapon.system.weaponLPDamage, 32);
+  assert.equal(actor.system.kiPool.value, 20);
+  const source = { foundation: 'Physical', weaponEquipped: weapon.id };
+  assert.match(attackWeapon093(actor, source).issue, /quebrada/);
+  weapon.system.qualities.push({ qualityKey: 'unbreakable' });
+  assert.match(attackWeapon093(actor, source).issue, /Unbreakable/);
 });

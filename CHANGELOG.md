@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.0.12-rules093-alpha.38] — qualidades de arma
+
+- Duelist aplica seu bônus no Parry. Giant Weapon aplica +3(T) Wound e a penalidade de Strike conforme o tamanho atual do personagem.
+- Dimension Blade reduz os LP da arma em 1/10 do máximo por ataque, arredondado para baixo.
+
 ## [1.0.12-rules093-alpha.37] — total de Wound no chat
 
 - O card de Combination destaca o Wound com bônus para alvo único e identifica o Wound base quando há vários alvos. O encerramento de Intervene informa o ataque correto.
