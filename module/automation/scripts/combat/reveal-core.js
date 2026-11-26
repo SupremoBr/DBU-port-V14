@@ -1,3 +1,4 @@
+import { attackForCombinationTarget, rollCombination } from "./combination.js";
 import { resolveUrgentWound } from "../intervene.js";
 import { sendRequest, listenRequests } from "../core/authorized-request.js";
 import { openRoll, finishDefense } from "../core/private-rolls.js";
@@ -116,7 +117,7 @@ function dbuAttackRevealHTML(attack) {
       <span class="dbu-roll-main">
         <code class="dbu-roll-formula">${dbuEsc(attack?.strikeDisplayFormula || "")}</code>
         <span class="dbu-roll-sub">
-          Nat ${Number(attack?.strikeNatural || 0)}${attack?.targetingBonus ? ` · Targeting System +${Number(attack.targetingBonus)} natural` : ""} · CT ${Number(attack?.strikeCT || 10)}+ · Botch ${Number(attack?.strikeBotchThreshold || 0) === 0 ? "OFF" : `1-${Number(attack?.strikeBotchThreshold || 1)}`}
+          Nat ${Number(attack?.strikeNatural || 0)}${attack?.targetingBonus ? ` · Targeting System +${Number(attack.targetingAdjustment ?? attack.targetingBonus)} natural` : ""} · CT ${Number(attack?.strikeCT || 10)}+ · Botch ${Number(attack?.strikeBotchThreshold || 0) === 0 ? "OFF" : `1-${Number(attack?.strikeBotchThreshold || 1)}`}${attack.pinpointInsight ? ` · Pinpoint ignora ${attack.pinpointInsight} Soak` : ""}
         </span>
         ${strikeTags}
       </span>
@@ -132,7 +133,7 @@ function dbuAttackRevealHTML(attack) {
         </span>
         ${woundTags}
       </span>
-      <span class="dbu-roll-total" data-dbu-wound-total>${attack.urgentPending ? "—" : Number(attack?.woundTotal || 0)}</span>
+      <span class="dbu-roll-total" data-dbu-wound-total>${attack.urgentPending || attack.combinationMissed ? "—" : Number(attack?.woundTotal || 0)}</span>
     </div>
   `;
 }
@@ -191,9 +192,11 @@ async function dbuShowAttackDice(reveal) {
     try {
       const rollDatas = [
         reveal.strikeRollData,
-        reveal.woundRollData,
         reveal.strikeCritRollData,
-        reveal.woundCritRollData
+        ...(reveal.combinationRollData || []),
+        reveal.woundRollData,
+        reveal.woundCritRollData,
+        reveal.woundExtraRollData
       ].filter(Boolean);
       for (const data of rollDatas) {
         await game.dice3d.showForRoll(Roll.fromData(data), game.user, true);
@@ -254,6 +257,24 @@ async function dbuGMRevealCombatResults(messageId) {
     await message.update({ "flags.world.dbuCombatRevealInProgress": true });
 
     const secret = attack.sealedRoll ? openRoll(attack, message) : null;
+    if (secret && attack.combination) {
+      if (!secret.results.combinationResolution) {
+        const outcomes = progress.ids.flatMap(key => {
+          const defender = resolveParticipant(key, attack);
+          return defender ? [{ key, outcome: states[key]?.hiddenOutcome, rules093: uses093(defender.system) }] : [];
+        });
+        secret.results.combinationResolution = await rollCombination(attack, outcomes);
+        // Persist privately before publishing any outcomes so a retry reuses these dice.
+        await secret.page.update({ "text.content": encodeURIComponent(JSON.stringify({
+          results: secret.results, reveal: secret.reveal
+        })) });
+      }
+      const { attackData, revealData } = secret.results.combinationResolution;
+      Object.assign(attack, attackData);
+      Object.assign(secret.reveal, revealData);
+      attack.woundTotal = attack.baseWoundTotal + Number(attack.unitedAttackBonus || 0);
+      attack.urgentPending = false;
+    }
 
     // Resolve mensagens e dano apenas agora, quando todos já escolheram.
     for (const actorId of progress.ids) {
@@ -270,10 +291,14 @@ async function dbuGMRevealCombatResults(messageId) {
         }
       }
       if ((secret || attack.isReflect) && defender && state.hiddenOutcome) {
-        state.hiddenOutcome = finishDefense(attack, state.hiddenOutcome, uses093(defender.system));
+        state.hiddenOutcome = finishDefense(attackForCombinationTarget(attack, actorId), state.hiddenOutcome, uses093(defender.system));
         const outcome = state.hiddenOutcome;
         state.status = outcome.success ? "defended" : outcome.damageDefense === "guard" ? "guard" : "hit";
         state.text = outcome.name + " · " + (outcome.success ? "Sucesso" : "Impacto");
+        const combination = attack.combinationTargets?.[actorId];
+        if (combination) {
+          state.text += ` · Combination: ${combination.totals.join(", ")} vs ${combination.defenseScore} · Wound ${attackForCombinationTarget(attack, actorId).woundTotal} (+${combination.bonus})`;
+        }
       }
       if (defender && state.hiddenOutcome) {
         try {

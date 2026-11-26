@@ -741,6 +741,8 @@ export default class DBUCharacterData extends foundry.abstract.TypeDataModel {
 
         partyRules: new SchemaField({
           narrativeStamina: new BooleanField({ initial: false }),
+          staminaForKi: new BooleanField({ initial: true }),
+          staminaForDamage: new BooleanField({ initial: true }),
           oneManArmy: new BooleanField({ initial: false }),
           villainousKarma: new BooleanField({ initial: false }),
           withoutCapacity: new BooleanField({ initial: false })

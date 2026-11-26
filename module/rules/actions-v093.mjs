@@ -1,3 +1,4 @@
+import { adversaryRound093 } from './adversaries-v093.mjs';
 import { actionPools, canConvertAction } from './v093.mjs';
 const num = value => Math.max(0, Number(value) || 0);
 export function rowActionType093(row) {
@@ -28,7 +29,20 @@ export function roundPools093(actor, { excludeIndex = -1, standardBonus = 0, cou
   // Native and integrated defenses share roundCounterCount. It is the SAME
   // payment represented by a defend row, so never add the two counters.
   counterSpent = Math.max(counterSpent, num(actor.system?.combatTabState?.roundCounterCount));
-  return actionPools({ standardSpent, counterSpent, converted: state.converted, standardBonus: standardBonus + num(state.standardBonus), counterBonus: counterBonus + num(state.counterBonus), bonusMomentum: state.bonusMomentum, reducedMomentum: state.reducedMomentum, slowed: slowed?.stacks || 0, pinned });
+  const army = adversaryRound093(actor);
+  const grant = army?.actions || 0;
+  const pools = actionPools({ standardSpent, counterSpent, converted: state.converted, counterBase: grant ? 0 : 1,
+    standardBonus: standardBonus + num(state.standardBonus), counterBonus: counterBonus + num(state.counterBonus),
+    bonusMomentum: state.bonusMomentum, reducedMomentum: state.reducedMomentum, slowed: slowed?.stacks || 0, pinned });
+  if (grant) {
+    const instantSpent = actor.system.rules093State?.adversaryInstant?.key === army.key
+      ? num(actor.system.rules093State.adversaryInstant.spent) : 0;
+    pools.adversary = { granted: grant, remaining: Math.max(0, grant - counterSpent - instantSpent) };
+    pools.counter.granted += grant;
+    pools.counter.spent += instantSpent;
+    pools.counter.remaining = Math.max(0, pools.counter.granted - pools.counter.spent);
+  }
+  return pools;
 }
 export async function convertStandardToCounter093(actor) {
   const cts = structuredClone(actor.system.combatTabState || {});

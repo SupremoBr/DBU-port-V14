@@ -63,6 +63,32 @@ test('the real system init installs the current catalogs, schema, sheet adapter 
     return [key, undefined];
   }));
 
+  await t.test('adversary bonuses reach the maxima before calculating health thresholds', () => {
+    const system = Object.assign(new CharacterModel(), initial(CharacterModel.defineSchema()), {
+      level: 5, race: 'earthling', rulesVersion: '0.9.3'
+    });
+    const actor = Object.assign(new CONFIG.Actor.documentClass(), { system, items: [] });
+    const prepare = () => {
+      system.prepareDerivedData();
+      system.attributes.ag.score = 20;
+      actor._prepareCharacterData(system);
+    };
+    prepare();
+    assert.ok(system.attributes.ag.score < 20);
+    const life = system.lifePoints.max;
+    const ki = system.kiPool.max;
+    Object.assign(system.adversary, { enabled: true, category: 'elite', partySize: 3 });
+    prepare();
+    assert.equal(system.lifePoints.max, life + 15);
+    assert.equal(system.kiPool.max, ki + 30);
+    assert.equal(system.thresholds.bruised.value, Math.floor((life + 15) / 2));
+    assert.equal(system.attributes.ag.score, 20);
+    assert.equal(system.adversary.traitSlots, 1);
+    prepare();
+    assert.equal(system.lifePoints.max, life + 15);
+    assert.equal(system.kiPool.max, ki + 30);
+  });
+
   await t.test('selected racial bonuses reach derived attributes, rolls, resources and defenses and clear on removal', () => {
     const system = Object.assign(new CharacterModel(), initial(CharacterModel.defineSchema()), {
       level: 5, race: 'bioAndroid', rulesVersion: '0.9.3',

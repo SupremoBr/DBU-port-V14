@@ -22,7 +22,7 @@
   <div class="tp-summary-bar">
     <div class="tp-item">
       <label>Total Technique Points</label>
-      <span class="tp-value">{{tpTotal}}</span>
+      <span class="tp-value">{{#if adversaryUnlimitedTP}}Ilimitado{{else}}{{tpTotal}}{{/if}}</span>
     </div>
     <div class="tp-item">
       <label>Spent on Signatures</label>
@@ -38,10 +38,12 @@
       <label>Spent on Unique</label>
       <span class="tp-value tp-spent">{{tpSpentUnique}}</span>
     </div>
+    {{#unless adversaryUnlimitedTP}}
     <div class="tp-item tp-remaining">
       <label>TP Remaining</label>
       <span class="tp-value {{#if (lt tpRemaining 0)}}tp-over{{/if}}">{{tpRemaining}}</span>
     </div>
+    {{/unless}}
   </div>
 
   {{!-- Section Header --}}

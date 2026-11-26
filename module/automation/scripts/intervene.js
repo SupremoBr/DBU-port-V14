@@ -1,3 +1,5 @@
+import { uses093 } from "../../rules/v093.mjs";
+import { attackForCombinationTarget } from "./combat/combination.js";
 import { privateRollJournal, sealRoll } from "./core/private-rolls.js";
 import { sendRequest, listenRequests } from "./core/authorized-request.js";
 import { SYSTEM_ID as MODULE_ID, AUTOMATION_SOCKET, readAutomationFlag, onAutomationChatRender, chatRenderHook } from "../package.mjs";
@@ -466,46 +468,16 @@ function upgradeDamageCategory(value) {
   return "lethal";
 }
 
-function effectiveCategoryForActor(actor, category) {
-  let c = normalizeDamageCategory(category);
-  if (actor.system.aspectEffects?.armoredActive) {
-    if (c === "lethal") c = "direct";
-    else if (c === "direct") c = "standard";
-  }
-  const prone = (actor.system.conditions || []).some(cond => cond?.id === "prone" && cond?.active);
-  if (prone) {
-    if (c === "standard") c = "direct";
-    else if (c === "direct") c = "lethal";
-  }
-  return c;
-}
-
-function wallExtraEffectiveSoak(actor, category) {
-  const soak = Math.max(0, Number(actor.system.status?.soak || 0));
-  const increase = Math.ceil(soak / 2);
-  const boosted = soak + increase;
-  const effectiveCategory = effectiveCategoryForActor(actor, category);
-
-  const effective = (value) => {
-    if (effectiveCategory === "lethal") return 0;
-    if (effectiveCategory === "direct") return Math.floor(value / 2);
-    return value;
-  };
-
-  return Math.max(0, effective(boosted) - effective(soak));
-}
-
 async function applyPreparedDamage(actor, attack, {
   defense = "none",
   categoryOverride = null,
-  extraDamageReduction = 0
+  extraSoak = 0
 } = {}) {
   const sheet = actor?.sheet;
   if (!actor || !sheet || typeof sheet._onApplyDamage !== "function") {
     throw new Error(`Não foi possível aplicar dano em ${actor?.name || "Actor"}.`);
   }
 
-  const previousExtraDR = Number(actor.system.damageCalc?.damageReduction || 0);
   const category = normalizeDamageCategory(categoryOverride || attack.damageCategory || attack.damageCat || "standard");
   const beforeLP = Number(actor.system.lifePoints?.value || 0);
   const terrainShield = prepareTerrainShield(actor, Math.max(0, Number(attack.woundTotal || 0)));
@@ -520,20 +492,13 @@ async function applyPreparedDamage(actor, attack, {
     "system.damageCalc.defense": defense,
     "system.damageCalc.incomingEC": Math.max(0, Number(attack.energyCharges || 0)),
     "system.damageCalc.guardPaidViaCard": defense === "guard",
-    "system.damageCalc.isRanged": String(attack.foundation || "").toLowerCase() !== "physical",
-    "system.damageCalc.damageReduction": previousExtraDR + Math.max(0, Number(extraDamageReduction || 0))
+    "system.damageCalc.isRanged": String(attack.foundation || "").toLowerCase() !== "physical"
   });
 
-  const predicted = Math.max(0, Number(actor.system.damageCalc?.healthReduction || 0));
-
-  try {
-    await sheet._onApplyDamage({ preventDefault() {}, stopPropagation() {}, dbuAttackingManeuver: true });
-  } finally {
-    // Extra DR da Defense Wall vale somente para este Attacking Maneuver.
-    try {
-      await actor.update({ "system.damageCalc.damageReduction": previousExtraDR });
-    } catch {}
-  }
+  const system = actor.system;
+  const dbuDamageCalc = actor._calculateDamageCalc(system, system.tier, system.baseTier, attack, extraSoak);
+  const predicted = Math.max(0, Number(dbuDamageCalc?.healthReduction || 0));
+  await sheet._onApplyDamage({ preventDefault() {}, stopPropagation() {}, dbuAttackingManeuver: true, dbuDamageCalc });
 
   const afterLP = Number(actor.system.lifePoints?.value || 0);
   const actual = Math.max(0, beforeLP - afterLP);
@@ -542,11 +507,10 @@ async function applyPreparedDamage(actor, attack, {
 }
 
 async function applyDefenseWall(intervener, protectedActor, attack) {
-  const category = normalizeDamageCategory(attack.damageCategory || attack.damageCat || "standard");
-  const extraSoak = wallExtraEffectiveSoak(intervener, category);
+  const extraSoak = Math.ceil(Math.max(0, Number(intervener.system.status?.soak || 0)) / 2);
   const result = await applyPreparedDamage(intervener, attack, {
     defense: "none",
-    extraDamageReduction: extraSoak
+    extraSoak
   });
 
   let spill = 0;
@@ -567,7 +531,7 @@ async function applyDefenseWall(intervener, protectedActor, attack) {
 async function finalizePendingDamageIfReady(message) {
   if (!game.user.isGM || !isPrimaryGM()) return;
 
-  const attack = foundry.utils.deepClone(attackData(message) || {});
+  const baseAttack = foundry.utils.deepClone(attackData(message) || {});
   const states = defenseStates(message);
   const unresolved = unresolvedDamageStates(states);
   if (!unresolved.length) return;
@@ -579,7 +543,8 @@ async function finalizePendingDamageIfReady(message) {
   }
 
   for (const [targetId, state] of unresolved) {
-    const target = resolveParticipant(targetId, attackData(message));
+    const attack = attackForCombinationTarget(baseAttack, targetId);
+    const target = resolveParticipant(targetId, attack);
     const outcome = state.hiddenOutcome;
     const resolution = state.intervention || { status: "declined" };
 
@@ -870,6 +835,20 @@ async function createReflectAttackCard({ journal, sourceMessage, reflector, targ
     woundNatural: wound.natural,
     foundation: attack.foundation || "Energy",
     profile: attack.profile || "",
+    attackerTier: Number(reflector.system.tier) || 1,
+    profileRules093: attack.profileRules093,
+    ...(attack.combination && uses093(reflector.system) ? {
+      combination: {
+        strikeFormula: strike.formula,
+        critFormula: reflector.sheet._critExtraFormula?.(reflector.system.tier),
+        botchPenalty: 2 * (Number(reflector.system.baseTier) || 1),
+        woundFormula: attack.combination.woundFormula,
+        woundExtra: `(${attack.combination.woundExtra || 0})+${Number(attack.unitedAttackBonus || 0)}`,
+        woundLinkMode: attack.combination.woundLinkMode,
+        woundCritFormula: attack.combination.woundCritFormula ?? attack.combination.critFormula,
+        woundBotchPenalty: attack.combination.woundBotchPenalty ?? attack.combination.botchPenalty
+      }
+    } : {}),
     damageCategory: attack.damageCategory || attack.damageCat || "Standard",
     damageCat: attack.damageCategory || attack.damageCat || "Standard",
     energyCharges: Number(attack.energyCharges || 0),

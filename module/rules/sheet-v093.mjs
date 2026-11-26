@@ -1,3 +1,4 @@
+import { adversaryRound093, isAdversary093 } from "./adversaries-v093.mjs";
 import { sendRequest, listenRequests } from "../automation/scripts/core/authorized-request.js";
 import { attackWeapon093 } from '../helpers/weapon-state.mjs';
 import { applyCatalogDescriptions, editCatalogDescription } from './catalog-descriptions.mjs';
@@ -118,6 +119,7 @@ export function transformationCanActivate093(actor, rows) {
   if (rows.some(t => t.active && requiresTransformationReview093(t))) return { ok: false, reason: 'AMB variável: preencha os valores da tabela oficial antes de ativar.' };
   const stacking = validateTransformationStack(rows);
   if (!stacking.ok) return { ok: false, reason: '0.9.3: limite de uma Form e um Enhancement. Enhancement Transcendente ocupa a vaga de Form.' };
+  if (isAdversary093(actor.system)) return { ok: true };
   const limits = awakeningLimits(actor.system.baseTier || 1);
   for (const [kind, maximum] of Object.entries(limits)) {
     if (rows.filter(t => t.active && t.transformationType === 'manifested_power' && String(t.awakeningType).toLowerCase() === kind).length > maximum) return { ok: false, reason: `0.9.3: limite ${maximum} de Awakenings ${kind}.` };
@@ -160,6 +162,31 @@ export function installRulesSheet093(Sheet) {
   });
   wrap('activateListeners', function(original, html) {
     original(html); if (!this.isEditable) return;
+    html.on('click', '[data-adversary-instant]', async event => {
+      const button = event.currentTarget;
+      if (button.disabled) return;
+      button.disabled = true;
+      try {
+        const actor = this.actor;
+        const pool = adversaryRound093(actor);
+        if (!pool?.actions || (roundPools093(actor).adversary?.remaining || 0) < 2) {
+          return warn('São necessárias 2 Adversary Actions nesta rodada.');
+        }
+        const confirmed = await Dialog.confirm({
+          title: 'One-Man Army',
+          content: '<p>Gastar 2 Adversary Actions para resolver uma Standard Maneuver de 1 Action como Instant? Resolva a manobra na mesa sem cobrar outra Action.</p>',
+          defaultYes: false
+        }, { classes: ['dbua-system-dialog'] });
+        if (!confirmed) return;
+        const current = adversaryRound093(actor);
+        if (current?.key !== pool.key || (roundPools093(actor).adversary?.remaining || 0) < 2) {
+          return warn('A rodada ou o saldo de Adversary Actions mudou.');
+        }
+        const previous = actor.system.rules093State?.adversaryInstant;
+        const spent = (previous?.key === current.key ? Number(previous.spent) || 0 : 0) + 2;
+        await actor.update({ 'system.rules093State.adversaryInstant': { key: current.key, spent } });
+      } finally { button.disabled = false; }
+    });
     html.on('click', '[data-rules093-steadfast]', async event => {
       const actor = this.actor;
       const key = event.currentTarget.dataset.rules093Steadfast;

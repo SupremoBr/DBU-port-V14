@@ -4,7 +4,7 @@ const scope = "DBU-MRR-OLD";
 const creating = new Map();
 const sealedFields = [
   "strikeTotal", "baseWoundTotal", "woundTotal", "strikeNatural", "woundNatural",
-  "strikeCritical", "woundCritical", "strikeBotch", "woundBotch"
+  "strikeCritical", "woundCritical", "strikeBotch", "woundBotch", "pinpointInsight", "combination", "targetingAdjustment"
 ];
 
 function findJournal(userId) {
@@ -88,7 +88,7 @@ export function openRoll(attack, message) {
     attack.woundTotal = attack.baseWoundTotal + Number(attack.unitedAttackBonus || 0);
     attack.sealedRoll = false;
   }
-  return { page, reveal: secret.reveal };
+  return { page, reveal: secret.reveal, results: secret.results };
 }
 
 export function finishDefense(attack, outcome, system093) {

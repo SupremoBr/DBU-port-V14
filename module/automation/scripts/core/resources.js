@@ -1,3 +1,5 @@
+import { spendNarrativeStamina093 } from "../../../rules/adversaries-v093.mjs";
+
 // DBU Automation — recursos Ki/Capacity
 export function dbuGetCapacity(actor) {
   const max = Number(
@@ -32,6 +34,8 @@ export function dbuCheckAffordability(
   ));
 
   const capacity = dbuGetCapacity(actor);
+  const stamina = spendNarrativeStamina093(actor, amount, "staminaForKi").amount;
+  const kiCost = amount - stamina;
 
   if (amount <= 0) {
     return {
@@ -42,11 +46,11 @@ export function dbuCheckAffordability(
     };
   }
 
-  if (currentKi < amount) {
+  if (currentKi < kiCost) {
     if (notify) {
       ui.notifications.warn(
         `${actor.name}: Ki insuficiente para ${label}. ` +
-        `Disponível ${currentKi}, necessário ${amount} KP.`
+        `Disponível ${currentKi}, necessário ${kiCost} KP.`
       );
     }
 
@@ -61,12 +65,12 @@ export function dbuCheckAffordability(
 
   if (
     capacity.max > 0
-    && capacity.left < amount
+    && capacity.left < kiCost
   ) {
     if (notify) {
       ui.notifications.warn(
         `${actor.name}: Capacity insuficiente para ${label}. ` +
-        `Restante ${capacity.left}, necessário ${amount}.`
+        `Restante ${capacity.left}, necessário ${kiCost}.`
       );
     }
 
@@ -109,44 +113,17 @@ export async function dbuPayKiAndCapacity(
     };
   }
 
-  const currentKi = Number(
-    actor.system.kiPool?.value || 0
-  );
-
+  const check = dbuCheckAffordability(actor, amount, label);
+  if (!check.ok) return check;
+  const stamina = spendNarrativeStamina093(actor, amount, "staminaForKi");
+  const currentKi = check.ki;
+  const kiCost = amount - stamina.amount;
   const capacity = dbuGetCapacity(actor);
 
-  if (currentKi < amount) {
-    ui.notifications.warn(
-      `${actor.name}: Ki insuficiente. Necessário ${amount} KP.`
-    );
-
-    return {
-      ok: false,
-      reason: "ki"
-    };
-  }
-
-  if (
-    capacity.max > 0 &&
-    capacity.left < amount
-  ) {
-    ui.notifications.warn(
-      `${actor.name}: Capacity insuficiente. ` +
-      `Restante ${capacity.left}, necessário ${amount}.`
-    );
-
-    return {
-      ok: false,
-      reason: "capacity"
-    };
-  }
-
   await actor.update({
-    "system.kiPool.value":
-      currentKi - amount,
-
-    "system.status.capacitySpent":
-      capacity.spent + amount
+    "system.kiPool.value": currentKi - kiCost,
+    "system.status.capacitySpent": capacity.spent + kiCost,
+    ...stamina.update
   });
 
   const after = dbuGetCapacity(actor);
@@ -158,7 +135,7 @@ export async function dbuPayKiAndCapacity(
       label,
       amount,
       kiBefore: currentKi,
-      kiAfter: currentKi - amount,
+      kiAfter: currentKi - kiCost,
       capacityBefore: capacity.spent,
       capacityAfter: after.spent,
       capacityMax: after.max
@@ -168,7 +145,8 @@ export async function dbuPayKiAndCapacity(
   return {
     ok: true,
     amount,
-    ki: currentKi - amount,
+    ki: currentKi - kiCost,
+    staminaSpent: stamina.amount,
     capacitySpent: after.spent,
     capacityLeft: after.left
   };

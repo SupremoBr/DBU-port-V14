@@ -1,7 +1,9 @@
+import { roundPools093 } from "../../rules/actions-v093.mjs";
 import { prepareCharacterTraits, prepareCharacterTalents } from "../character-data.mjs";
 import { getCatalogById, getRacialCatalogIndex } from "../../helpers/catalog-index.mjs";
 import { Dialog } from "../../helpers/foundry-compat.mjs";
 import { ELEMENTAL_PROFILES_093 } from "../../rules/profiles-v093.mjs";
+import { adversaryBenefits093, adversaryRound093 } from "../../rules/adversaries-v093.mjs";
 import { uses093 } from "../../rules/v093.mjs";
 import { openRacialFactorSelector } from "./racial-factors.mjs";
 
@@ -441,7 +443,18 @@ export const traitsTalentsMethods = {
 
     // LP/KP bonus display values
     const pl = system.level || 1;
-    switch (adv.category) {
+    const benefits = adversaryBenefits093(system);
+    context.adversary093 = benefits;
+    context.adversaryActionsRemaining = 0;
+    const round = adversaryRound093(this.actor);
+    if (round) {
+      context.adversaryStaminaRemaining = round.stamina;
+      context.adversaryActionsRemaining = roundPools093(this.actor).adversary?.remaining || 0;
+    }
+    if (benefits && !benefits.legacyMook) {
+      context.adversaryLPBonus = benefits.life;
+      context.adversaryKPBonus = benefits.ki;
+    } else switch (adv.category) {
       case "villain":  context.adversaryLPBonus = 4 * pl; context.adversaryKPBonus = 4 * pl; break;
       case "superior": context.adversaryLPBonus = 2 * pl; context.adversaryKPBonus = 2 * pl; break;
       case "mook":     context.adversaryLPBonus = "\u00f74"; context.adversaryKPBonus = "\u00f72"; break;

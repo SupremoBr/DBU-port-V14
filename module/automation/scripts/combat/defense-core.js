@@ -454,6 +454,9 @@ async function dbuApplyDamage(
     preventDefault() {},
     stopPropagation() {},
     dbuSizeDamage: sizeDamage,
+    dbuDamageCalc: attack.profileRules093
+      ? defender._calculateDamageCalc(defender.system, defender.system.tier, defender.system.baseTier, attack)
+      : undefined,
     dbuAttackingManeuver: true
   });
 

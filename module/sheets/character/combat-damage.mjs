@@ -1,3 +1,4 @@
+import { spendNarrativeStamina093 } from "../../rules/adversaries-v093.mjs";
 import { uses093 } from "../../rules/v093.mjs";
 import { Dialog } from "../../helpers/foundry-compat.mjs";
 
@@ -55,7 +56,7 @@ export const combatDamageMethods = {
   async _onApplyDamage(event) {
     event.preventDefault();
     const system = this.actor.system;
-    const dc = system.damageCalc;
+    const dc = event.dbuDamageCalc ?? system.damageCalc;
     let damage = (dc?.healthReduction || 0) + (event.dbuSizeDamage || 0);
     if (damage <= 0) {
       // Guard is paid even when it reduces the final damage to 0 — the Defend
@@ -474,6 +475,8 @@ export const combatDamageMethods = {
       }
     }
 
+    const stamina = spendNarrativeStamina093(this.actor, damage, "staminaForDamage");
+    damage -= stamina.amount;
     const currentLP = system.lifePoints?.value ?? 0;
     const undying = uses093(system) && system.combatStates?.undying;
     let newLP = undying ? currentLP - damage : Math.max(0, currentLP - damage);
@@ -556,6 +559,7 @@ export const combatDamageMethods = {
       round: cts.currentRound || 1,
       type: source === "wound" ? category : source,
       finalDamage: -damage,
+      staminaAbsorbed: stamina.amount || undefined,
       lpBefore: currentLP,
       lpAfter: newLP,
       sapBefore: sapAbsorbed > 0 ? sapBefore : undefined,
@@ -566,6 +570,7 @@ export const combatDamageMethods = {
     });
 
     const updates = {
+      ...stamina.update,
       "system.lifePoints.value": newLP,
       "system.combatTabState.damageLog": cts.damageLog
     };

@@ -160,8 +160,28 @@ test('signature use checks Climax and the selected Weapon Assisted weapon', () =
 
 test('Targeting System adjusts the base die before critical and botch checks', () => {
   assert.deepEqual(profileRoll093('Cutting', { strikeNatural: 9, targetingBonus: 1, damageCat: 'Direct' }),
-    { natural: 10, strikeAdjustment: 1, critical: true, botch: false, damageCat: 'Lethal' });
+    { natural: 10, targetingAdjustment: 1, strikeAdjustment: 1, critical: true, botch: false, damageCat: 'Lethal' });
   assert.equal(profileRoll093('Beam', { strikeNatural: 10, targetingBonus: 2 }).strikeAdjustment, 0);
   assert.equal(profileRoll093('Beam', { strikeNatural: 5, targetingBonus: 2, faces: 6 }).natural, 6);
-  assert.equal(profileRoll093('Clearing', { strikeNatural: 1, targetingBonus: 1 }).natural, 5);
+  const clearing = profileRoll093('Clearing', { strikeNatural: 1, targetingBonus: 1 });
+  assert.equal(clearing.natural, 5);
+  assert.equal(clearing.targetingAdjustment, 1);
+  assert.equal(clearing.strikeAdjustment, 4);
+});
+
+test('adversary benefits use the official PCC table and preserve legacy Mooks', async () => {
+  const { adversaryBenefits093 } = await import('../module/rules/adversaries-v093.mjs');
+  const system = { rulesVersion: '0.9.3', level: 8, baseTier: 2, adversary: { enabled: true, category: 'superior', partySize: 3 } };
+  assert.deepEqual(adversaryBenefits093(system), { category: 'elite', pcc: 3, legacyMook: false,
+    life: 24, ki: 48, attributePoints: 6, traitSlots: 1, stamina: 36, adversaryActions: 3, karma: 1 });
+  system.adversary.category = 'villain';
+  assert.deepEqual(adversaryBenefits093(system), { category: 'villain', pcc: 3, legacyMook: false,
+    life: 48, ki: 96, attributePoints: 12, traitSlots: 2, stamina: 72, adversaryActions: 3, karma: 3 });
+  system.adversary.category = 'standard';
+  assert.equal(adversaryBenefits093(system).life, 8);
+  assert.equal(adversaryBenefits093(system).ki, 8);
+  system.adversary.category = 'mook';
+  assert.equal(adversaryBenefits093(system).legacyMook, true);
+  system.adversary.enabled = false;
+  assert.equal(adversaryBenefits093(system), null);
 });

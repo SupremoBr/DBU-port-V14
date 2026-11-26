@@ -455,6 +455,11 @@ export class DBUCharacterSheet extends ActorSheet {
     context.adversaryCategoryOptions = {
       villain: "Villain", superior: "Superior", standard: "Standard", mook: "Mook"
     };
+    if (context.rules093) {
+      context.adversaryCategoryOptions = { standard: "Standard", elite: "Elite", villain: "Villain" };
+      if (system.adversary?.category === "superior") context.adversaryCategoryOptions.superior = "Elite (Superior salvo)";
+      if (system.adversary?.category === "mook") context.adversaryCategoryOptions.mook = "Mook (legado)";
+    }
     context.adversaryDifficultyOptions = {
       easy: "Easy", medium: "Medium", hard: "Hard", super: "Super"
     };

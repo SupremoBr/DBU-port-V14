@@ -1,3 +1,4 @@
+import { adversaryRound093 } from "./adversaries-v093.mjs";
 import { attackWeapon093 } from '../helpers/weapon-state.mjs';
 import { SUPER_PROFILES_093, superProfileKiUnits093 } from "./super-profiles-v093.mjs";
 import { limitedMartialPower, martialEnergyCharges, martialLevel } from './path-to-power-v093.mjs';
@@ -211,7 +212,8 @@ export function signatureEnergyCharges093(technique, system) {
 }
 export function maximumWager093(actor, technique, kiCost = 0) {
   const system = actor.system, max = Math.max(0, Number(system.status?.maxCapacity ?? system.capacity?.max) || 0);
-  const remaining = Math.max(0, max - (Number(system.status?.capacitySpent) || 0) - kiCost);
+  const stamina = system.adversary?.partyRules?.staminaForKi === false ? 0 : (adversaryRound093(actor)?.stamina || 0);
+  const remaining = Math.max(0, max - (Number(system.status?.capacitySpent) || 0) + stamina - kiCost);
   const full = technique?.advantages?.some(a => a.name === 'Full Wager') || technique?.profile === 'Elemental (Light)';
-  return Math.max(0, Math.min(full ? remaining : Math.floor(max / 2), remaining, (Number(system.kiPool?.value) || 0) - kiCost));
+  return Math.max(0, Math.min(full ? Math.min(max, remaining) : Math.floor(max / 2), remaining, (Number(system.kiPool?.value) || 0) + stamina - kiCost));
 }

@@ -33,7 +33,7 @@ export function applyEquipmentQualityBonuses(actor, system, tier, baseTier) {
     system._magicStaff093 = false;
     system.equipmentFlags.wardingDR = 0;
     system.equipmentFlags.opponentClashDice = 0;
-    for (const field of ['skillBonuses', 'weaponStrikePenalty', 'weaponWoundBonus', 'weaponDamageCatBonus', 'weaponLongRangeStrikeBonus']) {
+    for (const field of ['skillBonuses', 'weaponStrikePenalty', 'weaponWoundBonus', 'weaponDamageCatBonus', 'weaponLongRangeStrikeBonus', 'weaponTargetingSystem']) {
       system.equipmentFlags[field] = {};
     }
   }
@@ -427,7 +427,7 @@ WEAPON_HANDLERS.long_range_weapon = (ctx) => {
   map[ctx.item.id] = ctx.tier;
 };
 
-// targeting_system: +1 Natural Strike result
+// targeting_system: +1 Natural Strike in legacy, +1/+2 by Quality Slots in 0.9.3
 WEAPON_HANDLERS.targeting_system = (ctx, quality) => {
   const map = _ensureObj(ctx.system.equipmentFlags, "weaponTargetingSystem");
   map[ctx.item.id] = uses093(ctx.system) ? Math.min(2, Math.max(1, Number(quality.slotsUsed) || 1)) : 1;

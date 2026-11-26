@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.0.12-rules093-alpha.36] — Combination e defesa
+
+- Os Strikes adicionais de Combination são comparados com Dodge 0 em Guard, Direct Hit e Power Flare. Cada sucesso soma +2(T) antes de resolver a defesa contra o Wound.
+- Adversários 0.9.3 recebem os benefícios da categoria conforme o tamanho do grupo. As opções Narrative Stamina e One-Man Army calculam seus recursos por rodada.
+
+## [1.0.12-rules093-alpha.35] — Profiles e armas
+
+- Combination resolve os Strikes adicionais contra a defesa original. Concentrated ignora metade do DR. Pinpoint ignora Soak por Insight e dobra o modificador no crítico de Strike.
+- Targeting System informa o aumento efetivo no resultado natural. Bludgeoning e Piercing aplicam sua penetração de defesa. Precision soma seus bônus no Called Shot.
+
 ## [1.0.12-rules093-alpha.34] — manobras vilanescas
 
 - O HUD de Adversários da 0.9.3 inclui a aba Vilãs, com nove cartões de consulta que mostram efeitos, custos e limites de uso.

@@ -104,10 +104,10 @@ export function stackedStressRequirement(requirements) {
 }
 
 /** Round ledger inputs are explicit, including rule-granted extra actions. */
-export function actionPools({ standardSpent = 0, counterSpent = 0, converted = 0, standardBonus = 0, counterBonus = 0, bonusMomentum = false, reducedMomentum = false, slowed = 0, pinned = false } = {}) {
+export function actionPools({ standardSpent = 0, counterSpent = 0, converted = 0, standardBonus = 0, counterBonus = 0, counterBase = 1, bonusMomentum = false, reducedMomentum = false, slowed = 0, pinned = false } = {}) {
   const conversion = Math.min(5, int(converted));
   const standard = Math.max(0, (pinned ? 1 : 3) + n(standardBonus) + Number(!!bonusMomentum) - Number(!!reducedMomentum) - int(slowed));
-  const counter = Math.min(6, Math.max(0, 1 + conversion + n(counterBonus)));
+  const counter = Math.min(6, Math.max(0, counterBase + conversion + n(counterBonus)));
   return {
     standard: { granted: standard, spent: int(standardSpent) + conversion, remaining: Math.max(0, standard - int(standardSpent) - conversion) },
     counter: { granted: counter, spent: int(counterSpent), remaining: Math.max(0, counter - int(counterSpent)) },
@@ -115,7 +115,7 @@ export function actionPools({ standardSpent = 0, counterSpent = 0, converted = 0
   };
 }
 
-export function canConvertAction(pools) { return pools.standard.remaining >= 1 && pools.counter.granted < 6; }
+export function canConvertAction(pools) { return pools.standard.remaining >= 1 && pools.counter.granted - (pools.adversary?.granted || 0) < 6; }
 
 export function validateManeuverTiming({ type = 'standard', cost = 1, pools, isOwnTurn = false, isAttackTarget = false, lastVoluntaryType = null, triggerId = null, usedTriggers = [], respondingTo = null, timingOverride = false } = {}) {
   const requested = Math.max(0, n(cost));

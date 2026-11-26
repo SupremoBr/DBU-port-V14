@@ -1,3 +1,4 @@
+import { isAdversary093 } from "./adversaries-v093.mjs";
 import { CATALOGS_093 } from './catalogs-v093.mjs';
 import { RACES_093, validateRacialAttributes } from './races-v093.mjs';
 import { validateTransformationStack, awakeningLimits, uses093 } from './v093.mjs';
@@ -77,7 +78,7 @@ export function convertActor093(source) {
   const limits = awakeningLimits(system.baseTier || 1);
   for (const [kind, limit] of Object.entries(limits)) {
     const owned = system.transformations.filter(t => t.transformationType === 'manifested_power' && String(t.awakeningType).toLowerCase() === kind);
-    if (owned.length > limit) issues.push(issue('awakenings', kind, `Quantidade ${owned.length} excede o limite ${limit}; revisar escolhas.`));
+    if (!isAdversary093({ ...system, rulesVersion: "0.9.3" }) && owned.length > limit) issues.push(issue('awakenings', kind, `Quantidade ${owned.length} excede o limite ${limit}; revisar escolhas.`));
   }
   // Never let former trait caches or options activate removed 0.9.2 effects.
   system.talentSelections = {}; system.transformationOptionSelections = {};

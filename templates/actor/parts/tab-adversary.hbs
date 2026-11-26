@@ -20,15 +20,17 @@
           {{selectOptions adversaryCategoryOptions selected=system.adversary.category}}
         </select>
       </div>
+      {{#unless rules093}}
       <div class="config-item">
         <label>Difficulty Level</label>
         <select name="system.adversary.difficultyLevel">
           {{selectOptions adversaryDifficultyOptions selected=system.adversary.difficultyLevel}}
         </select>
       </div>
+      {{/unless}}
       <div class="config-item">
-        <label>Party Size</label>
-        <input type="number" name="system.adversary.partySize" value="{{system.adversary.partySize}}" min="1" />
+        <label for="adversary-pcc-{{actor.uuid}}">{{#if rules093}}PCC (personagens enfrentados){{else}}Party Size{{/if}}</label>
+        <input id="adversary-pcc-{{actor.uuid}}" type="number" name="system.adversary.partySize" value="{{system.adversary.partySize}}" min="1" />
       </div>
     </div>
 
@@ -43,8 +45,13 @@
         <span class="stat-value">{{adversaryKPBonus}}</span>
       </div>
       <div class="stat-item">
+        {{#if adversary093}}
+        <span class="stat-label">AP extras (atribuição manual)</span>
+        <span class="stat-value">+{{adversary093.attributePoints}}</span>
+        {{else}}
         <span class="stat-label">PL Bonus:</span>
         <span class="stat-value">+{{system.adversary.plBonus}}</span>
+        {{/if}}
       </div>
       <div class="stat-item">
         <span class="stat-label">Trait Slots:</span>
@@ -54,6 +61,37 @@
   </div>
 
   {{!-- ==================== PARTY RULES ==================== --}}
+  {{#if adversary093}}
+  <div class="adversary-section party-rules">
+    <div class="section-header">Adversários 0.9.3</div>
+    {{#if adversary093.legacyMook}}
+    <p>Mook salvo com os ajustes antigos de LP e KP. Na 0.9.3, crie os Mooks como Adversary Minions, com PL definido pelo ARC.</p>
+    {{else}}
+    <p>O PCC conta os personagens jogadores que este adversário foi criado para enfrentar, excluindo Minions.</p>
+    {{#if adversary093.adversaryActions}}
+    <div class="party-rules-grid">
+      <label class="party-rule-item">
+        <input type="checkbox" name="system.adversary.partyRules.narrativeStamina" {{checked system.adversary.partyRules.narrativeStamina}}>
+        <span>Narrative Stamina · {{#if adversaryStaminaRemaining}}{{adversaryStaminaRemaining}}{{else}}0{{/if}} / {{adversary093.stamina}} nesta rodada</span>
+      </label>
+      {{#if system.adversary.partyRules.narrativeStamina}}
+      <label><input type="checkbox" name="system.adversary.partyRules.staminaForKi" {{checked system.adversary.partyRules.staminaForKi}}> Priorizar Stamina em pagamentos de Ki</label>
+      <label><input type="checkbox" name="system.adversary.partyRules.staminaForDamage" {{checked system.adversary.partyRules.staminaForDamage}}> Priorizar Stamina ao sofrer dano</label>
+      {{/if}}
+      <label class="party-rule-item">
+        <input type="checkbox" name="system.adversary.partyRules.oneManArmy" {{checked system.adversary.partyRules.oneManArmy}}>
+        <span>One-Man Army · {{#if adversaryActionsRemaining}}{{adversaryActionsRemaining}}{{else}}0{{/if}} / {{adversary093.adversaryActions}} Adversary Actions nesta rodada</span>
+      </label>
+      {{#if system.adversary.partyRules.oneManArmy}}
+      <button type="button" data-adversary-instant {{#if (lt adversaryActionsRemaining 2)}}disabled{{/if}}>Gastar 2 para uma manobra Instant</button>
+      {{/if}}
+    </div>
+    <p class="notes">Narrative Stamina repõe no início da rodada. Karma por encontro (manual) · {{adversary093.karma}}.</p>
+    {{/if}}
+    {{/if}}
+    <a href="https://dbu-rpg.com/adversaries/" target="_blank" rel="noopener noreferrer">Regras de Adversários</a>
+  </div>
+  {{else}}
   {{#if (eq system.adversary.category "villain")}}
   <div class="adversary-section party-rules">
     <div class="section-header">Party Rules</div>
@@ -117,12 +155,17 @@
   </div>
   {{/if}}
 
+  {{/if}}
+
   {{!-- ==================== VILLAINOUS TRAITS ==================== --}}
   <div class="adversary-section villainous-traits">
     <div class="section-header">
       Villainous Traits ({{adversaryTraits.length}}/{{system.adversary.traitSlots}} slots)
       <button type="button" class="add-btn" data-action="add-villainous-trait" title="Add Villainous Trait"><i class="fas fa-plus"></i></button>
     </div>
+    {{#if adversary093}}
+    <p class="notes">As fichas salvas preservam o catálogo antigo. Consulte os exemplos de Villainous Traits nas regras da 0.9.3 e resolva os efeitos com o ARC.</p>
+    {{/if}}
     <div class="traits-list">
       {{#if (gt adversaryTraits.length 0)}}
         {{#each adversaryTraits}}
@@ -159,7 +202,7 @@
   {{!-- ==================== WEAKNESSES ==================== --}}
   <div class="adversary-section weaknesses">
     <div class="section-header">
-      Weaknesses ({{adversaryWeaknesses.length}} — each grants +1 trait slot)
+      {{#if adversary093}}Weakpoints e registros legados ({{adversaryWeaknesses.length}}){{else}}Weaknesses ({{adversaryWeaknesses.length}} — each grants +1 trait slot){{/if}}
       <button type="button" class="add-btn" data-action="add-weakness" title="Add Weakness"><i class="fas fa-plus"></i></button>
     </div>
     <div class="traits-list">
@@ -197,7 +240,8 @@
 
   {{!-- ==================== DANGEROUS MINIONS ==================== --}}
   <div class="adversary-section minions">
-    <div class="section-header">Dangerous Minions</div>
+    <div class="section-header">{{#if adversary093}}Adversary Minions · opções legadas{{else}}Dangerous Minions{{/if}}</div>
+    {{#if adversary093}}<p class="notes">Defina o PL do Minion diretamente na ficha. A tabela antiga de Danger Level é apenas referência para fichas salvas.</p>{{/if}}
     <div class="minion-toggle-bar">
       <label>
         <input type="checkbox" name="system.adversary.minion.enabled" {{#if system.adversary.minion.enabled}}checked{{/if}} />

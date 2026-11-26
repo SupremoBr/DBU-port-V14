@@ -1,3 +1,4 @@
+import { isAdversary093 } from "../../rules/adversaries-v093.mjs";
 import { stateLevel } from "../../rules/states-v093.mjs";
 import { attackWeapon093, weaponRollModifiers093, wieldingStrikePenalty093 } from '../../helpers/weapon-state.mjs';
 import { limitedMartialPower } from "../../rules/path-to-power-v093.mjs";
@@ -139,6 +140,7 @@ export const techniquesMethods = {
     const tpSpentAuras = currentRules ? 0 : this._calcAurasTotalTP(system);
     const tpSpentUnique = this._calcUniqueTotalTP(system);
 
+    context.adversaryUnlimitedTP = isAdversary093(system);
     context.tpTotal = tpTotal;
     context.tpSpentSignatures = tpSpentSignatures;
     context.tpSpentAuras = tpSpentAuras;

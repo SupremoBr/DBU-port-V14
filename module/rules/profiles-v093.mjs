@@ -52,7 +52,31 @@ export function profileRoll093(profileName, { strikeNatural, targetingBonus = 0,
   const botch = profileName === 'Cutting' ? !critical : strikeBotchThreshold > 0 && natural <= strikeBotchThreshold;
   const categories = ['Standard', 'Direct', 'Lethal'];
   const category = profileName === 'Cutting' && critical ? categories[Math.min(2, Math.max(0, categories.indexOf(damageCat)) + 1)] : damageCat;
-  return { natural, strikeAdjustment: natural - Number(strikeNatural), critical, botch, damageCat: category };
+  return { natural, targetingAdjustment: adjusted - Number(strikeNatural), strikeAdjustment: natural - Number(strikeNatural), critical, botch, damageCat: category };
+}
+
+export async function rollLinked093(formula, mode) {
+  const first = await new Roll(formula).evaluate();
+  if (!mode) return { roll: first, discarded: null };
+  const second = await new Roll(formula).evaluate();
+  const keepSecond = (second.total > first.total) === (mode === "high");
+  return keepSecond ? { roll: second, discarded: first } : { roll: first, discarded: second };
+}
+
+export function combinationDefenseScore(outcome) {
+  if (["guard", "directHit", "powerFlare"].includes(outcome?.defenseType)) return 0;
+  return ["dodge", "parry"].includes(outcome?.defenseType) && Number.isFinite(outcome.total)
+    ? outcome.total : null;
+}
+
+export function combinationWoundBonus(totals, defenseScore, tier) {
+  if (defenseScore === null) return 0;
+  return totals.filter(total => total > defenseScore).length * PROFILES_093.Combination.woundPerAdditionalHit * tier;
+}
+
+export function pinpointInsight093(system, strikeCritical) {
+  const insight = system.attributes?.in?.totalScore || 0;
+  return strikeCritical ? 2 * insight : insight;
 }
 
 export const PROFILE_SUMMARIES_093 = Object.freeze({

@@ -767,7 +767,7 @@ test('secondary weapon applies its own size, category, quality and damage attrib
   const system = {
     rulesVersion: '0.9.3', level: 2, tier: 1, baseTier: 1,
     talents: [], aptitudes: {}, attributes: { fo: { totalScore: 5 }, sc: { totalScore: 12 } },
-    equipmentFlags: { weaponWoundBonus: { sword: 8, knife: 1 } },
+    equipmentFlags: { weaponWoundBonus: { sword: 8, knife: 1 }, weaponTargetingSystem: { sword: 1, knife: 2 } },
     attackRefs: [{
       name: 'Ataque', foundation: 'Physical', profile: 'Simple',
       weaponEquipped: 'Sword', offHand: 'knife', offHandCheckbox: true
@@ -788,10 +788,12 @@ test('secondary weapon applies its own size, category, quality and damage attrib
   sheet._prepareAttackRefData(context, system);
   const [attack] = context.attackRefs;
   assert.equal(attack.selectedWeapon.id, 'knife');
+  assert.equal(attack.targetingBonus, 2);
   assert.equal(attack.weaponStrikeMod, -1);
   assert.equal(attack.weaponWoundMod, 1);
   assert.equal(attack.damageAttr, 12);
   system.attackRefs[0].offHandCheckbox = false;
   sheet._prepareAttackRefData(context, system);
   assert.match(context.attackRefs[0].weaponIssue, /quebrada/);
+  assert.equal(context.attackRefs[0].targetingBonus, 0);
 });

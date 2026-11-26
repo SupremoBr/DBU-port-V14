@@ -2,10 +2,12 @@ import { stateLevel } from "../rules/states-v093.mjs";
 import { healthThresholdChanges093, pendingSteadfast093 } from "../rules/health-thresholds-v093.mjs";
 import { awakeningAMB, limitedMartialPower, martialDie, martialLevel, martialResourcePenalty, martialSkillSlots, progressionRowIsEarned, usesPathToPower } from "../rules/path-to-power-v093.mjs";
 import { applyConditionalCustomBuffs, buffAmount, buffEffectKey, conditionalBuff, linkedCatalogBuffs } from "../helpers/custom-buffs.mjs";
+import { PROFILES_093 } from "../rules/profiles-v093.mjs";
 import { uses093 } from "../rules/v093.mjs";
 import { racialSaves093, racialLife093, applyRacial093, applyCatalogPassives093, applyRacialAttribute093, ignoresSaiyanPenalties093 } from "../rules/runtime-v093.mjs";
 import { applyRacialResources093, applyResilienceSave093, racialResourceBonuses093 } from "../rules/racial-resources-v093.mjs";
 import { racialPassiveBonuses093 } from "../rules/racial-passives-v093.mjs";
+import { adversaryBenefits093, isAdversary093 } from "../rules/adversaries-v093.mjs";
 import { talentPassiveBonus093 } from "../rules/talent-passives-v093.mjs";
 import { getDisabledRacialPassives, getRacialStressBonus } from "../helpers/catalog-index.mjs";
 /**
@@ -308,6 +310,7 @@ export class DBUActor extends Actor {
 
     // ---- Resources ----
     this._calculateResources(system, level, tier, baseTier, racialBonuses);
+    if (uses093(system)) this._calculateAdversaryStats(system, level, tier, baseTier);
     if (martialLevel(system) || system._masterMartialLevel) {
       system.lifePoints.value = Math.min(system.lifePoints.value, system.lifePoints.max);
       system.kiPool.value = Math.min(system.kiPool.value, system.kiPool.max);
@@ -317,11 +320,6 @@ export class DBUActor extends Actor {
     this._calculateSavingThrows(system, tier, racialBonuses);
 
     // ---- Health Thresholds ----
-    if (uses093(system) && system.adversary?.enabled) {
-      if (system.adversary.category === "villain") system.lifePoints.max += 4 * level;
-      if (system.adversary.category === "superior") system.lifePoints.max += 2 * level;
-      if (system.adversary.category === "mook") system.lifePoints.max = Math.floor(system.lifePoints.max / 4);
-    }
     this._calculateThresholds(system, tier, baseTier);
 
     // ---- Combat Stats (size-dependent) ----
@@ -573,7 +571,7 @@ export class DBUActor extends Actor {
     if (bb.woundBonus) system.aptitudes.woundBuffTotal = (system.aptitudes.woundBuffTotal || 0) + bb.woundBonus;
 
     // ---- Adversary stat modifications ----
-    this._calculateAdversaryStats(system, level, tier, baseTier);
+    if (!uses093(system)) this._calculateAdversaryStats(system, level, tier, baseTier);
 
     if (system.race === 'demon') applyResilienceSave093(system, tier);
 
@@ -664,6 +662,7 @@ export class DBUActor extends Actor {
       }
     }
 
+    const hasScoreLimit = !isAdversary093(system);
     for (const key of ["ag", "fo", "te", "sc", "in", "ma", "pe"]) {
       const attr = system.attributes[key];
       if (!attr) continue;
@@ -678,7 +677,7 @@ export class DBUActor extends Actor {
       // Score Limit: "At ToP 1, Attribute Scores cannot exceed 8. For every ToP
       // after the first, increase this limit by 3." (attributes.txt)
       const scoreCap = 8 + (tier - 1) * 3;
-      attr.score = Math.min(attr.score, scoreCap);
+      if (hasScoreLimit) attr.score = Math.min(attr.score, scoreCap);
 
       let modifier = 0;
 
@@ -3174,11 +3173,13 @@ export class DBUActor extends Actor {
   // Damage Calculator
   // =============================================================
 
-  _calculateDamageCalc(system, tier, baseTier) {
-    const dc = system.damageCalc;
-    if (!dc) return;
+  _calculateDamageCalc(system, tier, baseTier, attack, extraSoak = 0) {
+    if (!system.damageCalc) return;
+    const dc = attack ? { ...system.damageCalc } : system.damageCalc;
 
-    const soak = system.status?.soak || 0;
+    const profile = attack?.profileRules093 ? PROFILES_093[attack.profile] : null;
+    const weaponCategory = attack?.profileRules093 ? attack.weaponCategory : undefined;
+    let soak = (system.status?.soak || 0) + extraSoak;
     let woundRoll = Number(dc.woundRoll) || 0;
     // Superior state: increase damage received by 2(T)
     if (system.combatStates?.superior) woundRoll += 2 * tier;
@@ -3205,11 +3206,18 @@ export class DBUActor extends Actor {
       else if (dmgCategory === "direct") dmgCategory = "lethal";
     }
 
-    // Effective soak after category and defense modifiers.
+    // Penetration uses the target’s Soak Value before Damage Category.
+    const pinpointInsight = profile?.ignoreSoakAttribute ? Math.max(0, Number(attack.pinpointInsight) || 0) : 0;
+    const penetratesSoak = pinpointInsight > 0 || weaponCategory === "piercing";
+    if (penetratesSoak) {
+      if (defense === "directHit") soak += Math.floor(soak / 2);
+      const piercing = weaponCategory === "piercing" ? Math.ceil(soak / 4) : 0;
+      soak = Math.max(0, soak - piercing - pinpointInsight);
+    }
     let effectiveSoak = soak;
     if (dmgCategory === "direct") effectiveSoak = Math.floor(soak / 2);
     else if (dmgCategory === "lethal") effectiveSoak = 0;
-    if (defense === "directHit") effectiveSoak = Math.floor(effectiveSoak * 1.5);
+    if (defense === "directHit" && !penetratesSoak) effectiveSoak = Math.floor(effectiveSoak * 1.5);
 
     // DR = innate Damage Reduction (status.damageReduction — the comprehensive
     // total: equipment + racial + talents + God Ki + buffs + aspects, finalized
@@ -3221,7 +3229,12 @@ export class DBUActor extends Actor {
     // Armor Plating (cybernetic trait): +2(bT) DR vs Standard-damage attacks
     const cyberStandardDR = (dc.category || "standard") === "standard"
       ? (Number(system._cyberStandardDR) || 0) : 0;
-    const totalReduction = innateDR + bestialRangedDR + cyberStandardDR + (Number(dc.damageReduction) || 0) + effectiveSoak;
+    const damageReduction = innateDR + bestialRangedDR + cyberStandardDR + (Number(dc.damageReduction) || 0);
+    const ignoreDRFraction = weaponCategory === "bludgeoning" ? 0.5 : profile?.ignoreDRFraction || 0;
+    const piercingDR = pinpointInsight && attack.armorPiercing ? Math.floor(pinpointInsight / 2) : 0;
+    const availableDR = Math.max(0, damageReduction);
+    const ignoredDR = Math.min(availableDR, Math.floor(availableDR * ignoreDRFraction) + piercingDR);
+    const totalReduction = damageReduction - ignoredDR + effectiveSoak;
     dc.totalReduction = totalReduction;
     dc.effectiveSoak = effectiveSoak;
     dc.innateDR = innateDR;
@@ -3234,7 +3247,7 @@ export class DBUActor extends Actor {
     // Broken: "If your Soak Value is 0, either before or after applying any number of
     // stacks from Broken, increase the Damage you receive by 2(T) for each stack" (damage-conditions.txt)
     // Check rawSoak (pre-minimum) since the tier minimum clamp would otherwise prevent this from firing.
-    const rawSoak = system.status?.rawSoak ?? soak;
+    const rawSoak = system.status?.rawSoak ?? system.status?.soak ?? 0;
     if (uses093(system)) {
       if (system.status?.effectiveBrokenStacks) healthReduction += system.status.brokenOverflow093 || 0;
     } else if (rawSoak <= 0) {
@@ -3245,6 +3258,7 @@ export class DBUActor extends Actor {
     }
 
     dc.healthReduction = healthReduction;
+    return dc;
   }
 
   // =============================================================
@@ -3321,6 +3335,14 @@ export class DBUActor extends Actor {
   _calculateAdversaryStats(system, level, tier, baseTier) {
     const adv = system.adversary;
     if (!adv?.enabled) return;
+
+    const benefits = adversaryBenefits093(system, level, baseTier);
+    if (benefits) {
+      system.lifePoints.max = benefits.legacyMook ? Math.floor(system.lifePoints.max / 4) : system.lifePoints.max + benefits.life;
+      system.kiPool.max = benefits.legacyMook ? Math.floor(system.kiPool.max / 2) : system.kiPool.max + benefits.ki;
+      adv.traitSlots = benefits.traitSlots;
+      return;
+    }
 
     const pl = level;
 

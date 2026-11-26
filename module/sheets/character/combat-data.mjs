@@ -1,3 +1,4 @@
+import { attackWeapon093 } from "../../helpers/weapon-state.mjs";
 import { martialEnergyCharges } from "../../rules/path-to-power-v093.mjs";
 import { attackKiWithBuffs, greaterDiceCategoryBonus, customBuffState, linkedCatalogBuffs } from "../../helpers/custom-buffs.mjs";
 import { attackPowerShot093, attackReferenceKiCost093, signatureEnergyCharges093 } from "../../rules/techniques-v093.mjs";
@@ -372,6 +373,7 @@ export const combatDataMethods = {
         kiCost,
         strikeFormula: prep.strikeFormula || "",
         targetingBonus: prep.targetingBonus || 0,
+        weaponCategory: uses093(system) ? prep.selectedWeapon?.system.weaponCategory : undefined,
         woundFormula: prep.woundFormula || "",
         strikeCT: refCTs.strikeCT,
         woundCT: refCTs.woundCT,
@@ -405,6 +407,7 @@ export const combatDataMethods = {
           uses093(system) ? (tech.profileBaseKP || 0) * trackerTier / 2 : 0, system.aptitudes),
         strikeFormula: tech.strikeFormula || "",
         targetingBonus: tech.targetingBonus || 0,
+        weaponCategory: uses093(system) && tech.isWeapon ? attackWeapon093(this.actor, tech).item?.system.weaponCategory : undefined,
         woundFormula: tech.woundFormula || "",
         strikeCT: tech.strikeCT || 10,
         woundCT: tech.woundCT || 10,

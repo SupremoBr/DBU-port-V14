@@ -4,7 +4,8 @@ import { surgingCharge093, surgingTargetsAllowed093, ragingBotch } from "../../r
 import { createHiddenTrackerCard, privateRollJournal } from "../../automation/scripts/core/private-rolls.js";
 import { defendKiCost093 } from "../../rules/defenses-v093.mjs";
 import { uses093 } from "../../rules/v093.mjs";
-import { profileRoll093, validFoundation } from "../../rules/profiles-v093.mjs";
+import { pinpointInsight093, PROFILES_093, profileRoll093, rollLinked093, validFoundation } from "../../rules/profiles-v093.mjs";
+import { tokenForActor } from "../../automation/scripts/core/token-identity.js";
 import { initiateDuel, initiateClash } from "../../helpers/duel.mjs";
 
 /** Character sheet domain: combat-tracker. Methods run with the sheet as this. */
@@ -362,6 +363,14 @@ export const combatTrackerMethods = {
       }
       focusCharge = surgingCharge093(this.actor.system, sd);
     }
+    const profile = uses093(this.actor.system) && PROFILES_093[sd.profile];
+    if (!prepareOnly && (profile?.additionalStrikeChecks || profile?.ignoreDRFraction || profile?.ignoreSoakAttribute || ["bludgeoning", "piercing"].includes(sd.weaponCategory))) {
+      const attackerToken = globalThis.canvas?.ready && tokenForActor(this.actor);
+      if (attackerToken) {
+        const { attack } = await import("../../automation/scripts/attack.js");
+        return attack({ attackerToken, trackerAttack: { roundNum, actionIndex, source: action.source, kiWager: action.kiWager, charging: action.charging }, sourceKey: action.source });
+      }
+    }
     const journal = prepareOnly ? null : await privateRollJournal();
     const wager = Math.max(0, Number(action.kiWager) || 0);
 
@@ -378,7 +387,9 @@ export const combatTrackerMethods = {
 
     // Compose Strike + Wound formulas. Wager adds flat to wound (already baked
     // into prep formula if set in attack-ref, but for tracker wager we add now).
-    const strikeFormulaBase = (sd.strikeFormula || "1d10") + (action.calledStrikePenalty ? "-" + Number(action.calledStrikePenalty) : "");
+    const calledStrikeModifier = -(Number(action.calledStrikePenalty) || 0);
+    const strikeFormulaBase = (sd.strikeFormula || "1d10")
+      + (calledStrikeModifier > 0 ? `+${calledStrikeModifier}` : calledStrikeModifier < 0 ? String(calledStrikeModifier) : "");
     const strikeFormulaRaw = dimOffensePen > 0
       ? `${strikeFormulaBase}-${dimOffensePen}`
       : strikeFormulaBase;
@@ -402,20 +413,11 @@ export const combatTrackerMethods = {
     // Execute rolls. Twin-Linked (signature.txt:382): roll the chosen Combat
     // Roll twice, keep the highest Dice Score. Dead-Link (signature.txt:875):
     // keep the lowest.
-    const _rollLinked = async (formula, mode) => {
-      const r1 = new Roll(formula);
-      await r1.evaluate();
-      if (!mode) return { roll: r1, discarded: null };
-      const r2 = new Roll(formula);
-      await r2.evaluate();
-      const keepHigh = mode === "high";
-      const keep = (r2.total > r1.total) === keepHigh ? r2 : r1;
-      return { roll: keep, discarded: keep === r1 ? r2 : r1 };
-    };
     const strikeLinkMode = sd.twinLinked === "strike" ? "high" : sd.deadLinked === "strike" ? "low" : "";
     const woundLinkMode = sd.twinLinked === "wound" ? "high" : sd.deadLinked === "wound" ? "low" : "";
-    const strikeLinked = await _rollLinked(strikeFormulaRaw, strikeLinkMode);
-    const woundLinked = await _rollLinked(woundFormula, woundLinkMode);
+    const strikeLinked = await rollLinked093(strikeFormulaRaw, strikeLinkMode);
+    const combinationPending = prepareOnly && uses093(this.actor.system) && sd.profile === "Combination";
+    const woundLinked = combinationPending ? {} : await rollLinked093(woundFormula, woundLinkMode);
     const strikeRoll = strikeLinked.roll;
     const woundRoll = woundLinked.roll;
 
@@ -447,7 +449,7 @@ export const combatTrackerMethods = {
       : "";
 
     const strikeNat = strikeRoll.dice[0]?.results?.[0]?.result ?? "?";
-    const woundNat = woundRoll.dice[0]?.results?.[0]?.result ?? "?";
+    const woundNat = woundRoll?.dice[0]?.results?.[0]?.result ?? "?";
     const strikeCT = sd.strikeCT || 10;
     const woundCT = sd.woundCT || 10;
     const sysTier = this.actor.system.tier || 1;
@@ -469,9 +471,10 @@ export const combatTrackerMethods = {
     if (strikeCrit) { strikeCritRoll = new Roll(critFormula); await strikeCritRoll.evaluate(); }
     if (woundCrit) { woundCritRoll = new Roll(critFormula); await woundCritRoll.evaluate(); }
 
-    const strikeTotal = strikeRoll.total + (profileRoll?.strikeAdjustment || 0)
+    const pinpointBonus = profile?.doubleInsightOnStrikeCrit && strikeCrit ? pinpointInsight093(this.actor.system, false) : 0;
+    const strikeTotal = strikeRoll.total + (profileRoll?.strikeAdjustment || 0) + pinpointBonus
       + (strikeCritRoll?.total || 0) - (strikeBotch ? botchPenalty : 0);
-    const woundTotal = woundRoll.total
+    const woundTotal = (woundRoll?.total || 0)
       + (woundCritRoll?.total || 0) - (woundBotch ? botchPenalty : 0);
 
     const critTag = (critRoll) =>
@@ -525,6 +528,12 @@ export const combatTrackerMethods = {
       ? `<div class="dbu-penalty-line"><i class="fas fa-angle-double-down"></i> Diminishing Offense −${dimOffensePen} Strike <span class="dbu-penalty-why">attack #${attackNum} this round</span></div>`
       : "";
     const metaChips = [
+      uses093(this.actor.system) && sd.profile === "Pinpoint"
+        ? `Pinpoint · ignora ${pinpointInsight093(this.actor.system, strikeCrit)} Soak` : "",
+      uses093(this.actor.system) && !prepareOnly && sd.profile === "Combination"
+        ? "Combination · após acertar, cada Strike extra superior ao Dodge ou Parry soma +2(T) ao Wound" : "",
+      uses093(this.actor.system) && !prepareOnly && sd.profile === "Concentrated"
+        ? "Concentrated · ignore metade do DR ao aplicar o dano" : "",
       `${sd.foundation || ""}${sd.profile ? " / " + sd.profile : ""}`.trim(),
       sd.damageCat || "",
       sd.energyCharges ? `EC ${sd.energyCharges}` : "",
@@ -541,7 +550,7 @@ export const combatTrackerMethods = {
           <span class="dbu-roll-label">Strike</span>
           <span class="dbu-roll-main">
             <code class="dbu-roll-formula">${strikeFormulaRaw}</code>
-            <span class="dbu-roll-sub">Nat ${profileRoll?.natural ?? strikeNat}${sd.targetingBonus ? ` · Targeting System +${sd.targetingBonus} natural` : ""} · CT ${strikeCT}+</span>${strikeTag}
+            <span class="dbu-roll-sub">Nat ${profileRoll?.natural ?? strikeNat}${sd.targetingBonus ? ` · Targeting System +${profileRoll?.targetingAdjustment ?? sd.targetingBonus} natural` : ""} · CT ${strikeCT}+</span>${strikeTag}
           </span>
           <span class="dbu-roll-total">${strikeTotal}</span>
         </div>
@@ -575,7 +584,8 @@ export const combatTrackerMethods = {
             strikeTotal,
             woundTotal,
             strikeRollData: strikeRoll.toJSON(),
-            woundRollData: woundRoll.toJSON(),
+            woundRollData: woundRoll?.toJSON() ?? null,
+            ...(combinationPending ? { combination: { strikeFormula: strikeFormulaRaw, strikeLinkMode: strikeLinkMode === "low" ? "low" : "", woundFormula, woundLinkMode } } : {}),
             strikeCritRollData: strikeCritRoll ? strikeCritRoll.toJSON() : null,
             woundCritRollData: woundCritRoll ? woundCritRoll.toJSON() : null
           }

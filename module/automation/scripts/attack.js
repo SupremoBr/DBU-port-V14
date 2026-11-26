@@ -3,7 +3,7 @@ import { surgingCharge093, surgingTargetsAllowed093, ragingBotch } from "../../r
 import { privateRollJournal, sealRoll } from "./core/private-rolls.js";
 import { attackWeapon093 } from '../../helpers/weapon-state.mjs';
 import { inCombat093 } from "../../rules/actions-v093.mjs";
-import { profileRoll093, validFoundation } from "../../rules/profiles-v093.mjs";
+import { pinpointInsight093, profileRoll093, validFoundation } from "../../rules/profiles-v093.mjs";
 import { uses093 } from "../../rules/v093.mjs";
 import { validateTechnique093, validateTechniqueUsage093, signatureUseIssue093, maximumWager093 } from "../../rules/techniques-v093.mjs";
 // DBU Automation v1.8.12 DEV — Attack Core
@@ -499,7 +499,7 @@ function dbuPatchOriginalRevealHtml(originalHtml, data) {
 
   if (data.woundBonus.raw) {
     modChips.push(
-      `<span class="dbu-attack-buff" title="Fórmula processada: ${dbuEsc(data.woundBonus.translated)}">Wound Extra ${dbuEsc(data.woundBonus.raw)} = ${dbuSigned(data.woundBonus.total)}</span>`
+      `<span class="dbu-attack-buff" title="Fórmula processada: ${dbuEsc(data.woundBonus.translated)}">Wound Extra ${dbuEsc(data.woundBonus.raw)}${data.woundBonus.total == null ? "" : ` = ${dbuSigned(data.woundBonus.total)}`}</span>`
     );
   }
 
@@ -590,7 +590,7 @@ function dbuPatchOriginalRevealHtml(originalHtml, data) {
     if (label === "strike") {
       if (formulaEl) formulaEl.textContent = data.strikeDisplayFormula;
       if (subEl) {
-        subEl.textContent = `Nat ${data.strikeNat}${data.targetingBonus ? ` · Targeting System +${data.targetingBonus} natural` : ""} · CT ${data.strikeCT}+ · Botch ${data.strikeBotchThreshold === 0 ? "OFF" : `1-${data.strikeBotchThreshold}`}`;
+        subEl.textContent = `Nat ${data.strikeNat}${data.targetingBonus ? ` · Targeting System +${data.targetingAdjustment ?? data.targetingBonus} natural` : ""} · CT ${data.strikeCT}+ · Botch ${data.strikeBotchThreshold === 0 ? "OFF" : `1-${data.strikeBotchThreshold}`}`;
       }
       if (totalEl) totalEl.textContent = String(data.strikeTotal);
 
@@ -762,12 +762,16 @@ if (!allowedGroups.length) {
 }
 
 // Se existe Energy Charge ativo, somente a source declarada fica disponível.
-const availableGroups = chargeState
+if (chargeState && context.trackerAttack && chargeState.sourceKey !== context.trackerAttack.source) {
+  return ui.notifications.warn("Libere ou cancele o Energy Charge antes de usar outro ataque.");
+}
+const requiredSourceKey = chargeState?.sourceKey || context.trackerAttack?.source;
+const availableGroups = requiredSourceKey
   ? allowedGroups
       .map(group => ({
         ...group,
         sources: (group.sources || []).filter(source =>
-          String(source.key) === String(chargeState.sourceKey)
+          String(source.key) === String(requiredSourceKey)
         )
       }))
       .filter(group => group.sources.length)
@@ -779,6 +783,8 @@ if (chargeState && !availableGroups.length) {
     "mas esse ataque não foi encontrado na ficha. Abra DBU - Energy Charge e cancele o Charge."
   );
 }
+
+if (!availableGroups.length) return ui.notifications.warn("Ataque selecionado indisponível.");
 
 const sources = [];
 const preferredSourceKey = String(context?.sourceKey || "");
@@ -931,7 +937,7 @@ const selection = await Dialog.wait({
 
       <div class="form-group" style="margin-bottom:10px;">
         <label><b>Ki Wager</b></label>
-        <input id="dbu-wager" type="number" value="0" min="0" ${Number(context?.wagerMaxOverride) >= 0 ? `max="${Math.max(0, Math.trunc(Number(context.wagerMaxOverride)))}"` : ""} step="1" style="width:100%;">
+        <input id="dbu-wager" type="number" value="${Math.max(0, Number(context.trackerAttack?.kiWager) || 0)}" min="0" ${Number(context?.wagerMaxOverride) >= 0 ? `max="${Math.max(0, Math.trunc(Number(context.wagerMaxOverride)))}"` : ""} step="1" style="width:100%;">
         ${Number(context?.wagerMaxOverride) >= 0 ? `<p class="notes">Limite desta ação: <b>${Math.max(0, Math.trunc(Number(context.wagerMaxOverride)))}</b> Ki Wager.</p>` : ""}
       </div>
 
@@ -983,7 +989,7 @@ const selection = await Dialog.wait({
         style="margin:10px 0;padding:8px;border:1px solid rgba(255,255,255,.18);border-radius:6px;"
       >
         <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
-          <input id="dbu-charging-assault" type="checkbox">
+          <input id="dbu-charging-assault" type="checkbox" ${context.trackerAttack?.charging ? "checked" : ""}>
           <b>🏃 Charging Assault</b>
         </label>
         <p class="notes" style="margin:5px 0 0;">
@@ -1310,8 +1316,9 @@ if (selection.calledShot) {
   if (actor.system.combatTabState?.rounds?.at(-1)?.actions?.some(row => row.dbuCalledShot)) return ui.notifications.warn("Called Shot já usado nesta rodada.");
   if (!validateActionUse(actor, { label: "Called Shot + Ataque", actionCost: 2, attacking: true }).ok) return;
   const difference = sizeLead(targetTokens[0].actor, actor);
-  calledStrikePenalty = difference >= 2 ? 0 : 2 * tier;
-  calledWoundBonus = difference >= 2 ? difference * tier : 0;
+  const precision = source.weaponCategory === "precision";
+  calledStrikePenalty = (difference >= 2 ? 0 : 2 * tier) - (precision ? tier : 0);
+  calledWoundBonus = (difference >= 2 ? difference * tier : 0) + (precision ? 2 * tier : 0);
   chosenDamageCategory = chosenDamageCategory === "Standard" ? "Direct" : "Lethal";
 }
 const wager = Number(selection.wager || 0);
@@ -1429,14 +1436,21 @@ if (!cts.rounds.length) {
   });
 }
 
-const currentRound = cts.rounds[cts.rounds.length - 1];
+const existing = context.trackerAttack;
+const currentRound = existing
+  ? cts.rounds.find(round => round.roundNumber === existing.roundNum)
+  : cts.rounds[cts.rounds.length - 1];
+const existingAction = existing && currentRound?.actions?.[existing.actionIndex];
+if (!currentRound || (existing && (existingAction?.type !== "attack" || existingAction.source !== existing.source))) {
+  return ui.notifications.warn("A ação da ficha mudou. Selecione o ataque novamente.");
+}
 currentRound.actions ??= [];
 if (!currentRound.roundNumber) currentRound.roundNumber = cts.rounds.length;
-cts.currentRound = currentRound.roundNumber;
+if (!existing || !cts.currentRound) cts.currentRound = currentRound.roundNumber;
 
-const actionIndex = currentRound.actions.length;
-
-currentRound.actions.push({
+const actionIndex = existing?.actionIndex ?? currentRound.actions.length;
+currentRound.actions[actionIndex] = {
+  ...currentRound.actions[actionIndex],
   type: "attack",
   effectiveType: context?.effectiveType || "standard",
   source: source.key,
@@ -1466,7 +1480,7 @@ currentRound.actions.push({
   dbuOutOfSequence: String(context?.effectiveType || "") === "out-of-sequence",
   dbuExploitPendingId: String(context?.exploitPendingId || ""),
   dbuExploitRecoveryActorId: String(context?.exploitRecoveryActorId || "")
-});
+};
 
 await actor.update({
   "system.combatTabState": cts
@@ -1499,17 +1513,18 @@ const messageId = foundry.utils.randomID();
 // RECONSTRUIR OS DADOS ORIGINAIS DA ROLAGEM
 // ============================================================
 
+const combination = reveal.combination;
 const strikeRoll = dbuRollFromData(reveal.strikeRollData);
 const woundRoll = dbuRollFromData(reveal.woundRollData);
 
-if (!strikeRoll || !woundRoll) {
+if (!strikeRoll || (!woundRoll && !combination)) {
   return ui.notifications.error("Não consegui reconstruir os dados originais de Strike/Wound.");
 }
 
 const strikeNat = dbuNaturalFromRoll(strikeRoll);
-const woundNat = dbuNaturalFromRoll(woundRoll);
+const woundNat = combination ? null : dbuNaturalFromRoll(woundRoll);
 
-if (!Number.isFinite(strikeNat) || !Number.isFinite(woundNat)) {
+if (!Number.isFinite(strikeNat) || (!combination && !Number.isFinite(woundNat))) {
   return ui.notifications.error("Não consegui identificar o dado natural de Strike/Wound.");
 }
 
@@ -1529,7 +1544,7 @@ let woundBonus;
 
 try {
   strikeBonus = await dbuRollBonus(preparedStrikeBonus);
-  woundBonus = await dbuRollBonus(preparedWoundBonus);
+  woundBonus = combination ? preparedWoundBonus : await dbuRollBonus(preparedWoundBonus);
 } catch (error) {
   console.error("DBU | Erro rolando bônus situacional:", error);
   return ui.notifications.error("Erro rolando bônus situacional.");
@@ -1552,10 +1567,10 @@ const woundBotchThreshold = dbuClampInt(selection.woundBotch, 0, 10);
 const profileRoll = uses093(actor.system) ? profileRoll093(source.profile, { strikeNatural: strikeNat, faces: strikeRoll.dice[0]?.faces || 10, targetingBonus: source.targetingBonus || 0, strikeCT, strikeBotchThreshold, damageCat: chosenDamageCategory }) : null;
 if (profileRoll) chosenDamageCategory = profileRoll.damageCat;
 const strikeCrit = profileRoll ? profileRoll.critical : strikeNat >= strikeCT;
-const woundCrit = woundNat >= woundCT;
+const woundCrit = !combination && woundNat >= woundCT;
 
 const strikeBotch = profileRoll ? profileRoll.botch : strikeBotchThreshold > 0 && strikeNat <= strikeBotchThreshold;
-const woundBotch = woundBotchThreshold > 0 && woundNat <= woundBotchThreshold;
+const woundBotch = !combination && woundBotchThreshold > 0 && woundNat <= woundBotchThreshold;
 
 const critFormula = typeof sheet._critExtraFormula === "function"
   ? sheet._critExtraFormula(tier)
@@ -1600,11 +1615,14 @@ const strikeBaseAdjusted =
   + Number(strikeBonus.total || 0);
 
 const woundBaseAdjusted =
-  Number(woundRoll.total || 0)
+  Number(woundRoll?.total || 0)
   + Number(woundBonus.total || 0);
 
+const isPinpoint = uses093(actor.system) && source.profile === "Pinpoint";
+const pinpointInsight = isPinpoint ? pinpointInsight093(actor.system, strikeCrit) : 0;
 const strikeTotal =
   strikeBaseAdjusted + (profileRoll?.strikeAdjustment || 0)
+  + (isPinpoint && strikeCrit ? pinpointInsight / 2 : 0)
   + Number(strikeCritRoll?.total || 0)
   - (strikeBotch ? botchPenalty : 0);
 
@@ -1626,11 +1644,13 @@ if (dimUsedPenalty > 0) {
   strikeDisplayFormula = `(${strikeDisplayFormula})-${dimUsedPenalty}`;
 }
 
+if (isPinpoint && strikeCrit && pinpointInsight) strikeDisplayFormula += ` + ${pinpointInsight / 2} (Pinpoint)`;
+
 if (strikeBonus.raw) {
   strikeDisplayFormula += ` [Extra ${strikeBonus.raw}]`;
 }
 
-const woundOriginalFormula = String(woundRoll.formula || source.woundFormula || "1d10");
+const woundOriginalFormula = String(woundRoll?.formula || combination?.woundFormula || source.woundFormula || "1d10");
 
 // ============================================================
 // CORRIGIR O REVEAL ORIGINAL DO DBU
@@ -1643,6 +1663,7 @@ const patchedRevealHtml = dbuPatchOriginalRevealHtml(
     wager,
     strikeNat: profileRoll?.natural ?? strikeNat,
     targetingBonus: source.targetingBonus || 0,
+    targetingAdjustment: profileRoll?.targetingAdjustment,
     woundNat,
     defaultStrikeCT,
     defaultWoundCT,
@@ -1692,7 +1713,7 @@ updatedReveal.manualModifiers = {
   strikeExtraTotal: strikeBonus.total,
   woundExtraFormula: woundBonus.raw,
   woundExtraTranslated: woundBonus.translated,
-  woundExtraTotal: woundBonus.total,
+  woundExtraTotal: woundBonus.total || 0,
   defaultStrikeCT,
   strikeCT,
   defaultWoundCT,
@@ -1752,10 +1773,24 @@ const attackData = {
 
   strikeNatural: profileRoll?.natural ?? strikeNat,
   targetingBonus: source.targetingBonus || 0,
+  targetingAdjustment: profileRoll?.targetingAdjustment,
   woundNatural: woundNat,
 
   foundation: source.foundation || "",
   profile: source.profile || "",
+  profileRules093: uses093(actor.system),
+  weaponCategory: source.weaponCategory,
+  pinpointInsight,
+  armorPiercing: isPinpoint && source.advantages?.some(advantage => advantage.name === "Armor-Piercing"),
+  ...(combination ? { combination: {
+    ...combination,
+    critFormula,
+    botchPenalty,
+    strikeFlatAdjustment: preExistingDimPenalty + dimDefaultPenalty - dimUsedPenalty,
+    extraChecks: Math.min(3, Math.max(0, Math.trunc(Number(source.advantages?.find(advantage => advantage.name === "Alotta Lotta Attacks")?.ranks) || 0))),
+    strikeExtra: strikeBonus.translated || "",
+    woundExtra: woundBonus.translated || ""
+  } } : {}),
 
   damageCategory: chosenDamageCategory,
   damageCat: chosenDamageCategory,
@@ -1781,7 +1816,7 @@ const attackData = {
 
   manualWoundFormula: woundBonus.raw,
   manualWoundTranslated: woundBonus.translated,
-  woundBonusTotal: woundBonus.total,
+  woundBonusTotal: woundBonus.total || 0,
 
   defaultStrikeCT,
   strikeCT,
@@ -1981,7 +2016,7 @@ if (strikeBonus.raw) {
   );
 }
 
-if (woundBonus.raw) {
+if (woundBonus.raw && !combination) {
   situationalChips.push(
     `<span class="dbu-attack-buff" title="${dbuEsc(woundBonus.translated)}">Wound Extra ${dbuEsc(woundBonus.raw)} = ${dbuSigned(woundBonus.total)}</span>`
   );
