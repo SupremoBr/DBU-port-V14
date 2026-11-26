@@ -9,7 +9,7 @@ import { listenRequests, sendRequest } from "./core/authorized-request.js";
 // ============================================================
 
 import { getPendingActions } from "./combat-panel.js";
-import { hudV2Panel, hudV2Tabs, hudV2Action, HUD_V2_ACTIONS } from "./hud-v2-menu.js";
+import { hudV2Panel, hudV2Tabs, hudV2Action, hudTabsForActor, HUD_V2_ACTIONS } from "./hud-v2-menu.js";
 import { getTerrainLiftState } from "./maneuvers.js";
 import { getStandardFavorites, resolveManeuverAction, StandardActions, openManeuverCategoryPreview } from "./standard-actions.js";
 import { areAllies as areTeamAllies, combatantForActor, getCombatantTeam } from "./combat-teams.js";
@@ -426,6 +426,7 @@ async function advanceTurn(request, sender) {
 }
 
 function hudContent(actor, token) {
+  const tabs = hudTabsForActor(actor.system);
   const lp = {
     value: number(actor.system?.lifePoints?.value, 0),
     max: number(actor.system?.lifePoints?.max, 0)
@@ -539,7 +540,7 @@ function hudContent(actor, token) {
     </aside>`:""}
 
     <div class="dbu-hud-dock${pressureActions.length ? " dbua-pressure-dock" : ""}">
-      ${!state.collapsed?hudV2Panel({tab:state.hudTab,selected:state.hudSelected,favorites:favoriteIds,pending,available:entry => {
+      ${!state.collapsed?hudV2Panel({tab:state.hudTab,selected:state.hudSelected,favorites:favoriteIds,pending,showVillain:tabs.some(tab => tab.id === "villain"),available:entry => {
         if (entry.id === "aura" && uses093(actor.system)) return false;
         if (entry.id === "defend") return pendingActions.some(row => row.type === "defense");
         if (entry.id === "intervene") return pendingActions.some(row => ["reflect", "intervene"].includes(row.type));
@@ -553,8 +554,8 @@ function hudContent(actor, token) {
           limitBonus: def.modifiers?.actionLimitBonus || 0, notify: false }).ok;
       }}):""}
       <div class="dbua-v2-dock-row" role="navigation" aria-label="Menu de combate DBU">
-        <div class="dbua-v2-dock-tabs" style="--dbua-dock-actions:${4 + pressureActions.length}">
-          ${hudV2Tabs(state.collapsed?null:state.hudTab,pending)}
+        <div class="dbua-v2-dock-tabs" style="--dbua-dock-actions:${tabs.length + pressureActions.length}">
+          ${hudV2Tabs(state.collapsed?null:state.hudTab,pending,tabs)}
           ${pressureActions.map(action => `<button type="button" class="dbua-v2-tab" data-dbu-hud-action="hud-pressure-${action.source}"
             title="${action.title}" ${action.available ? "" : "disabled"}><i class="fas fa-${action.icon}" aria-hidden="true"></i>
             <span>${action.label}</span></button>`).join("")}
@@ -604,7 +605,7 @@ async function dispatchHudAction(button, actor, token) {
 
   if (action === "hud-tab") {
     const tab=String(button.dataset.hudTab||"");
-    if(!["standard","counter","instant","favorites"].includes(tab))return;
+    if (!hudTabsForActor(actor.system).some(entry => entry.id === tab)) return;
     state.hudTab=state.hudTab===tab?null:tab;
     state.hudSelected=null;
     return renderCombatHud();
@@ -615,8 +616,10 @@ async function dispatchHudAction(button, actor, token) {
     return renderCombatHud();
   }
   if (action === "hud-select") {
-    state.hudSelected=String(button.dataset.hudId||"");
-    return renderCombatHud();
+    state.hudSelected = String(button.dataset.hudId || "");
+    const hud = await renderCombatHud();
+    if (state.hudTab === "villain") hud?.querySelector('.dbua-v2-villain-panel [aria-pressed="true"]')?.focus();
+    return hud;
   }
   if (action === "hud-favorite")return toggleHudFavorite(actor,token,button.dataset.hudId);
   if (action === "hud-run")return runV2Action(button.dataset.hudId,actor,token);

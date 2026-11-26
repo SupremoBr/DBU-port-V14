@@ -98,3 +98,5 @@
 .dbua-hud-v2 .dbua-v2-allies-floating .dbu-hud-ally{min-height:34px;grid-template-columns:32px minmax(0,1fr);gap:8px}
 .dbua-hud-v2 .dbua-v2-allies-floating .dbu-hud-ally img{width:32px;height:32px}
 .dbua-hud-v2 .dbua-v2-allies-floating .dbu-hud-ally-copy strong{font-size:9px}
+
+.dbua-v2-villain-panel .dbua-v2-action-choice b { white-space: normal; overflow-wrap: anywhere; }

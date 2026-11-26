@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.0.12-rules093-alpha.34] — manobras vilanescas
+
+- O HUD de Adversários da 0.9.3 inclui a aba Vilãs, com nove cartões de consulta que mostram efeitos, custos e limites de uso.
+
 ## [1.0.12-rules093-alpha.33] — saldo de ações informativo
 
 - Saldo zerado e Standard Maneuvers fora do turno exibem aviso e permitem seguir. O tracker continua registrando os custos.
