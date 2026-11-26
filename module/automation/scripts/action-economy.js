@@ -125,13 +125,7 @@ export function validateActionUse(actor, {
   else if (budget.pinned && movement) message = "Pinned impede Movement.";
   else if (budget.pinned && !allowPinnedEscape && budget.limit <= 0) message = "Pinned impede esta Maneuver neste Round.";
 
-  // v1.8.5 TEST — a economia de Actions é deliberadamente permissiva.
-  // DBU possui Characteristics, Traits, Transformations e efeitos que podem
-  // conceder Actions extras ou remover/alterar custos. O módulo registra o
-  // custo padrão, mas NÃO bloqueia uma Maneuver apenas porque o contador base
-  // chegou a zero. Requisitos mecânicos de estado (Pinned, alvo, alcance etc.) continuam
-  // sendo gates reais. Timing padrão de Standard é informativo/permissivo, pois
-  // efeitos podem permitir uso como Instant ou Out-of-Sequence.
+  // Legacy rules track the budget. Current rules share the sheet’s action pools.
   const requestedCost = Math.max(0, Number(actionCost) || 0);
   const overBudget = effectiveType === "standard" && budget.inCombat && budget.remaining < requestedCost;
 

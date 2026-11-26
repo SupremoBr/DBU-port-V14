@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.0.12-rules093-alpha.32] — HUD e ações
+
+- Signature Aura sai do HUD e do Painel de Combate de personagens 0.9.3, incluindo favoritos antigos.
+- O Painel de Combate explica quando a economia 0.9.3 valida o custo e o gatilho de uma manobra.
+
 ## [1.0.12-rules093-alpha.31] — equipes de combate
 
 - A escolha Sem Time permanece salva no encontro. A disposição do token passa a definir a relação nesse caso.

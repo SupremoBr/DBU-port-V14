@@ -1,3 +1,4 @@
+import { uses093 } from "../../rules/v093.mjs";
 import { sizeLead } from "../../rules/size-v093.mjs";
 import { sendRequest, listenRequests } from "./core/authorized-request.js";
 import { unsetAutomationFlag } from "../migration.mjs";
@@ -1507,7 +1508,7 @@ async function postRuleCard(actor, title, html) {
 const BASE_STANDARD_ACTIONS = [
   { key: "attack", type: "standard", actionCost: 1, attacking: true, icon: "fas fa-fist-raised", label: "Ataque", cost: "1 Action + KP/Wager", limit: "Profile / técnica", mode: "automated", available: a => !conditionActive(a, "pinned"), run: c => globalThis.DBUAutomation?.attack?.(c) },
   { key: "transform", type: "standard", actionCost: 1, icon: "fas fa-dragon", label: "Transformação", cost: "1 Action", limit: "—", mode: "automated", run: c => globalThis.DBUAutomation?.transform?.(c) },
-  { key: "aura", type: "standard", actionCost: 1, icon: "fas fa-sun", label: "Aura", cost: "1 Action + KP da Aura", limit: "1/Round", mode: "automated", run: c => globalThis.DBUAutomation?.aura?.(c) },
+  { key: "aura", type: "standard", actionCost: 1, icon: "fas fa-sun", label: "Aura", cost: "1 Action + KP da Aura", limit: "1/Round", mode: "automated", available: actor => !uses093(actor?.system), run: c => globalThis.DBUAutomation?.aura?.(c) },
   { key: "energyCharge", type: "standard", actionCost: 1, deferValidation: true, resolveTypes: ({ actor }) => getEnergyChargeAllowedTypes(actor), icon: "fas fa-bolt", label: "Energy Charge", cost: "1 Action + 2(bT) KP", limit: "—", mode: "automated", run: c => globalThis.DBUAutomation?.energyCharge?.(c) },
   { key: "powerUp", type: "standard", actionCost: 1, icon: "fas fa-fire", label: "Power Up", cost: "1 Action", limit: "2/Round", mode: "automated", run: powerUp },
   { key: "combatRecovery", type: "standard", actionCost: 2, icon: "fas fa-heart-pulse", label: "Combat Recovery", cost: "mín. 2 Actions", limit: "1/Round · somente Encounter", mode: "automated", available: a => actorInActiveCombat(a) && !conditionActive(a, "pinned"), run: combatRecovery },
@@ -1578,7 +1579,7 @@ export async function runManeuverAction(key, context = {}) {
   const actor = actorFromContext(context);
   const def = resolveManeuverAction(key, actor, context);
   if (!def) return ui.notifications.error(`DBU: Maneuver '${key}' não registrada.`);
-  if (def.effectiveType === "standard" && !context?.timingOverride && !isActorsTurn(actor)) {
+  if (!uses093(actor?.system) && def.effectiveType === "standard" && !context?.timingOverride && !isActorsTurn(actor)) {
     ui.notifications.warn(`${def.label}: esta é normalmente uma Standard Maneuver usada no turno de ${actor?.name || "seu personagem"}. O módulo permitiu o uso fora do turno para respeitar Traits, Talents, Transformations e efeitos que mudam o timing para Instant/Out-of-Sequence.`);
   }
   if (typeof def.available === "function" && !def.available(actor)) return ui.notifications.warn(`${def.label} não está disponível neste estado.`);

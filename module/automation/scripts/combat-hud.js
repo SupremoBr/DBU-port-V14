@@ -1,3 +1,4 @@
+import { uses093 } from "../../rules/v093.mjs";
 import { validateActionUse } from "./action-economy.js";
 import { listenRequests, sendRequest } from "./core/authorized-request.js";
 // ============================================================
@@ -331,7 +332,7 @@ function standardFavoriteButtons(actor) {
   const favorites = getStandardFavorites();
   return favorites.map((key, index) => {
     const def = resolveManeuverAction(key, actor);
-    if (!def) return "";
+    if (!def || (key === "aura" && uses093(actor.system))) return "";
     const available = typeof def.available !== "function" || def.available(actor);
     const detail = typeof def.detail === "function" ? def.detail(actor) : "";
     return `<button type="button" class="dbu-hud-action ${index === 0 ? "primary" : ""} dbua-hud-favorite" data-dbu-hud-action="standard-favorite" data-standard-key="${esc(key)}" ${available ? "" : "disabled"} title="${esc(available ? (detail || `${def.label} — favorito Standard`) : `${def.label} não está disponível agora`)}">
@@ -389,7 +390,7 @@ async function rollHudClash(actor, token) {
 }
 async function runV2Action(id, actor, token) {
   const entry = hudV2Action(id);
-  if(!entry) return ui.notifications.warn("HUD: ação desconhecida.");
+  if (!entry || (id === "aura" && uses093(actor.system))) return ui.notifications.warn("HUD: ação indisponível.");
   const api = globalThis.DBUAutomation;
   const context = {actor,token};
   if(entry.maneuver) {
@@ -506,7 +507,7 @@ function hudContent(actor, token) {
       <div class="dbua-v2-vital-tags">
         ${pendingSteadfast ? `<span title="Resolva em Combat na ficha"><i class="fas fa-dice-d10" aria-hidden="true"></i>Steadfast pendente</span>` : ""}
         <span title="Transformation"><i class="fas fa-dragon"></i>${esc(activeForm)}</span>
-        <span title="Signature Aura"><i class="fas fa-sun"></i>${esc(aura)}</span>
+        ${uses093(actor.system) ? "" : `<span title="Signature Aura"><i class="fas fa-sun"></i>${esc(aura)}</span>`}
         ${charge?`<span title="Energy Charge"><i class="fas fa-bolt"></i>${esc(number(charge.gatheredCharges,0))} EC</span>`:""}
         ${powerStacks?`<span title="Power Stacks"><i class="fas fa-fire"></i>POWER ${powerStacks}</span>`:""}
         ${terrain?`<span title="Terrain Lift"><i class="fas fa-mountain"></i>H${esc(terrain.hardness)} S${esc(terrainShield)}</span>`:""}
@@ -539,7 +540,7 @@ function hudContent(actor, token) {
 
     <div class="dbu-hud-dock${pressureActions.length ? " dbua-pressure-dock" : ""}">
       ${!state.collapsed?hudV2Panel({tab:state.hudTab,selected:state.hudSelected,favorites:favoriteIds,pending,available:entry => {
-        if (entry.id === "aura" && actor.system.rulesVersion === "0.9.3") return false;
+        if (entry.id === "aura" && uses093(actor.system)) return false;
         if (entry.id === "defend") return pendingActions.some(row => row.type === "defense");
         if (entry.id === "intervene") return pendingActions.some(row => ["reflect", "intervene"].includes(row.type));
         const key = entry.maneuver || (["attack", "transform"].includes(entry.id) ? entry.id : null);
