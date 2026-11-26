@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.0.12-rules093-alpha.33] — saldo de ações informativo
+
+- Saldo zerado e Standard Maneuvers fora do turno exibem aviso e permitem seguir. O tracker continua registrando os custos.
+- Gatilhos específicos de Counter e Out-of-Sequence continuam sendo validados.
+
 ## [1.0.12-rules093-alpha.32] — HUD e ações
 
 - Signature Aura sai do HUD e do Painel de Combate de personagens 0.9.3, incluindo favoritos antigos.

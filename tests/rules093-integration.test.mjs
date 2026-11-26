@@ -109,17 +109,17 @@ test('actual signature creation uses the full Profile floor and separate half-Pr
   assert.equal(techniqueKiCost093(technique({profile:'Sphere'})).finalKP,null);
   assert.equal(techniqueKiCost093(technique({profile:'Blitz',foundation:'Physical'})).finalKP,4);
 });
-test('native and embedded actions share one budget, enforce turn and allow explicit rule-granted bonuses',async()=>{
+test('native and embedded actions share one budget and allow effects that change cost or timing',async()=>{
   const actor=new ActorStub({rulesVersion:'0.9.3',combatTabState:{rounds:[{roundNumber:1,actions:[{type:'attack'},{type:'movement'}]}]}});
   activeCombat(actor);
   assert.equal(standardActionBudget(actor).remaining,1);
   assert.equal((await convertStandardToCounter093(actor)).ok,true);
   assert.equal(roundPools093(actor).counter.remaining,2);
-  assert.equal(validateActionUse(actor,{notify:false}).ok,false);
+  assert.equal(validateActionUse(actor,{notify:false}).overBudget,true);
   assert.equal(validateActionUse(actor,{notify:false,limitBonus:1}).ok,true);
   assert.equal(validateActionUse(actor,{notify:false,effectiveType:'counter',isAttackTarget:true}).ok,true);
   game.combat.combatant={actor:{uuid:'other'}};
-  assert.equal(validateActionUse(actor,{notify:false,limitBonus:1}).ok,false);
+  assert.equal(validateActionUse(actor,{notify:false,limitBonus:1}).ok,true);
   assert.equal(validateActionUse(actor,{notify:false,limitBonus:1,timingOverride:true}).ok,true);
 });
 test('a defense recorded by the embedded module consumes one Counter Action, represented only once',async()=>{
@@ -128,7 +128,7 @@ test('a defense recorded by the embedded module consumes one Counter Action, rep
   await dbuRecordDefend(actor,'parry');
   assert.equal(roundPools093(actor).counter.spent,1);
   assert.equal(roundPools093(actor).counter.remaining,0);
-  assert.equal(validateActionUse(actor,{notify:false,effectiveType:'counter',isAttackTarget:true}).ok,false);
+  assert.equal(validateActionUse(actor,{notify:false,effectiveType:'counter',isAttackTarget:true}).overBudget,true);
   await convertStandardToCounter093(actor);
   assert.equal(validateActionUse(actor,{notify:false,effectiveType:'counter',isAttackTarget:true}).ok,true);
 });

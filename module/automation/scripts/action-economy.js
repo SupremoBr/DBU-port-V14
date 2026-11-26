@@ -125,16 +125,16 @@ export function validateActionUse(actor, {
   else if (budget.pinned && movement) message = "Pinned impede Movement.";
   else if (budget.pinned && !allowPinnedEscape && budget.limit <= 0) message = "Pinned impede esta Maneuver neste Round.";
 
-  // Legacy rules track the budget. Current rules share the sheet’s action pools.
+  // The tracker reports costs even when a table-managed effect permits overdraft or a different timing.
   const requestedCost = Math.max(0, Number(actionCost) || 0);
-  const overBudget = effectiveType === "standard" && budget.inCombat && budget.remaining < requestedCost;
+  const remaining = effectiveType === "standard" ? budget.remaining
+    : effectiveType === "counter" ? budget.counter?.remaining : undefined;
+  const overBudget = budget.inCombat && remaining !== undefined && remaining < requestedCost;
+  const offTurn = uses093(actor.system) && budget.inCombat && effectiveType === "standard"
+    && !timingOverride && !isOwnTurn093(actor);
 
   if (uses093(actor.system) && budget.inCombat) {
-    const pools = roundPools093(actor, { standardBonus: limitBonus });
-    if (effectiveType === "standard" && !timingOverride && !isOwnTurn093(actor)) message ||= "Standard Maneuvers exigem seu turno.";
-    if (effectiveType === "standard" && pools.standard.remaining < requestedCost) message ||= "Standard Actions insuficientes.";
     if (effectiveType === "counter" && !isAttackTarget && !timingOverride) message ||= "Counter Maneuver exige ser alvo de um ataque.";
-    if (effectiveType === "counter" && pools.counter.remaining < requestedCost) message ||= "Counter Actions insuficientes. Converta uma Standard Action na ficha.";
     if (effectiveType === "out-of-sequence" && !triggerId && !timingOverride) message ||= "Out-of-Sequence exige um efeito que a conceda.";
   }
 
@@ -143,8 +143,9 @@ export function validateActionUse(actor, {
     return { ok: false, reason: "state", message, budget, overBudget };
   }
 
-  if (overBudget && notify && !uses093(actor.system)) {
-    ui.notifications.info(`${actor.name}: custo padrão ${requestedCost} Action${requestedCost === 1 ? "" : "s"}; contador base restante ${budget.remaining}. O uso foi permitido para respeitar efeitos que alteram a economia de Actions.`);
+  if (notify && (overBudget || offTurn)) {
+    const reason = offTurn ? "manobra fora do turno" : "saldo padrão insuficiente";
+    ui.notifications.info(`${label}: ${reason}. Confirme a concessão do talento, traço ou efeito na mesa.`);
   }
 
   return { ok: true, budget, effectiveType, overBudget };

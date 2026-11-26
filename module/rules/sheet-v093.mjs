@@ -7,7 +7,7 @@ import { applyLegendRealized093, newLevelOfPower093, requiresTransformationRevie
 import { Dialog } from '../helpers/foundry-compat.mjs';
 import { CATALOGS_093 } from './catalogs-v093.mjs';
 import { uses093, awakeningLimits, validateTransformationStack, fullAwakeningRecovery, stackedStressRequirement } from './v093.mjs';
-import { roundPools093, convertStandardToCounter093, isOwnTurn093, inCombat093, rowActionType093, rowCost093 } from './actions-v093.mjs';
+import { roundPools093, convertStandardToCounter093, isOwnTurn093, inCombat093, rowActionType093 } from './actions-v093.mjs';
 import { validateTechnique093, validateTechniqueUsage093, signatureUseIssue093, maximumWager093 } from './techniques-v093.mjs';
 import { roundKey, resolutionOwner, rollPressure093, adjustRacialResource093, racialEncounterReset093, racialResourceView093, racialTurnReset093, promptPressureCheck093, rollPhantomSteadfast093, useMakyanPower093 } from './racial-resources-v093.mjs';
 import { editAttackGrant093 } from './attack-grants-v093.mjs';
@@ -129,7 +129,7 @@ export async function fullAwakening093(actor, transformationIndex) {
   const row = rows[transformationIndex], entry = CATALOGS_093.transformations[row?.catalogKey];
   if (!row || String(row.awakeningType).toLowerCase() !== 'super' || !entry?.traitGroups.some(g => g.kind === 'grandAwakening')) return warn('Selecione uma Super Awakening com Grand Awakening.');
   if (actor.system.rules093State?.fullAwakeningUsed) return warn('Full Awakening já usada neste encontro.');
-  if (inCombat093(actor) && (!isOwnTurn093(actor) || roundPools093(actor).standard.remaining < 1)) return warn('Full Awakening exige seu turno e uma Standard Action.');
+  if (inCombat093(actor) && !isOwnTurn093(actor)) return warn('Full Awakening exige seu turno.');
   // The Grand Trigger is a prerequisite selected by the player/GM, never guessed.
   const confirmed = await Dialog.confirm({ title: 'Full Awakening', content: `<p>O Grand Trigger de <b>${escape(row.name)}</b> foi satisfeito? O uso consome 1 Standard Action e recupera ¼ dos máximos de LP e Ki.</p>` });
   if (!confirmed) return false;
@@ -300,9 +300,9 @@ export function installRulesSheet093(Sheet) {
         if (row.rules093Executed) return warn('Esta ação já foi executada. Use um novo registro para outra manobra.');
       }
       const type = rowActionType093(row);
-      if (inCombat093(this.actor) && type === 'standard' && !isOwnTurn093(this.actor)) return warn('Standard Maneuvers exigem seu turno.');
-      const pools = roundPools093(this.actor, { excludeIndex: index });
-      if (pools[type === 'counter' ? 'counter' : 'standard'].remaining < rowCost093(row)) return warn('Actions insuficientes para essa manobra.');
+      if (!args[0]?.prepareOnly && inCombat093(this.actor) && type === 'standard' && !isOwnTurn093(this.actor)) {
+        ui.notifications.info('Manobra fora do turno. Confirme a concessão do talento, traço ou efeito na mesa.');
+      }
       const attacksBefore = this.actor.system.combatTabState?.roundAttackCount || 0;
       const result = await original(event, ...args);
       if (name === '_onRollTrackerAttack' && (this.actor.system.combatTabState?.roundAttackCount || 0) > attacksBefore) {
