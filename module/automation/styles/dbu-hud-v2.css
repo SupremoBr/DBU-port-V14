@@ -101,7 +101,6 @@
 
 .dbua-v2-villain-panel .dbua-v2-action-choice b { white-space: normal; overflow-wrap: anywhere; }
 
-.dbua-hud-v2 .dbua-v2-tab[data-hud-tab="rules"] span { min-width: 0; white-space: normal; }
 .dbua-v2-rules-body {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));

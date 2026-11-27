@@ -6,6 +6,16 @@ export function ruleShareButton(name) {
   return `<button type="button" class="dbu-share-rule" data-dbu-share-rule="${escaped}" title="Enviar ao chat" aria-label="Enviar ${escaped} ao chat"><i class="fas fa-comment-alt" aria-hidden="true"></i></button>`;
 }
 
+function rulePart(text, escape) {
+  const effect = /^(Lv\.\s*\d+)\s*(?:\[([^\]]+)\]\s*)?(.*)$/is.exec(text);
+  if (!effect) return `<p>${escape(text)}</p>`;
+  const [, level, timing, description] = effect;
+  return `<section class="dbu-rule-chat-effect">
+    <div class="dbu-rule-chat-effect-meta"><strong>${escape(level)}</strong>${timing ? `<span>${escape(timing)}</span>` : ""}</div>
+    ${description ? `<p>${escape(description)}</p>` : ""}
+  </section>`;
+}
+
 export async function shareRuleToChat(button, actor) {
   const scope = button.closest(scopeSelector);
   if (!scope || button.disabled) return;
@@ -28,7 +38,7 @@ export async function shareRuleToChat(button, actor) {
       speaker: ChatMessage.getSpeaker({ actor }),
       whisper: [],
       blind: false,
-      content: `<article class="dbu-rule-chat"><h3 class="dbu-attack-title">${esc(button.dataset.dbuShareRule)}</h3><div class="dbu-rule-chat-text">${parts.map(text => `<p>${esc(text)}</p>`).join("")}${source}</div></article>`
+      content: `<article class="dbu-rule-chat"><h3 class="dbu-attack-title">${esc(button.dataset.dbuShareRule)}</h3><div class="dbu-rule-chat-text">${parts.map(text => rulePart(text, esc)).join("")}${source}</div></article>`
     });
   } catch (error) {
     console.error("DBU | Compartilhar regra", error);

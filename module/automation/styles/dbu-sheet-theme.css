@@ -363,6 +363,24 @@
 
 .dbua-hud-v2 .dbua-v2-dock-tabs button { position: relative; }
 
+.dbua-hud-v2 .dbua-v2-tab[data-hud-tab="rules"] {
+  container: dbu-rules-tab / inline-size;
+  gap: 4px;
+  padding-inline: 4px;
+}
+
+.dbua-hud-v2 .dbua-v2-tab[data-hud-tab="rules"] span {
+  font-size: 10px;
+  line-height: 1.1;
+  white-space: nowrap;
+  text-align: center;
+}
+
+@container dbu-rules-tab (max-width: 68px) {
+  .dbua-hud-v2 .dbua-v2-tab[data-hud-tab="rules"] i { display: none; }
+}
+
+
 .dbua-hud-v2 .dbua-v2-dock-tabs button > b {
   position: absolute;
   top: 2px;

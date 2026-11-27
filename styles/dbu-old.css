@@ -15629,6 +15629,37 @@
 }
 .dbu-old .dbu-share-rule:hover { color: var(--accent-cyan-light); }
 .dbu-old .dbu-share-rule:focus-visible { outline: 2px solid var(--accent-gold); }
-.dbu-rule-chat-text { padding: 6px 9px; color: var(--text-primary); overflow-wrap: anywhere; }
-.dbu-rule-chat-text p { white-space: pre-line; }
-.dbu-rule-chat-text a { color: var(--accent-cyan-light); }
+.dbu-rule-chat .dbu-attack-title {
+  padding: 7px 9px;
+  overflow-wrap: anywhere;
+}
+.dbu-rule-chat-text {
+  display: grid;
+  gap: 7px;
+  padding: 8px;
+  color: var(--text-primary);
+  overflow-wrap: anywhere;
+  font: 400 13px/1.4 system-ui, sans-serif;
+}
+.dbu-rule-chat-text p { margin: 0; white-space: pre-line; }
+.dbu-rule-chat-effect {
+  padding: 6px 7px;
+  background: #182638;
+  border-inline-start: 2px solid var(--accent-cyan-dark);
+  border-radius: 4px;
+}
+.dbu-rule-chat-effect-meta {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 2px 7px;
+  margin-bottom: 4px;
+  font-size: 11px;
+  color: #b7c7d7;
+}
+.dbu-rule-chat-effect-meta strong { color: var(--accent-gold); }
+.dbu-rule-chat-text a {
+  justify-self: start;
+  margin-top: 2px;
+  color: var(--accent-cyan-light);
+}

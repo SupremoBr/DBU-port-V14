@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.0.12-rules093-alpha.43] — leitura no HUD e no chat
+
+- O botão Traços e Talentos mantém o rótulo dentro da barra do HUD. Cards de regras no chat destacam cada nível e o tipo de efeito em blocos.
+
 ## [1.0.12-rules093-alpha.42] — traços e talentos no HUD
 
 - A aba Traços e Talentos mostra os efeitos do personagem ativo e permite enviar cada descrição ao chat público. Usa as edições da ficha e as opções escolhidas pelo personagem.

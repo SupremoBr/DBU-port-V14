@@ -134,6 +134,6 @@ export function hudV2Panel({tab,actor,selected,favorites=[],pending=0,available=
 }
 export function hudV2Tabs(activeTab,pending=0,tabs=HUD_V2_TABS){
   return tabs.map(t=>`<button type="button" class="dbua-v2-tab${activeTab===t.id?" active":""}${t.id==="counter"&&pending?" attention":""}"
-    data-dbu-hud-action="hud-tab" data-hud-tab="${t.id}" aria-expanded="${activeTab===t.id}" aria-controls="dbua-v2-action-panel">
-    <i class="${t.icon}"></i><span>${t.label}</span>${t.id==="counter"&&pending?`<b>${pending}</b>`:""}</button>`).join("");
+    data-dbu-hud-action="hud-tab" data-hud-tab="${t.id}" aria-expanded="${activeTab===t.id}" aria-controls="dbua-v2-action-panel" aria-label="${t.label}">
+    <i class="${t.icon}" aria-hidden="true"></i><span>${t.id === "rules" ? "TRAÇOS E<br>TALENTOS" : t.label}</span>${t.id==="counter"&&pending?`<b>${pending}</b>`:""}</button>`).join("");
 }

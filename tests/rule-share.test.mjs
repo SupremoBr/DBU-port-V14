@@ -27,7 +27,9 @@ test('sharing sends only the selected rule to public chat and escapes user text'
   assert.equal(messages[0].blind, false);
   assert.deepEqual(messages[0].speaker, { actor: 'actor' });
   assert.match(messages[0].content, /&lt;em&gt;Descrição editada/);
-  assert.match(messages[0].content, /Lv\.1 \[Passive\] \+1 Strike/);
+  assert.match(messages[0].content, /class="dbu-rule-chat-effect"/);
+  assert.match(messages[0].content, /<strong>Lv\.1<\/strong><span>Passive<\/span>/);
+  assert.match(messages[0].content, /<p>\+1 Strike<\/p>/);
   assert.match(messages[0].content, /href="https:\/\/dbu-rpg\.com/);
   assert.doesNotMatch(messages[0].content, /Texto de outra entrada|<em>/);
   assert.equal(button.disabled, false);
