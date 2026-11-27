@@ -1,8 +1,14 @@
+import { ruleShareButton } from "../../helpers/rule-share.mjs";
+import { applyCatalogDescriptions } from "../../rules/catalog-descriptions.mjs";
+import { uses093 } from "../../rules/v093.mjs";
+import { prepareCharacterTalents, prepareCharacterTraits } from "../../sheets/character-data.mjs";
+
 export const HUD_V2_TABS=[
   {id:"standard",label:"PADRÃO",icon:"fas fa-fist-raised"},
   {id:"counter",label:"COUNTER",icon:"fas fa-shield-alt"},
   {id:"instant",label:"INSTANT",icon:"fas fa-bolt"},
-  {id:"favorites",label:"FAVORITOS",icon:"fas fa-star"}
+  {id:"favorites",label:"FAVORITOS",icon:"fas fa-star"},
+  {id:"rules",label:"TRAÇOS E TALENTOS",icon:"fas fa-book-open"}
 ];
 const villainTab = { id: "villain", label: "VILÃS", icon: "fas fa-skull-crossbones" };
 const villainActions = [
@@ -45,8 +51,56 @@ export function hudV2Actions(tab,favorites=[]){
   return HUD_V2_ACTIONS.filter(a=>a.tab===tab);
 }
 const esc=x=>String(x??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
-export function hudV2Panel({tab,selected,favorites=[],pending=0,available=()=>true,showVillain=false}={}){
+function effectText(effect) {
+  const text = effect.summary || effect.text || "";
+  if (effect.summary || !text.includes("<") || !globalThis.document) return text;
+  const template = document.createElement("template");
+  template.innerHTML = text;
+  return template.content.textContent;
+}
+
+function ruleEntry(entry) {
+  const parts = [
+    entry.prerequisites ? `Pré-requisitos: ${entry.prerequisites}` : "",
+    entry.description,
+    ...(entry.effects || []).flatMap(effect => [
+      [effect.level == null ? "" : `Lv.${effect.level}`, effect.keyword ? `[${effect.keyword}]` : "", effectText(effect)].filter(Boolean).join(" "),
+      ...(effect.options || []).filter(option => option.selected).map(option => {
+        const element = option.elementalProfiles?.find(profile => profile.selected)?.name;
+        return [option.name, effectText(option), element].filter(Boolean).join(" · ");
+      })
+    ])
+  ].filter(text => text?.trim());
+  const name = entry.name || entry.id;
+  return `<div class="dbua-v2-rule-entry" data-dbu-share-scope data-dbu-share-source="${esc(entry.source)}">
+    <details><summary>${esc(name)}</summary>
+      ${parts.length ? parts.map(text => `<p data-dbu-share-text>${esc(text)}</p>`).join("") : "<p>Sem descrição cadastrada.</p>"}
+    </details>
+    ${parts.length ? ruleShareButton(name) : ""}
+  </div>`;
+}
+
+function hudRulePanel(actor) {
+  const system = actor.system;
+  const groups = [
+    { label: "Traços", type: "traits", entries: prepareCharacterTraits(system) },
+    { label: "Talentos", type: "talents", entries: prepareCharacterTalents(system) }
+  ];
+  return `<section class="dbua-v2-panel dbua-v2-rules-panel" id="dbua-v2-action-panel" aria-label="Traços e talentos">
+    <div class="dbua-v2-panel-head"><strong>Traços e talentos</strong><span>${esc(actor.name)}</span>
+      <button type="button" data-dbu-hud-action="hud-tab-close" title="Fechar menu" aria-label="Fechar menu"><i class="fas fa-times" aria-hidden="true"></i></button></div>
+    <div class="dbua-v2-rules-body">
+      ${groups.map(({ label, type, entries }) => `<section><h3>${label}</h3>
+        ${(uses093(system) ? applyCatalogDescriptions(actor, type, entries) : entries).map(ruleEntry).join("")
+          || '<p class="dbua-v2-empty">Nenhuma entrada na ficha.</p>'}
+      </section>`).join("")}
+    </div>
+  </section>`;
+}
+
+export function hudV2Panel({tab,actor,selected,favorites=[],pending=0,available=()=>true,showVillain=false}={}){
   if(!tab)return "";
+  if(tab==="rules")return actor ? hudRulePanel(actor) : "";
   const readOnly = tab === villainTab.id;
   if (readOnly && !showVillain) return "";
   const actions = readOnly ? villainActions : hudV2Actions(tab, favorites).filter(available);

@@ -1,3 +1,4 @@
+import { bindRuleSharing } from "../../helpers/rule-share.mjs";
 import { Dialog } from "../../helpers/foundry-compat.mjs";
 import { uses093 } from "../../rules/v093.mjs";
 import { validateActionUse } from "./action-economy.js";
@@ -541,7 +542,7 @@ function hudContent(actor, token) {
     </aside>`:""}
 
     <div class="dbu-hud-dock${pressureActions.length ? " dbua-pressure-dock" : ""}">
-      ${!state.collapsed?hudV2Panel({tab:state.hudTab,selected:state.hudSelected,favorites:favoriteIds,pending,showVillain:tabs.some(tab => tab.id === "villain"),available:entry => {
+      ${!state.collapsed?hudV2Panel({tab:state.hudTab,actor,selected:state.hudSelected,favorites:favoriteIds,pending,showVillain:tabs.some(tab => tab.id === "villain"),available:entry => {
         if (entry.id === "aura" && uses093(actor.system)) return false;
         if (entry.id === "defend") return pendingActions.some(row => row.type === "defense");
         if (entry.id === "intervene") return pendingActions.some(row => ["reflect", "intervene"].includes(row.type));
@@ -754,6 +755,7 @@ function attachHudDrag(root, selector, prefix) {
 }
 
 function attachHudListeners(root, actor, token) {
+  bindRuleSharing(root, actor);
   for (const button of root.querySelectorAll("[data-dbu-hud-action]")) {
     button.addEventListener("click", async event => {
       event.preventDefault();

@@ -100,3 +100,54 @@
 .dbua-hud-v2 .dbua-v2-allies-floating .dbu-hud-ally-copy strong{font-size:9px}
 
 .dbua-v2-villain-panel .dbua-v2-action-choice b { white-space: normal; overflow-wrap: anywhere; }
+
+.dbua-hud-v2 .dbua-v2-tab[data-hud-tab="rules"] span { min-width: 0; white-space: normal; }
+.dbua-v2-rules-body {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+  gap: 8px;
+  padding: 8px;
+  max-height: min(330px, 50vh);
+  overflow: auto;
+}
+.dbua-v2-rules-body h3 {
+  margin: 0 0 4px;
+  color: #ffb56a;
+  font: 700 11px Orbitron, sans-serif;
+}
+.dbua-v2-rule-entry {
+  display: flex;
+  gap: 4px;
+  align-items: flex-start;
+  padding: 3px 4px;
+  margin-bottom: 3px;
+  border: 1px solid rgba(79,119,145,.34);
+  background: rgba(13,26,39,.78);
+}
+.dbua-v2-rule-entry details { flex: 1; min-width: 0; }
+.dbua-v2-rule-entry summary {
+  padding: 7px 4px;
+  cursor: pointer;
+  overflow-wrap: anywhere;
+  color: #e2ebf3;
+  font: 700 11px 'Segoe UI', sans-serif;
+}
+.dbua-v2-rule-entry summary:focus-visible { outline: 2px solid #ffc273; }
+.dbua-v2-rule-entry p {
+  margin: 4px;
+  color: #bed0dc;
+  overflow-wrap: anywhere;
+  font: 400 12px/1.45 'Segoe UI', sans-serif;
+}
+.dbua-hud-v2 .dbua-v2-rule-entry .dbu-share-rule {
+  width: 30px;
+  min-height: 30px;
+  padding: 0;
+  border: 1px solid rgba(125,167,187,.36);
+  background: #1a2837;
+  color: #ffb56a;
+}
+@media (max-width: 480px) {
+  .dbua-v2-rules-body { grid-template-columns: minmax(0, 1fr); }
+}

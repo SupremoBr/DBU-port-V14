@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.0.12-rules093-alpha.42] — traços e talentos no HUD
+
+- A aba Traços e Talentos mostra os efeitos do personagem ativo e permite enviar cada descrição ao chat público. Usa as edições da ficha e as opções escolhidas pelo personagem.
+
 ## [1.0.12-rules093-alpha.41] — descrições no chat
 
 - O botão Enviar ao chat publica descrições de talentos, traços, vantagens, desvantagens, Profiles, técnicas, habilidades únicas, traços de transformação, condições e qualidades de equipamento. O card inclui o link oficial quando disponível.

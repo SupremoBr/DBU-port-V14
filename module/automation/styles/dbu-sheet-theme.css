@@ -386,8 +386,9 @@
 @media (max-width: 820px) {
   .dbua-hud-v2 .dbua-pressure-dock .dbua-v2-dock-row { grid-template-columns: minmax(0, 1fr); }
 }
-@media (max-width: 520px) {
-  .dbua-hud-v2 .dbua-pressure-dock .dbua-v2-dock-tabs { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+@media (max-width: 620px) {
+  .dbua-hud-v2 .dbua-v2-dock-row { grid-template-columns: minmax(0, 1fr); }
+  .dbua-hud-v2 .dbua-v2-dock-tabs { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
 
 .dbua-hud-v2 .dbua-v2-tab.active,
