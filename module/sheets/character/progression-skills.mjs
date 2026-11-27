@@ -1,3 +1,4 @@
+import { uniqueSkillPassives093 } from "../../rules/unique-abilities-v093.mjs";
 import { stateLevel, ragingBotch } from "../../rules/states-v093.mjs";
 import { martialAttributeBudget, martialAttributeWarnings, martialDie, martialLevel, martialProgressionRows, martialResourcePenalty, martialRowLevel, martialSkillSlots, progressionRowIsEarned, usesPathToPower, validMartialAttributes } from "../../rules/path-to-power-v093.mjs";
 import { uses093 } from "../../rules/v093.mjs";
@@ -277,6 +278,7 @@ export const progressionSkillsMethods = {
     const ranks = rankNum * 2;
     const gs = system.aptitudes?.giftedStudentSkillBonus || 0;
     const equip = Number(system.equipmentFlags?.skillBonuses?.[skillKey]) || 0;
+    const unique = uniqueSkillPassives093(this.actor, skillKey);
     const traits = (skillKey === "perception"
       ? (Number(system._bestialPerceptionBonus) || 0) + (Number(system.aptitudes?.perceptionBonus) || 0) : 0)
       + (skillKey === "stealth" ? (Number(system._cyberStealthBonus) || 0) : 0);
@@ -296,7 +298,7 @@ export const progressionSkillsMethods = {
     // +1/rank on Insight-attribute skills (both computed in actor.mjs).
     const auraMod = -(Number(system.aptitudes?.auraSkillPenalty) || 0)
       + (attrKey === "in" ? (Number(system.aptitudes?.auraInSkillBonus) || 0) : 0);
-    let total = attr + ranks + gs + equip + traits + buffs + misc + knowledge + auraMod;
+    let total = attr + ranks + gs + equip + traits + buffs + misc + knowledge + auraMod + unique.bonus;
     const parts = [
       { label: "Attribute", value: attr },
       { label: "Ranks", value: ranks },
@@ -304,6 +306,7 @@ export const progressionSkillsMethods = {
       { label: "Knowledge", value: knowledge },
       { label: "Aura", value: auraMod },
       { label: "Equipment", value: equip },
+      { label: "Unique Abilities", value: unique.bonus },
       { label: "Traits", value: traits },
       { label: "Buffs", value: buffs },
       { label: "Misc", value: misc }
@@ -345,6 +348,7 @@ export const progressionSkillsMethods = {
       return;
     }
     const attrKey = bd.attrKey;
+    const unique = uniqueSkillPassives093(this.actor, skillKey);
     let bonus = bd.total;
     let breakdownParts = bd.parts;
     // Genius Designer L1: +1 Natural Result on all Craft Skill Checks
@@ -363,13 +367,18 @@ export const progressionSkillsMethods = {
         const sAttrScore = sAttrData?.score ?? 0;
         // Suppressed actor's own equipment skill bonuses (Absorption pulls best total)
         const sEquipBonus = Number(suppActor.system.equipmentFlags?.skillBonuses?.[skillKey]) || 0;
-        const sBonus = Math.floor(sAttrScore / 2) + (Number(sRank) || 0) * 2 + sEquipBonus;
+        const sBonus = Math.floor(sAttrScore / 2) + (Number(sRank) || 0) * 2 + sEquipBonus + unique.bonus;
         if (sBonus > bonus) {
           bonus = sBonus;
           viaName = suppActor.name;
           breakdownParts = [{ label: `Best of ${suppActor.name}`, value: sBonus }];
         }
       }
+    }
+
+    if (unique.check) {
+      bonus += unique.check;
+      breakdownParts = [...breakdownParts, { label: "Unique Ability Checks", value: unique.check }];
     }
 
     // Roll Base Die (d10) + bonus
@@ -383,7 +392,9 @@ export const progressionSkillsMethods = {
     const rawNat = roll.dice[0]?.results?.[0]?.result ?? "?";
     const nat = (rawNat !== "?" && geniusNatBonus) ? Math.min(10, rawNat + geniusNatBonus) : rawNat;
     const sysTier = this.actor.system.tier || 1;
-    const isCrit = nat >= 10 - (uses093(this.actor.system) ? stateLevel(this.actor.system, "mindful") : 0);
+    const mindful = uses093(this.actor.system) ? stateLevel(this.actor.system, "mindful") : 0;
+    const criticalTarget = Math.max(7, 10 - mindful - unique.critical);
+    const isCrit = nat >= criticalTarget;
     const isBotch = rawNat <= ragingBotch(this.actor.system);
     let critRoll = null;
     if (isCrit) { critRoll = new Roll(this._scaleDiceByTier("1d4", sysTier)); await critRoll.evaluate(); }
@@ -413,7 +424,7 @@ export const progressionSkillsMethods = {
           <span class="dbu-roll-label">Check</span>
           <span class="dbu-roll-main">
             <code class="dbu-roll-formula">1d10+${bonus}</code>
-            <span class="dbu-roll-sub">Nat ${nat !== rawNat ? `${rawNat}→${nat} (Genius Designer)` : nat}</span>${resultTag}
+            <span class="dbu-roll-sub">Nat ${nat !== rawNat ? `${rawNat}→${nat} (Genius Designer)` : nat}${unique.critical ? ` · CT ${criticalTarget}+` : ""}</span>${resultTag}
           </span>
           <span class="dbu-roll-total">${finalTotal}</span>
         </div>

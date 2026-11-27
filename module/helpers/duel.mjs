@@ -1,3 +1,4 @@
+import { uniqueSkillPassives093 } from "../rules/unique-abilities-v093.mjs";
 import { Dialog, onRenderChatMessage } from "./foundry-compat.mjs";
 /**
  * Duel Maneuver — interactive two-player chat flow (actions-combat.txt:507-544).
@@ -972,7 +973,9 @@ export function computeSkillBonus(actor, skillKey) {
   // Aura effects: Distracting penalty (all) + Sensory Refinement (IN skills)
   const auraMod = -(Number(actor.system.aptitudes?.auraSkillPenalty) || 0)
     + (attrKey === "in" ? (Number(actor.system.aptitudes?.auraInSkillBonus) || 0) : 0);
-  return Math.floor(attrScore / 2) + (Number(rank) || 0) * 2 + gs + equip + bestial + cyber + buffs + misc + knowledge + auraMod;
+  const unique = uniqueSkillPassives093(actor, skillKey);
+  return Math.floor(attrScore / 2) + (Number(rank) || 0) * 2 + gs + equip + bestial + cyber + buffs + misc + knowledge + auraMod
+    + unique.bonus + unique.check;
 }
 
 async function responderRoll(actor, choice) {
@@ -992,7 +995,7 @@ async function responderRoll(actor, choice) {
     return evalClashRoll(actor, formula, choice === "dodge" ? cts.dodgeCT : cts.strikeCT);
   }
   // Skill Clash response (Terrify: Intuition/Intimidation; Feint: Intuition/Perception)
-  return evalClashRoll(actor, `1d10+${computeSkillBonus(actor, choice)}`, 10);
+  return evalClashRoll(actor, `1d10+${computeSkillBonus(actor, choice)}`, 10 - uniqueSkillPassives093(actor, choice).critical);
 }
 
 /** Outcome text per clash type/option. initiatorWins: ties already resolved (defender wins). */

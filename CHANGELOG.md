@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.0.12-rules093-alpha.44] — passivas de habilidades únicas
+
+- Dragon Dash aumenta Boosted Speed e Precognition aumenta a Iniciativa. Bluff Attack e Down Burst entram no Skill Bonus. Illusion, Healing Hands e Metamoran Fusion Dance modificam os testes correspondentes. Para Para Dance reduz o Critical Target de Performance.
+
 ## [1.0.12-rules093-alpha.43] — leitura no HUD e no chat
 
 - O botão Traços e Talentos mantém o rótulo dentro da barra do HUD. Cards de regras no chat destacam cada nível e o tipo de efeito em blocos.

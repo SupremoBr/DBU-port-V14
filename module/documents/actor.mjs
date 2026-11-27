@@ -1,3 +1,4 @@
+import { uniqueCombatPassives093 } from "../rules/unique-abilities-v093.mjs";
 import { stateLevel } from "../rules/states-v093.mjs";
 import { healthThresholdChanges093, pendingSteadfast093 } from "../rules/health-thresholds-v093.mjs";
 import { awakeningAMB, limitedMartialPower, martialDie, martialLevel, martialResourcePenalty, martialSkillSlots, progressionRowIsEarned, usesPathToPower } from "../rules/path-to-power-v093.mjs";
@@ -1800,7 +1801,8 @@ export class DBUActor extends Actor {
 
     // --- Boosted Speed ---
     // Formula: 2 + AG total + SizeMod + AuraBonus
-    let boostedSpeed = Math.max(0, 2 + agTotal + sizeData.speedMod + (racialBonuses.boostedSpeed || 0));
+    const uniquePassives = uniqueCombatPassives093(this, system, tier);
+    let boostedSpeed = Math.max(0, 2 + agTotal + sizeData.speedMod + (racialBonuses.boostedSpeed || 0) + uniquePassives.boostedSpeed);
     if (this._isConditionActive(system, "prone")) boostedSpeed = Math.floor(boostedSpeed / 2);
 
     // Aura Speed Bonus (Boosted; benefit skipped with Infusion, penalty kept)
@@ -1911,7 +1913,7 @@ export class DBUActor extends Actor {
     // --- Initiative ---
     // Rule: "Add 1/2 of your Agility Score to your Initiative Check" (attributes.txt)
     system.aptitudes.initiative = Math.floor((system.attributes.ag?.score ?? 0) / 2)
-      + this._getBuffTotal(system, "Initiative");
+      + this._getBuffTotal(system, "Initiative") + uniquePassives.initiative;
 
     // Initiative Value (separate bonus for Initiative Advantage determination only,
     // NOT added to the d10 roll — from transformations like SSJ, Golden Power, etc.)

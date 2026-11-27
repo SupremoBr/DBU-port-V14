@@ -1,3 +1,4 @@
+import { uses093 } from './v093.mjs';
 import { UNIQUE_ABILITIES_093, UNIQUE_ABILITIES_SOURCE_093 } from './data/unique-abilities-v093.mjs';
 
 export function uniqueAbilityCatalog093(legacy = {}) {
@@ -49,4 +50,44 @@ export function uniqueAbilityUsage(data, selection) {
       .reduce((ranks, row) => ranks + (row.amount || 1), 0)
     : 0;
   return { usageLimit: 'round', maxUses: 1 + Math.min(2, barrage) };
+}
+
+function accessibleUniqueKeys093(actor, system) {
+  const keys = new Set();
+  if (!uses093(system)) return keys;
+  const add = rows => {
+    for (const row of rows || []) keys.add(row.abilityKey);
+  };
+  add(system.uniqueAbilities);
+  const fusion = system.fusion;
+  if (fusion?.isFusion && ["one-sided-absorption", "one-sided-possession"].includes(fusion.type)
+      && !actor._blockGainedAbilities?.(system)) {
+    for (const id of fusion.suppressedCharacterIds || []) add(globalThis.game?.actors?.get(id)?.system.uniqueAbilities);
+  }
+  const jacket = system.isPiloting && globalThis.game?.actors?.get(system.pilotedJacketId);
+  if (jacket?.type === "battleJacket" && jacket.system.pilotId === actor.id) add(jacket.system.uniqueAbilities);
+  return keys;
+}
+
+export function uniqueCombatPassives093(actor, system, tier) {
+  const keys = accessibleUniqueKeys093(actor, system);
+  return {
+    boostedSpeed: keys.has("dragon_dash") ? tier : 0,
+    initiative: keys.has("precognition") ? tier : 0
+  };
+}
+
+const skillPassives = {
+  bluff: { bonus: ["bluff_attack", "down_burst"], check: ["illusion"] },
+  concealment: { bonus: ["down_burst"] },
+  medicine: { check: ["healing_hands"] },
+  performance: { check: ["metamoran_fusion_dance"], critical: ["para_para_dance"] }
+};
+
+export function uniqueSkillPassives093(actor, skill) {
+  const effects = Object.hasOwn(skillPassives, skill) ? skillPassives[skill] : null;
+  if (!effects) return { bonus: 0, check: 0, critical: 0 };
+  const keys = accessibleUniqueKeys093(actor, actor.system);
+  const count = group => (effects[group] || []).filter(ability => keys.has(ability)).length;
+  return { bonus: count("bonus"), check: count("check"), critical: count("critical") };
 }

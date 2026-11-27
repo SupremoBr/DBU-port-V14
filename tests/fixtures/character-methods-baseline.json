@@ -501,13 +501,14 @@
     "_calcSkillBreakdown": {
       "hash": "7151d004f4ec7b7e1789433895eab641a5f3cb3f0c75ac933a73cd7962bb8758",
       "length": 1,
-      "async": false
+      "async": false,
+      "rules093Hash": "1f6784975e73bc04d23ce63f769161f43717e4d1c8e1409bb45c4d0d31101e10"
     },
     "_onRollSkill": {
       "hash": "a366fca682a0ae97380daf9fccb463983fe7d840cfd31b75029d1bc5e85c84e2",
       "length": 1,
       "async": true,
-      "rules093Hash": "68ba14c99a6ebb85652d2a18fc9c3d500d710098d281fd43e69d128a8717e69c"
+      "rules093Hash": "90504c866a307a3411f51d3c68a1bbda90de686d517e8f6d6cee8eabd529de51"
     },
     "_onAddCustomBuff": {
       "hash": "35ab39c5f9167b4301d6ccc88be2fce1a3c60b240571d40ec71e1a437dbf0c2f",

@@ -141,6 +141,33 @@ test('the real system init installs the current catalogs, schema, sheet adapter 
     assert.deepEqual(stats(), baseline);
   });
 
+  await t.test('Unique Ability combat passives reach derived stats without changing Agility', () => {
+    const system = Object.assign(new CharacterModel(), initial(CharacterModel.defineSchema()), {
+      level: 5, rulesVersion: '0.9.3'
+    });
+    const actor = Object.assign(new CONFIG.Actor.documentClass(), { system, items: [] });
+    const stats = () => {
+      system.prepareDerivedData();
+      actor._prepareCharacterData(system);
+      return {
+        agility: system.attributes.ag.score,
+        boostedSpeed: system.status.boostedSpeed,
+        initiative: system.aptitudes.initiative
+      };
+    };
+    const baseline = stats();
+    system.uniqueAbilities = [{ abilityKey: 'dragon_dash' }, { abilityKey: 'precognition' }];
+    const withPassives = {
+      agility: baseline.agility,
+      boostedSpeed: baseline.boostedSpeed + system.tier,
+      initiative: baseline.initiative + system.tier
+    };
+    assert.deepEqual(stats(), withPassives);
+    assert.deepEqual(stats(), withPassives);
+    system.uniqueAbilities = [];
+    assert.deepEqual(stats(), baseline);
+  });
+
   await t.test('Demon Actor prepares one set of modifiers, with final LP, Prone, Soak and Broken', () => {
     const system = Object.assign(new CharacterModel(), initial(CharacterModel.defineSchema()), {
       level: 5, race: 'demon', subrace: 'phantom', rulesVersion: '0.9.3',
