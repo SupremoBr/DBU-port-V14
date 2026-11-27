@@ -1,7 +1,10 @@
+import { ruleShareButton } from "./rule-share.mjs";
+
 /**
  * Register custom Handlebars helpers for the DBU-OLD system.
  */
 export function registerHandlebarsHelpers() {
+  Handlebars.registerHelper("dbuShareRule", name => new Handlebars.SafeString(ruleShareButton(name)));
 
   // -------------------------------------------------------
   // Comparison helpers

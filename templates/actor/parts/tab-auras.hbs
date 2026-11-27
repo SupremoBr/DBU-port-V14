@@ -33,13 +33,14 @@
   {{!-- Auras List --}}
   <div class="auras-list">
     {{#each signatureAuras}}
-    <div class="signature-aura-card {{#if active}}aura-active{{/if}} {{#if isGained}}gained-ability{{/if}}" data-aura-id="{{id}}" {{#if gainedAuraKey}}data-gained-aura-key="{{gainedAuraKey}}"{{/if}}>
+    <div class="signature-aura-card {{#if active}}aura-active{{/if}} {{#if isGained}}gained-ability{{/if}}" data-dbu-share-scope data-aura-id="{{id}}" {{#if gainedAuraKey}}data-gained-aura-key="{{gainedAuraKey}}"{{/if}}>
       <div class="aura-header-bar">
         <button type="button" class="aura-toggle-btn" data-action="toggle-aura" data-aura-id="{{id}}" {{#if gainedAuraKey}}data-gained-aura-key="{{gainedAuraKey}}"{{/if}}>
           <i class="fas {{#if active}}fa-bolt{{else}}fa-circle{{/if}}"></i>
           <span>{{#if active}}ACTIVE{{else}}INACTIVE{{/if}}</span>
         </button>
         <span class="aura-name-display">{{name}}</span>
+        {{dbuShareRule name}}
         {{#if isGained}}<span class="gained-badge"><i class="fas fa-link"></i> Gained from: {{gainedFrom}}</span>{{/if}}
         <span class="aura-type-badge">{{type}}</span>
         <span class="aura-tp-badge {{#if tpOverLimit}}tp-badge-over{{/if}}" title="Max TP per Aura at your base Tier of Power (25/30/40/50)">TP: {{tpCost}}/{{tpMax}}</span>
@@ -73,7 +74,7 @@
           {{!-- Description --}}
           <div class="aura-row aura-desc-row">
             <label>Description</label>
-            <textarea class="aura-input aura-description" data-aura-id="{{id}}" data-field="description" rows="2">{{description}}</textarea>
+            <textarea data-dbu-share-text class="aura-input aura-description" data-aura-id="{{id}}" data-field="description" rows="2">{{description}}</textarea>
           </div>
         </div>
 

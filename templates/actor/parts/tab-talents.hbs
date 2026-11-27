@@ -32,12 +32,13 @@
           <span class="talent-group-count">({{talents.length}})</span>
         </div>
         {{#each talents}}
-        <div class="talent-card" data-talent-id="{{id}}">
+        <div class="talent-card" data-dbu-share-scope data-talent-id="{{id}}">
           <div class="talent-header">
             <span class="talent-category-badge">{{category}}</span>
             <span class="talent-name">{{name}}</span>
-            {{#if @root.editable}}
             <div class="dbu-talent-actions">
+            {{dbuShareRule name}}
+            {{#if @root.editable}}
             {{#if @root.rules093}}
             <button type="button" class="dbu-edit-catalog-description" data-dbu-edit-description="talents" data-entry-id="{{id}}" title="Editar descrição e buffs" aria-label="Editar descrição e buffs de {{name}}">
               <i class="fas fa-pen" aria-hidden="true"></i>
@@ -46,16 +47,16 @@
             <button type="button" class="delete-btn item-delete" data-action="delete-talent" data-talent-id="{{id}}" title="Remover talento" aria-label="Remover {{name}}">
               <i class="fas fa-trash" aria-hidden="true"></i>
             </button>
-            </div>
             {{/if}}
+            </div>
           </div>
           {{#if prerequisites}}
-          <div class="talent-prerequisites"><strong>Prerequisites:</strong> {{prerequisites}}</div>
+          <div class="talent-prerequisites" data-dbu-share-text><strong>Prerequisites:</strong> {{prerequisites}}</div>
           {{/if}}
           {{#if description}}
-          <div class="talent-description dbu-catalog-description">{{description}}</div>
+          <div class="talent-description dbu-catalog-description" data-dbu-share-text>{{description}}</div>
           {{/if}}
-          {{#if source}}<a class="dbu-catalog-source" href="{{source}}" target="_blank" rel="noopener noreferrer">Regra completa no site</a>{{/if}}
+          {{#if source}}<a class="dbu-catalog-source" href="{{source}}" data-dbu-share-source target="_blank" rel="noopener noreferrer">Regra completa no site</a>{{/if}}
           {{#if linkedBuffs.length}}
           <ul class="dbu-linked-buffs" aria-label="Custom Buffs">
             {{#each linkedBuffs}}<li>{{effect}} · {{state}}</li>{{/each}}
@@ -63,7 +64,7 @@
           {{/if}}
           <div class="talent-effects-list">
             {{#each effects}}
-            <div class="talent-effect {{activationType}}">
+            <div class="talent-effect {{activationType}}" data-dbu-share-text>
               <span class="effect-level">Lv.{{level}}</span>
               <span class="effect-keyword {{activationType}}">[{{keyword}}]</span>
               <span class="effect-text">{{#if summary}}{{summary}}{{else}}{{{text}}}{{/if}}</span>

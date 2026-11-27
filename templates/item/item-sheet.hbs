@@ -21,7 +21,7 @@
       </div>
     </div>
     <div class="tab" data-group="primary" data-tab="details">
-      <div class="item-details">
+      <div class="item-details" data-dbu-share-scope>
         {{#if isUniqueAbility}}
         <label>Unique Ability
           <select name="system.abilityKey">
@@ -29,11 +29,12 @@
           </select>
         </label>
         {{#with uniqueAbility}}
+        {{dbuShareRule name}}
         <p>{{abilityType}} · {{tpCost}} TP · {{kpCost}} KP · {{maneuverType}} · {{actionCost}}</p>
         {{#if prerequisites}}<p>Prerequisites · {{prerequisites}}</p>{{/if}}
         {{#if passiveBonus}}<p><strong>Passive Bonus</strong> {{passiveBonus}}</p>{{/if}}
-        <p>{{effect}}</p>
-        {{#if source}}<a class="dbu-catalog-source" href="{{source}}" target="_blank" rel="noopener noreferrer">Regra completa no site</a>{{/if}}
+        <p data-dbu-share-text>{{effect}}</p>
+        {{#if source}}<a class="dbu-catalog-source" href="{{source}}" data-dbu-share-source target="_blank" rel="noopener noreferrer">Regra completa no site</a>{{/if}}
         {{/with}}
         {{else}}
         <p>Item details will be implemented in a future update.</p>

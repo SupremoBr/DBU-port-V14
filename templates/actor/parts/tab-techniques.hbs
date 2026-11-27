@@ -55,9 +55,10 @@
   {{!-- Techniques List --}}
   <div class="techniques-list">
     {{#each signatureTechniques}}
-    <div class="signature-technique-card {{#if isGained}}gained-ability{{/if}}" data-technique-id="{{id}}">
+    <div class="signature-technique-card {{#if isGained}}gained-ability{{/if}}" data-technique-id="{{id}}" data-dbu-share-scope>
       <div class="tech-header">
         <span class="tech-name-display">{{name}}</span>
+        {{dbuShareRule name}}
         {{#if isGained}}<span class="gained-badge"><i class="fas fa-link"></i> Gained from: {{gainedFrom}}</span>{{/if}}
         <span class="tech-type-badge">{{#if ../limitedMartialPower}}Super{{else}}{{type}}{{/if}}</span>
         <span class="tech-tp-badge {{#if tpOverLimit}}tp-badge-over{{/if}}" title="TP total / limite">TP: {{tpCapUsage}}/{{tpMax}}</span>
@@ -191,12 +192,13 @@
 
       {{!-- Profile Info --}}
       {{#if profileInfo}}
-      <div class="tech-profile-info">
+      <div class="tech-profile-info" data-dbu-share-scope>
+        {{dbuShareRule profile}}
         <span class="profile-tag">{{profile}}</span>
         <span class="profile-tag">{{profileInfo.damageCat}}</span>
         <span class="profile-tag">{{profileInfo.range}}</span>
-        <div class="profile-effect">{{profileInfo.effect}}</div>
-        {{#if profileInfo.source}}<a href="{{profileInfo.source}}" target="_blank" rel="noopener noreferrer">Fonte oficial do perfil</a>{{/if}}
+        <div class="profile-effect" data-dbu-share-text>{{profileInfo.effect}}</div>
+        {{#if profileInfo.source}}<a href="{{profileInfo.source}}" data-dbu-share-source target="_blank" rel="noopener noreferrer">Fonte oficial do perfil</a>{{/if}}
       </div>
       {{/if}}
 
@@ -237,7 +239,7 @@
       {{!-- Description --}}
       <div class="tech-field full-width">
         <label>Description</label>
-        <textarea class="tech-input tech-description" data-tech-id="{{id}}" data-field="description" rows="2">{{description}}</textarea>
+        <textarea data-dbu-share-text class="tech-input tech-description" data-tech-id="{{id}}" data-field="description" rows="2">{{description}}</textarea>
       </div>
 
       {{!-- Advantages Table --}}
@@ -304,11 +306,11 @@
               </td>
             </tr>
             {{#if name}}{{#if requirement}}
-            <tr class="signature-modifier-summary">
+            <tr class="signature-modifier-summary" data-dbu-share-scope>
               <td colspan="{{#if @root.rules093}}7{{else}}6{{/if}}">
-                {{#if effect}}<span>{{effect}}</span>{{/if}}
-                {{#unless (eq requirement "Sem requisito de aquisição.")}}<span class="signature-modifier-requirement"><strong>Requisito</strong> {{requirement}}</span>{{/unless}}
-                {{#if source}}<a href="{{source}}" target="_blank" rel="noopener noreferrer" aria-label="Regra oficial de {{name}}">Regra oficial</a>{{/if}}
+                {{#if effect}}<span data-dbu-share-text>{{effect}}</span> {{dbuShareRule name}}{{/if}}
+                {{#unless (eq requirement "Sem requisito de aquisição.")}}<span class="signature-modifier-requirement" data-dbu-share-text><strong>Requisito</strong> {{requirement}}</span>{{/unless}}
+                {{#if source}}<a href="{{source}}" data-dbu-share-source target="_blank" rel="noopener noreferrer" aria-label="Regra oficial de {{name}}">Regra oficial</a>{{/if}}
               </td>
             </tr>
             {{/if}}{{/if}}
@@ -365,11 +367,11 @@
               </td>
             </tr>
             {{#if name}}{{#if requirement}}
-            <tr class="signature-modifier-summary">
+            <tr class="signature-modifier-summary" data-dbu-share-scope>
               <td colspan="6">
-                {{#if effect}}<span>{{effect}}</span>{{/if}}
-                {{#unless (eq requirement "Sem requisito de aquisição.")}}<span class="signature-modifier-requirement"><strong>Requisito</strong> {{requirement}}</span>{{/unless}}
-                {{#if source}}<a href="{{source}}" target="_blank" rel="noopener noreferrer" aria-label="Regra oficial de {{name}}">Regra oficial</a>{{/if}}
+                {{#if effect}}<span data-dbu-share-text>{{effect}}</span> {{dbuShareRule name}}{{/if}}
+                {{#unless (eq requirement "Sem requisito de aquisição.")}}<span class="signature-modifier-requirement" data-dbu-share-text><strong>Requisito</strong> {{requirement}}</span>{{/unless}}
+                {{#if source}}<a href="{{source}}" data-dbu-share-source target="_blank" rel="noopener noreferrer" aria-label="Regra oficial de {{name}}">Regra oficial</a>{{/if}}
               </td>
             </tr>
             {{/if}}{{/if}}

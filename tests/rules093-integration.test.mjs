@@ -31,7 +31,9 @@ class DialogStub {
 }
 globalThis.Actor=ActorStub; globalThis.ActorSheet=SheetStub;
 globalThis.Dialog=DialogStub;
-globalThis.foundry={ utils:{deepClone:structuredClone} };
+globalThis.foundry={ utils:{deepClone:structuredClone,
+  escapeHTML: text => String(text).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;')
+} };
 globalThis.CONFIG={DBU:{}}; registerConfig(); installRules093(CONFIG.DBU);
 globalThis.ui={notifications:{warn:()=>{},info:()=>{}}};
 globalThis.game={user:{isGM:true},combat:null,actors:new Map()};

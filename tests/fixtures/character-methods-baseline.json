@@ -1980,12 +1980,14 @@
     "_onAttackRefLookup": {
       "hash": "43fd01572da3b0fb76e0625b857ebfb5db29a26eae57e5184478922a1931a59d",
       "length": 1,
-      "async": false
+      "async": false,
+      "rules093Hash": "84681df9244ec37fddc3f09b4ec348286fd96484cfb46764c61e39b02849e131"
     },
     "_onStateLookup": {
       "hash": "4248435bd276166d923ca5a57e8d1e41f7453d44b964e510f4cebc46d2023892",
       "length": 1,
-      "async": false
+      "async": false,
+      "rules093Hash": "331a0d348a4fc597375e9d7bcab0ea8170b02da80d3b60bda258790579b9f608"
     }
   },
   "defaultOptionsHash": "6c75a19bc1c5d7acbbd8000fe7e6088ff0bd2ac1c2cc28f109cdbeabba046acd",

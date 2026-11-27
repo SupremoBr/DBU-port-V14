@@ -1,3 +1,4 @@
+import { bindRuleSharing, ruleShareButton } from "../helpers/rule-share.mjs";
 import { adversaryRound093, isAdversary093 } from "./adversaries-v093.mjs";
 import { sendRequest, listenRequests } from "../automation/scripts/core/authorized-request.js";
 import { attackWeapon093 } from '../helpers/weapon-state.mjs';
@@ -358,20 +359,20 @@ export function installRulesSheet093(Sheet) {
     const entry = CATALOGS_093.transformations[trans?.catalogKey];
     if (!entry) return original(event);
     const groups = entry.traitGroups.map(group => `
-      <section class="tf-trait-group-detail">
-        <h3 class="tf-trait-group-header">${escape(group.name)}</h3>
+      <section class="tf-trait-group-detail" data-dbu-share-scope data-dbu-share-source="${escape(entry.source)}">
+        <h3 class="tf-trait-group-header">${escape(group.name)} ${ruleShareButton(entry.name + " · " + group.name)}</h3>
         ${group.effects.map(effect => `
           <div class="tf-trait-effect-row">
-            <div class="tf-reference-label">
+            <div class="tf-reference-label" data-dbu-share-text>
               <strong>Lv.${escape(effect.level)}</strong>
               <span class="tf-trait-keyword-badge ${escape(effect.activationType)}">[${escape(effect.keyword)}]</span>
             </div>
-            <div class="tf-trait-effect-text">${escape(effect.summary)}</div>
+            <div class="tf-trait-effect-text" data-dbu-share-text>${escape(effect.summary)}</div>
             ${effect.referenceOptions?.length ? `
               <dl class="tf-reference-options">
                 ${effect.referenceOptions.map(option => `
-                  <dt>${escape(option.name)} <span>[${escape(option.keyword)}]</span></dt>
-                  <dd>${escape(option.summary)}</dd>
+                  <dt data-dbu-share-text>${escape(option.name)} <span>[${escape(option.keyword)}]</span></dt>
+                  <dd data-dbu-share-text>${escape(option.summary)}</dd>
                 `).join('')}
               </dl>` : ''}
           </div>`).join('')}
@@ -386,7 +387,8 @@ export function installRulesSheet093(Sheet) {
         ${groups}
       </div>`;
     new Dialog({
-      title: entry.name+' — 0.9.3', content, buttons: { close: { label: 'Fechar' } }
+      title: entry.name+' — 0.9.3', content, buttons: { close: { label: 'Fechar' } },
+      render: html => bindRuleSharing(html[0] || html, this.actor)
     }, { width: 650, classes: ['dbu-old', 'tf-traits-window', 'dbu-transformation-reference'] }).render(true);
   });
   wrap('_onTransformationCheckChange', async function(original, event) {

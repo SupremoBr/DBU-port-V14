@@ -1,3 +1,4 @@
+import { ruleShareButton } from "../../helpers/rule-share.mjs";
 import { stateLevel } from "../../rules/states-v093.mjs";
 import { attackWeapon093, weaponRollModifiers093, wieldingStrikePenalty093 } from "../../helpers/weapon-state.mjs";
 import { martialDie, martialEnergyCharges } from "../../rules/path-to-power-v093.mjs";
@@ -701,17 +702,18 @@ export const combatMathMethods = {
 
     const tpDisplay = Array.isArray(data.tpPerRank) ? data.tpPerRank.join("/") : data.tpPerRank;
 
+    const escape = foundry.utils.escapeHTML;
     resultDiv.innerHTML = `
-      <div class="ar-lookup-card">
-        <div class="ar-lookup-name">${val}</div>
-        <div class="ar-lookup-row">
+      <div class="ar-lookup-card" data-dbu-share-scope data-dbu-share-source="${escape(data.source || "")}">
+        <div class="ar-lookup-name">${escape(val)} ${data.effect ? ruleShareButton(val) : ""}</div>
+        <div class="ar-lookup-row" data-dbu-share-text>
           <span class="ar-lk-label">Type:</span> 
           <span class="${type === 'adv' ? 'ar-lk-adv' : 'ar-lk-dis'}">${type === 'adv' ? 'Advantage' : 'Disadvantage'}</span>
         </div>
-        <div class="ar-lookup-row"><span class="ar-lk-label">TP/Rank:</span> ${tpDisplay}</div>
-        <div class="ar-lookup-row"><span class="ar-lk-label">Max Ranks:</span> ${data.maxRanks || 5}</div>
-        ${data.requirement ? `<div class="ar-lookup-row"><span class="ar-lk-label">Restriction:</span> ${data.requirement}</div>` : ''}
-        ${data.effect ? `<div class="ar-lookup-row"><span class="ar-lk-label">Effect:</span> ${data.effect}</div>` : ''}
+        <div class="ar-lookup-row" data-dbu-share-text><span class="ar-lk-label">TP/Rank:</span> ${tpDisplay}</div>
+        <div class="ar-lookup-row" data-dbu-share-text><span class="ar-lk-label">Max Ranks:</span> ${data.maxRanks || 5}</div>
+        ${data.requirement ? `<div class="ar-lookup-row" data-dbu-share-text><span class="ar-lk-label">Restriction:</span> ${escape(data.requirement)}</div>` : ''}
+        ${data.effect ? `<div class="ar-lookup-row" data-dbu-share-text><span class="ar-lk-label">Effect:</span> ${escape(data.effect)}</div>` : ''}
       </div>
     `;
   },
@@ -746,10 +748,10 @@ export const combatMathMethods = {
     const stacks = stored?.stacks ?? 0;
 
     resultDiv.innerHTML = `
-      <div class="ar-lookup-card">
-        <div class="ar-lookup-name">${cond.name} ${isActive ? `<span class="ar-lk-active">ACTIVE ${cond.maxStacks > 1 ? `(${stacks}/${cond.maxStacks})` : ''}</span>` : ''}</div>
+      <div class="ar-lookup-card" data-dbu-share-scope>
+        <div class="ar-lookup-name">${ruleShareButton(cond.name)} ${cond.name} ${isActive ? `<span class="ar-lk-active">ACTIVE ${cond.maxStacks > 1 ? `(${stacks}/${cond.maxStacks})` : ''}</span>` : ''}</div>
         <div class="ar-lookup-row"><span class="ar-lk-label">Max Stacks:</span> ${cond.maxStacks}</div>
-        <div class="ar-lookup-row"><span class="ar-lk-label">Effect:</span> ${cond.effect}</div>
+        <div class="ar-lookup-row" data-dbu-share-text><span class="ar-lk-label">Effect:</span> ${cond.effect}</div>
       </div>
     `;
   },

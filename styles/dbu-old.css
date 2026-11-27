@@ -14233,19 +14233,19 @@
 /* Integrate the whole chat message bubble when it holds a DBU card:
    dark navy instead of Foundry's parchment, so cards sit flush. */
 .chat-message:has(.dbu-attack-roll),
-.chat-message:has(.dbu-round-card),
+.chat-message:has(.dbu-round-card, .dbu-rule-chat),
 .chat-message:has(.dbu-ki-deduct) {
   background: linear-gradient(165deg, rgba(13, 17, 23, 0.96), rgba(20, 29, 42, 0.96));
   border: 1px solid #2a4a6a;
   color: #8899aa;
 }
 .chat-message:has(.dbu-attack-roll) .message-sender,
-.chat-message:has(.dbu-round-card) .message-sender,
+.chat-message:has(.dbu-round-card, .dbu-rule-chat) .message-sender,
 .chat-message:has(.dbu-ki-deduct) .message-sender {
   color: #e8ecf1;
 }
 .chat-message:has(.dbu-attack-roll) .message-metadata,
-.chat-message:has(.dbu-round-card) .message-metadata,
+.chat-message:has(.dbu-round-card, .dbu-rule-chat) .message-metadata,
 .chat-message:has(.dbu-ki-deduct) .message-metadata {
   color: #5a6a7a;
 }
@@ -15611,3 +15611,24 @@
 .dbu-old.sheet .dbu-racial-combat { display: grid; gap: .45rem; margin-block-start: .65rem; min-width: 0; }
 .dbu-old.sheet .dbu-racial-combat :is(.bb-header, .bb-row) { flex-wrap: wrap; }
 .dbu-old.sheet .dbu-racial-combat :is(.bb-label, .bb-bonus) { overflow-wrap: anywhere; }
+
+/* Share a rule using the sheet button pattern and the existing chat header. */
+.dbu-old .dbu-share-rule {
+  display: inline-grid;
+  place-items: center;
+  width: auto;
+  min-width: 26px;
+  min-height: 26px;
+  padding: 0 4px;
+  flex: 0 0 auto;
+  color: var(--text-primary);
+  background: var(--bg-input);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  vertical-align: middle;
+}
+.dbu-old .dbu-share-rule:hover { color: var(--accent-cyan-light); }
+.dbu-old .dbu-share-rule:focus-visible { outline: 2px solid var(--accent-gold); }
+.dbu-rule-chat-text { padding: 6px 9px; color: var(--text-primary); overflow-wrap: anywhere; }
+.dbu-rule-chat-text p { white-space: pre-line; }
+.dbu-rule-chat-text a { color: var(--accent-cyan-light); }

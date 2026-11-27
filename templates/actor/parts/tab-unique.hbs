@@ -35,9 +35,10 @@
   {{!-- Unique Abilities List --}}
   <div class="unique-abilities-list">
     {{#each characterUniques as |ability|}}
-    <div class="unique-ability-card {{#if isGained}}gained-ability{{/if}}" data-unique-index="{{@index}}">
+    <div class="unique-ability-card {{#if isGained}}gained-ability{{/if}}" data-unique-index="{{@index}}" data-dbu-share-scope>
       <div class="unique-header-bar">
         <span class="unique-name-display">{{data.name}}</span>
+        {{dbuShareRule data.name}}
         {{#if isGained}}<span class="gained-badge"><i class="fas fa-link"></i> Gained from: {{gainedFrom}}</span>{{/if}}
         <span class="unique-type-badge">{{#if abilityType}}{{abilityType}}{{else}}{{data.abilityType}}{{/if}}</span>
         {{#if data.legacy}}<span class="unique-type-badge">Legado</span>{{/if}}
@@ -102,24 +103,24 @@
         {{#if data.passiveBonus}}
         <div class="unique-passive-section">
           <label>Passive Bonus</label>
-          <span class="unique-passive-text">{{{data.passiveBonus}}}</span>
+          <span class="unique-passive-text" data-dbu-share-text>{{{data.passiveBonus}}}</span>
         </div>
         {{/if}}
 
         <div class="unique-effect-section">
           <label>Effect</label>
-          <span class="unique-effect-text">{{{data.effect}}}</span>
-          {{#if data.source}}<a class="dbu-catalog-source" href="{{data.source}}" target="_blank" rel="noopener noreferrer">Regra completa no site</a>{{/if}}
+          <span class="unique-effect-text" data-dbu-share-text>{{{data.effect}}}</span>
+          {{#if data.source}}<a class="dbu-catalog-source" href="{{data.source}}" data-dbu-share-source target="_blank" rel="noopener noreferrer">Regra completa no site</a>{{/if}}
         </div>
 
         {{#if hasCatalogOptions}}
         <details class="unique-advres-section">
           <summary>Ver avanços e restrições</summary>
           {{#each data.advancements}}{{#unless legacy}}
-          <p><strong>{{name}} · {{tpCost}} TP</strong> {{effect}}{{#if prerequisites}} <small>{{prerequisites}}</small>{{/if}}</p>
+          <p data-dbu-share-scope data-dbu-share-source="{{../data.source}}"><strong>{{name}}</strong> · <span data-dbu-share-text>{{tpCost}} TP</span> <span data-dbu-share-text>{{effect}}</span>{{#if prerequisites}} <small data-dbu-share-text>{{prerequisites}}</small>{{/if}} {{dbuShareRule name}}</p>
           {{/unless}}{{/each}}
           {{#each data.restrictions}}{{#unless legacy}}
-          <p><strong>{{name}} · {{tpCost}} TP</strong> {{effect}}</p>
+          <p data-dbu-share-scope data-dbu-share-source="{{../data.source}}"><strong>{{name}}</strong> · <span data-dbu-share-text>{{tpCost}} TP</span> <span data-dbu-share-text>{{effect}}</span> {{dbuShareRule name}}</p>
           {{/unless}}{{/each}}
         </details>
         {{/if}}

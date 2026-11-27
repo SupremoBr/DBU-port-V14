@@ -202,7 +202,7 @@
                        data-item-id="{{itemId}}" data-q-idx="{{qIdx}}"
                        value="{{notes}}" placeholder="Notes" />
               </td>
-              <td class="eq-quality-effect" title="{{description}}">{{description}}</td>
+              <td class="eq-quality-effect" title="{{description}}" data-dbu-share-scope><span data-dbu-share-text>{{description}}</span> {{#if description}}{{dbuShareRule catalogName}}{{/if}}</td>
               <td>
                 <button type="button" class="remove-btn"
                         data-action="remove-item-quality"
@@ -364,7 +364,7 @@
                        data-item-id="{{itemId}}" data-q-idx="{{qIdx}}"
                        value="{{notes}}" placeholder="Notes" />
               </td>
-              <td class="eq-quality-effect" title="{{description}}">{{description}}</td>
+              <td class="eq-quality-effect" title="{{description}}" data-dbu-share-scope><span data-dbu-share-text>{{description}}</span> {{#if description}}{{dbuShareRule catalogName}}{{/if}}</td>
               <td>
                 <button type="button" class="remove-btn"
                         data-action="remove-item-quality"

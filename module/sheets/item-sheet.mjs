@@ -1,3 +1,4 @@
+import { bindRuleSharing } from "../helpers/rule-share.mjs";
 import { ItemSheet, TextEditor } from "../helpers/foundry-compat.mjs";
 /**
  * Item sheet for all DBU-OLD item types.
@@ -82,6 +83,7 @@ export class DBUItemSheet extends ItemSheet {
   /** @override */
   activateListeners(html) {
     super.activateListeners(html);
+    bindRuleSharing(html[0], this.item.actor);
 
     // Everything below requires owner permission
     if (!this.isEditable) return;

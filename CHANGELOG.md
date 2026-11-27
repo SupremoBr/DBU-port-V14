@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.0.12-rules093-alpha.41] — descrições no chat
+
+- O botão Enviar ao chat publica descrições de talentos, traços, vantagens, desvantagens, Profiles, técnicas, habilidades únicas, traços de transformação, condições e qualidades de equipamento. O card inclui o link oficial quando disponível.
+
 ## [1.0.12-rules093-alpha.40] — janelas de ação e seleção
 
 - Diálogos do sistema usam o mesmo tema escuro para cabeçalho, campos, botões e foco.

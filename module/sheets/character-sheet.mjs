@@ -1,3 +1,4 @@
+import { bindRuleSharing } from "../helpers/rule-share.mjs";
 import { captureSheetEdits, omitUnchangedFields, rebaseSheetRows } from "./sheet-edits.mjs";
 import { martialAttributeWarnings, martialProgressionRows, progressionRowIsEarned, usesPathToPower } from "../rules/path-to-power-v093.mjs";
 import { buffAmount, buffEffectKey, buffStateLabels, buffTriggers, conditionalBuff, customBuffState, manualBuffEffect, supportsBuffTrigger } from "../helpers/custom-buffs.mjs";
@@ -690,6 +691,7 @@ export class DBUCharacterSheet extends ActorSheet {
   /** @override Keep the Foundry lifecycle call on the actual sheet class. */
   activateListeners(html) {
     super.activateListeners(html);
+    bindRuleSharing(html[0], this.actor);
     captureSheetEdits(this, html, ["progressionRows", "customBuffs", "attackRefs", "transformations"]);
     return listenersMethods.activateListeners.call(this, html);
   }
