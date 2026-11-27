@@ -1,3 +1,4 @@
+import { skillAttribute } from "../../helpers/skill-attributes.mjs";
 import { uniqueSkillPassives093 } from "../../rules/unique-abilities-v093.mjs";
 import { stateLevel, ragingBotch } from "../../rules/states-v093.mjs";
 import { martialAttributeBudget, martialAttributeWarnings, martialDie, martialLevel, martialProgressionRows, martialResourcePenalty, martialRowLevel, martialSkillSlots, progressionRowIsEarned, usesPathToPower, validMartialAttributes } from "../../rules/path-to-power-v093.mjs";
@@ -266,7 +267,7 @@ export const progressionSkillsMethods = {
   _calcSkillBreakdown(skillKey, specialty = "") {
     const system = this.actor.system;
     const def = (CONFIG.DBU?.skillsData || []).find(s => s.id === skillKey) || {};
-    const attrKey = def.attribute || "ag";
+    const attrKey = skillAttribute(system, skillKey, def.attribute || "ag");
     // Encompassing Skills (skills.txt:52-56): each Specialty tracks its own ranks
     const specRow = specialty
       ? (system.skillSpecialties?.[skillKey] || []).find(s => s.name === specialty)

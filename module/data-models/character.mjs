@@ -390,6 +390,7 @@ export default class DBUCharacterData extends foundry.abstract.TypeDataModel {
 
       // ---- Skills (freeform object: { acrobatics: { rank: 2 }, ... }) ----
       skills: new ObjectField(),
+      skillAttributes: new ObjectField(),
       // Per-skill flat Misc modifier: { acrobatics: 2, stealth: -1, ... }
       skillMisc: new ObjectField(),
       // Encompassing Skill specialties (skills.txt:52-56):

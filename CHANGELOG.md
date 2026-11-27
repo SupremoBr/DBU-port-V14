@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.0.12-rules093-alpha.45] — atributo manual de perícia
+
+- A coluna Attr da aba Skills permite escolher o atributo usado em cada perícia e voltar ao padrão. A seleção vale para as especialidades, a prévia da ficha e as rolagens, incluindo Skill Clashes.
+
 ## [1.0.12-rules093-alpha.44] — passivas de habilidades únicas
 
 - Dragon Dash aumenta Boosted Speed e Precognition aumenta a Iniciativa. Bluff Attack e Down Burst entram no Skill Bonus. Illusion, Healing Hands e Metamoran Fusion Dance modificam os testes correspondentes. Para Para Dance reduz o Critical Target de Performance.

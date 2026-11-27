@@ -4,7 +4,7 @@
     <thead>
       <tr>
         <th>Skill</th>
-        <th>Attr</th>
+        <th title="Atributo usado nos testes de perícia">Attr</th>
         <th title="Attribute Bonus: 1/2 of the assigned Attribute Score">Attr ½</th>
         <th title="+2 per Skill Rank">Ranks</th>
         <th title="Gifted Student + Equipment + Traits + Buffs">Extra</th>
@@ -17,7 +17,18 @@
       {{#each skills}}
       <tr data-skill="{{key}}" class="{{#if isEncompassing}}skill-encompassing{{/if}}">
         <td class="skill-name">{{name}}{{#if isEncompassing}} <span class="skill-enc-tag" title="Encompassing Skill: ranks are placed into Specialties (each rolled separately)">(E)</span>{{/if}}</td>
-        <td class="skill-attr"><span class="attr-badge">{{abbr}}</span></td>
+        <td class="skill-attr">
+          {{#if @root.editable}}
+          <select class="skill-attribute-select" data-skill="{{key}}" aria-label="Atributo de {{name}}">
+            <option value="">Padrão ({{defaultAbbr}})</option>
+            {{#each attributeChoices}}
+            <option value="{{key}}" {{#if selected}}selected{{/if}}>{{label}}</option>
+            {{/each}}
+          </select>
+          {{else}}
+          <span class="attr-badge">{{abbr}}</span>
+          {{/if}}
+        </td>
         <td class="skill-attr-half">+{{attrHalf}}</td>
         {{#if isEncompassing}}
         <td class="skill-ranks skill-enc-note" colspan="3">

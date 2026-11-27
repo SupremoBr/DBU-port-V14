@@ -339,8 +339,11 @@ export class DBUCharacterSheet extends ActorSheet {
       return {
         key: def.id,
         name: def.name || def.id,
-        attribute: bd.attrKey,
         abbr: bd.attrKey.toUpperCase(),
+        defaultAbbr: (def.attribute || "ag").toUpperCase(),
+        attributeChoices: Object.entries(attrLabels)
+          .filter(([key]) => key !== (def.attribute || "ag"))
+          .map(([key, label]) => ({ key, label, selected: key === bd.attrKey })),
         rank: bd.rankNum,
         attrHalf: bd.attr,
         ranksBonus: bd.ranks,

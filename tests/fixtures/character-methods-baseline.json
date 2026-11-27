@@ -16,7 +16,7 @@
       "hash": "3526627ce6f3856e36b3595385220fd7a5d1b02ef6180adca6e0a1f3feb13981",
       "length": 0,
       "async": true,
-      "rules093Hash": "b35448dfc56a9ecb3c80a997f3fc3826c2803eecb97ce48a494f46d949e79627"
+      "rules093Hash": "0fb3a67a02bd1b99f00fcf4dcc070afa9b260dd916c252435c629bd2414376be"
     },
     "_prepareProgressionData": {
       "hash": "6cf2b995786a1a995689e856ad51c39298cb301a546f86f4cdc3789198e6f1eb",
@@ -502,7 +502,7 @@
       "hash": "7151d004f4ec7b7e1789433895eab641a5f3cb3f0c75ac933a73cd7962bb8758",
       "length": 1,
       "async": false,
-      "rules093Hash": "1f6784975e73bc04d23ce63f769161f43717e4d1c8e1409bb45c4d0d31101e10"
+      "rules093Hash": "a463c611b9967305637aad31f12e5849a720426c184ed6739109119da514cc53"
     },
     "_onRollSkill": {
       "hash": "a366fca682a0ae97380daf9fccb463983fe7d840cfd31b75029d1bc5e85c84e2",
@@ -2025,7 +2025,7 @@
       "baseBuilding": 4
     }
   },
-  "listenersHash": "f5bee7732293a8dc6f47436b71d27a9b4183e7ee245e33e2ae0ae2b4c32c2de4",
+  "listenersHash": "1fbe91a3415e92417770a94dbff9a135a4a55382c0143ac396f05307e68349de",
   "listenerBindings": [
     [
       "click",
@@ -2110,6 +2110,10 @@
     [
       "click",
       "[data-action='roll-skill']"
+    ],
+    [
+      "change",
+      ".skill-attribute-select"
     ],
     [
       "change",

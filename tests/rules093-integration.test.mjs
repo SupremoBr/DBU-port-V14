@@ -821,3 +821,24 @@ test('secondary weapon applies its own size, category, quality and damage attrib
   assert.match(context.attackRefs[0].weaponIssue, /quebrada/);
   assert.equal(context.attackRefs[0].targetingBonus, 0);
 });
+
+test('manual skill attributes apply in the sheet and in clashes while preserving ranks and defaults', async () => {
+  const { computeSkillBonus } = await import('../module/helpers/duel.mjs');
+  const actor = new DBUActor({
+    rulesVersion: '0.9.3',
+    attributes: { ma: { score: 4 }, fo: { score: 10 } },
+    skills: { use_magic: { rank: 2 } },
+    skillSpecialties: { crafting: [{ name: 'Weapons', rank: 1 }] },
+    skillAttributes: { use_magic: 'fo', crafting: 'fo' }
+  });
+  const sheet = new DBUCharacterSheet(actor);
+  assert.equal(sheet._calcSkillBreakdown('use_magic').attrKey, 'fo');
+  assert.equal(sheet._calcSkillBreakdown('use_magic').total, 9);
+  assert.equal(computeSkillBonus(actor, 'use_magic'), 9);
+  assert.equal(sheet._calcSkillBreakdown('crafting', 'Weapons').total, 7);
+
+  actor.system.skillAttributes.use_magic = '';
+  assert.equal(sheet._calcSkillBreakdown('use_magic').total, 6);
+  actor.system.skillAttributes.use_magic = ['fo'];
+  assert.equal(computeSkillBonus(actor, 'use_magic'), 6);
+});

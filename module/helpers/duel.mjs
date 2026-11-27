@@ -1,3 +1,4 @@
+import { skillAttribute } from "./skill-attributes.mjs";
 import { uniqueSkillPassives093 } from "../rules/unique-abilities-v093.mjs";
 import { Dialog, onRenderChatMessage } from "./foundry-compat.mjs";
 /**
@@ -948,7 +949,7 @@ function fallbackFormula(actor, kind) {
  */
 export function computeSkillBonus(actor, skillKey) {
   const skillDef = (CONFIG.DBU?.skillsData || []).find(s => s.id === skillKey);
-  const attrKey = skillDef?.attribute || "in";
+  const attrKey = skillAttribute(actor.system, skillKey, skillDef?.attribute || "in");
   const rank = actor.system.skills?.[skillKey]?.rank ?? actor.system.skills?.[skillKey] ?? 0;
   const attrScore = actor.system.attributes?.[attrKey]?.score ?? 0;
   const gs = actor.system.aptitudes?.giftedStudentSkillBonus || 0;

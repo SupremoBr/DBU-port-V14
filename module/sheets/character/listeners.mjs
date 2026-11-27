@@ -36,6 +36,13 @@ export const listenersMethods = {
 
     // Skill roll button
     html.on("click", "[data-action='roll-skill']", this._onRollSkill.bind(this));
+    html.on("change", ".skill-attribute-select", async (ev) => {
+      const { dataset, value } = ev.currentTarget;
+      const config = CONFIG.DBU;
+      if (!config?.skillsData?.some(skill => skill.id === dataset.skill)) return;
+      if (value && !Object.hasOwn(config.attributes || {}, value)) return;
+      await this.actor.update({ [`system.skillAttributes.${dataset.skill}`]: value });
+    });
     html.on("change", ".skill-misc-input", async (ev) => {
       const key = ev.currentTarget.dataset.skill;
       if (!key) return;

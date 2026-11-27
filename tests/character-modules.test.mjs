@@ -43,7 +43,7 @@ test('default options and downtime tables retain the baseline implementation and
   assert.equal(hash(listenersMethods.activateListeners), baseline.listenersHash);
 });
 
-test('editable sheet binds the same 246 events and preserves callback receivers', async () => {
+test('editable sheet binds the reviewed events and preserves callback receivers', async () => {
   const updates = [], registrations = [];
   const sheet = new DBUCharacterSheet({ system: {}, update: async value => updates.push(value) });
   let populated = 0;
@@ -59,6 +59,16 @@ test('editable sheet binds the same 246 events and preserves callback receivers'
   const event = { currentTarget: { dataset: { skill: 'perception' }, value: '4' } };
   await registrations.find(([, selector]) => selector === '.skill-misc-input')[2](event);
   assert.deepEqual(updates, [{ 'system.skillMisc.perception': 4 }]);
+  const changeAttribute = registrations.find(([, selector]) => selector === '.skill-attribute-select')[2];
+  CONFIG.DBU = { skillsData: [{ id: 'use_magic' }], attributes: { fo: 'Force', ma: 'Magic' } };
+  try {
+    for (const [skill, value] of [['use_magic', 'fo'], ['use_magic', ''], ['use_magic', 'invalid'], ['invalid', 'fo']]) {
+      await changeAttribute({ currentTarget: { dataset: { skill }, value } });
+    }
+    assert.deepEqual(updates.slice(1), [{ 'system.skillAttributes.use_magic': 'fo' }, { 'system.skillAttributes.use_magic': '' }]);
+  } finally {
+    CONFIG.DBU = {};
+  }
   registrations.find(([, selector]) => selector === '.item-edit')[2](event);
   assert.equal(edited.receiver, sheet);
   assert.equal(edited.event, event);
