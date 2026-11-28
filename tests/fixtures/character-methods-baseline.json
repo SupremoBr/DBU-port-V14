@@ -16,7 +16,7 @@
       "hash": "3526627ce6f3856e36b3595385220fd7a5d1b02ef6180adca6e0a1f3feb13981",
       "length": 0,
       "async": true,
-      "rules093Hash": "0fb3a67a02bd1b99f00fcf4dcc070afa9b260dd916c252435c629bd2414376be"
+      "rules093Hash": "a6eaa09190847837d34ea6892b13254890d800026056115ef684f2eaffcedd5c"
     },
     "_prepareProgressionData": {
       "hash": "6cf2b995786a1a995689e856ad51c39298cb301a546f86f4cdc3789198e6f1eb",
@@ -346,7 +346,8 @@
     "_prepareRacialBonusData": {
       "hash": "0fb33d60ab412dca7035be513aa1e4a45f69d4d8916449faf07142380cc41e77",
       "length": 2,
-      "async": false
+      "async": false,
+      "rules093Hash": "35927780d3fc5030c9b11348a8a0b05d08fbb11524fdbe80eddeaebd32519acc"
     },
     "_prepareManifestedPowerData": {
       "hash": "cac70b31ecbe60cfd58219613a6fd13c11bae5a35eed1b8406e5ed1c467d5fe8",
@@ -549,7 +550,8 @@
     "_onToggleTrait": {
       "hash": "30c027099f0f40b43dca693100827b860d35b38d0c6f43f866d2bc56597dcc7c",
       "length": 1,
-      "async": false
+      "async": false,
+      "rules093Hash": "14fdfd809c94df90e059c650bb8a63a2a737f0fd6c8b3498d45c10b33cf440d8"
     },
     "_onAddTrait": {
       "hash": "edba07dbc54e010eac57a258dabe1629ff97f1235ae3b309cde6a6bdd1116e7f",

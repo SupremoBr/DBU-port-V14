@@ -430,7 +430,9 @@ export class DBUCharacterSheet extends ActorSheet {
     context.raceLabel = context.raceOptions[system.race] || system.race;
     context.subspeciesLabel = this._getSubspeciesLabel(system) || "—";
     context.subraceLabel = context.subraceOptions.find(option => option.selected)?.label || "—";
-    context.characterTraits = this._getCharacterTraits(system);
+    context.characterTraits = this._getCharacterTraits(system).map(trait => ({
+      ...trait, collapsed: this._collapsedRacialTraits?.has(trait.id)
+    }));
     context.isCustomSpecies = system.race === "customSpecies";
 
     // ---- Talents tab data ----

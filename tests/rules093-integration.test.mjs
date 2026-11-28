@@ -842,3 +842,57 @@ test('manual skill attributes apply in the sheet and in clashes while preserving
   actor.system.skillAttributes.use_magic = ['fo'];
   assert.equal(computeSkillBonus(actor, 'use_magic'), 6);
 });
+
+test('Legendary Saiyan raises only the Wound cap and the stack picker permits four', async t => {
+  const factor = 'r093_mutation_legendary_saiyan';
+  const born = 'r093_saiyans_born_for_battle';
+  const { racialFactorsForRace } = await import('../module/sheets/character/racial-factors.mjs');
+  assert.ok(racialFactorsForRace(CATALOGS_093.racialTraits, 'saiyan').some(trait => trait.id === factor));
+  assert.ok(!racialFactorsForRace(CATALOGS_093.racialTraits, 'earthling').some(trait => trait.id === factor));
+
+  const system = {
+    rulesVersion: '0.9.3', race: 'saiyan', racialTraits: [born, factor],
+    aptitudes: {}, status: { soak: 0 }, battleBorn: { strike: 3, dodge: 2, wound: 3 }
+  };
+  const actor = new ActorStub(system);
+  const sheet = new DBUCharacterSheet(actor);
+  const prepare = () => applyRacial093(system, 2, 2);
+  prepare();
+  assert.equal(system.battleBorn.strike, 2);
+  assert.equal(system.battleBorn.dodge, 2);
+  assert.equal(system.battleBorn.woundCap, 4);
+  assert.equal(system.battleBorn.maxTotal, 8);
+  const context = {};
+  sheet._prepareRacialBonusData(context, system);
+  assert.equal(context.bbWoundPips.length, 4);
+  assert.equal(context.bbStrikePips.length, 2);
+  const wait = DialogStub.wait;
+  t.after(() => { DialogStub.wait = wait; });
+  DialogStub.wait = async ({ buttons }) => {
+    assert.deepEqual(Object.keys(buttons), ['wound']);
+    assert.equal(buttons.wound.label, 'wound (3/4)');
+    return 'wound';
+  };
+  assert.equal(await sheet._battleBornGrantStack('Racial Trait'), 'wound');
+  prepare();
+  assert.equal(system.battleBorn.wound, 4);
+  assert.equal(system.battleBorn.woundBonus, 8);
+  assert.equal(await sheet._battleBornGrantStack('Racial Trait'), 'maxed');
+  await sheet._onBBIncrement({ preventDefault() {}, currentTarget: { dataset: { bbType: 'wound' } } });
+  assert.equal(system.battleBorn.wound, 4);
+
+  system.rules093State = { bornLimitOverride: true };
+  system.battleBorn.strike = 3;
+  system.battleBorn.dodge = 3;
+  prepare();
+  assert.equal(system.battleBorn.wound, 4);
+  assert.equal(system.battleBorn.woundCap, 4);
+  assert.equal(system.battleBorn.maxTotal, 10);
+  assert.equal(await sheet._battleBornGrantStack('Racial Trait'), 'maxed');
+
+  delete system.rules093State;
+  system.racialTraits = [born];
+  prepare();
+  assert.equal(system.battleBorn.wound, 2);
+  assert.equal(system.battleBorn.maxTotal, 6);
+});

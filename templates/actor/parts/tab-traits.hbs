@@ -35,7 +35,7 @@
   <div class="traits-list">
     {{#if (gt characterTraits.length 0)}}
       {{#each characterTraits}}
-      <div class="trait-card" data-dbu-share-scope data-trait-id="{{id}}">
+      <div class="trait-card{{#if collapsed}} collapsed{{/if}}" data-dbu-share-scope data-trait-id="{{id}}">
         <div class="trait-header">
           {{#if factor}}
           <span class="trait-category-badge factor">Factor</span>
@@ -45,7 +45,7 @@
           <span class="trait-name">{{name}}</span>
           {{dbuShareRule name}}
           <span class="trait-race-tag">{{#if factor}}{{factor.name}}{{else}}{{#if isSubraceTrait}}Subrace{{else}}{{race}}{{/if}}{{/if}}</span>
-          <button type="button" class="trait-expand" data-action="toggle-trait" title="Expand/Collapse">
+          <button type="button" class="trait-expand" data-action="toggle-trait" aria-label="Detalhes de {{name}}" aria-expanded="{{#if collapsed}}false{{else}}true{{/if}}">
             <i class="fas fa-chevron-down"></i>
           </button>
           {{#if @root.rules093}}

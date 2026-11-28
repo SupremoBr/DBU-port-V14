@@ -10,10 +10,12 @@
         <div class="bb-header">
           <i class="fas fa-fist-raised"></i> Battle Born Tracker
           <span class="bb-total">Total: {{system.battleBorn.total}}/{{system.battleBorn.maxTotal}}</span>
+          {{#unless rules093}}
           <label class="bb-undying-toggle">
             <input type="checkbox" name="system.battleBorn.undying" {{#if system.battleBorn.undying}}checked{{/if}} />
             Undying L3 (max 3)
           </label>
+          {{/unless}}
         </div>
         <div class="bb-allocations">
           <div class="bb-row" data-bb-type="strike">
@@ -40,7 +42,7 @@
             <div class="bb-pips">
               {{#each bbWoundPips}}<span class="bb-pip {{#if filled}}filled{{/if}}"></span>{{/each}}
             </div>
-            <button type="button" class="bb-increment" data-bb-type="wound" {{#if (gte system.battleBorn.wound system.battleBorn.cap)}}disabled{{/if}}><i class="fas fa-plus"></i></button>
+            <button type="button" class="bb-increment" data-bb-type="wound" {{#if (gte system.battleBorn.wound system.battleBorn.woundCap)}}disabled{{/if}}><i class="fas fa-plus"></i></button>
             <span class="bb-bonus">+{{system.battleBorn.woundBonus}}</span>
           </div>
         </div>

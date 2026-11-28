@@ -15,6 +15,7 @@ import { roundKey, resolutionOwner, rollPressure093, adjustRacialResource093, ra
 import { editAttackGrant093 } from './attack-grants-v093.mjs';
 import { pendingSteadfast093 } from './health-thresholds-v093.mjs';
 import { racialTrackerTraits093 } from './racial-tracker-v093.mjs';
+import { battleBornCaps093 } from './runtime-v093.mjs';
 const installed = new WeakSet();
 const resolvingSteadfast = new WeakSet();
 const warn = message => { ui.notifications.warn(message); return false; };
@@ -278,7 +279,8 @@ export function installRulesSheet093(Sheet) {
     context.canEditTransformationToken = context.editable && !!game.dbu?.automation?.editTransformationToken;
     context.rules093Pools = roundPools093(this.actor);
     context.canExportRulesBackup = !!game.user.isGM;
-    context.rules093Born = (this.actor.system.racialTraits || []).includes(CATALOGS_093.racialTraits.saiyan.find(t => t.name === 'Born for Battle').id);
+    context.battleBornTraitId = CATALOGS_093.racialTraits.saiyan.find(t => t.name === 'Born for Battle').id;
+    context.rules093Born = (this.actor.system.racialTraits || []).includes(context.battleBornTraitId);
     return context;
   });
   wrap('_prepareTechniquesData', function(original, ...args) {
@@ -428,12 +430,18 @@ export function installRulesSheet093(Sheet) {
   wrap('_battleBornGrantStack', async function(original, source) {
     const trait = (CATALOGS_093.racialTraits[this.actor.system.race] || []).find(t => t.name === 'Born for Battle');
     if (!trait || !this.actor.system.racialTraits?.includes(trait.id)) return;
-    const bb = this.actor.system.battleBorn || {}, cap = this.actor.system.rules093State?.bornLimitOverride ? 3 : 2;
-    const options = Object.fromEntries(['strike','dodge','wound'].filter(k => (bb[k] || 0) < cap).map(k => [k, { label: k, callback: () => k }]));
+    const system = this.actor.system;
+    const bb = system.battleBorn || {};
+    const options = Object.fromEntries(Object.entries(battleBornCaps093(system))
+      .filter(([roll, cap]) => (bb[roll] || 0) < cap)
+      .map(([roll, cap]) => [roll, { label: `${roll} (${bb[roll] || 0}/${cap})`, callback: () => roll }]));
     if (!Object.keys(options).length) return 'maxed';
     const selected = await Dialog.wait({ title: 'Born for Battle — '+source, content: '<p>Escolha onde aplicar o stack (+1(T)).</p>', buttons: options });
-    if (!options[selected]) return;
-    await this.actor.update({ ['system.battleBorn.'+selected]: (bb[selected] || 0) + 1 });
+    if (!Object.hasOwn(options, selected)) return;
+    const current = this.actor.system;
+    const stacks = current.battleBorn?.[selected] || 0;
+    if (current.race !== 'saiyan' || !current.racialTraits?.includes(trait.id) || stacks >= battleBornCaps093(current)[selected]) return;
+    await this.actor.update({ [`system.battleBorn.${selected}`]: stacks + 1 });
     return selected;
   });
   wrap('_onTfNewLevelOfPower', async function(original, event) {

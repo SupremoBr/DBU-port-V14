@@ -15,6 +15,12 @@ export function racialSaves093(system) {
 export function racialLife093(system, race = system.race) {
   return (RACES_093[race]?.life ?? 3) + talentPassiveBonus093(system, 'racialLife');
 }
+export function battleBornCaps093(system) {
+  const cap = 2;
+  const bonus = system.race === 'saiyan' ? racialPassiveBonuses093(system, 1, 1).battleBornWoundCap : 0;
+  return { strike: cap, dodge: cap, wound: cap + (bonus || 0) };
+}
+
 /** Only verified current passives belong here. Other changed traits remain manual. */
 export function applyRacial093(system, tier, baseTier) {
   if (!uses093(system)) return;
@@ -22,11 +28,16 @@ export function applyRacial093(system, tier, baseTier) {
   const has = (name, level = 1) => racialEffectEnabled093(system, name, level);
   const bb = system.battleBorn || {};
   const born = has('Born for Battle');
-  const cap = system.rules093State?.bornLimitOverride ? 3 : 2;
-  bb.cap = cap; bb.woundCap = cap; bb.maxTotal = cap * 3;
-  bb.strike = system.rules093State?.bornLimitOverride ? Math.max(0, Number(bb.strike) || 0) : Math.min(cap, Math.max(0, Number(bb.strike) || 0));
-  bb.dodge = system.rules093State?.bornLimitOverride ? Math.max(0, Number(bb.dodge) || 0) : Math.min(cap, Math.max(0, Number(bb.dodge) || 0));
-  bb.wound = system.rules093State?.bornLimitOverride ? Math.max(0, Number(bb.wound) || 0) : Math.min(cap, Math.max(0, Number(bb.wound) || 0));
+  const caps = battleBornCaps093(system);
+  const heritageStackCount = system.rules093State?.bornLimitOverride ? 3 : 0;
+  bb.cap = caps.strike;
+  bb.woundCap = caps.wound;
+  bb.maxTotal = 0;
+  for (const [roll, cap] of Object.entries(caps)) {
+    // Heritage 2 can set a roll to three stacks without changing its normal limit.
+    bb[roll] = Math.min(Math.max(cap, heritageStackCount), Math.max(0, Number(bb[roll]) || 0));
+    bb.maxTotal += Math.max(cap, bb[roll]);
+  }
   bb.total = bb.strike + bb.dodge + bb.wound;
   bb.strikeBonus = born ? bb.strike * tier : 0;
   bb.dodgeBonus = born ? bb.dodge * tier : 0;

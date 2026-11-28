@@ -135,9 +135,9 @@ export const traitsTalentsMethods = {
         return pips;
       };
 
-      context.bbStrikePips = makePips(bb.strike, cap);
-      context.bbDodgePips = makePips(bb.dodge, cap);
-      context.bbWoundPips = makePips(bb.wound, bb.woundCap || cap);
+      context.bbStrikePips = makePips(bb.strike, Math.max(bb.strike, cap));
+      context.bbDodgePips = makePips(bb.dodge, Math.max(bb.dodge, cap));
+      context.bbWoundPips = makePips(bb.wound, Math.max(bb.wound, bb.woundCap || cap));
       context.racialBonuses = system.racialBonuses || { has: {} };
       context.hasRacialBonuses = Object.values(context.racialBonuses.has || {}).some(v => v);
       context.battleBornTraitId = "908d85ede236e3ce";
@@ -558,15 +558,12 @@ export const traitsTalentsMethods = {
     event.preventDefault();
     const btn = event.currentTarget;
     const card = btn.closest(".trait-card");
-    if (!card) return;
-    const effectsList = card.querySelector(".trait-effects-list");
-    const description = card.querySelector(".trait-description");
-    const icon = btn.querySelector("i");
-    if (!effectsList) return;
-    const isCollapsed = effectsList.style.display === "none";
-    effectsList.style.display = isCollapsed ? "" : "none";
-    if (description) description.style.display = isCollapsed ? "" : "none";
-    if (icon) icon.className = isCollapsed ? "fas fa-chevron-down" : "fas fa-chevron-right";
+    if (!card?.dataset.traitId) return;
+    const collapsed = card.classList.toggle("collapsed");
+    const saved = this._collapsedRacialTraits ??= new Set();
+    if (collapsed) saved.add(card.dataset.traitId);
+    else saved.delete(card.dataset.traitId);
+    btn.setAttribute("aria-expanded", String(!collapsed));
   },
 
   async _onAddTrait(event) {

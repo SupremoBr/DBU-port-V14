@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.0.12-rules093-alpha.46] — Legendary Saiyan
+
+- O efeito 2 do fator Legendary Saiyan (Mutation) aumenta de 2 para 4 o limite de Battle Born em Wound. O contador e a alocação de stacks usam os limites por rolagem. O terceiro efeito de Born for Battle ainda pode elevar a contagem a 3 como exceção.
+- A ficha conserva os cartões de traços abertos ou fechados quando o contador de Battle Born é atualizado.
+
 ## [1.0.12-rules093-alpha.45] — atributo manual de perícia
 
 - A coluna Attr da aba Skills permite escolher o atributo usado em cada perícia e voltar ao padrão. A seleção vale para as especialidades, a prévia da ficha e as rolagens, incluindo Skill Clashes.

@@ -28,6 +28,7 @@ export const RACIAL_PASSIVES_093 = {
     { level: 3, bonuses: { te: 1 } },
   ],
   r093_mutation_captain: [{ level: 2, bonuses: { pe: 1 } }],
+  r093_mutation_legendary_saiyan: [{ level: 2, scale: 'flat', bonuses: { battleBornWoundCap: 2 } }],
   r093_mutation_psychic: [{ level: 2, bonuses: { in: 1, cognitiveSave: 1 } }],
   r093_mutation_speedster: [{ level: 2, bonuses: { ag: 1 } }],
   r093_mutation_tactician: [{ level: 2, bonuses: { sc: 1 } }],
