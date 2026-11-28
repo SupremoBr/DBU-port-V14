@@ -8,12 +8,13 @@ import { CATALOGS_093 } from '../module/rules/catalogs-v093.mjs';
 
 // Exercise the actual exported sheet against a small Foundry lifecycle stub.
 class ActorSheetStub {
+  static get defaultOptions() { return { scrollY: [".window-content"] }; }
   constructor(actor = { system: {} }) { this.actor = actor; this.isEditable = true; }
   activateListeners(html) { this.baseListenerCalls = (this.baseListenerCalls || 0) + 1; this.baseHtml = html; }
   async _updateObject(event, formData) { this.baseUpdateCalls = (this.baseUpdateCalls || 0) + 1; return { event, formData }; }
 }
 globalThis.ActorSheet = ActorSheetStub;
-globalThis.foundry = { utils: { deepClone: structuredClone } };
+globalThis.foundry = { utils: { deepClone: structuredClone, mergeObject: Object.assign } };
 globalThis.CONFIG = { DBU: {} };
 const { DBUCharacterSheet } = await import('../module/sheets/character-sheet.mjs');
 const baseline = JSON.parse(readFileSync(new URL('./fixtures/character-methods-baseline.json', import.meta.url)));
@@ -38,6 +39,7 @@ test('385 prototype methods retain their contract, with reviewed 0.9.3 rule chan
 });
 
 test('default options and downtime tables retain the baseline implementation and values', () => {
+  assert.deepEqual(DBUCharacterSheet.defaultOptions.scrollY, ['.window-content', '.sheet-body']);
   assert.equal(hash(Object.getOwnPropertyDescriptor(DBUCharacterSheet, 'defaultOptions').get), baseline.defaultOptionsHash);
   for (const [key, value] of Object.entries(baseline.downtime)) assert.deepEqual(DBUCharacterSheet[key], value);
   assert.equal(hash(listenersMethods.activateListeners), baseline.listenersHash);

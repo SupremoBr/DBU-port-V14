@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.0.12-rules093-alpha.49] — rolagem da ficha
+
+- A ficha registra a área de rolagem compartilhada pelas abas para o Foundry restaurar a posição após editar o personagem.
+
 ## [1.0.12-rules093-alpha.48] — estado dos cartões de traços
 
 - A aba Traits conserva os cartões abertos ou fechados por personagem ou token durante a sessão, inclusive quando a ficha é recriada após atualizar o contador de Battle Born.

@@ -35,7 +35,9 @@ export class DBUCharacterSheet extends ActorSheet {
 
   /** @override */
   static get defaultOptions() {
-    return foundry.utils.mergeObject(super.defaultOptions, {
+    const options = super.defaultOptions;
+    return foundry.utils.mergeObject(options, {
+      scrollY: [...new Set([...(options.scrollY ?? []), ".sheet-body"])],
       classes: ["dbu-old", "sheet", "actor", "character"],
       template: "systems/DBU-MRR-OLD/templates/actor/character-sheet.hbs",
       width: 1100,
