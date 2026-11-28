@@ -8,9 +8,14 @@ test('current adversaries get nine read-only maneuver cards in the combat HUD', 
   assert.doesNotMatch(hudV2Tabs(null, 0, hudTabsForActor({ ...standard, adversary: { enabled: false } })), /data-hud-tab="villain"/);
   assert.doesNotMatch(hudV2Tabs(null, 0, hudTabsForActor({ ...standard, adversary: { enabled: true, category: 'mook' } })), /data-hud-tab="villain"/);
   assert.equal(hudV2Panel({ tab: 'villain' }), '');
+  globalThis.foundry = { utils: { escapeHTML: String } };
   const render = hudV2Panel({ tab: 'villain', selected: 'act-again', showVillain: true });
   assert.equal((render.match(/data-dbu-hud-action="hud-select"/g) || []).length, 9);
-  assert.match(render, /Quando outro personagem termina o turno/);
+  assert.match(render, /data-dbu-share-scope/);
+  assert.match(render, /data-dbu-share-rule="Act Again"/);
+  assert.match(render, /<span data-dbu-share-text>Out-of-Sequence · 1\/rodada/);
+  assert.match(render, /<p data-dbu-share-text>Quando outro personagem termina o turno/);
+  assert.match(render, /data-dbu-share-source href="https:\/\/dbu-rpg\.com\/adversaries\/"/);
   assert.doesNotMatch(render, /data-dbu-hud-action="hud-(run|favorite)"/);
   assert.equal(hudV2Action('act-again'), null);
 });

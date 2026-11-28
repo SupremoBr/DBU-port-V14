@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.0.12-rules093-alpha.55] — manobras vilanescas no chat
+
+- A aba VILÃS do HUD permite compartilhar a manobra selecionada com custo, descrição e link da regra.
+
 ## [1.0.12-rules093-alpha.54] — escolha de Battle Born
 
 - A escolha de Battle Born usa as rodadas pares do Combat Tracker e abre no cliente do jogador que controla o participante, incluindo tokens sem vínculo.

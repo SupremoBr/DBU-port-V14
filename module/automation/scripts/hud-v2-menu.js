@@ -122,11 +122,12 @@ export function hudV2Panel({tab,actor,selected,favorites=[],pending=0,available=
       <button type="button" data-dbu-hud-action="hud-tab-close" title="Fechar menu"><i class="fas fa-times"></i></button></div>
     <div class="dbua-v2-panel-body">
       <div class="dbua-v2-list">${items||'<div class="dbua-v2-empty">Nenhum favorito. Marque ☆ em outra aba.</div>'}</div>
-      <aside class="dbua-v2-detail"${readOnly ? ' aria-live="polite"' : ""}>${active?`
+      <aside class="dbua-v2-detail"${readOnly ? ' aria-live="polite" data-dbu-share-scope' : ""}>${active?`
         <div class="dbua-v2-detail-heading"><i class="${esc(active.icon)}"></i><div><b>${esc(active.label)}</b>
-        <small>${esc(active.mode)} · ${esc(active.cost)}</small></div></div>
-        <p>${esc(active.detail)}</p>
-        ${readOnly ? '<a href="https://dbu-rpg.com/adversaries/" target="_blank" rel="noopener noreferrer">Regra completa</a>' : `<button type="button" class="dbua-v2-execute" data-dbu-hud-action="hud-run" data-hud-id="${esc(active.id)}">
+        <small>${esc(active.mode)} · <span${readOnly ? " data-dbu-share-text" : ""}>${esc(active.cost)}</span></small></div>
+        ${readOnly ? ruleShareButton(active.label) : ""}</div>
+        <p${readOnly ? " data-dbu-share-text" : ""}>${esc(active.detail)}</p>
+        ${readOnly ? '<a data-dbu-share-source href="https://dbu-rpg.com/adversaries/" target="_blank" rel="noopener noreferrer">Regra completa</a>' : `<button type="button" class="dbua-v2-execute" data-dbu-hud-action="hud-run" data-hud-id="${esc(active.id)}">
         <i class="fas fa-play"></i> ${active.mode==="assistida"?"ABRIR RESOLUÇÃO":"EXECUTAR / ABRIR"}</button>`}`:
         '<p>Selecione uma ação para ver a descrição.</p>'}</aside>
     </div>

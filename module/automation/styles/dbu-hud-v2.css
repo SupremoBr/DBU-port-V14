@@ -139,7 +139,7 @@
   overflow-wrap: anywhere;
   font: 400 12px/1.45 'Segoe UI', sans-serif;
 }
-.dbua-hud-v2 .dbua-v2-rule-entry .dbu-share-rule {
+.dbua-hud-v2 :is(.dbua-v2-rule-entry, .dbua-v2-villain-panel) .dbu-share-rule {
   width: 30px;
   min-height: 30px;
   padding: 0;
@@ -147,6 +147,7 @@
   background: #1a2837;
   color: #ffb56a;
 }
+.dbua-v2-villain-panel .dbu-share-rule { margin-inline-start: auto; flex: 0 0 30px; }
 @media (max-width: 480px) {
   .dbua-v2-rules-body { grid-template-columns: minmax(0, 1fr); }
 }
