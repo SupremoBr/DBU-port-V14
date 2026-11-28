@@ -12,7 +12,7 @@ import { progressionSkillsMethods } from "./character/progression-skills.mjs";
 import { techniquesMethods } from "./character/techniques.mjs";
 import { combatMathMethods } from "./character/combat-math.mjs";
 import { aurasMethods } from "./character/auras.mjs";
-import { traitsTalentsMethods } from "./character/traits-talents.mjs";
+import { collapsedRacialTraits, traitsTalentsMethods } from "./character/traits-talents.mjs";
 import { transformationDataMethods } from "./character/transformation-data.mjs";
 import { uniquePowersMethods } from "./character/unique-powers.mjs";
 import { basesMethods } from "./character/bases.mjs";
@@ -430,8 +430,9 @@ export class DBUCharacterSheet extends ActorSheet {
     context.raceLabel = context.raceOptions[system.race] || system.race;
     context.subspeciesLabel = this._getSubspeciesLabel(system) || "—";
     context.subraceLabel = context.subraceOptions.find(option => option.selected)?.label || "—";
+    const collapsedTraits = collapsedRacialTraits(this.actor);
     context.characterTraits = this._getCharacterTraits(system).map(trait => ({
-      ...trait, collapsed: this._collapsedRacialTraits?.has(trait.id)
+      ...trait, collapsed: collapsedTraits.has(trait.id)
     }));
     context.isCustomSpecies = system.race === "customSpecies";
 

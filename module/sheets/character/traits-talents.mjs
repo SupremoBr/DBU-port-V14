@@ -7,6 +7,18 @@ import { adversaryBenefits093, adversaryRound093 } from "../../rules/adversaries
 import { uses093 } from "../../rules/v093.mjs";
 import { openRacialFactorSelector } from "./racial-factors.mjs";
 
+const collapsedByActor = new Map();
+
+export function collapsedRacialTraits(actor) {
+  const key = actor.uuid ?? actor;
+  let traits = collapsedByActor.get(key);
+  if (!traits) {
+    traits = new Set();
+    collapsedByActor.set(key, traits);
+  }
+  return traits;
+}
+
 /** Character sheet domain: traits-talents. Methods run with the sheet as this. */
 export const traitsTalentsMethods = {
 
@@ -560,7 +572,7 @@ export const traitsTalentsMethods = {
     const card = btn.closest(".trait-card");
     if (!card?.dataset.traitId) return;
     const collapsed = card.classList.toggle("collapsed");
-    const saved = this._collapsedRacialTraits ??= new Set();
+    const saved = collapsedRacialTraits(this.actor);
     if (collapsed) saved.add(card.dataset.traitId);
     else saved.delete(card.dataset.traitId);
     btn.setAttribute("aria-expanded", String(!collapsed));

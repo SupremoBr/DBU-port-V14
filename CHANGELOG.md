@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.0.12-rules093-alpha.48] — estado dos cartões de traços
+
+- A aba Traits conserva os cartões abertos ou fechados por personagem ou token durante a sessão, inclusive quando a ficha é recriada após atualizar o contador de Battle Born.
+
 ## [1.0.12-rules093-alpha.47] — Warrior of Two Worlds
 
 - Aplica os efeitos 1 e 2 de Warrior of Two Worlds. Com quatro stacks de Battle Born, soma +2(T) em Wound e dobra esse bônus nas Técnicas Assinatura. No limiar Injured, soma +1(T) em Strike e Wound.

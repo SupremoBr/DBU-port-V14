@@ -240,37 +240,34 @@ test('composition rejects conflicting or invalid methods before changing any pro
   assert.throws(() => installCharacterMethods(Sheet, [{ name: 'invalid', methods: { value: 3 } }]), /not a method/);
 });
 
-test('the collapsed racial trait state belongs to the sheet and survives replacing the card markup', () => {
-  const sheet = new DBUCharacterSheet();
-  const otherSheet = new DBUCharacterSheet();
-  const card = () => {
-    const classes = new Set();
-    return {
-      dataset: { traitId: 'born-for-battle' },
-      classList: {
-        toggle(name) {
-          if (classes.delete(name)) return false;
-          classes.add(name);
-          return true;
-        }
+test('racial trait collapse survives a fresh sheet and actor instance for the same token', async () => {
+  const { collapsedRacialTraits } = await import('../module/sheets/character/traits-talents.mjs');
+  const actor = { uuid: 'Scene.world.Token.saiyan.Actor.base', system: {} };
+  const sheet = new DBUCharacterSheet(actor);
+  const replacements = new DBUCharacterSheet({ ...actor });
+  const otherSheet = new DBUCharacterSheet({ ...actor, uuid: 'Scene.world.Token.other.Actor.base' });
+  const card = (collapsed = false) => ({
+    dataset: { traitId: 'born-for-battle' },
+    classList: {
+      toggle() {
+        collapsed = !collapsed;
+        return collapsed;
       }
-    };
-  };
-  const first = card();
+    }
+  });
   const states = [];
-  const toggle = node => sheet._onToggleTrait({
+  const toggle = (activeSheet, node) => activeSheet._onToggleTrait({
     preventDefault() {},
     currentTarget: {
       closest: () => node,
       setAttribute: (attribute, value) => states.push([attribute, value])
     }
   });
-  toggle(first);
-  assert.equal(sheet._collapsedRacialTraits.has('born-for-battle'), true);
-  assert.equal(otherSheet._collapsedRacialTraits, undefined);
-  const replacement = card();
-  if (sheet._collapsedRacialTraits.has('born-for-battle')) replacement.classList.toggle('collapsed');
-  toggle(replacement);
-  assert.equal(sheet._collapsedRacialTraits.has('born-for-battle'), false);
+  toggle(sheet, card());
+  const retained = collapsedRacialTraits(replacements.actor);
+  assert.equal(retained.has('born-for-battle'), true);
+  assert.equal(collapsedRacialTraits(otherSheet.actor).has('born-for-battle'), false);
+  toggle(replacements, card(true));
+  assert.equal(retained.has('born-for-battle'), false);
   assert.deepEqual(states, [['aria-expanded', 'false'], ['aria-expanded', 'true']]);
 });
