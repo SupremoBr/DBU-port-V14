@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.0.12-rules093-alpha.56] — seletor de transformações
+
+- O botão Add mantém largura compacta no catálogo, deixando espaço para o nome, a categoria e os requisitos de cada transformação.
+
 ## [1.0.12-rules093-alpha.55] — manobras vilanescas no chat
 
 - A aba VILÃS do HUD permite compartilhar a manobra selecionada com custo, descrição e link da regra.

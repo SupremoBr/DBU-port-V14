@@ -4165,9 +4165,10 @@
 }
 
 .tf-catalog-window .tf-catalog-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) max-content;
+  align-items: center;
+  gap: 12px;
   padding: 10px 12px;
   border-bottom: 1px solid #2a4a6a;
   transition: background 0.15s;
@@ -4178,7 +4179,7 @@
 }
 
 .tf-catalog-window .tf-catalog-item-info {
-  flex: 1;
+  min-inline-size: 0;
 }
 
 .tf-catalog-window .tf-catalog-item-name {
@@ -4196,12 +4197,12 @@
 
 .tf-catalog-window .tf-catalog-item-meta span {
   font-size: 11px;
-  color: #8899aa;
+  color: #b7c7d7;
 }
 
 .tf-catalog-window .tf-catalog-item-attrs {
   font-size: 11px;
-  color: #5a6a7a;
+  color: #9bacbd;
   margin-top: 3px;
 }
 
@@ -4232,7 +4233,9 @@
   cursor: pointer;
   font-size: 11px;
   font-weight: bold;
-  align-self: center;
+  inline-size: auto;
+  min-inline-size: 60px;
+  min-block-size: 36px;
   white-space: nowrap;
 }
 
