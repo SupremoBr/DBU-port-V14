@@ -627,14 +627,11 @@ async function dispatchHudAction(button, actor, token) {
   if (action === "hud-run")return runV2Action(button.dataset.hudId,actor,token);
   if (action === "skip-turn") {
     const request = turnRequest(actor, token);
-    if (!request || button.disabled) return;
-    button.disabled = true;
-    try {
-      const gm = Array.from(game.users).filter(u => u.active && u.isGM).sort((a,b) => a.id.localeCompare(b.id))[0];
-      if (gm?.id === game.user.id) await advanceTurn(request, game.user);
-      else if (gm) await sendRequest("advance-turn", request, gm.id);
-      else ui.notifications.warn("Pular turno exige um mestre conectado.");
-    } finally { button.disabled = false; }
+    if (!request) return ui.notifications.warn("O turno deste personagem já terminou.");
+    const gm = Array.from(game.users).filter(u => u.active && u.isGM).sort((a,b) => a.id.localeCompare(b.id))[0];
+    if (gm?.id === game.user.id) await advanceTurn(request, game.user);
+    else if (gm) await sendRequest("advance-turn", request, gm.id);
+    else ui.notifications.warn("Pular turno exige um mestre conectado.");
     return;
   }
   if (action === "hud-clash")return rollHudClash(actor,token);
@@ -754,7 +751,7 @@ function attachHudDrag(root, selector, prefix) {
   });
 }
 
-function attachHudListeners(root, actor, token) {
+export function attachHudListeners(root, actor, token) {
   bindRuleSharing(root, actor);
   for (const button of root.querySelectorAll("[data-dbu-hud-action]")) {
     button.addEventListener("click", async event => {

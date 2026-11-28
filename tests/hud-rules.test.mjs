@@ -29,3 +29,26 @@ test('the HUD rules tab shares only the current actor’s entries, edits and cho
   assert.doesNotMatch(panel, /Resumo original|Opção ausente|Talento que não está na ficha|data-dbu-hud-action="hud-run"/);
   assert.match(hudV2Panel({ tab: 'rules', actor: { name: 'Outro', system: {} } }), /Nenhuma entrada na ficha/);
 });
+
+test('clicking skip turn from the HUD advances exactly once while a click is pending', async () => {
+  const { attachHudListeners } = await import('../module/automation/scripts/combat-hud.js');
+  const gm = { id: 'gm', isGM: true, active: true };
+  const actor = { id: 'a' };
+  const current = { id: 'c', actor };
+  let advances = 0, finish;
+  globalThis.game = { user: gm, users: [gm], combat: {
+    id: 'fight', round: 1, turn: 0, started: true, combatant: current, combatants: [current],
+    nextTurn() { advances++; return new Promise(resolve => { finish = resolve; }); }
+  } };
+  let click;
+  const button = { dataset: { dbuHudAction: 'skip-turn' }, isConnected: true,
+    addEventListener(event, fn) { click = fn; } };
+  attachHudListeners({ querySelectorAll: () => [button], querySelector: () => null }, actor, null);
+  const event = { preventDefault() {}, stopPropagation() {} };
+  const pending = click(event);
+  await click(event);
+  assert.equal(advances, 1);
+  finish();
+  await pending;
+  assert.equal(button.disabled, false);
+});
