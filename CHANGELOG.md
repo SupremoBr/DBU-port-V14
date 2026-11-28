@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.0.12-rules093-alpha.47] — Warrior of Two Worlds
+
+- Aplica os efeitos 1 e 2 de Warrior of Two Worlds. Com quatro stacks de Battle Born, soma +2(T) em Wound e dobra esse bônus nas Técnicas Assinatura. No limiar Injured, soma +1(T) em Strike e Wound.
+
 ## [1.0.12-rules093-alpha.46] — Legendary Saiyan
 
 - O efeito 2 do fator Legendary Saiyan (Mutation) aumenta de 2 para 4 o limite de Battle Born em Wound. O contador e a alocação de stacks usam os limites por rolagem. O terceiro efeito de Born for Battle ainda pode elevar a contagem a 3 como exceção.

@@ -896,3 +896,33 @@ test('Legendary Saiyan raises only the Wound cap and the stack picker permits fo
   assert.equal(system.battleBorn.wound, 2);
   assert.equal(system.battleBorn.maxTotal, 6);
 });
+
+test('Warrior of Two Worlds adds its own Wound bonus twice on Signatures and honors Injured and saved toggles', () => {
+  const system = {
+    rulesVersion: '0.9.3', race: 'saiyan', tier: 2, baseTier: 2,
+    racialTraits: ['r093_saiyans_born_for_battle', 'r093_half_saiyan_warrior_of_two_worlds'],
+    battleBorn: { strike: 2, dodge: 1, wound: 0 }, thresholds: { injured: { crossed: false } },
+    status: { soak: 0 }
+  };
+  const actor = new ActorStub(system);
+  actor._getSelfBenefitAura = () => null;
+  const sheet = new DBUCharacterSheet(actor);
+  const baseAttack = technique({ foundation: 'Physical', profile: 'Simple' });
+  const stats = () => {
+    system.aptitudes = { strikeBuffTotal: 1, woundBuffTotal: 3 };
+    applyRacial093(system, 2, 2);
+    return [
+      system.aptitudes.strikeBuffTotal, system.aptitudes.woundBuffTotal,
+      sheet._calcTechWound(baseAttack, system, 2).formula
+    ];
+  };
+  assert.deepEqual(stats(), [1, 3, '1d10+1d4+3']);
+  system.battleBorn.dodge = 2;
+  assert.deepEqual(stats(), [1, 7, '1d10+1d4+11']);
+  system.thresholds.injured.crossed = true;
+  assert.deepEqual(stats(), [3, 9, '1d10+1d4+13']);
+  system.effectTracking = { enabledPassives: { racial_factor_warrior_of_two_worlds_1: false } };
+  assert.deepEqual(stats(), [3, 5, '1d10+1d4+5']);
+  system.racialTraits.pop();
+  assert.deepEqual(stats(), [1, 3, '1d10+1d4+3']);
+});

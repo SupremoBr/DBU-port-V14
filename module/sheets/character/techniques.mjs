@@ -1,3 +1,4 @@
+import { warriorOfTwoWorldsWound093 } from "../../rules/runtime-v093.mjs";
 import { isAdversary093 } from "../../rules/adversaries-v093.mjs";
 import { stateLevel } from "../../rules/states-v093.mjs";
 import { attackWeapon093, weaponRollModifiers093, wieldingStrikePenalty093 } from '../../helpers/weapon-state.mjs';
@@ -507,6 +508,7 @@ export const techniquesMethods = {
       ? (system.aptitudes?.allOutStartSigWound || 0) : 0;
     let totalMod = damageAttr + extraDamageAttr + powerShotBonus - lowPenPenalty + woundBuffTotal + foundationWoundBuff + unarmedWoundBuff + armedWoundBuff + allOutSigWound;
 
+    totalMod += warriorOfTwoWorldsWound093(system, tier);
     if (uses093(system) && (tech.advantages || []).some(row => row.name === "Last Legs")) {
       totalMod += (system.thresholds?.penalties || 0) + (system.thresholds?.crossedCount || 0) * tier;
     }

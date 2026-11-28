@@ -21,6 +21,11 @@ export function battleBornCaps093(system) {
   return { strike: cap, dodge: cap, wound: cap + (bonus || 0) };
 }
 
+export function warriorOfTwoWorldsWound093(system, tier) {
+  return uses093(system) && system.battleBorn?.total >= 4
+    && racialEffectEnabled093(system, 'Warrior of Two Worlds') ? 2 * tier : 0;
+}
+
 /** Only verified current passives belong here. Other changed traits remain manual. */
 export function applyRacial093(system, tier, baseTier) {
   if (!uses093(system)) return;
@@ -44,6 +49,12 @@ export function applyRacial093(system, tier, baseTier) {
   bb.woundBonus = born ? bb.wound * tier : 0;
   system.battleBorn = bb;
   if (system.race !== 'saiyan') return;
+  const twoWorldsWound = warriorOfTwoWorldsWound093(system, tier);
+  const twoWorldsInjured = system.thresholds?.injured?.crossed && has('Warrior of Two Worlds', 2) ? tier : 0;
+  if (twoWorldsWound || twoWorldsInjured) {
+    system.aptitudes.woundBuffTotal = (system.aptitudes.woundBuffTotal || 0) + twoWorldsWound + twoWorldsInjured;
+  }
+  if (twoWorldsInjured) system.aptitudes.strikeBuffTotal = (system.aptitudes.strikeBuffTotal || 0) + twoWorldsInjured;
   if (has('Saiyan Heritage', 5)) {
     const trait = traits.find(t => t.name === 'Saiyan Heritage');
     const option = system.racialOptionSelections?.[trait.id]?.['5'];
@@ -104,7 +115,8 @@ export function applyRacialAttribute093(system, tier, bonuses = racialPassiveBon
 }
 
 export function racialEffectEnabled093(system, name, level = 1) {
-  const trait = (CATALOGS_093.racialTraits[system.race] || []).find(t => t.name === name);
+  const trait = (CATALOGS_093.racialTraits[system.race] || []).find(t => t.name === name)
+    ?? CATALOGS_093.racialTraits.factors.find(t => t.race === system.race && t.name === name);
   if (!trait || !system.racialTraits?.includes(trait.id)) return false;
   if (system.race === 'demon' && !matchesRacialSubrace093(system, system.race, trait.id, true)) return false;
   const key = trait.name.toLowerCase().replace(/[^a-z0-9]/g, '_');
