@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.0.12-rules093-alpha.50] — revelação no chat
+
+- O card recupera Strike, Wound e defesas finalizadas ao exibir uma mensagem já revelada que ainda mostra os campos ocultos.
+
 ## [1.0.12-rules093-alpha.49] — rolagem da ficha
 
 - A ficha registra a área de rolagem compartilhada pelas abas para o Foundry restaurar a posição após editar o personagem.

@@ -152,6 +152,36 @@ function dbuAttackRevealHTML(attack) {
   `;
 }
 
+function restoreRevealedCard(message, root) {
+  if (!root || message.isContentVisible === false || !message.getFlag("world", "dbuCombatRevealed")) return;
+  const results = root.querySelector("[data-dbu-secret-attack-results]");
+  const attack = message.getFlag("world", "dbuAttackData");
+  if (!attack) return;
+  if (results && Array.from(results.querySelectorAll(".dbu-roll-total")).some(el => el.textContent.trim() === "?")) {
+    const reveal = message.getFlag(DBU_SYSTEM_ID, "attackReveal");
+    const native = document.createElement("div");
+    if (reveal?.revealed) native.innerHTML = reveal.revealedHtml || "";
+    if (!attack.sealedRoll && Number.isFinite(attack.strikeTotal)) {
+      results.innerHTML = dbuAttackRevealHTML(attack);
+    } else {
+      const rows = native.querySelectorAll(".dbu-roll-row");
+      if (rows.length) results.replaceChildren(...rows);
+    }
+    const pay = native.querySelector("[data-dbu-pay]");
+    if (pay && !root.querySelector("[data-dbu-pay]")) results.append(pay.closest(".dbu-attack-actions") || pay);
+  }
+  const states = message.getFlag("world", "dbuDefenseStates") || {};
+  for (const [key, state] of Object.entries(states)) {
+    if (!state?.finalized) continue;
+    const id = key.replace(/[^a-zA-Z0-9_-]/g, "");
+    const waiting = root.querySelector(`[data-target-row="${id}"] .dbu-auto-selected-defense`);
+    if (waiting) {
+      waiting.classList.remove("dbu-auto-selected-defense");
+      waiting.textContent = state.text || "Defesa resolvida";
+    }
+  }
+}
+
 async function dbuRevealNativeAttackMessage(attack) {
   const originalId = attack?.originalAttackMessageId;
   if (!originalId) return;
@@ -308,7 +338,7 @@ async function dbuGMRevealCombatResults(messageId) {
         state.hiddenOutcome = finishDefense(attackForCombinationTarget(attack, actorId), state.hiddenOutcome, uses093(defender.system));
         const outcome = state.hiddenOutcome;
         state.status = outcome.success ? "defended" : outcome.damageDefense === "guard" ? "guard" : "hit";
-        state.text = outcome.name + " · " + (outcome.success ? "Sucesso" : "Impacto");
+        state.text = outcome.name + (Number.isFinite(outcome.total) ? " " + outcome.total : "") + " · " + (outcome.success ? "Sucesso" : "Impacto");
         const combination = attack.combinationTargets?.[actorId];
         if (combination) {
           state.text += ` · Combination: ${combination.totals.join(", ")} vs ${combination.defenseScore} · Wound ${attackForCombinationTarget(attack, actorId).woundTotal} (+${combination.bonus})`;
@@ -517,12 +547,16 @@ async function dbuGMUpdateDefenseCard({
 const dbuDefenseCardQueues = new Map();
 
 function dbuQueueDefenseCard(payload) {
+  return queueCardUpdate(payload, dbuGMUpdateDefenseCard);
+}
+
+function queueCardUpdate(payload, update) {
   const key = String(payload?.messageId || "");
   if (!key) return Promise.resolve();
   const previous = dbuDefenseCardQueues.get(key) || Promise.resolve();
   const running = previous.catch(error => {
     console.error("DBU | Erro na fila anterior de defesa:", error);
-  }).then(() => dbuGMUpdateDefenseCard(payload));
+  }).then(() => update(payload));
   dbuDefenseCardQueues.set(key, running);
   return running.finally(() => {
     if (dbuDefenseCardQueues.get(key) === running) dbuDefenseCardQueues.delete(key);
@@ -619,7 +653,11 @@ function dbuRenderUnitedAttackIntoContent(
   };
 }
 
-async function dbuGMRefreshUnitedAttackCard({
+function dbuGMRefreshUnitedAttackCard(payload) {
+  return queueCardUpdate(payload, dbuGMRefreshUnitedAttackCardNow);
+}
+
+async function dbuGMRefreshUnitedAttackCardNow({
   messageId,
   supporterId = null,
   userId = null
@@ -627,7 +665,7 @@ async function dbuGMRefreshUnitedAttackCard({
   if (!game.user.isGM) return;
 
   const message = game.messages.get(messageId);
-  if (!message) return;
+  if (!message || message.getFlag("world", "dbuCombatRevealed") || message.getFlag("world", "dbuCombatRevealInProgress")) return;
 
   const attack = foundry.utils.deepClone(
     message.getFlag("world", "dbuAttackData") || {}
@@ -690,7 +728,11 @@ async function dbuGMRefreshUnitedAttackCard({
   );
 }
 
-async function dbuGMSetUnitedAttackLock({
+function dbuGMSetUnitedAttackLock(payload) {
+  return queueCardUpdate(payload, dbuGMSetUnitedAttackLockNow);
+}
+
+async function dbuGMSetUnitedAttackLockNow({
   messageId,
   locked = true,
   defenderId = null,
@@ -700,7 +742,7 @@ async function dbuGMSetUnitedAttackLock({
   if (!game.user.isGM) return;
 
   const message = game.messages.get(messageId);
-  if (!message) return;
+  if (!message || message.getFlag("world", "dbuCombatRevealed") || message.getFlag("world", "dbuCombatRevealInProgress")) return;
 
   if (userId && defenderId) {
     const requester = game.users.get(userId);
@@ -1018,10 +1060,10 @@ globalThis.DBU_BOOTSTRAP.secretRevealHandler = dbuSecretRevealHandler;
 
 const secretRevealHookId = onAutomationChatRender((message, html) => {
   try {
+    const root = html instanceof HTMLElement ? html : (html?.[0] || html);
+    restoreRevealedCard(message, root);
     const secret = dbuSecretCombatFromNativeMessage(message);
     if (!secret || secret.revealed) return;
-
-    const root = html instanceof HTMLElement ? html : (html?.[0] || html);
     const button = root?.querySelector?.("[data-dbu-reveal]");
     if (!button) return;
 
