@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.0.12-rules093-alpha.57] — calculadora de movimento
+
+- Movement no HUD calcula distância, custo de Ki e Rapid Movement antes de registrar a manobra.
+
 ## [1.0.12-rules093-alpha.56] — seletor de transformações
 
 - O botão Add mantém largura compacta no catálogo, deixando espaço para o nome, a categoria e os requisitos de cada transformação.

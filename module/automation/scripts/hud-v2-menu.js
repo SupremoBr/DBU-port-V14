@@ -32,7 +32,7 @@ export const HUD_V2_ACTIONS=[
   {id:"power",tab:"standard",label:"Power Up",icon:"fas fa-fire",cost:"1 Action",mode:"automática",maneuver:"powerUp",detail:"Usa o registro Standard Maneuvers e seus limites de Power Stacks."},
   {id:"energy",tab:"standard",label:"Energy Charge",icon:"fas fa-bolt",cost:"1 Action · 2(bT) Ki",mode:"automática",maneuver:"energyCharge",detail:"Automação existente de Energy Charge com tipos permitidos."},
   {id:"grapple",tab:"standard",label:"Grapple",icon:"fas fa-hand-rock",cost:"1 Action",mode:"automática",maneuver:"grapple",detail:"Grapple e Clash pelo fluxo integrado."},
-  {id:"movement",tab:"standard",label:"Movement",icon:"fas fa-running",cost:"1 Action",mode:"assistida",maneuver:"movement",detail:"Registra a manobra; o deslocamento do token é manual."},
+  {id:"movement",tab:"standard",label:"Movement",icon:"fas fa-running",cost:"1 Action",mode:"assistida",maneuver:"movement",detail:"Calcula a distância e o custo de Ki antes de registrar a manobra."},
   {id:"recovery",tab:"standard",label:"Combat Recovery",icon:"fas fa-heart",cost:"mínimo 2 Actions",mode:"automática",maneuver:"combatRecovery",detail:"Recuperação de combate existente, com as condições e limites do sistema."},
   {id:"standard-all",tab:"standard",label:"Outras manobras",icon:"fas fa-th-large",cost:"Catálogo completo",mode:"integrada",method:"standard",detail:"Abre o menu completo, incluindo as manobras assistidas."},
   {id:"defend",tab:"counter",label:"Defend / Dodge / Guard",icon:"fas fa-shield-alt",cost:"Counter · contextual",mode:"contextual",method:"panel",detail:"Mostra defesas pendentes e permite selecionar as opções válidas."},

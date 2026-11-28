@@ -1,3 +1,4 @@
+import { openMovementCalculator } from "./standard-actions/movement.js";
 import { Dialog } from "../../helpers/foundry-compat.mjs";
 import { uses093 } from "../../rules/v093.mjs";
 import { sizeLead } from "../../rules/size-v093.mjs";
@@ -1467,11 +1468,16 @@ async function throwManeuver(context = {}) {
 async function movement(context = {}) {
   const actor = actorFromContext(context);
   if (!actor) return ui.notifications.warn("DBU Movement: selecione seu personagem.");
-  const normal = Math.max(0, num(actor?.system?.status?.normalSpeed ?? actor?.system?.speed?.normal, 0));
-  const boosted = Math.max(normal, num(actor?.system?.status?.boostedSpeed ?? actor?.system?.speed?.boosted, normal));
   const grappleGate = validateGrappleMovement({ actor, token: tokenFromContext(context, actor), kind: "movement" });
-  await recordStandardAction(actor, { type: "movement", dbuStandardKey: "movement", actionCost: 1, kiCost: 0, description: "Movement (assistido)" });
-  return postRuleCard(actor, "Movement Maneuver", `Standard · 1 Action. Pode mover até <b>${boosted || "Boosted Speed"}</b> Squares. Cada Square além do Normal Speed (${normal || "—"}) custa <b>3 Ki</b>. Sair do Melee Range de um oponente provoca Exploit.${grappleGate.requiresClash ? `<br><br><b>Grapple:</b> ${esc(grappleGate.message)} O deslocamento não foi automatizado.` : ""}<br><br><b>v1.8.1:</b> o gasto foi registrado; o deslocamento permanece manual para respeitar Walls/Terrain.`);
+  const result = await openMovementCalculator(actor, `${esc(actor.name)} — Movement`, grappleGate.requiresClash ? esc(grappleGate.message) : "");
+  if (!result?.valid) return null;
+  const rapid = result.rapidCost > 0;
+  const description = `Movement · ${result.distance} quadrado(s) · ${result.cost} Ki (pagamento manual)${rapid ? " · Rapid Movement" : ""}`;
+  await recordStandardAction(actor, { type: "movement", dbuStandardKey: "movement", actionCost: 1, kiCost: 0, description });
+  return postRuleCard(actor, "Movement Maneuver", `1 ação · <b>${result.distance} quadrado(s)</b> · <b>${result.cost} Ki</b>
+    ${rapid ? "<br>Rapid Movement · +1(T) em Strike até o fim do turno e em Dodge contra Exploit provocado por este movimento." : ""}
+    <br>Ao sair do alcance corpo a corpo de um oponente, verifique Exploit.
+    ${grappleGate.requiresClash ? `<br>${esc(grappleGate.message)}` : ""}`);
 }
 
 async function command(context = {}) {
