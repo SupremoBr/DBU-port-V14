@@ -3231,7 +3231,8 @@ export class DBUActor extends Actor {
     // Armor Plating (cybernetic trait): +2(bT) DR vs Standard-damage attacks
     const cyberStandardDR = (dc.category || "standard") === "standard"
       ? (Number(system._cyberStandardDR) || 0) : 0;
-    const damageReduction = innateDR + bestialRangedDR + cyberStandardDR + (Number(dc.damageReduction) || 0);
+    const damageReduction = innateDR + bestialRangedDR + cyberStandardDR + (Number(dc.damageReduction) || 0)
+      + (Number(attack?.defenseDamageReduction) || 0);
     const ignoreDRFraction = weaponCategory === "bludgeoning" ? 0.5 : profile?.ignoreDRFraction || 0;
     const piercingDR = pinpointInsight && attack.armorPiercing ? Math.floor(pinpointInsight / 2) : 0;
     const availableDR = Math.max(0, damageReduction);

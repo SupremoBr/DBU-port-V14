@@ -273,7 +273,7 @@ async function dbuFinalizeHiddenOutcome(defender, attack, outcome, { deferDamage
   // de Intervene ser encerrada, porque um Deflect bem-sucedido pode cancelar
   // o ataque para TODOS os alvos.
   if (damagePending && !deferDamage) {
-    await dbuApplyDamage(defender, attack, outcome.damageDefense);
+    await dbuApplyDamage(defender, attack, outcome.damageDefense, outcome.incomingDamage);
   }
 
   return { damagePending };

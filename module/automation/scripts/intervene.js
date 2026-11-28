@@ -1,3 +1,4 @@
+import { defenseAdjustments } from "./combat/defense-adjustments.js";
 import { Dialog } from "../../helpers/foundry-compat.mjs";
 import { uses093 } from "../../rules/v093.mjs";
 import { attackForCombinationTarget } from "./combat/combination.js";
@@ -472,14 +473,16 @@ function upgradeDamageCategory(value) {
 async function applyPreparedDamage(actor, attack, {
   defense = "none",
   categoryOverride = null,
-  extraSoak = 0
+  extraSoak = 0,
+  incomingDamage
 } = {}) {
   const sheet = actor?.sheet;
   if (!actor || !sheet || typeof sheet._onApplyDamage !== "function") {
     throw new Error(`Não foi possível aplicar dano em ${actor?.name || "Actor"}.`);
   }
 
-  const category = normalizeDamageCategory(categoryOverride || attack.damageCategory || attack.damageCat || "standard");
+  const adjustments = defenseAdjustments(incomingDamage);
+  const category = normalizeDamageCategory(adjustments.category || categoryOverride || attack.damageCategory || attack.damageCat || "standard");
   const beforeLP = Number(actor.system.lifePoints?.value || 0);
   const terrainShield = prepareTerrainShield(actor, Math.max(0, Number(attack.woundTotal || 0)));
   const woundForDamage = terrainShield
@@ -497,7 +500,8 @@ async function applyPreparedDamage(actor, attack, {
   });
 
   const system = actor.system;
-  const dbuDamageCalc = actor._calculateDamageCalc(system, system.tier, system.baseTier, attack, extraSoak);
+  const dbuDamageCalc = actor._calculateDamageCalc(system, system.tier, system.baseTier,
+    { ...attack, defenseDamageReduction: adjustments.reduction }, extraSoak + adjustments.soak);
   const predicted = Math.max(0, Number(dbuDamageCalc?.healthReduction || 0));
   await sheet._onApplyDamage({ preventDefault() {}, stopPropagation() {}, dbuAttackingManeuver: true, dbuDamageCalc });
 
@@ -507,7 +511,7 @@ async function applyPreparedDamage(actor, attack, {
   return { beforeLP, afterLP, predicted, actual };
 }
 
-async function applyDefenseWall(intervener, protectedActor, attack) {
+async function applyDefenseWall(intervener, protectedActor, attack, incomingDamage) {
   const extraSoak = Math.ceil(Math.max(0, Number(intervener.system.status?.soak || 0)) / 2);
   const result = await applyPreparedDamage(intervener, attack, {
     defense: "none",
@@ -523,7 +527,7 @@ async function applyDefenseWall(intervener, protectedActor, attack) {
     const spillAttack = foundry.utils.deepClone(attack);
     spillAttack.woundTotal = spill;
     spillAttack.baseWoundTotal = spill;
-    await applyPreparedDamage(protectedActor, spillAttack, { defense: "none" });
+    await applyPreparedDamage(protectedActor, spillAttack, { defense: "none", incomingDamage });
   }
 
   return { ...result, spill, extraSoak };
@@ -558,10 +562,10 @@ async function finalizePendingDamageIfReady(message) {
       if (resolution.status === "wall") {
         const intervener = resolveParticipant(resolution.intervenerId, attack);
         if (intervener) {
-          const wall = await applyDefenseWall(intervener, target, attack);
+          const wall = await applyDefenseWall(intervener, target, attack, outcome.incomingDamage);
           state.text = `🛡 Defense Wall — ${intervener.name} protege ${target.name}${wall.spill ? ` · excesso ${wall.spill} passou ao aliado` : ""}`;
         } else {
-          await globalThis.DBU.applyDamage(target, attack, outcome.damageDefense);
+          await globalThis.DBU.applyDamage(target, attack, outcome.damageDefense, outcome.incomingDamage);
         }
       } else if (resolution.status === "deflectFailed") {
         const intervener = resolveParticipant(resolution.intervenerId, attack);
@@ -570,12 +574,12 @@ async function finalizePendingDamageIfReady(message) {
           await applyPreparedDamage(intervener, attack, { defense: "none", categoryOverride: upgraded });
           state.text = `❌ Deflect falhou — ${intervener.name} recebeu o ataque em ${upgraded.toUpperCase()}`;
         } else {
-          await globalThis.DBU.applyDamage(target, attack, outcome.damageDefense);
+          await globalThis.DBU.applyDamage(target, attack, outcome.damageDefense, outcome.incomingDamage);
         }
       } else {
         // Sem Intervene ou Distant Deflect falho: a defesa escolhida pelo alvo
         // continua valendo normalmente (Guard/Direct Hit/etc.).
-        await globalThis.DBU.applyDamage(target, attack, outcome.damageDefense);
+        await globalThis.DBU.applyDamage(target, attack, outcome.damageDefense, outcome.incomingDamage);
         if (resolution.status === "distantDeflectFailed") {
           state.text = `❌ Distant Deflect falhou — ${state.text || target.name}`;
         }

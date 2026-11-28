@@ -1,4 +1,4 @@
-import { Dialog } from "../../../helpers/foundry-compat.mjs";
+import { defenseAdjustments, promptDefenseAdjustments } from "./defense-adjustments.js";
 import { duelistParryBonus093 } from "../../../helpers/weapon-state.mjs";
 import { sizeLead } from "../../../rules/size-v093.mjs";
 import { resolveParticipant } from "../core/token-identity.js";
@@ -54,7 +54,7 @@ async function dbuCritRoll(actor, sheet) {
 // DODGE
 // ============================================================
 
-async function dbuRollDodge(defender, { silent = false } = {}) {
+async function dbuRollDodge(defender, { silent = false, bonus = 0 } = {}) {
   const sheet = await dbuPrepareSheet(defender);
 
   const td = sheet._trackerDodge || {
@@ -77,9 +77,8 @@ async function dbuRollDodge(defender, { silent = false } = {}) {
   const perStack = Math.ceil(baseTier / 2);
   const penalty = (dodgeNum - 1) * perStack;
 
-  const formula = penalty > 0
-    ? `(${td.formula})-${penalty}`
-    : String(td.formula);
+  const modifier = bonus - penalty;
+  const formula = modifier ? `(${td.formula})+(${modifier})` : String(td.formula);
 
   const roll = new Roll(formula);
   await roll.evaluate();
@@ -185,7 +184,7 @@ async function dbuRollDefend(
   type,
   attack,
   wager = 0,
-  { silent = false } = {}
+  { silent = false, bonus = 0 } = {}
 ) {
   const sheet = await dbuPrepareSheet(defender);
 
@@ -278,6 +277,8 @@ async function dbuRollDefend(
   if (parryBonus) {
     formula = `(${formula})+${parryBonus}`;
   }
+
+  if (bonus) formula = `(${formula})+(${bonus})`;
 
   const counterNum = await dbuRecordDefend(
     defender,
@@ -376,8 +377,10 @@ async function dbuRollDefend(
 async function dbuApplyDamage(
   defender,
   attack,
-  defense = "none"
+  defense = "none",
+  adjustments
 ) {
+  const { soak, reduction, category: categoryOverride } = defenseAdjustments(adjustments);
   const sheet = defender.sheet;
 
   if (!sheet) {
@@ -387,7 +390,7 @@ async function dbuApplyDamage(
   }
 
   const rawCategory = String(
-    attack.damageCategory
+    categoryOverride || attack.damageCategory
     || attack.damageCat
     || "standard"
   ).toLowerCase();
@@ -456,8 +459,9 @@ async function dbuApplyDamage(
     preventDefault() {},
     stopPropagation() {},
     dbuSizeDamage: sizeDamage,
-    dbuDamageCalc: attack.profileRules093
-      ? defender._calculateDamageCalc(defender.system, defender.system.tier, defender.system.baseTier, attack)
+    dbuDamageCalc: attack.profileRules093 || soak || reduction
+      ? defender._calculateDamageCalc(defender.system, defender.system.tier, defender.system.baseTier,
+        { ...attack, defenseDamageReduction: reduction }, soak)
       : undefined,
     dbuAttackingManeuver: true
   });
@@ -637,6 +641,7 @@ async function dbuDefenseResult(
 
 async function dbuResolveDefense(defender, attack, type, context = {}) {
   const result = await rollDefense(defender, attack, type, context);
+  if (!result) return { cancelled: true };
   if (attack.sealedRoll && result?.hiddenOutcome) {
     result.status = "waiting";
     result.text = "Defesa registrada.";
@@ -683,9 +688,25 @@ async function rollDefense(
     );
   }
 
+  let maxWager;
+  if (defenseType === "powerFlare") {
+    const sheet = await dbuPrepareSheet(defender);
+    const fallback = Math.floor(Number(defender.system.status?.maxCapacity || 0) / 5);
+    maxWager = Math.max(0, Math.trunc(Number(sheet._trackerDefend?.maxFlareWager ?? fallback) || 0));
+  }
+  const labels = { dodge: "Dodge", parry: "Parry", powerFlare: "Power Flare",
+    crossCounter: "Cross Counter", guard: "Guard", directHit: "Direct Hit" };
+  if (!Object.hasOwn(labels, defenseType)) return { cancelled: true };
+  const adjustments = await promptDefenseAdjustments({
+    title: `${defender.name} — ${labels[defenseType]}`, type: defenseType, maxWager,
+    category: attack.damageCategory || attack.damageCat
+  });
+  if (!adjustments) return { cancelled: true };
+  const { bonus, wager, ...incomingDamage } = adjustments;
+
   // DODGE
   if (defenseType === "dodge") {
-    const roll = await dbuRollDodge(defender, { silent: deferReveal });
+    const roll = await dbuRollDodge(defender, { silent: deferReveal, bonus });
     const success = roll.total >= strike;
 
     if (!deferReveal) {
@@ -700,7 +721,7 @@ async function rollDefense(
       );
 
       if (!success) {
-        await dbuApplyDamage(defender, attack, "none");
+        await dbuApplyDamage(defender, attack, "none", incomingDamage);
       }
     }
 
@@ -710,6 +731,7 @@ async function rollDefense(
         ? `✅ Dodge — ${roll.total} vs ${strike}`
         : `❌ Dodge — ${roll.total} vs ${strike}`,
       hiddenOutcome: deferReveal ? {
+        incomingDamage,
         defenseType: "dodge", rollData: roll.rollData, name: "Dodge", total: roll.total,
         targetLabel: "Strike", target: strike, success, extra: "",
         damageDefense: success ? null : "none"
@@ -724,7 +746,7 @@ async function rollDefense(
       "parry",
       attack,
       0,
-      { silent: deferReveal }
+      { silent: deferReveal, bonus }
     );
 
     const success = roll.total >= strike;
@@ -741,7 +763,7 @@ async function rollDefense(
       );
 
       if (!success) {
-        await dbuApplyDamage(defender, attack, "none");
+        await dbuApplyDamage(defender, attack, "none", incomingDamage);
       }
     }
 
@@ -751,6 +773,7 @@ async function rollDefense(
         ? `✅ Parry — ${roll.total} vs ${strike}`
         : `❌ Parry — ${roll.total} vs ${strike}`,
       hiddenOutcome: deferReveal ? {
+        incomingDamage,
         defenseType: "parry", rollData: roll.rollData, name: "Parry", total: roll.total,
         targetLabel: "Strike", target: strike, success, extra: "",
         damageDefense: success ? null : "none"
@@ -780,13 +803,14 @@ async function rollDefense(
         `Wound ${wound}`
       );
 
-      await dbuApplyDamage(defender, attack, "directHit");
+      await dbuApplyDamage(defender, attack, "directHit", incomingDamage);
     }
 
     return {
       status: "hit",
       text: `🎯 Direct Hit — Wound ${wound}`,
       hiddenOutcome: deferReveal ? {
+        incomingDamage,
         defenseType: "directHit", name: "Direct Hit", total: null,
         targetLabel: "Wound", target: wound, success: false,
         extra: `Wound ${wound}`, damageDefense: "directHit"
@@ -796,78 +820,6 @@ async function rollDefense(
 
   // POWER FLARE
   if (defenseType === "powerFlare") {
-    const sheet = await dbuPrepareSheet(defender);
-
-    const fallbackMaxWager = Math.floor(
-      Number(
-        defender.system.status?.maxCapacity || 0
-      ) / 5
-    );
-
-    const maxWager = Number(
-      sheet._trackerDefend?.maxFlareWager
-      ?? fallbackMaxWager
-      ?? 0
-    );
-
-    const wager = await Dialog.wait({
-      title: `${defender.name} — Power Flare`,
-
-      content: `
-        <div class="dbua-sheet-content">
-          <p>
-            Wound recebido: <b>${deferReveal ? "🔒 oculto" : wound}</b>
-          </p>
-
-          <p>
-            Wager máximo: <b>${maxWager}</b>
-          </p>
-
-          <input
-            id="dbu-flare-wager"
-            type="number"
-            min="0"
-            max="${maxWager}"
-            value="0"
-            step="1"
-            style="width:100%;"
-          >
-        </div>
-      `,
-
-      buttons: {
-        roll: {
-          label: "Power Flare",
-          callback: html =>
-            Math.max(
-              0,
-              Math.min(
-                maxWager,
-                Number(
-                  html
-                    .find("#dbu-flare-wager")
-                    .val()
-                ) || 0
-              )
-            )
-        },
-
-        cancel: {
-          label: "Cancelar",
-          callback: () => null
-        }
-      },
-
-      default: "roll",
-      close: () => null
-    });
-
-    if (wager === null) {
-      return {
-        cancelled: true
-      };
-    }
-
     const tier = Number(
       defender.system.tier || 1
     );
@@ -891,7 +843,7 @@ async function rollDefense(
       "powerFlare",
       attack,
       wager,
-      { silent: deferReveal }
+      { silent: deferReveal, bonus }
     );
 
     const success = uses093(defender.system) ? roll.total > wound : roll.total >= wound;
@@ -909,7 +861,7 @@ async function rollDefense(
       );
 
       if (!success) {
-        await dbuApplyDamage(defender, attack, "none");
+        await dbuApplyDamage(defender, attack, "none", incomingDamage);
       }
     }
 
@@ -919,6 +871,7 @@ async function rollDefense(
         ? `✅ Power Flare — ${roll.total} vs ${wound}`
         : `❌ Power Flare — ${roll.total} vs ${wound}`,
       hiddenOutcome: deferReveal ? {
+        incomingDamage,
         defenseType: "powerFlare", rollData: roll.rollData, name: "Power Flare", total: roll.total,
         targetLabel: "Wound", target: wound, success,
         extra: `Cost ${cost} KP / Capacity`,
@@ -961,7 +914,7 @@ async function rollDefense(
 
     const halfDefense = Math.floor(
       defenseValue / 2
-    );
+    ) + bonus;
 
     const success = strike < halfDefense;
 
@@ -978,7 +931,7 @@ async function rollDefense(
       );
 
       if (!success) {
-        await dbuApplyDamage(defender, attack, "none");
+        await dbuApplyDamage(defender, attack, "none", incomingDamage);
       }
     }
 
@@ -988,6 +941,7 @@ async function rollDefense(
         ? `✅ Cross Counter — ${halfDefense} vs ${strike}`
         : `❌ Cross Counter — ${halfDefense} vs ${strike}`,
       hiddenOutcome: deferReveal ? {
+        incomingDamage,
         defenseType: "crossCounter", name: "Cross Counter", total: halfDefense,
         targetLabel: "Strike", target: strike, success,
         extra: `Cost ${cost} KP / Capacity`,
@@ -1065,13 +1019,14 @@ async function rollDefense(
         `Cost ${cost} KP / Capacity · EC ${ec}`
       );
 
-      await dbuApplyDamage(defender, attack, "guard");
+      await dbuApplyDamage(defender, attack, "guard", incomingDamage);
     }
 
     return {
       status: "guard",
       text: `🛡 Guard — Wound ${wound} · Cost ${cost}`,
       hiddenOutcome: deferReveal ? {
+        incomingDamage,
         defenseType: "guard", name: "Guard", total: null,
         targetLabel: "Wound", target: wound, success: false,
         extra: `Cost ${cost} KP / Capacity · EC ${ec}`,

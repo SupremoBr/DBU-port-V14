@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.0.12-rules093-alpha.53] — ajustes de defesa
+
+- Defesas pelo chat e pelo painel abrem uma janela para bônus de defesa, Soak extra, redução de dano extra e categoria recebida, com ajustes por alvo.
+
 ## [1.0.12-rules093-alpha.52] — fim de combate
 
 - Ao encerrar um combate iniciado, as fichas dos participantes voltam à rodada zero e os personagens de jogadores recebem Instant Recovery.

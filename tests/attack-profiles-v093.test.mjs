@@ -199,3 +199,15 @@ test('Dimension Blade spends its weapon LP per attack, rounds down, and caps at 
   weapon.system.qualities.push({ qualityKey: 'unbreakable' });
   assert.match(attackWeapon093(actor, source).issue, /Unbreakable/);
 });
+
+test('extra Soak and DR apply to the selected incoming hit without modifying the defender', () => {
+  const actor = Object.create(DBUActor.prototype);
+  const system = {
+    status: { soak: 8, damageReduction: 2 },
+    damageCalc: { woundRoll: 20, category: 'direct' }
+  };
+  const damage = actor._calculateDamageCalc(system, 1, 1, { defenseDamageReduction: 3 }, 4);
+  assert.equal(damage.effectiveSoak, 6);
+  assert.equal(damage.healthReduction, 9);
+  assert.equal(actor._calculateDamageCalc(system, 1, 1).healthReduction, 14);
+});
