@@ -99,19 +99,16 @@ export async function recoverActor(actor, {
   const gainedLP = Math.max(0, afterLP - beforeLP);
   const gainedKi = Math.max(0, afterKi - beforeKi);
 
-  await actor.update({
+  const updates = {
     "system.lifePoints.value": afterLP,
     "system.kiPool.value": afterKi
-  });
-
+  };
   if (mode === "instant" && combatId) {
-    await actor.setFlag(MODULE_ID, LAST_INSTANT_FLAG, {
-      combatId,
-      at: Date.now(),
-      lp: gainedLP,
-      ki: gainedKi
-    }).catch(error => console.warn("DBU Recovery | não consegui registrar Instant Recovery:", error));
+    updates[`flags.${MODULE_ID}.${LAST_INSTANT_FLAG}`] = {
+      combatId, at: Date.now(), lp: gainedLP, ki: gainedKi
+    };
   }
+  await actor.update(updates);
 
   return {
     actor,
@@ -153,18 +150,18 @@ async function postRecoveryCard(title, results, subtitle = "") {
   });
 }
 
-export async function applyInstantRecovery(combat, { announce = true } = {}) {
+export async function applyInstantRecovery(combat, { announce = true, recoveryId = combat?.id } = {}) {
   if (!combat?.id) return { combatId: null, actors: 0, recovered: 0, results: [] };
 
   const actors = combatPlayerCharacters(combat);
   const results = [];
+  const failures = [];
   for (const actor of actors) {
-    results.push(await recoverActor(actor, {
-      mode: "instant",
-      units: 1,
-      combatId: combat.id,
-      preventDuplicateInstant: true
-    }));
+    try {
+      results.push(await recoverActor(actor, { mode: "instant", combatId: recoveryId }));
+    } catch (error) {
+      failures.push(error);
+    }
   }
 
   const recovered = results.filter(result => result && !result.skipped).length;
@@ -176,6 +173,7 @@ export async function applyInstantRecovery(combat, { announce = true } = {}) {
     );
   }
 
+  if (failures.length) throw new AggregateError(failures, "Falha na Instant Recovery de um ou mais personagens.");
   return { combatId: combat.id, actors: actors.length, recovered, results };
 }
 

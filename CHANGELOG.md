@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.0.12-rules093-alpha.52] — fim de combate
+
+- Ao encerrar um combate iniciado, as fichas dos participantes voltam à rodada zero e os personagens de jogadores recebem Instant Recovery.
+
 ## [1.0.12-rules093-alpha.51] — próximo turno
 
 - O botão Pular turno do HUD volta a encaminhar o clique ao combate, com proteção contra clique duplo.

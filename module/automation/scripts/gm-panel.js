@@ -83,8 +83,8 @@ function uniqueCombatActors(combat = game.combat) {
   const seen = new Set();
   for (const combatant of combat?.combatants || []) {
     const actor = combatant.actor;
-    if (!actor || seen.has(actor.id)) continue;
-    seen.add(actor.id);
+    if (!actor || seen.has(actor.uuid ?? actor.id)) continue;
+    seen.add(actor.uuid ?? actor.id);
     actors.push(actor);
   }
   return actors;
@@ -316,7 +316,7 @@ function buildPanelContent() {
         <div class="dbu-gm-maintenance-actions">
           <button type="button" data-dbu-gm-action="prolonged-recovery" ${combat?.started ? "disabled" : ""}><i class="fas fa-hourglass-half"></i><span>Prolonged Recovery<small>Escolha os jogadores e as horas fora de Combat. Recupera 1/10 Max LP + Ki por hora.</small></span></button>
         </div>
-        <div class="dbu-auto-empty" style="margin-top:8px;"><i class="fas fa-info-circle"></i> Instant Recovery é aplicada automaticamente aos personagens de jogadores quando você confirma <b>End Encounter</b> no Combat Tracker. Capacity não é recuperada.</div>
+        <div class="dbu-auto-empty" style="margin-top:8px;"><i class="fas fa-info-circle"></i> Instant Recovery é aplicada automaticamente aos personagens de jogadores ao encerrar um combate iniciado. As rodadas dos participantes voltam a zero. Capacity não é recuperada.</div>
       </div>
     </div>
 
@@ -532,6 +532,32 @@ export async function cleanupEncounter({ combat = game.combat, automatic = false
     ui.notifications.info(`DBU Painel GM: ${actors.length} Actor(s), ${states} estado(s) temporário(s) e ${locks} trava(s) tratados.`);
   }
   return { actors: actors.length, states, locks };
+}
+
+const finishingEncounters = new Set();
+
+async function finishEncounter(combat, recoveryId = combat.id) {
+  if (finishingEncounters.has(combat.id)) return;
+  finishingEncounters.add(combat.id);
+  try {
+    const results = await Promise.allSettled([applyInstantRecovery(combat, { recoveryId })]);
+    const participants = uniqueCombatActors(combat).filter(actor => actor.type === "character");
+    results.push(...await Promise.allSettled(participants.map(actor => actor.update({
+      "system.combatTabState.currentRound": 0,
+      "system.combatTabState.rounds": [],
+      "system.combatTabState.roundAttackCount": 0,
+      "system.combatTabState.roundDodgeCount": 0,
+      "system.combatTabState.roundCounterCount": 0
+    }))));
+    results.push(...await Promise.allSettled([cleanupEncounter({ combat, automatic: true })]));
+    const failures = results.filter(result => result.status === "rejected");
+    if (failures.length) {
+      console.error("DBU Painel GM | encerramento automático:", failures.map(result => result.reason));
+      ui.notifications.warn("DBU Automation: o encerramento teve falhas. Consulte o console.");
+    }
+  } finally {
+    finishingEncounters.delete(combat.id);
+  }
 }
 
 async function focusActor(actor) {
@@ -815,23 +841,18 @@ export function initializeGmPanelAutomation() {
     updateChatMessage: Hooks.on("updateChatMessage", scheduleRefresh),
     deleteChatMessage: Hooks.on("deleteChatMessage", scheduleRefresh),
     updateActor: Hooks.on("updateActor", scheduleRefresh),
-    updateCombat: Hooks.on("updateCombat", scheduleRefresh),
+    updateCombat: Hooks.on("updateCombat", async (combat, changes) => {
+      scheduleRefresh();
+      if (isPrimaryGM() && changes.round === 0 && combat.previous?.round > 0) {
+        await finishEncounter(combat, `${combat.id}:${combat._stats?.modifiedTime ?? Date.now()}`);
+      }
+    }),
     updateCombatant: Hooks.on("updateCombatant", scheduleRefresh),
     createCombatant: Hooks.on("createCombatant", scheduleRefresh),
     deleteCombatant: Hooks.on("deleteCombatant", scheduleRefresh),
     canvasReady: Hooks.on("canvasReady", scheduleRefresh),
     deleteCombat: Hooks.on("deleteCombat", async combat => {
-      if (!isPrimaryGM()) return;
-      try {
-        // Foundry End Encounter empties/deletes the Combat. Apply DBU 0.9.2
-        // Instant Recovery before encounter-only temporary state is cleaned up.
-        const recovery = await applyInstantRecovery(combat, { announce: true });
-        const result = await cleanupEncounter({ combat, automatic: true });
-        ui.notifications.info(`DBU Automation: encontro encerrado; Instant Recovery aplicada a ${recovery.recovered} personagem(ns) e ${result.states} estado(s) temporário(s) limpo(s).`);
-      } catch (error) {
-        console.error("DBU Painel GM | encerramento automático do encontro:", error);
-        ui.notifications.warn("DBU Automation: não foi possível concluir toda a recuperação/limpeza automática do encontro.");
-      }
+      if (isPrimaryGM() && combat.round > 0) await finishEncounter(combat);
       scheduleRefresh();
     })
   };
