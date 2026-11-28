@@ -57,7 +57,8 @@ async function dbuNewRound(combat) {
         try {
           await sheet._onCombatNewRound({
             preventDefault() {},
-            stopPropagation() {}
+            stopPropagation() {},
+            dbuCombatRound: combat.round
           });
         } finally {
           if (typeof nativeBattleBorn === "function") {

@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.0.12-rules093-alpha.54] — escolha de Battle Born
+
+- A escolha de Battle Born usa as rodadas pares do Combat Tracker e abre no cliente do jogador que controla o participante, incluindo tokens sem vínculo.
+
 ## [1.0.12-rules093-alpha.53] — ajustes de defesa
 
 - Defesas pelo chat e pelo painel abrem uma janela para bônus de defesa, Soak extra, redução de dano extra e categoria recebida, com ajustes por alvo.

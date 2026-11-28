@@ -1177,7 +1177,8 @@
     "_onCombatNewRound": {
       "hash": "ea0233684cd42f3ba544e88870668b308cc9570b665e27d1e7cc42b2536ab119",
       "length": 1,
-      "async": true
+      "async": true,
+      "rules093Hash": "7269ba6de35dee5f10a23a46ecfdab3f8d65e0e991aaf11d69d6e23f87395be6"
     },
     "_onEvilAuraPointsAdd": {
       "hash": "d1fbe3724ececf809c1b5ebcb4fec08f1ea1d7d572a8abe3adcab60a9a893708",

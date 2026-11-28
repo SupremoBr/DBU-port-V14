@@ -402,7 +402,7 @@ export const combatRoundsMethods = {
     }
 
     // Battle Born: grant a stack on even-numbered rounds (Saiyan with Battle Born trait)
-    const newRound = cts.currentRound;
+    const newRound = event.dbuCombatRound ?? cts.currentRound;
     if (newRound % 2 === 0) {
       await this._battleBornGrantStack("Even Round " + newRound);
     }

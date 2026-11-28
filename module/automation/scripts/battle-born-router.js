@@ -1,3 +1,4 @@
+import { tokenDocument } from "./core/token-identity.js";
 import { sendRequest, listenRequests } from "./core/authorized-request.js";
 import { SYSTEM_ID as MODULE_ID, readAutomationFlag } from "../package.mjs";
 // ============================================================
@@ -56,9 +57,9 @@ function playerOwners(actor, { activeOnly = true } = {}) {
     if (user?.isGM) return false;
     if (activeOnly && !user?.active) return false;
     try {
-      return user.character?.id === actor.id || !!actor.testUserPermission?.(user, "OWNER");
+      return !!actor.testUserPermission?.(user, "OWNER");
     } catch {
-      return user.character?.id === actor.id;
+      return false;
     }
   });
 }
@@ -77,9 +78,9 @@ function preferredPlayerOwner(actor) {
 function userOwnsActor(user, actor) {
   if (!user || !actor || user.isGM) return false;
   try {
-    return user.character?.id === actor.id || !!actor.testUserPermission?.(user, "OWNER");
+    return !!actor.testUserPermission?.(user, "OWNER");
   } catch {
-    return user.character?.id === actor.id;
+    return false;
   }
 }
 
@@ -107,12 +108,18 @@ export async function routeBattleBornRoundGrant(actor, source) {
   const owner = preferredPlayerOwner(actor);
   if (!owner) return false;
 
-  await sendRequest("battle-born", {
-    type: "dbuaBattleBornAllocate",
-    targetUserId: owner.id,
-    actorId: actor.id,
-    source: String(source || "Battle Born")
-  }, owner.id);
+  try {
+    await sendRequest("battle-born", {
+      type: "dbuaBattleBornAllocate",
+      targetUserId: owner.id,
+      actorId: actor.id,
+      tokenUuid: tokenDocument(actor)?.uuid,
+      source: String(source || "Battle Born")
+    }, owner.id);
+  } catch (error) {
+    console.warn("DBU Battle Born | Falha ao encaminhar escolha ao jogador:", error);
+    return false;
+  }
 
   console.log(`DBU Battle Born | alocação de ${actor.name} enviada para ${owner.name}`);
   return true;
@@ -123,17 +130,15 @@ async function battleBornSocketHandler(data, sender) {
   if (!data || data.type !== "dbuaBattleBornAllocate") return;
   if (data.targetUserId !== game.user?.id || game.user?.isGM) return;
 
-  const actor = game.actors?.get?.(data.actorId) || null;
-  if (!actor) {
-    console.warn("DBU Battle Born | Actor não encontrado no cliente alvo:", data.actorId);
-    return;
-  }
-  if (!userOwnsActor(game.user, actor)) {
-    console.warn("DBU Battle Born | usuário alvo não possui OWNER do Actor:", actor.name);
-    return;
-  }
-
   try {
+    const actor = data.tokenUuid
+      ? (await fromUuid(data.tokenUuid))?.actor
+      : game.actors?.get?.(data.actorId);
+    if (!actor || !userOwnsActor(game.user, actor)) {
+      console.warn("DBU Battle Born | Ficha indisponível para o jogador:", data.tokenUuid || data.actorId);
+      return;
+    }
+
     await runNativeBattleBornDialog(actor, data.source);
   } catch (error) {
     console.error("DBU Battle Born | Dialog no player:", error);
